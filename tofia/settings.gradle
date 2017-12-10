@@ -1,0 +1,3 @@
+include ':app'
+include ':matcha'
+project(':matcha').projectDir = new File("${System.env.HOME}/golib/src/gomatcha.io/matcha/android/MatchaLib/matcha")
