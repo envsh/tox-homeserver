@@ -58,6 +58,7 @@ func NewTutorialView() *TutorialView {
 
 	this.mvst = &mainViewState{}
 	this.registerEvents()
+	appctx.mainV = this
 	return this
 }
 
@@ -65,6 +66,22 @@ func NewTutorialView() *TutorialView {
 // children in Build().
 func (v *TutorialView) Build(ctx view.Context) view.Model {
 	l := &constraint.Layouter{}
+
+	{
+		cf := NewChatFormView()
+		if true {
+			l.Add(cf, func(s *constraint.Solver) {
+				s.LeftEqual(l.Left())
+				s.TopEqual(l.Top())
+				s.RightEqual(l.Right())
+				s.BottomEqual(l.Bottom())
+			})
+			return view.Model{Children: l.Views(), Layouter: l}
+		}
+	}
+	if appctx.currV != nil {
+		return view.Model{Children: []view.View{appctx.currV}}
+	}
 
 	hl := &constraint.Layouter{}
 	hl.Solve(func(s *constraint.Solver) {

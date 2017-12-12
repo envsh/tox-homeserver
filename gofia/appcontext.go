@@ -6,11 +6,14 @@ import (
 	"log"
 	"sync"
 
+	"gomatcha.io/matcha/view"
+
 	thscli "tox-homeserver/client"
 	thscom "tox-homeserver/common"
 	"tox-homeserver/thspbs"
 
 	simplejson "github.com/bitly/go-simplejson"
+	"github.com/kitech/godsts/maps/hashmap"
 	"github.com/nats-io/nats"
 	"google.golang.org/grpc"
 )
@@ -20,6 +23,10 @@ type AppContext struct {
 	rpcli *grpc.ClientConn
 	vtcli *thscli.LigTox
 	logFn func(s string)
+
+	mainV view.View
+	currV view.View
+	cfs   *hashmap.Map
 }
 
 var appctx *AppContext
@@ -30,6 +37,7 @@ func AppOnCreate() {
 		printBuildInfo(true)
 		appctx = &AppContext{}
 		appctx.vtcli = thscli.NewLigTox()
+		appctx.cfs = hashmap.New()
 
 		log.Println("connecting gnats:", thscom.GnatsAddr)
 		nc, err := nats.Connect(thscom.GnatsAddr)

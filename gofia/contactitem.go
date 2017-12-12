@@ -1,6 +1,8 @@
 package gofia
 
 import (
+	"log"
+
 	"golang.org/x/image/colornames"
 	"gomatcha.io/matcha/layout/constraint"
 	"gomatcha.io/matcha/paint"
@@ -8,9 +10,7 @@ import (
 	"gomatcha.io/matcha/view"
 )
 
-type ContactItem struct {
-	view.Embed
-
+type ContactItemState struct {
 	group  bool
 	cnum   uint32
 	ctid   string
@@ -19,9 +19,15 @@ type ContactItem struct {
 	stmsg  string
 	avatar string
 }
+type ContactItem struct {
+	view.Embed
+
+	*ContactItemState
+}
 
 func NewContactItem(group bool) *ContactItem {
 	this := &ContactItem{}
+	this.ContactItemState = &ContactItemState{}
 	this.group = group
 
 	return this
@@ -41,9 +47,25 @@ func (this *ContactItem) Build(ctx view.Context) view.Model {
 		s.Height(40)
 	})
 
-	avabtn := view.NewButton()
-	avabtn.String = "AVATAR图"
-	l.Add(avabtn, func(s *constraint.Solver) {
+	avtbtn := view.NewButton()
+	avtbtn.String = "AVATAR图"
+	avtbtn.OnPress = func() {
+		log.Println("clicked:", this.ContactItemState)
+		log.Println("view path:", ctx.Path())
+		if !appctx.cfs.Has(this.ctid) {
+			cf := NewChatFormView()
+			cf.cfst = this.ContactItemState
+			appctx.cfs.Put(this.ctid, cf)
+		}
+		cfx, found := appctx.cfs.Get(this.ctid)
+		if !found {
+			log.Println("not found:", this.ctid)
+		} else {
+			appctx.currV = cfx.(*ChatFormView)
+		}
+		appctx.mainV.(*TutorialView).Signal()
+	}
+	l.Add(avtbtn, func(s *constraint.Solver) {
 		setViewGeometry4(s, 0, 40, 60, 60)
 	})
 
@@ -94,8 +116,16 @@ func (this *ContactItem) Build(ctx view.Context) view.Model {
 }
 
 func setViewGeometry4(s *constraint.Solver, top, left, width, height float64) {
-	s.Top(top)
-	s.Left(left)
-	s.Width(width)
-	s.Height(height)
+	if top >= 0 {
+		s.Top(top)
+	}
+	if left >= 0 {
+		s.Left(left)
+	}
+	if width >= 0 {
+		s.Width(width)
+	}
+	if height >= 0 {
+		s.Height(height)
+	}
 }
