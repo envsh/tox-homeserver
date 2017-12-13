@@ -1,7 +1,13 @@
 package gofia
 
 import (
+	"fmt"
+	"log"
+	"time"
+
+	"github.com/kitech/godsts/lists/arraylist"
 	"golang.org/x/image/colornames"
+	"gomatcha.io/matcha/animate"
 	egview "gomatcha.io/matcha/examples/view"
 	"gomatcha.io/matcha/layout"
 	"gomatcha.io/matcha/layout/constraint"
@@ -15,12 +21,14 @@ type ChatFormState = ContactItemState
 type ChatFormView struct {
 	view.Embed
 
-	cfst *ChatFormState
+	cfst           *ChatFormState
+	scrollPosition *view.ScrollPosition
 }
 
 func NewChatFormView() *ChatFormView {
 	this := &ChatFormView{}
-	this.cfst = &ChatFormState{}
+	this.cfst = &ChatFormState{msgs: arraylist.New()}
+	this.scrollPosition = &view.ScrollPosition{}
 
 	return this
 }
@@ -109,7 +117,16 @@ func (v *ChatFormView) Buildfc(ctx view.Context) view.Model {
 		cell.Index = 1000000000 + i + 1
 		cctablo.Add(cell, nil)
 	}
+	// TODO 设置首次加载消息最大数，然后滚动下拉持续加载
+	msgcnt := 0
+	v.cfst.msgs.Each(func(index int, value interface{}) {
+		msgv := NewMessageView(value.(*ContactMessage))
+		cctablo.Add(msgv, nil)
+		msgcnt += 1
+	})
 	ccsv := view.NewScrollView()
+	// v.scrollPosition.SetValue(layout.Pt(0, 100)) // hang ui why???
+	ccsv.ScrollPosition = v.scrollPosition
 	ccsv.ContentLayouter = cctablo
 	ccsv.ContentChildren = cctablo.Views()
 	ccsv.ScrollAxes = layout.AxisY
@@ -119,6 +136,19 @@ func (v *ChatFormView) Buildfc(ctx view.Context) view.Model {
 		s.BottomEqual(l.Bottom().Add(-50))
 		s.RightEqual(l.Right())
 	})
+
+	scrollBottom := 200*12 + msgcnt*20 // 或者给一个无限大的值滚动到底部？
+	log.Println(ccsv.ScrollPosition == nil, scrollBottom)
+	if ccsv.ScrollPosition != nil {
+		log.Println(ccsv.ScrollPosition.Value()) //{0, 1770.5714111328125}
+		// ccsv.ScrollPosition.SetValue(layout.Pt(0, 100)) // hang ui why???
+		a := &animate.Basic{
+			Start: v.scrollPosition.Y.Value(),
+			End:   float64(scrollBottom),
+			Dur:   time.Second / 5,
+		}
+		v.scrollPosition.Y.Run(a)
+	}
 	////// content layout end
 
 	////// footer layout begin
@@ -162,6 +192,15 @@ func (v *ChatFormView) Buildfc(ctx view.Context) view.Model {
 
 	ftstbtn := view.NewButton()
 	ftstbtn.String = "SNT图+"
+	ftstbtn.OnPress = func() {
+		fmt.Println("OnPress")
+		a := &animate.Basic{
+			Start: v.scrollPosition.Y.Value(),
+			End:   v.scrollPosition.Y.Value() + 20,
+			Dur:   time.Second / 5,
+		}
+		v.scrollPosition.Y.Run(a)
+	}
 	fl.Add(ftstbtn, func(s *constraint.Solver) {
 		setViewGeometry4(s, 0, -1, 50, 50)
 		s.RightEqual(fl.Right())

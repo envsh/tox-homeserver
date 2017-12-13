@@ -5,6 +5,7 @@ import (
 	"gopp"
 	"log"
 	"sync"
+	"time"
 
 	"gomatcha.io/matcha/view"
 
@@ -26,7 +27,12 @@ type AppContext struct {
 
 	mainV view.View
 	currV view.View
-	cfs   *hashmap.Map
+
+	// friend: pubkey => *ChatFormView,
+	// invited group: cookie => *ChatFormView
+	// ours group: 无法直接获取自己创建的群组的cookie
+	cfs *hashmap.Map // chat form views
+	cts *hashmap.Map // contact item views
 }
 
 var appctx *AppContext
@@ -38,6 +44,7 @@ func AppOnCreate() {
 		appctx = &AppContext{}
 		appctx.vtcli = thscli.NewLigTox()
 		appctx.cfs = hashmap.New()
+		appctx.cts = hashmap.New()
 
 		log.Println("connecting gnats:", thscom.GnatsAddr)
 		nc, err := nats.Connect(thscom.GnatsAddr)
@@ -76,6 +83,7 @@ func (this *AppContext) pollNats() {
 					if this.logFn != nil {
 						this.logFn(string(m.Data))
 					}
+					this.dispatchEvent(jso)
 				}
 			case <-stopC:
 				return
@@ -84,6 +92,34 @@ func (this *AppContext) pollNats() {
 	}
 }
 
+func (this *AppContext) dispatchEvent(jso *simplejson.Json) {
+	evtName := jso.Get("name").MustString()
+	switch evtName {
+	case "SelfConnectionStatus":
+	case "FriendRequest":
+	case "FriendMessage":
+		// jso.Get("args").GetIndex(0).MustString()
+		msg := jso.Get("args").GetIndex(1).MustString()
+		fname := jso.Get("margs").GetIndex(0).MustString()
+		pubkey := jso.Get("margs").GetIndex(1).MustString()
+		cfx, found := this.cfs.Get(pubkey)
+		if !found {
+			log.Println("wtf, chat form view not found:", fname, pubkey)
+		} else {
+			cf := cfx.(*ChatFormView)
+			msgo := &ContactMessage{}
+			msgo.msg = msg
+			msgo.tm = time.Now()
+			cf.cfst.msgs.Add(msgo)
+			if this.currV == cf {
+				cf.Signal()
+			}
+		}
+	default:
+	}
+}
+
+///
 func (this *AppContext) pollGrpc() {
 
 }

@@ -1,7 +1,11 @@
 package gofia
 
 import (
+	"gopp"
 	"log"
+	"time"
+
+	"github.com/kitech/godsts/lists/arraylist"
 
 	"golang.org/x/image/colornames"
 	"gomatcha.io/matcha/layout/constraint"
@@ -9,6 +13,13 @@ import (
 	"gomatcha.io/matcha/text"
 	"gomatcha.io/matcha/view"
 )
+
+type ContactMessage struct {
+	msg   string
+	mine  bool //
+	mtype int  //
+	tm    time.Time
+}
 
 type ContactItemState struct {
 	group  bool
@@ -18,6 +29,9 @@ type ContactItemState struct {
 	status uint32
 	stmsg  string
 	avatar string
+
+	// *ContactMessage
+	msgs *arraylist.List
 }
 type ContactItem struct {
 	view.Embed
@@ -27,7 +41,7 @@ type ContactItem struct {
 
 func NewContactItem(group bool) *ContactItem {
 	this := &ContactItem{}
-	this.ContactItemState = &ContactItemState{}
+	this.ContactItemState = &ContactItemState{msgs: arraylist.New()}
 	this.group = group
 
 	return this
@@ -129,3 +143,39 @@ func setViewGeometry4(s *constraint.Solver, top, left, width, height float64) {
 		s.Height(height)
 	}
 }
+
+//
+type MessageView struct {
+	view.Embed
+
+	msg *ContactMessage
+}
+
+func NewMessageView(msg *ContactMessage) *MessageView {
+	this := &MessageView{}
+	this.msg = msg
+
+	return this
+}
+
+func (this *MessageView) Build(ctx view.Context) view.Model {
+	l := &constraint.Layouter{}
+	l.Solve(func(s *constraint.Solver) {
+		s.Height(20)
+	})
+
+	msgtxt := view.NewTextView()
+	msgtxt.String = gopp.IfElseStr(this.msg.mine, "mine:", "frnd:") + this.msg.msg
+	l.Add(msgtxt, func(s *constraint.Solver) {
+		setViewGeometry4(s, 0, 0, -1, 20)
+	})
+
+	vm := view.Model{}
+	vm.Layouter = l
+	vm.Children = l.Views()
+	vm.Painter = &paint.Style{BackgroundColor: colornames.White}
+
+	return vm
+}
+
+///////////

@@ -67,18 +67,24 @@ func NewTutorialView() *TutorialView {
 func (v *TutorialView) Build(ctx view.Context) view.Model {
 	l := &constraint.Layouter{}
 
-	{
+	if true { // for test fixed chat form view
+		log.Println("111")
+		tpubkey := "398C8161D038FD328A573FFAA0F5FAAF7FFDE5E8B4350E7D15E6AFD0B993FC52"
 		cf := NewChatFormView()
-		if true {
-			l.Add(cf, func(s *constraint.Solver) {
-				s.LeftEqual(l.Left())
-				s.TopEqual(l.Top())
-				s.RightEqual(l.Right())
-				s.BottomEqual(l.Bottom())
-			})
-			return view.Model{Children: l.Views(), Layouter: l}
+		if cfx, found := appctx.cfs.Get(tpubkey); found {
+			cf = cfx.(*ChatFormView)
+			log.Println("using real form info:")
 		}
+
+		l.Add(cf, func(s *constraint.Solver) {
+			s.LeftEqual(l.Left())
+			s.TopEqual(l.Top())
+			s.RightEqual(l.Right())
+			s.BottomEqual(l.Bottom())
+		})
+		return view.Model{Children: l.Views(), Layouter: l}
 	}
+
 	if appctx.currV != nil {
 		return view.Model{Children: []view.View{appctx.currV}}
 	}

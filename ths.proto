@@ -11,6 +11,7 @@ message Event {
     int32  id = 1;
     string name = 2;
     repeated string args = 3;
+    repeated string margs = 4; // more info based on args
 }
 
 message BaseInfo {

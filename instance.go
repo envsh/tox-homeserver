@@ -57,7 +57,11 @@ func (this *ToxVM) setupCallbacks() {
 		evt := thspbs.Event{}
 		evt.Name = "FriendMessage"
 		evt.Args = []string{fmt.Sprintf("%d", friendNumber), message}
-
+		pubkey, err := t.FriendGetPublicKey(friendNumber)
+		gopp.ErrPrint(err)
+		fname, err := t.FriendGetName(friendNumber)
+		gopp.ErrPrint(err)
+		evt.Margs = []string{fname, pubkey}
 		this.pubmsg(&evt)
 	}, nil)
 	/*

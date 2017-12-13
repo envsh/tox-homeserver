@@ -27,6 +27,8 @@ type GrpcServer struct {
 func newGrpcServer() *GrpcServer {
 	this := &GrpcServer{}
 
+	// TODO 压缩支持
+	// TODO tls支持
 	nc, _ := nats.Connect(common.GnatsAddr)
 	this.nc = nc
 	this.srv = grpc.NewServer()

@@ -38,6 +38,11 @@ func (this *TutorialView) registerEvents() {
 
 			this.contacts = append(this.contacts, cti)
 			this.contactsv = append(this.contactsv, cti)
+
+			appctx.cts.Put(cti.ctid, cti)
+			cf := NewChatFormView()
+			cf.cfst = cti.ContactItemState
+			appctx.cfs.Put(cti.ctid, cf)
 		}
 
 		this.Signal()
