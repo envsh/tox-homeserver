@@ -15,14 +15,14 @@ com:
 	go install -v ./thspbs/ ./common/
 
 
-allfia: gofian tofian tofiai
-gofian: #build
+allfia: gofiab tofiab tofiai
+gofiab: #build
 	echo -e "package gofia\nconst btversion = \"${GOVVV2}\"\n" > gofia/btversion.go
 	echo -e "const isandroid = true\n" >> gofia/btversion.go
 	matcha build --target android/arm -v -x --ldflags "${GOVVV2}" tox-homeserver/gofia
 	ls -l ${HOME}/golib/src/gomatcha.io/matcha/android/matchabridge.aar
 
-tofian: # build
+tofiab: # build
 	cd tofia && ./gradlew build  --console plain --build-cache --warn build
 	find ./tofia -name "*.apk"|xargs ls -lh
 tofiai: # install

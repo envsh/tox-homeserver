@@ -5,6 +5,7 @@ import (
 	"log"
 	"strconv"
 	"strings"
+	"time"
 
 	"golang.org/x/image/colornames"
 	"gomatcha.io/matcha"
@@ -40,26 +41,43 @@ type TutorialView struct {
 	tnum      int
 	responder *keyboard.Responder
 
-	contacts  []*ContactItem
-	contactsv []view.View
-	mvst      *mainViewState
+	// contacts  []*ContactItem
+	// contactsv []view.View
+	// mvst *mainViewState
 }
 
 // This is our view's initializer.
 func NewTutorialView() *TutorialView {
+	log.Println("herere")
 	AppOnCreate()
 	this := &TutorialView{}
 	this.text = text.New("")
 	this.responder = &keyboard.Responder{}
 	appctx.logFn = this.logFn
 
-	this.contacts = make([]*ContactItem, 0)
-	this.contactsv = make([]view.View, 0)
+	// this.contacts = make([]*ContactItem, 0)
+	// this.contactsv = make([]view.View, 0)
+	// this.mvst = &mainViewState{}
 
-	this.mvst = &mainViewState{}
 	this.registerEvents()
 	appctx.mainV = this
 	return this
+}
+
+func (v *TutorialView) Lifecycle(from, to view.Stage) {
+	if view.EntersStage(from, to, view.StageMounted) {
+		log.Println("hehre")
+	} else if view.EntersStage(from, to, view.StageVisible) {
+		log.Println("hehre")
+	} else if view.EntersStage(from, to, view.StageDead) {
+		log.Println("hehre")
+	} else if view.ExitsStage(from, to, view.StageMounted) {
+		log.Println("hehre")
+	} else if view.ExitsStage(from, to, view.StageVisible) {
+		log.Println("hehre")
+	} else if view.ExitsStage(from, to, view.StageDead) {
+		log.Println("hehre")
+	}
 }
 
 // Similar to React's render function. Views specify their properties and
@@ -67,7 +85,7 @@ func NewTutorialView() *TutorialView {
 func (v *TutorialView) Build(ctx view.Context) view.Model {
 	l := &constraint.Layouter{}
 
-	if true { // for test fixed chat form view
+	if false { // for test fixed chat form view
 		log.Println("111")
 		tpubkey := "398C8161D038FD328A573FFAA0F5FAAF7FFDE5E8B4350E7D15E6AFD0B993FC52"
 		cf := NewChatFormView()
@@ -113,10 +131,10 @@ func (v *TutorialView) Build(ctx view.Context) view.Model {
 
 	nlab := view.NewTextView()
 	nlab.String = "名字Tofia"
-	nlab.String = v.mvst.nickName
+	nlab.String = appctx.mvst.nickName
 	nlab.Style.SetFont(text.DefaultFont(18))
 	// nlab.PaintStyle = &paint.Style{BackgroundColor: colornames.Blue}
-	log.Println(nlab.Style.Alignment())
+	log.Println("align:", nlab.Style.Alignment())
 	hl.Add(nlab, func(s *constraint.Solver) {
 		// s.Top(0)
 		s.Left(150)
@@ -189,9 +207,9 @@ func (v *TutorialView) Build(ctx view.Context) view.Model {
 	})
 
 	// contacts
-	log.Println("contacts:", len(v.contactsv), len(v.contacts))
+	log.Println("contacts:", len(appctx.contactsv), len(appctx.contacts))
 	vtable := &table.Layouter{}
-	for i, ctv := range v.contactsv {
+	for i, ctv := range appctx.contactsv {
 		cell := NewTableCell()
 		cell.Axis = layout.AxisY
 		cell.Index = i
@@ -201,8 +219,8 @@ func (v *TutorialView) Build(ctx view.Context) view.Model {
 			vtable.Add(ctv, nil)
 		}
 	}
-	if len(v.contactsv) < 12 {
-		for i := 0; i < 12-len(v.contactsv); i++ {
+	if len(appctx.contactsv) < 12 {
+		for i := 0; i < 12-len(appctx.contactsv); i++ {
 			cell := NewTableCell()
 			cell.Axis = layout.AxisY
 			cell.Index = i
@@ -212,6 +230,7 @@ func (v *TutorialView) Build(ctx view.Context) view.Model {
 		}
 	}
 	lstwin := view.NewScrollView()
+	lstwin.ScrollAxes = layout.AxisY
 	lstwin.ContentLayouter = vtable
 	lstwin.ContentChildren = vtable.Views()
 	l.Add(lstwin, func(s *constraint.Solver) {
@@ -288,4 +307,63 @@ func (v *TableCell) Build(ctx view.Context) view.Model {
 		Layouter: l,
 		Painter:  &paint.Style{BackgroundColor: colornames.White},
 	}
+}
+
+//
+func init() {
+	// Registers a function with the objc bridge. This function returns
+	// a view.View, which can be displayed in a MatchaViewController.
+	bridge.RegisterFunc("tox-homeserver/gofia OnBackPressed", OnBackPressed)
+	bridge.RegisterFunc("tox-homeserver/gofia OnKeyDown", OnKeyDown)
+	bridge.RegisterFunc("tox-homeserver/gofia OnKeyUp", OnKeyUp)
+	bridge.RegisterFunc("tox-homeserver/gofia OnKeyLongPress", OnKeyLongPress)
+	bridge.RegisterFunc("tox-homeserver/gofia OnKeyMultiple", OnKeyMultiple)
+}
+
+// Android 点击两次Back退出应用, 2s内
+// return 1 for exit main view
+func OnBackPressed() int {
+	log.Println("hehehhe", appctx.mainV == nil, appctx.currV == nil)
+	now := time.Now()
+	if now.Sub(lastBackPressed).Seconds() <= 2 {
+		clearLastBackPressed()
+		return 1
+	}
+
+	// 切换view
+	if appctx.currV == nil { // must main view, 开始检查2次Back
+		lastBackPressed = now
+	} else {
+		clearLastBackPressed() //切换view，重新计数
+		appctx.currV = nil
+		appctx.mainV.(*TutorialView).Signal()
+	}
+
+	return 0
+}
+
+var lastBackPressed time.Time = time.Time{}
+
+func clearLastBackPressed() { lastBackPressed = time.Time{} }
+
+type KeyEvent int
+
+func OnKeyDown(keyCode int, event KeyEvent) bool {
+	log.Println(keyCode, event)
+	return false
+}
+
+func OnKeyUp(keyCode int, event KeyEvent) bool {
+	log.Println(keyCode, event)
+	return false
+}
+
+func OnKeyLongPress(keyCode int, event KeyEvent) bool {
+	log.Println(keyCode, event)
+	return false
+}
+
+func OnKeyMultiple(keyCode int, count int, event KeyEvent) bool {
+	log.Println(keyCode, count, event)
+	return false
 }

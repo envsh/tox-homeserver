@@ -25,6 +25,10 @@ type AppContext struct {
 	vtcli *thscli.LigTox
 	logFn func(s string)
 
+	contacts  []*ContactItem
+	contactsv []view.View
+	mvst      *mainViewState
+
 	mainV view.View
 	currV view.View
 
@@ -45,6 +49,9 @@ func AppOnCreate() {
 		appctx.vtcli = thscli.NewLigTox()
 		appctx.cfs = hashmap.New()
 		appctx.cts = hashmap.New()
+		appctx.contacts = make([]*ContactItem, 0)
+		appctx.contactsv = make([]view.View, 0)
+		appctx.mvst = &mainViewState{}
 
 		log.Println("connecting gnats:", thscom.GnatsAddr)
 		nc, err := nats.Connect(thscom.GnatsAddr)

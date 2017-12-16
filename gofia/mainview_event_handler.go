@@ -22,11 +22,11 @@ type mainViewState struct {
 
 func (this *TutorialView) registerEvents() {
 	vtc := appctx.vtcli
-	this.mvst.nickName = "Tofia User"
+	appctx.mvst.nickName = "Tofia User"
 
 	vtc.CallbackBaseInfo(func(_ *thscli.LigTox, bi *thspbs.BaseInfo, ud interface{}) {
 		log.Println("hehrereh")
-		this.mvst.nickName = bi.GetName() + "." + bi.GetId()[:5]
+		appctx.mvst.nickName = bi.GetName() + "." + bi.GetId()[:5]
 
 		for fn, frnd := range bi.Friends {
 			cti := NewContactItem(false)
@@ -36,8 +36,8 @@ func (this *TutorialView) registerEvents() {
 			cti.stmsg = frnd.GetStmsg()
 			cti.status = frnd.GetStatus()
 
-			this.contacts = append(this.contacts, cti)
-			this.contactsv = append(this.contactsv, cti)
+			appctx.contacts = append(appctx.contacts, cti)
+			appctx.contactsv = append(appctx.contactsv, cti)
 
 			appctx.cts.Put(cti.ctid, cti)
 			cf := NewChatFormView()

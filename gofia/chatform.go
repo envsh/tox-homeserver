@@ -21,14 +21,14 @@ type ChatFormState = ContactItemState
 type ChatFormView struct {
 	view.Embed
 
-	cfst           *ChatFormState
-	scrollPosition *view.ScrollPosition
+	cfst *ChatFormState
+	// scrollPosition *view.ScrollPosition
 }
 
 func NewChatFormView() *ChatFormView {
 	this := &ChatFormView{}
 	this.cfst = &ChatFormState{msgs: arraylist.New()}
-	this.scrollPosition = &view.ScrollPosition{}
+	// this.scrollPosition = &view.ScrollPosition{}
 
 	return this
 }
@@ -125,29 +125,45 @@ func (v *ChatFormView) Buildfc(ctx view.Context) view.Model {
 		msgcnt += 1
 	})
 	ccsv := view.NewScrollView()
+	ccsv.ScrollAxes = layout.AxisY // 首先设置坐标轴？？？
 	// v.scrollPosition.SetValue(layout.Pt(0, 100)) // hang ui why???
-	ccsv.ScrollPosition = v.scrollPosition
+	//ccsv.ScrollPosition = v.scrollPosition
+	ccsv.ScrollPosition = &view.ScrollPosition{}
 	ccsv.ContentLayouter = cctablo
 	ccsv.ContentChildren = cctablo.Views()
-	ccsv.ScrollAxes = layout.AxisY
-	l.Add(ccsv, func(s *constraint.Solver) {
+	ccsv.OnScroll = func(p layout.Point) {
+	}
+	guide := l.Add(ccsv, func(s *constraint.Solver) {
 		s.BottomEqual(l.Bottom().Add(-50))
 		setViewGeometry4(s, 50, 0, -1, -1)
 		s.BottomEqual(l.Bottom().Add(-50))
 		s.RightEqual(l.Right())
 	})
+	_ = guide
 
 	scrollBottom := 200*12 + msgcnt*20 // 或者给一个无限大的值滚动到底部？
 	log.Println(ccsv.ScrollPosition == nil, scrollBottom)
 	if ccsv.ScrollPosition != nil {
 		log.Println(ccsv.ScrollPosition.Value()) //{0, 1770.5714111328125}
+		//log.Println(v.scrollPosition)
+		//log.Println(v.scrollPosition.Value())
 		// ccsv.ScrollPosition.SetValue(layout.Pt(0, 100)) // hang ui why???
-		a := &animate.Basic{
-			Start: v.scrollPosition.Y.Value(),
-			End:   float64(scrollBottom),
-			Dur:   time.Second / 5,
+
+		//log.Println("heree", v.scrollPosition.Y.Value(), scrollBottom)
+		log.Println("heree", ccsv.ScrollPosition.Y.Value(), scrollBottom)
+		if ccsv.ScrollPosition.Y.Value() < float64(scrollBottom) {
+			a := &animate.Basic{
+				Start: ccsv.ScrollPosition.Y.Value(),
+				End:   float64(scrollBottom * 2 / 3),
+				Dur:   time.Second / 5,
+			}
+			log.Println("heree", ccsv.ScrollPosition.Y.Value(), scrollBottom)
+			if true {
+				ccsv.ScrollPosition.Y.Run(a)
+				// 12-14 22:29:57.697 13271 13271 I Go      : gofiat go-go.go:230: call name222: Call true false 0xb3175984 3 [OnScroll <int64 Value> <[]reflect.Value Value>]
+			}
+			log.Println("heree")
 		}
-		v.scrollPosition.Y.Run(a)
 	}
 	////// content layout end
 
@@ -159,7 +175,7 @@ func (v *ChatFormView) Buildfc(ctx view.Context) view.Model {
 		s.BottomEqual(l.Bottom())
 		s.RightEqual(l.Right())
 	})
-
+	log.Println("heree")
 	ftipt := view.NewTextInput()
 	ftipt.Placeholder = "input hereeee..."
 	ftipt.MaxLines = 5
@@ -172,15 +188,18 @@ func (v *ChatFormView) Buildfc(ctx view.Context) view.Model {
 		// s.BottomEqual(fl.Bottom())
 		// s.RightEqual(fl.Right().Add(-80))
 	})
+	log.Println("heree")
 	ftsvl.Add(ftipt, func(s *constraint.Solver) {
 		setViewGeometry4(s, 0, 0, -1, 50)
 		s.BottomEqual(ftsvl.Bottom())
 		s.RightEqual(ftsvl.Right())
 	})
+	log.Println("heree")
 	ftsv := view.NewScrollView()
+	ftsv.ScrollAxes = layout.AxisY
 	ftsv.ContentChildren = []view.View{ftipt}
 	ftsv.ContentLayouter = ftsvl
-	ftsv.ScrollAxes = layout.AxisY
+	log.Println("heree")
 	//ftsv.PaintStyle = &paint.Style{BackgroundColor: colornames.Blue}
 	fl.Add(ftsv, func(s *constraint.Solver) {
 		setViewGeometry4(s, 0, 0, -1, 50)
@@ -189,37 +208,41 @@ func (v *ChatFormView) Buildfc(ctx view.Context) view.Model {
 		s.BottomEqual(fl.Bottom())
 		s.RightEqual(fl.Right().Add(-80))
 	})
-
+	log.Println("heree")
 	ftstbtn := view.NewButton()
 	ftstbtn.String = "SNT图+"
 	ftstbtn.OnPress = func() {
 		fmt.Println("OnPress")
-		a := &animate.Basic{
-			Start: v.scrollPosition.Y.Value(),
-			End:   v.scrollPosition.Y.Value() + 20,
-			Dur:   time.Second / 5,
-		}
-		v.scrollPosition.Y.Run(a)
+		/*
+			a := &animate.Basic{
+				Start: v.scrollPosition.Y.Value(),
+				End:   v.scrollPosition.Y.Value() + 200,
+				// End: float64(scrollBottom),
+				Dur: time.Second / 5,
+			}
+			v.scrollPosition.Y.Run(a)
+		*/
 	}
+	log.Println("heree")
 	fl.Add(ftstbtn, func(s *constraint.Solver) {
 		setViewGeometry4(s, 0, -1, 50, 50)
 		s.RightEqual(fl.Right())
 	})
-
+	log.Println("heree")
 	ftemojibtn := view.NewButton()
 	ftemojibtn.String = "Emoji图+"
 	fl.Add(ftemojibtn, func(s *constraint.Solver) {
 		s.RightEqual(fl.Right().Add(-50))
 		setViewGeometry4(s, 0, -1, 30, 30)
 	})
-
+	log.Println("heree")
 	ftfilebtn := view.NewButton()
 	ftfilebtn.String = "File图+"
 	fl.Add(ftfilebtn, func(s *constraint.Solver) {
 		s.RightEqual(fl.Right().Add(-50))
 		setViewGeometry4(s, 30, -1, 30, 30)
 	})
-
+	log.Println("heree")
 	fv := view.NewBasicView()
 	fv.Layouter = fl
 	fv.Children = fl.Views()
@@ -229,7 +252,12 @@ func (v *ChatFormView) Buildfc(ctx view.Context) view.Model {
 		s.RightEqual(l.Right())
 		s.LeftEqual(l.Left())
 	})
+	log.Println("heree")
 	////// footer layout end
+	log.Println(hl.DebugStrings())
+	log.Println(fl.DebugStrings())
+	log.Println(l.DebugStrings())
+	// log.Println(ccsv.ContentLayouter.Layout(nil))
 
 	vml := view.Model{}
 	vml.Layouter = l

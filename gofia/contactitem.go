@@ -85,6 +85,15 @@ func (this *ContactItem) Build(ctx view.Context) view.Model {
 
 	stsbtn := view.NewButton()
 	stsbtn.String = "STS图"
+	stsbtn.OnPress = func() {
+		key := this.ctid
+		if cfx, found := appctx.cfs.Get(key); found {
+			appctx.currV = cfx.(*ChatFormView)
+			appctx.mainV.(*TutorialView).Signal()
+		} else {
+			log.Println("chat form not found:", key)
+		}
+	}
 	l.Add(stsbtn, func(s *constraint.Solver) {
 		// setViewGeometry4(s, 0, 100, 40, 40)
 		s.CenterYEqual(l.CenterY())
