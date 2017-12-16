@@ -23,10 +23,9 @@ import (
 func init() {
 	// Registers a function with the objc bridge. This function returns
 	// a view.View, which can be displayed in a MatchaViewController.
-	bridge.RegisterFunc("tox-homeserver/gofia New", func() view.View {
+	bridge.RegisterFunc("tox-homeserver/gofia NewGofiaView", func() view.View {
 		// Call the TutorialView initializer.
 		v := NewTutorialView()
-		v.TextColor = colornames.Red
 		return v
 	})
 }
@@ -48,9 +47,10 @@ type TutorialView struct {
 
 // This is our view's initializer.
 func NewTutorialView() *TutorialView {
-	log.Println("herere")
-	AppOnCreate()
+	log.Println("herere", appctx != nil)
+	// AppOnCreate()
 	this := &TutorialView{}
+	this.TextColor = colornames.Red
 	this.text = text.New("")
 	this.responder = &keyboard.Responder{}
 	appctx.logFn = this.logFn
@@ -60,7 +60,7 @@ func NewTutorialView() *TutorialView {
 	// this.mvst = &mainViewState{}
 
 	this.registerEvents()
-	appctx.mainV = this
+	// appctx.mainV = this
 	return this
 }
 
@@ -83,17 +83,17 @@ func (v *TutorialView) Lifecycle(from, to view.Stage) {
 // Similar to React's render function. Views specify their properties and
 // children in Build().
 func (v *TutorialView) Build(ctx view.Context) view.Model {
-	l := &constraint.Layouter{}
+	/*
+		if appctx.currV != nil {
+			return view.Model{Children: []view.View{appctx.currV}}
+		}
+	*/
 
+	l := &constraint.Layouter{}
 	if false { // for test fixed chat form view
 		log.Println("111")
-		tpubkey := "398C8161D038FD328A573FFAA0F5FAAF7FFDE5E8B4350E7D15E6AFD0B993FC52"
+		// tpubkey := "398C8161D038FD328A573FFAA0F5FAAF7FFDE5E8B4350E7D15E6AFD0B993FC52"
 		cf := NewChatFormView()
-		if cfx, found := appctx.cfs.Get(tpubkey); found {
-			cf = cfx.(*ChatFormView)
-			log.Println("using real form info:")
-		}
-
 		l.Add(cf, func(s *constraint.Solver) {
 			s.LeftEqual(l.Left())
 			s.TopEqual(l.Top())
@@ -101,10 +101,6 @@ func (v *TutorialView) Build(ctx view.Context) view.Model {
 			s.BottomEqual(l.Bottom())
 		})
 		return view.Model{Children: l.Views(), Layouter: l}
-	}
-
-	if appctx.currV != nil {
-		return view.Model{Children: []view.View{appctx.currV}}
 	}
 
 	hl := &constraint.Layouter{}
@@ -207,20 +203,30 @@ func (v *TutorialView) Build(ctx view.Context) view.Model {
 	})
 
 	// contacts
-	log.Println("contacts:", len(appctx.contactsv), len(appctx.contacts))
+	log.Println("contacts:", appctx.contactStates.Size())
 	vtable := &table.Layouter{}
-	for i, ctv := range appctx.contactsv {
-		cell := NewTableCell()
-		cell.Axis = layout.AxisY
-		cell.Index = i
-		if false {
-			vtable.Add(cell, nil)
-		} else {
-			vtable.Add(ctv, nil)
-		}
+	// TODO 排序？？？
+	for _, idx := range appctx.contactStates.Keys() {
+		ctisx, _ := appctx.contactStates.Get(idx)
+		ctis := ctisx.(*ContactItemState)
+		ctv := NewContactItem(ctis.group)
+		ctv.ContactItemState = ctis
+		vtable.Add(ctv, nil)
 	}
-	if len(appctx.contactsv) < 12 {
-		for i := 0; i < 12-len(appctx.contactsv); i++ {
+	/*
+		for i, ctv := range appctx.contactsv {
+			cell := NewTableCell()
+			cell.Axis = layout.AxisY
+			cell.Index = i
+			if false {
+				vtable.Add(cell, nil)
+			} else {
+				vtable.Add(ctv, nil)
+			}
+		}
+	*/
+	if appctx.contactStates.Size() < 12 {
+		for i := 0; i < 12-appctx.contactStates.Size(); i++ {
 			cell := NewTableCell()
 			cell.Axis = layout.AxisY
 			cell.Index = i
@@ -231,8 +237,11 @@ func (v *TutorialView) Build(ctx view.Context) view.Model {
 	}
 	lstwin := view.NewScrollView()
 	lstwin.ScrollAxes = layout.AxisY
+	lstwin.ScrollPosition = &view.ScrollPosition{}
 	lstwin.ContentLayouter = vtable
 	lstwin.ContentChildren = vtable.Views()
+	lstwin.OnScroll = func(p layout.Point) {
+	}
 	l.Add(lstwin, func(s *constraint.Solver) {
 		s.Top(200)
 		s.Left(0)
@@ -323,7 +332,7 @@ func init() {
 // Android 点击两次Back退出应用, 2s内
 // return 1 for exit main view
 func OnBackPressed() int {
-	log.Println("hehehhe", appctx.mainV == nil, appctx.currV == nil)
+	log.Println("hehehhe", appctx.app.Child == nil)
 	now := time.Now()
 	if now.Sub(lastBackPressed).Seconds() <= 2 {
 		clearLastBackPressed()
@@ -331,12 +340,13 @@ func OnBackPressed() int {
 	}
 
 	// 切换view
-	if appctx.currV == nil { // must main view, 开始检查2次Back
+	if appctx.app.Child == nil { // must main view, 开始检查2次Back
 		lastBackPressed = now
 	} else {
 		clearLastBackPressed() //切换view，重新计数
-		appctx.currV = nil
-		appctx.mainV.(*TutorialView).Signal()
+		appctx.app.Child = nil
+		appctx.app.ChildRelay.Signal()
+		// appctx.mainV.(*TutorialView).Signal()
 	}
 
 	return 0

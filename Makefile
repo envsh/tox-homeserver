@@ -22,6 +22,12 @@ gofiab: #build
 	matcha build --target android/arm -v -x --ldflags "${GOVVV2}" tox-homeserver/gofia
 	ls -l ${HOME}/golib/src/gomatcha.io/matcha/android/matchabridge.aar
 
+gofiac: # check quickly
+	echo -e "package gofia\nconst btversion = \"${GOVVV2}\"\n" > gofia/btversion.go
+	echo -e "const isandroid = true\n" >> gofia/btversion.go
+	go build -v --ldflags "${GOVVV2}" tox-homeserver/gofia
+	ls -l ${HOME}/golib/src/gomatcha.io/matcha/android/matchabridge.aar
+
 tofiab: # build
 	cd tofia && ./gradlew build  --console plain --build-cache --warn build
 	find ./tofia -name "*.apk"|xargs ls -lh

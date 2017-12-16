@@ -5,6 +5,8 @@ import (
 	"runtime"
 	thscli "tox-homeserver/client"
 	"tox-homeserver/thspbs"
+
+	"github.com/kitech/godsts/lists/arraylist"
 )
 
 func init() {
@@ -36,13 +38,26 @@ func (this *TutorialView) registerEvents() {
 			cti.stmsg = frnd.GetStmsg()
 			cti.status = frnd.GetStatus()
 
-			appctx.contacts = append(appctx.contacts, cti)
-			appctx.contactsv = append(appctx.contactsv, cti)
+			// appctx.contacts = append(appctx.contacts, cti)
+			// appctx.contactsv = append(appctx.contactsv, cti)
 
-			appctx.cts.Put(cti.ctid, cti)
+			// appctx.ctvs.Put(cti.ctid, cti)
 			cf := NewChatFormView()
 			cf.cfst = cti.ContactItemState
-			appctx.cfs.Put(cti.ctid, cf)
+			// appctx.cfvs.Put(cti.ctid, cf)
+			_, _ = cti, cf
+
+			//
+			ctis := &ContactItemState{}
+			ctis.cnum = fn
+			ctis.ctid = frnd.GetPubkey()
+			ctis.ctname = frnd.GetName()
+			ctis.stmsg = frnd.GetStmsg()
+			ctis.status = frnd.GetStatus()
+			ctis.msgs = arraylist.New()
+			appctx.contactStates.Put(ctis.ctid, ctis)
+			cfst := &*ctis
+			appctx.chatFormStates.Put(ctis.ctid, cfst)
 		}
 
 		this.Signal()

@@ -33,6 +33,22 @@ func NewChatFormView() *ChatFormView {
 	return this
 }
 
+func (v *ChatFormView) Lifecycle(from, to view.Stage) {
+	if view.EntersStage(from, to, view.StageMounted) {
+		log.Println("hehre")
+	} else if view.EntersStage(from, to, view.StageVisible) {
+		log.Println("hehre")
+	} else if view.EntersStage(from, to, view.StageDead) {
+		log.Println("hehre")
+	} else if view.ExitsStage(from, to, view.StageMounted) {
+		log.Println("hehre")
+	} else if view.ExitsStage(from, to, view.StageVisible) {
+		log.Println("hehre")
+	} else if view.ExitsStage(from, to, view.StageDead) {
+		log.Println("hehre")
+	}
+}
+
 func (v *ChatFormView) Build(ctx view.Context) view.Model {
 	if v.cfst.group {
 		return v.Buildgc(ctx)

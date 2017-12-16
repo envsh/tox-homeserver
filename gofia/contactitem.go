@@ -66,18 +66,23 @@ func (this *ContactItem) Build(ctx view.Context) view.Model {
 	avtbtn.OnPress = func() {
 		log.Println("clicked:", this.ContactItemState)
 		log.Println("view path:", ctx.Path())
-		if !appctx.cfs.Has(this.ctid) {
-			cf := NewChatFormView()
-			cf.cfst = this.ContactItemState
-			appctx.cfs.Put(this.ctid, cf)
-		}
-		cfx, found := appctx.cfs.Get(this.ctid)
-		if !found {
-			log.Println("not found:", this.ctid)
-		} else {
-			appctx.currV = cfx.(*ChatFormView)
-		}
-		appctx.mainV.(*TutorialView).Signal()
+
+		// always new view
+		cf := NewChatFormView()
+		cf.cfst = this.ContactItemState
+		// appctx.cfvs.Put(this.ctid, cf)
+		// if !appctx.cfvs.Has(this.ctid) {
+		// }
+		// cfx, found := appctx.cfvs.Get(this.ctid)
+		// if !found {
+		//	log.Println("not found:", this.ctid)
+		//} else {
+		//	appctx.currV = cfx.(*ChatFormView)
+		//}
+		// appctx.currV = cf
+		// appctx.mainV.(*TutorialView).Signal()
+		appctx.app.Child = cf
+		appctx.app.ChildRelay.Signal()
 	}
 	l.Add(avtbtn, func(s *constraint.Solver) {
 		setViewGeometry4(s, 0, 40, 60, 60)
@@ -87,12 +92,25 @@ func (this *ContactItem) Build(ctx view.Context) view.Model {
 	stsbtn.String = "STS图"
 	stsbtn.OnPress = func() {
 		key := this.ctid
-		if cfx, found := appctx.cfs.Get(key); found {
-			appctx.currV = cfx.(*ChatFormView)
-			appctx.mainV.(*TutorialView).Signal()
+		if cfsx, found := appctx.chatFormStates.Get(key); found {
+			cfst := cfsx.(*ChatFormState)
+			cfv := NewChatFormView()
+			cfv.cfst = cfst
+			// appctx.currV = cfv
+			// appctx.mainV.(*TutorialView).Signal()
+			appctx.app.Child = cfv
+			appctx.app.ChildRelay.Signal()
 		} else {
 			log.Println("chat form not found:", key)
 		}
+		/*
+			if cfx, found := appctx.cfvs.Get(key); found {
+				appctx.currV = cfx.(*ChatFormView)
+				appctx.mainV.(*TutorialView).Signal()
+			} else {
+				log.Println("chat form not found:", key)
+			}
+		*/
 	}
 	l.Add(stsbtn, func(s *constraint.Solver) {
 		// setViewGeometry4(s, 0, 100, 40, 40)

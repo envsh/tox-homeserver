@@ -7,8 +7,6 @@ import (
 	"sync"
 	"time"
 
-	"gomatcha.io/matcha/view"
-
 	thscli "tox-homeserver/client"
 	thscom "tox-homeserver/common"
 	"tox-homeserver/thspbs"
@@ -25,18 +23,22 @@ type AppContext struct {
 	vtcli *thscli.LigTox
 	logFn func(s string)
 
-	contacts  []*ContactItem
-	contactsv []view.View
-	mvst      *mainViewState
+	// contacts  []*ContactItem
+	// contactsv []view.View
+	mvst *mainViewState
 
-	mainV view.View
-	currV view.View
+	// mainV view.View
+	// currV view.View
+	app *App
 
 	// friend: pubkey => *ChatFormView,
 	// invited group: cookie => *ChatFormView
 	// ours group: 无法直接获取自己创建的群组的cookie
-	cfs *hashmap.Map // chat form views
-	cts *hashmap.Map // contact item views
+	// cfvs *hashmap.Map // chat form views
+	// ctvs *hashmap.Map // contact item views
+
+	chatFormStates *hashmap.Map // id => chat form state datas
+	contactStates  *hashmap.Map // id => contact state datas
 }
 
 var appctx *AppContext
@@ -47,10 +49,12 @@ func AppOnCreate() {
 		printBuildInfo(true)
 		appctx = &AppContext{}
 		appctx.vtcli = thscli.NewLigTox()
-		appctx.cfs = hashmap.New()
-		appctx.cts = hashmap.New()
-		appctx.contacts = make([]*ContactItem, 0)
-		appctx.contactsv = make([]view.View, 0)
+		//appctx.cfvs = hashmap.New()
+		//appctx.ctvs = hashmap.New()
+		appctx.contactStates = hashmap.New()
+		appctx.chatFormStates = hashmap.New()
+		// appctx.contacts = make([]*ContactItem, 0)
+		// appctx.contactsv = make([]view.View, 0)
 		appctx.mvst = &mainViewState{}
 
 		log.Println("connecting gnats:", thscom.GnatsAddr)
@@ -109,18 +113,20 @@ func (this *AppContext) dispatchEvent(jso *simplejson.Json) {
 		msg := jso.Get("args").GetIndex(1).MustString()
 		fname := jso.Get("margs").GetIndex(0).MustString()
 		pubkey := jso.Get("margs").GetIndex(1).MustString()
-		cfx, found := this.cfs.Get(pubkey)
+		// cfx, found := this.cfvs.Get(pubkey)
+		cfsx, found := this.chatFormStates.Get(pubkey)
 		if !found {
 			log.Println("wtf, chat form view not found:", fname, pubkey)
 		} else {
-			cf := cfx.(*ChatFormView)
+			cfs := cfsx.(*ChatFormState)
 			msgo := &ContactMessage{}
 			msgo.msg = msg
 			msgo.tm = time.Now()
-			cf.cfst.msgs.Add(msgo)
-			if this.currV == cf {
-				cf.Signal()
-			}
+			cfs.msgs.Add(msgo)
+			// if this.currV != nil && this.currV.(*ChatFormView).cfst == cfs {
+			//	this.currV.(*ChatFormView).Signal()
+			// }
+			InterBackRelay.Signal()
 		}
 	default:
 	}
