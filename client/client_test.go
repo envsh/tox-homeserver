@@ -4,5 +4,5 @@ import "testing"
 
 func TestFnoName(t *testing.T) {
 	ltox := NewLigTox()
-	ltox.FriendSendMessage(1, "aa")
+	ltox.FriendSendMessage(4, "aa")
 }

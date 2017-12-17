@@ -36,3 +36,5 @@ tofiai: # install
 tofiac: # clean
 	rm -vf ./tofia/app/build/outputs/apk/*/*.apk
 
+# convert -density 1200 dot_away.svg -size 72x72 dot_away_72.png
+# rsvg-convert -o transfer.png  transfer.svg

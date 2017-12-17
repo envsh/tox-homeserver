@@ -124,6 +124,20 @@ func (this *GrpcService) GetBaseInfo(ctx context.Context, req *thspbs.EmptyReq) 
 	return out, nil
 }
 
+func (this *GrpcService) RmtCall(ctx context.Context, req *thspbs.Event) (*thspbs.Event, error) {
+	log.Println(req.Id, req.Name, req.Args, req.Margs)
+	out := thspbs.Event{}
+
+	t := appctx.tvm.t
+	switch req.Name {
+	case "FriendSendMessage":
+		fnum := gopp.MustInt(req.Args[0])
+		_, err := t.FriendSendMessage(uint32(fnum), req.Args[1])
+		gopp.ErrPrint(err)
+	}
+	return &out, nil
+}
+
 func (this *GrpcService) PollCallback(req *thspbs.EmptyReq, stm thspbs.Toxhs_PollCallbackServer) error {
 	return nil
 }

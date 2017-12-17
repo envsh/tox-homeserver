@@ -8,6 +8,7 @@ import (
 	"github.com/kitech/godsts/lists/arraylist"
 
 	"golang.org/x/image/colornames"
+	"gomatcha.io/matcha/application"
 	"gomatcha.io/matcha/layout/constraint"
 	"gomatcha.io/matcha/paint"
 	"gomatcha.io/matcha/text"
@@ -61,8 +62,14 @@ func (this *ContactItem) Build(ctx view.Context) view.Model {
 		s.Height(40)
 	})
 
-	avtbtn := view.NewButton()
-	avtbtn.String = "AVATAR图"
+	avtbtn := view.NewImageButton()
+	avtbtn.Image = application.MustLoadImage("ic_launcher")
+	avtbtn.Image = application.MustLoadImage("identity")
+	if this.group {
+		//avtbtn.Image = application.MustLoadImage("group")
+	} else {
+		//avtbtn.Image = application.MustLoadImage("contact")
+	}
 	avtbtn.OnPress = func() {
 		log.Println("clicked:", this.ContactItemState)
 		log.Println("view path:", ctx.Path())
@@ -88,8 +95,10 @@ func (this *ContactItem) Build(ctx view.Context) view.Model {
 		setViewGeometry4(s, 0, 40, 60, 60)
 	})
 
-	stsbtn := view.NewButton()
-	stsbtn.String = "STS图"
+	stsbtn := view.NewImageButton()
+	stsbtn.Image = application.MustLoadImage("dot_online22")
+	// stsbtn := view.NewButton()
+	// stsbtn.String = "STS图"
 	stsbtn.OnPress = func() {
 		key := this.ctid
 		if cfsx, found := appctx.chatFormStates.Get(key); found {

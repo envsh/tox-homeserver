@@ -1,18 +1,20 @@
 package gofia
 
 import (
-	"fmt"
 	"log"
 	"time"
 
 	"github.com/kitech/godsts/lists/arraylist"
 	"golang.org/x/image/colornames"
 	"gomatcha.io/matcha/animate"
+	"gomatcha.io/matcha/application"
 	egview "gomatcha.io/matcha/examples/view"
+	"gomatcha.io/matcha/keyboard"
 	"gomatcha.io/matcha/layout"
 	"gomatcha.io/matcha/layout/constraint"
 	"gomatcha.io/matcha/layout/table"
 	"gomatcha.io/matcha/paint"
+	"gomatcha.io/matcha/text"
 	"gomatcha.io/matcha/view"
 )
 
@@ -61,41 +63,49 @@ func (v *ChatFormView) Buildfc(ctx view.Context) view.Model {
 
 	hl := &constraint.Layouter{}
 	hl.Solve(func(s *constraint.Solver) { s.Height(60) })
-	avtbtn := view.NewButton()
-	avtbtn.String = "ICO图"
+	avtbtn := view.NewImageButton()
+	imgrc := application.MustLoadImage("ic_launcher")
+	avtbtn.Image = imgrc
 	hl.Add(avtbtn, func(s *constraint.Solver) {
-		setViewGeometry4(s, 0, 0, 50, -1)
+		setViewGeometry4(s, 0, 0, 50, 50)
 	})
 
 	namlab := view.NewTextView()
 	namlab.String = "NAM图+"
+	namlab.String = v.cfst.ctname
 	hl.Add(namlab, func(s *constraint.Solver) {
 		setViewGeometry4(s, 0, 50, 80, 30)
 	})
 	idlab := view.NewTextView()
 	idlab.String = "TID图+"
+	idlab.String = v.cfst.ctid
 	hl.Add(idlab, func(s *constraint.Solver) {
 		setViewGeometry4(s, 0, 130, -1, 30)
 	})
 	stmlab := view.NewTextView()
 	stmlab.String = "STM图++++++++++++++++++++"
+	stmlab.String = v.cfst.stmsg
 	hl.Add(stmlab, func(s *constraint.Solver) {
 		setViewGeometry4(s, 30, 50, -1, 30)
 	})
 
 	//TODO mute/mic/audio/video
-	vdobtn := view.NewButton()
-	vdobtn.String = "VDO图+"
+	vdobtn := view.NewImageButton()
+	vdobtn.Image = application.MustLoadImage("av")
+	//vdobtn := view.NewButton()
+	//vdobtn.String = "VDO图+"
 	hl.Add(vdobtn, func(s *constraint.Solver) {
 		s.RightEqual(hl.Right())
 		setViewGeometry4(s, -1, -1, 50, -1)
 		s.RightEqual(hl.Right())
 	})
-	adobtn := view.NewButton()
-	adobtn.String = "ADO图+"
+	adobtn := view.NewImageButton()
+	adobtn.Image = application.MustLoadImage("av")
+	//adobtn := view.NewButton()
+	//adobtn.String = "ADO图+"
 	hl.Add(adobtn, func(s *constraint.Solver) {
 		s.RightEqual(hl.Right().Add(-50))
-		setViewGeometry4(s, 0, -1, 50, -1)
+		setViewGeometry4(s, 0, -1, 50, 50)
 		s.RightEqual(hl.Right().Add(-50))
 	})
 	mutebtn := view.NewButton()
@@ -193,9 +203,14 @@ func (v *ChatFormView) Buildfc(ctx view.Context) view.Model {
 	})
 	log.Println("heree")
 	ftipt := view.NewTextInput()
+	ftipt.RWText = text.New("")
+	ftipt.KeyboardType = keyboard.TextType
 	ftipt.Placeholder = "input hereeee..."
 	ftipt.MaxLines = 5
 	ftipt.PaintStyle = &paint.Style{BackgroundColor: colornames.Blue}
+	ftipt.OnChange = func(t *text.Text) {
+		log.Println(t.String())
+	}
 	ftsvl := &constraint.Layouter{}
 	ftsvl.Solve(func(s *constraint.Solver) {
 		setViewGeometry4(s, -1, -1, -1, 50)
@@ -225,19 +240,15 @@ func (v *ChatFormView) Buildfc(ctx view.Context) view.Model {
 		s.RightEqual(fl.Right().Add(-80))
 	})
 	log.Println("heree")
-	ftstbtn := view.NewButton()
-	ftstbtn.String = "SNT图+"
+
+	ftstbtn := view.NewImageButton()
+	// imgrc2 := application.MustLoadImage("favicon")
+	imgrc2 := application.MustLoadImage("send")
+	ftstbtn.Image = imgrc2
 	ftstbtn.OnPress = func() {
-		fmt.Println("OnPress")
-		/*
-			a := &animate.Basic{
-				Start: v.scrollPosition.Y.Value(),
-				End:   v.scrollPosition.Y.Value() + 200,
-				// End: float64(scrollBottom),
-				Dur: time.Second / 5,
-			}
-			v.scrollPosition.Y.Run(a)
-		*/
+		log.Println("OnPress")
+		log.Println(ftipt.RWText.String())
+		appctx.vtcli.FriendSendMessage(v.cfst.cnum, ftipt.RWText.String())
 	}
 	log.Println("heree")
 	fl.Add(ftstbtn, func(s *constraint.Solver) {

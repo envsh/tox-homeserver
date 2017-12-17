@@ -5,13 +5,15 @@ package thspbs;
 service Toxhs {
     rpc PollCallback(EmptyReq) returns(stream EmptyReq);
     rpc GetBaseInfo(EmptyReq) returns(BaseInfo);
+    rpc RmtCall(Event) returns(Event);
 }
 
 message Event {
     int32  id = 1;
-    string name = 2;
-    repeated string args = 3;
-    repeated string margs = 4; // more info based on args
+    int32  mid = 2;
+    string name = 3;
+    repeated string args = 4;
+    repeated string margs = 5; // more info based on args
 }
 
 message BaseInfo {

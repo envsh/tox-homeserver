@@ -24,11 +24,12 @@ type mainViewState struct {
 
 func (this *TutorialView) registerEvents() {
 	vtc := appctx.vtcli
-	appctx.mvst.nickName = "Tofia User"
+	// appctx.mvst.nickName = "Tofia User"
 
 	vtc.CallbackBaseInfo(func(_ *thscli.LigTox, bi *thspbs.BaseInfo, ud interface{}) {
 		log.Println("hehrereh")
 		appctx.mvst.nickName = bi.GetName() + "." + bi.GetId()[:5]
+		log.Println("hehrereh", appctx.mvst.nickName)
 
 		for fn, frnd := range bi.Friends {
 			cti := NewContactItem(false)

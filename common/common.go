@@ -18,6 +18,7 @@ var GrpcAddr = fmt.Sprintf("%s:%d", GrpcIp, GrpcPort)
 var GnatsAddr = fmt.Sprintf("nats://%s:%d", GnatsIp, GnatsPort)
 
 const DefaultUserName = "Tox User"
+const GroupTitleSep = " ::: " // group title and group stmsg title, "@title@ ::: @stmsg@"
 
 func init() {
 

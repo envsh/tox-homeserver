@@ -1,8 +1,18 @@
 package client
 
 import (
+	"context"
+	"fmt"
+	"gopp"
+	"log"
+	"runtime"
+	"strings"
 	"tox-homeserver/thspbs"
 	"unsafe"
+
+	thscom "tox-homeserver/common"
+
+	"google.golang.org/grpc"
 )
 
 // friend callback type
@@ -38,6 +48,8 @@ type LigTox struct {
 	Stmsg  string
 	Binfo  *thspbs.BaseInfo
 
+	rpcli *grpc.ClientConn
+
 	// some callbacks, should be private. &fn => ud
 	cb_friend_requests           map[unsafe.Pointer]interface{}
 	cb_friend_messages           map[unsafe.Pointer]interface{}
@@ -71,6 +83,12 @@ type LigTox struct {
 func NewLigTox() *LigTox {
 	this := &LigTox{}
 	this.initCbmap()
+
+	// this.initConnections()
+	log.Println("connecting grpc:", thscom.GrpcAddr)
+	rpcli, err := grpc.Dial(thscom.GrpcAddr, grpc.WithInsecure())
+	gopp.ErrPrint(err, rpcli)
+	this.rpcli = rpcli
 
 	return this
 }
@@ -438,4 +456,214 @@ func (this *LigTox) CallbackFileChunkRequestAdd(cbfn cb_file_chunk_request_ftype
 	}
 	this.cb_file_chunk_requests[cbfnp] = userData
 
+}
+
+///// directly methods
+func (this *LigTox) GetSavedataSize() int32 {
+	return int32(0)
+}
+
+func (this *LigTox) GetSavedata() []byte {
+	return nil
+}
+
+/*
+ * @param pubkey hex 64B length
+ */
+func (this *LigTox) Bootstrap(addr string, port uint16, pubkey string) (bool, error) {
+	return true, nil
+}
+
+func (this *LigTox) SelfGetAddress() string {
+	return ""
+}
+
+func (this *LigTox) SelfGetConnectionStatus() int {
+	return int(0)
+}
+
+func (this *LigTox) FriendAdd(friendId string, message string) (uint32, error) {
+	return uint32(0), nil
+}
+
+func (this *LigTox) FriendAddNorequest(friendId string) (uint32, error) {
+	return uint32(0), nil
+}
+
+func (this *LigTox) FriendByPublicKey(pubkey string) (uint32, error) {
+	return uint32(0), nil
+}
+
+func (this *LigTox) FriendGetPublicKey(friendNumber uint32) (string, error) {
+	return "", nil
+}
+
+func (this *LigTox) FriendDelete(friendNumber uint32) (bool, error) {
+	return true, nil
+}
+
+func (this *LigTox) FriendGetConnectionStatus(friendNumber uint32) (int, error) {
+	return int(0), nil
+}
+
+func (this *LigTox) FriendExists(friendNumber uint32) bool {
+	return false
+}
+
+func (this *LigTox) FriendSendMessage(friendNumber uint32, message string) (uint32, error) {
+	fname := this.getMethodName()
+	args := thspbs.Event{}
+	args.Name = fname
+	args.Args = []string{fmt.Sprintf("%d", friendNumber), message}
+	cli := thspbs.NewToxhsClient(this.rpcli)
+	rsp, err := cli.RmtCall(context.Background(), &args)
+	gopp.ErrPrint(err, rsp)
+	log.Println(rsp)
+	return uint32(0), nil
+}
+
+func (this *LigTox) FriendSendAction(friendNumber uint32, action string) (uint32, error) {
+	return uint32(0), nil
+}
+
+func (this *LigTox) SelfSetName(name string) error {
+	return nil
+}
+
+func (this *LigTox) SelfGetName() string {
+	return string("")
+}
+
+func (this *LigTox) FriendGetName(friendNumber uint32) (string, error) {
+	return string(""), nil
+}
+
+func (this *LigTox) FriendGetNameSize(friendNumber uint32) (int, error) {
+	return int(0), nil
+}
+
+func (this *LigTox) SelfGetNameSize() int {
+	return int(0)
+}
+
+func (this *LigTox) SelfSetStatusMessage(status string) (bool, error) {
+	return true, nil
+}
+
+func (this *LigTox) SelfSetStatus(status uint8) {
+}
+
+func (this *LigTox) FriendGetStatusMessageSize(friendNumber uint32) (int, error) {
+	return int(0), nil
+}
+
+func (this *LigTox) SelfGetStatusMessageSize() int {
+	return int(0)
+}
+
+func (this *LigTox) FriendGetStatusMessage(friendNumber uint32) (string, error) {
+	return string(""), nil
+}
+
+func (this *LigTox) SelfGetStatusMessage() (string, error) {
+	return string(""), nil
+}
+
+func (this *LigTox) FriendGetStatus(friendNumber uint32) (int, error) {
+	return int(0), nil
+}
+
+func (this *LigTox) SelfGetStatus() int {
+	return int(0)
+}
+
+func (this *LigTox) FriendGetLastOnline(friendNumber uint32) (uint64, error) {
+	return uint64(0), nil
+}
+
+func (this *LigTox) SelfSetTyping(friendNumber uint32, typing bool) (bool, error) {
+	return true, nil
+}
+
+func (this *LigTox) FriendGetTyping(friendNumber uint32) (bool, error) {
+	return true, nil
+}
+
+func (this *LigTox) SelfGetFriendListSize() uint32 {
+	return uint32(0)
+}
+
+func (this *LigTox) SelfGetFriendList() []uint32 {
+	return nil
+}
+
+// tox_callback_***
+
+func (this *LigTox) SelfGetNospam() uint32 {
+	return uint32(0)
+}
+
+func (this *LigTox) SelfSetNospam(nospam uint32) {
+}
+
+func (this *LigTox) SelfGetPublicKey() string {
+	return strings.ToUpper("")
+}
+
+func (this *LigTox) SelfGetSecretKey() string {
+	return strings.ToUpper("")
+}
+
+// tox_lossy_***
+
+func (this *LigTox) FriendSendLossyPacket(friendNumber uint32, data string) error {
+	return nil
+}
+
+func (this *LigTox) FriendSendLosslessPacket(friendNumber uint32, data string) error {
+	return nil
+}
+
+// tox_callback_avatar_**
+
+func (this *LigTox) Hash(data string, datalen uint32) (string, bool, error) {
+	return string(""), true, nil
+}
+
+// tox_callback_file_***
+func (this *LigTox) FileControl(friendNumber uint32, fileNumber uint32, control int) (bool, error) {
+	return true, nil
+}
+
+func (this *LigTox) FileSend(friendNumber uint32, kind uint32, fileSize uint64, fileId string, fileName string) (uint32, error) {
+	return uint32(0), nil
+}
+
+func (this *LigTox) FileSendChunk(friendNumber uint32, fileNumber uint32, position uint64, data []byte) (bool, error) {
+	return true, nil
+}
+
+func (this *LigTox) FileSeek(friendNumber uint32, fileNumber uint32, position uint64) (bool, error) {
+	return true, nil
+}
+
+func (this *LigTox) FileGetFileId(friendNumber uint32, fileNumber uint32) (string, error) {
+	return "", nil
+}
+
+// boostrap, see upper
+func (this *LigTox) AddTcpRelay(addr string, port uint16, pubkey string) (bool, error) {
+	return true, nil
+}
+
+func (this *LigTox) IsConnected() int {
+	return int(0)
+}
+
+func (this *LigTox) getMethodName() string {
+	pc, _, _, _ := runtime.Caller(1)
+	fno := runtime.FuncForPC(pc)
+	parts := strings.Split(fno.Name(), ".")
+	fname := parts[2]
+	return fname
 }

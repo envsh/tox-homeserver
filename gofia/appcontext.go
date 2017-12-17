@@ -56,6 +56,7 @@ func AppOnCreate() {
 		// appctx.contacts = make([]*ContactItem, 0)
 		// appctx.contactsv = make([]view.View, 0)
 		appctx.mvst = &mainViewState{}
+		appctx.mvst.nickName = "Tofia User"
 
 		log.Println("connecting gnats:", thscom.GnatsAddr)
 		nc, err := nats.Connect(thscom.GnatsAddr)
@@ -126,7 +127,10 @@ func (this *AppContext) dispatchEvent(jso *simplejson.Json) {
 			// if this.currV != nil && this.currV.(*ChatFormView).cfst == cfs {
 			//	this.currV.(*ChatFormView).Signal()
 			// }
-			InterBackRelay.Signal()
+			if appctx.app.Child != nil && appctx.app.Child.(*ChatFormView).cfst == cfs {
+				appctx.app.Child.(*ChatFormView).Signal()
+			}
+			// InterBackRelay.Signal()
 		}
 	default:
 	}
