@@ -28,9 +28,6 @@ func newGrpcServer() *GrpcServer {
 	this := &GrpcServer{}
 
 	// TODO 压缩支持
-	// TODO tls支持
-	nc, _ := nats.Connect(common.GnatsAddr)
-	this.nc = nc
 	this.srv = grpc.NewServer()
 
 	this.svc = &GrpcService{}
@@ -45,6 +42,12 @@ func (this *GrpcServer) run() {
 	this.lsner = lsner
 	log.Println("listen on:", lsner.Addr())
 
+	// TODO tls支持
+	log.Println("Connecting gnatsd:", common.GnatsAddrlo)
+	nc, err := nats.Connect(common.GnatsAddrlo)
+	gopp.ErrPrint(err)
+	this.nc = nc
+
 	this.register()
 	err = this.srv.Serve(this.lsner)
 	gopp.ErrPrint(err)
@@ -52,6 +55,17 @@ func (this *GrpcServer) run() {
 
 func (this *GrpcServer) register() {
 	dyngrpc.RegisterService(demofn1, "thsdemo", "pasv")
+}
+
+func (this *GrpcServer) checkOrReconnNats(err error) {
+	if err == nats.ErrConnectionClosed {
+		log.Println("Reconnecting...")
+		nc, err2 := nats.Connect(common.GnatsAddr)
+		gopp.ErrPrint(err2)
+		if err2 == nil {
+			this.nc = nc
+		}
+	}
 }
 
 type GrpcService struct {
@@ -93,9 +107,12 @@ func (this *GrpcService) GetBaseInfo(ctx context.Context, req *thspbs.EmptyReq) 
 		mtype, err := t.ConferenceGetType(gn)
 		gopp.ErrPrint(err, mtype)
 
+		groupId, _ := xtox.ConferenceGetIdentifier(t, gn)
+
 		gi := &thspbs.GroupInfo{}
 		gi.Members = make(map[uint32]*thspbs.MemberInfo)
 		gi.Gnum = gn
+		gi.GroupId = groupId
 		gi.Title = title
 		gi.Ours = !xtox.IsInvitedGroup(t, gn)
 		gi.Mtype = uint32(mtype)
@@ -134,8 +151,15 @@ func (this *GrpcService) RmtCall(ctx context.Context, req *thspbs.Event) (*thspb
 		fnum := gopp.MustInt(req.Args[0])
 		_, err := t.FriendSendMessage(uint32(fnum), req.Args[1])
 		gopp.ErrPrint(err)
+		// groups
+	case "ConferenceDelete":
+
 	}
 	return &out, nil
+}
+
+func (this *GrpcService) Ping(ctx context.Context, req *thspbs.EmptyReq) (*thspbs.EmptyReq, error) {
+	return &thspbs.EmptyReq{}, nil
 }
 
 func (this *GrpcService) PollCallback(req *thspbs.EmptyReq, stm thspbs.Toxhs_PollCallbackServer) error {

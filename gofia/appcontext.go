@@ -4,6 +4,8 @@ import (
 	"context"
 	"gopp"
 	"log"
+	"net/http"
+	_ "net/http/pprof"
 	"sync"
 	"time"
 
@@ -15,6 +17,7 @@ import (
 	"github.com/kitech/godsts/maps/hashmap"
 	"github.com/nats-io/nats"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/connectivity"
 )
 
 type AppContext struct {
@@ -47,6 +50,8 @@ var appctxOnce sync.Once
 func AppOnCreate() {
 	appctxOnce.Do(func() {
 		printBuildInfo(true)
+		go func() { gopp.ErrPrint(http.ListenAndServe(":8089", nil)) }()
+
 		appctx = &AppContext{}
 		appctx.vtcli = thscli.NewLigTox()
 		//appctx.cfvs = hashmap.New()
@@ -67,8 +72,18 @@ func AppOnCreate() {
 		rpcli, err := grpc.Dial(thscom.GrpcAddr, grpc.WithInsecure())
 		gopp.ErrPrint(err, rpcli)
 		appctx.rpcli = rpcli
+		go appctx.keepConn()
+		time.Sleep(1 * time.Millisecond)
+
+		//ping
+		cc := appctx.rpcli
+		thsc := thspbs.NewToxhsClient(cc)
+		in := &thspbs.EmptyReq{}
+		_, err = thsc.Ping(context.Background(), in)
+		gopp.ErrPrint(err)
 
 		go func() {
+
 			appctx.getBaseInfo()
 			go appctx.pollGrpc()
 			go appctx.pollNats()
@@ -132,6 +147,98 @@ func (this *AppContext) dispatchEvent(jso *simplejson.Json) {
 			}
 			// InterBackRelay.Signal()
 		}
+	case "ConferenceInvite":
+		groupNumber := jso.Get("margs").GetIndex(2).MustString()
+		cookie := jso.Get("args").GetIndex(2).MustString()
+		groupId := thscli.ConferenceCookieToIdentifier(cookie)
+		log.Println(groupId)
+		valuex, found := appctx.contactStates.Get(groupId)
+		var ctis *ContactItemState
+		if !found {
+			ctis = newContactItemState()
+			appctx.contactStates.Put(groupId, ctis)
+			log.Println("new group contact:", groupId)
+		} else {
+			ctis = valuex.(*ContactItemState)
+		}
+		ctis.group = true
+		ctis.cnum = uint32(gopp.MustInt(groupNumber))
+		ctis.ctid = groupId
+
+		if appctx.app.Child == nil {
+			InterBackRelay.Signal()
+		}
+	case "ConferenceTitle":
+		groupTitle := jso.Get("args").GetIndex(2).MustString()
+		groupId := jso.Get("margs").GetIndex(0).MustString()
+		log.Println(groupId)
+		if thscli.ConferenceIdIsEmpty(groupId) {
+			break
+		}
+		valuex, found := appctx.contactStates.Get(groupId)
+		var ctis *ContactItemState
+		if !found {
+			ctis = newContactItemState()
+			ctis.group = true
+			appctx.contactStates.Put(groupId, ctis)
+			log.Println("new group contact:", groupId)
+		} else {
+			ctis = valuex.(*ContactItemState)
+		}
+		if groupTitle != "" && groupTitle != ctis.ctname {
+			ctis.ctname = groupTitle
+			if appctx.app.Child == nil {
+				InterBackRelay.Signal()
+			}
+		}
+	case "ConferenceNameListChange":
+		groupTitle := jso.Get("margs").GetIndex(2).MustString()
+		groupId := jso.Get("margs").GetIndex(3).MustString()
+		log.Println(groupId)
+		if thscli.ConferenceIdIsEmpty(groupId) {
+			break
+		}
+		valuex, found := appctx.contactStates.Get(groupId)
+		var ctis *ContactItemState
+		if !found {
+			ctis = newContactItemState()
+			ctis.group = true
+			appctx.contactStates.Put(groupId, ctis)
+			log.Println("new group contact:", groupId)
+		} else {
+			ctis = valuex.(*ContactItemState)
+		}
+		if groupTitle != "" && groupTitle != ctis.ctname {
+			ctis.ctname = groupTitle
+			if appctx.app.Child == nil {
+				InterBackRelay.Signal()
+			}
+		}
+	case "ConferenceMessage":
+		groupId := jso.Get("margs").GetIndex(3).MustString()
+		log.Println(groupId)
+		if thscli.ConferenceIdIsEmpty(groupId) {
+			break
+		}
+		valuex, found := appctx.contactStates.Get(groupId)
+		var ctis *ContactItemState
+		if !found {
+			log.Println("group contact not found:", groupId)
+		} else {
+			ctis = valuex.(*ContactItemState)
+		}
+		message := jso.Get("args").GetIndex(3).MustString()
+		if ctis != nil {
+			msgo := &ContactMessage{}
+			msgo.msg = message
+			msgo.tm = time.Now()
+			ctis.msgs.Add(msgo)
+
+			if appctx.app.Child != nil && appctx.app.Child.(*ChatFormView).cfst == ctis {
+				appctx.app.Child.(*ChatFormView).Signal()
+			}
+		}
+
 	default:
 	}
 }
@@ -146,9 +253,23 @@ func (this *AppContext) getBaseInfo() {
 	thsc := thspbs.NewToxhsClient(cc)
 	in := &thspbs.EmptyReq{}
 	info, err := thsc.GetBaseInfo(context.Background(), in)
-	gopp.ErrPrint(err, info)
+	gopp.ErrPrint(err, info) // rpc error: code = Internal desc = grpc: failed to unmarshal the received message proto: bad wiretype for field thspbs.GroupInfo.Ours: got wiretype 2, want 0 <nil>
 	log.Println(info, len(info.Friends))
 
 	this.vtcli.ParseBaseInfo(info)
 	log.Println("herehehe")
+}
+
+func (this *AppContext) doCall() {
+	cc := this.rpcli
+	thsc := thspbs.NewToxhsClient(cc)
+	_ = thsc
+}
+
+// should block
+func (this *AppContext) keepConn() {
+	for false {
+		ok := this.rpcli.WaitForStateChange(context.Background(), connectivity.Idle)
+		log.Println(ok, this.rpcli.GetState().String())
+	}
 }

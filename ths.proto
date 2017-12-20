@@ -6,6 +6,7 @@ service Toxhs {
     rpc PollCallback(EmptyReq) returns(stream EmptyReq);
     rpc GetBaseInfo(EmptyReq) returns(BaseInfo);
     rpc RmtCall(Event) returns(Event);
+    rpc Ping(EmptyReq) returns(EmptyReq);
 }
 
 message Event {
@@ -37,11 +38,12 @@ message FriendInfo {
 
 message GroupInfo {
     uint32 gnum = 1;
-    string cookie = 2;
-    string title = 3;
-    uint32 mtype = 4;
-    bool ours = 5;
-    map<uint32, MemberInfo> members = 6;
+    uint32 mtype = 2;
+    string groupId = 3;
+    string title = 4;
+    string stmsg = 5;
+    bool ours = 6;
+    map<uint32, MemberInfo> members = 7;
 }
 
 message MemberInfo {

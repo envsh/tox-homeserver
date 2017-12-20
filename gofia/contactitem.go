@@ -34,6 +34,13 @@ type ContactItemState struct {
 	// *ContactMessage
 	msgs *arraylist.List
 }
+
+func newContactItemState() *ContactItemState {
+	this := &ContactItemState{}
+	this.msgs = arraylist.New()
+	return this
+}
+
 type ContactItem struct {
 	view.Embed
 
@@ -67,6 +74,7 @@ func (this *ContactItem) Build(ctx view.Context) view.Model {
 	avtbtn.Image = application.MustLoadImage("identity")
 	if this.group {
 		//avtbtn.Image = application.MustLoadImage("group")
+		avtbtn.Image = application.MustLoadImage("ic_launcher")
 	} else {
 		//avtbtn.Image = application.MustLoadImage("contact")
 	}
@@ -131,7 +139,7 @@ func (this *ContactItem) Build(ctx view.Context) view.Model {
 
 	titlab := view.NewTextView()
 	titlab.String = "TITLE TEXT字"
-	titlab.String = this.ctname + "." + this.ctid[:5]
+	titlab.String = this.ctname + "." + gopp.SubStr(this.ctid, 5)
 	l.Add(titlab, func(s *constraint.Solver) {
 		// setViewGeometry4(s, 0, 140, 60, 20)
 		s.Top(0)

@@ -74,7 +74,7 @@ func (v *ChatFormView) Buildfc(ctx view.Context) view.Model {
 	namlab.String = "NAM图+"
 	namlab.String = v.cfst.ctname
 	hl.Add(namlab, func(s *constraint.Solver) {
-		setViewGeometry4(s, 0, 50, 80, 30)
+		setViewGeometry4(s, 0, 50, 120, 30)
 	})
 	idlab := view.NewTextView()
 	idlab.String = "TID图+"
@@ -293,7 +293,9 @@ func (v *ChatFormView) Buildfc(ctx view.Context) view.Model {
 }
 
 func (v *ChatFormView) Buildgc(ctx view.Context) view.Model {
-
+	if true {
+		return v.Buildfc(ctx)
+	}
 	vml := view.Model{}
 	return vml
 }

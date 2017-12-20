@@ -1,6 +1,7 @@
 package gofia
 
 import (
+	"fmt"
 	"log"
 	"runtime"
 	thscli "tox-homeserver/client"
@@ -59,6 +60,21 @@ func (this *TutorialView) registerEvents() {
 			appctx.contactStates.Put(ctis.ctid, ctis)
 			cfst := &*ctis
 			appctx.chatFormStates.Put(ctis.ctid, cfst)
+		}
+
+		for gn, grp := range bi.Groups {
+			ctis := &ContactItemState{}
+			ctis.group = true
+			ctis.cnum = gn
+			ctis.ctid = fmt.Sprintf("%d", gn)
+			ctis.ctid = grp.GroupId
+			ctis.ctname = grp.Title
+			ctis.stmsg = grp.Stmsg
+			ctis.stmsg = grp.Title + "SS"
+			ctis.msgs = arraylist.New()
+			appctx.contactStates.Put(ctis.ctid, ctis)
+			ctsf := &*ctis
+			appctx.chatFormStates.Put(ctis.ctid, ctsf)
 		}
 
 		this.Signal()

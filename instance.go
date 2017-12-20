@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"gopp"
 	"log"
+	"time"
 	"tox-homeserver/common"
 	"tox-homeserver/thspbs"
 
@@ -41,6 +42,7 @@ func (this *ToxVM) setupCallbacks() {
 		evt := thspbs.Event{}
 		evt.Name = "SelfConnectionStatus"
 		evt.Args = []string{fmt.Sprintf("%d", status)}
+		evt.Margs = []string{tox.ConnStatusString(status)}
 
 		this.pubmsg(&evt)
 	}, nil)
@@ -64,6 +66,7 @@ func (this *ToxVM) setupCallbacks() {
 		evt.Margs = []string{fname, pubkey}
 		this.pubmsg(&evt)
 	}, nil)
+
 	/*
 	   type cb_friend_request_ftype func(this *Tox, pubkey string, message string, userData interface{})
 	   type cb_friend_message_ftype func(this *Tox, friendNumber uint32, message string, userData interface{})
@@ -90,6 +93,148 @@ func (this *ToxVM) setupCallbacks() {
 	   	length int, user_data interface{})
 
 	*/
+
+	t.CallbackConferenceInviteAdd(func(_ *tox.Tox, friendNumber uint32, itype uint8, cookie string, userData interface{}) {
+		evt := thspbs.Event{}
+		evt.Name = "ConferenceInvite"
+		evt.Args = []string{fmt.Sprintf("%d", friendNumber), fmt.Sprintf("%d", itype), cookie}
+
+		pubkey, err := t.FriendGetPublicKey(friendNumber)
+		gopp.ErrPrint(err)
+		fname, err := t.FriendGetName(friendNumber)
+		gopp.ErrPrint(err)
+		evt.Margs = []string{fname, pubkey}
+
+		var gn uint32
+		switch int(itype) {
+		case tox.CONFERENCE_TYPE_TEXT:
+			gn, err = t.ConferenceJoin(friendNumber, cookie)
+			gopp.ErrPrint(err)
+		case tox.CONFERENCE_TYPE_AV:
+			gn_, err_ := t.JoinAVGroupChat(friendNumber, cookie)
+			gopp.ErrPrint(err_)
+			err = err_
+			gn = uint32(gn_)
+		}
+		if err != nil {
+			if false {
+				time.Sleep(300 * time.Millisecond)
+			}
+			if gn_, found := xtox.ConferenceGetByCookie(t, cookie); found {
+				gn = gn_
+			} else {
+				log.Println("why not found:", cookie)
+			}
+		}
+		evt.Margs = append(evt.Margs, fmt.Sprintf("%d", gn))
+
+		log.Println(gn)
+		cookie2, _ := t.ConferenceGetIdentifier(gn)
+		log.Println(cookie2 == cookie, cookie, cookie2)
+
+		this.pubmsg(&evt)
+	}, nil)
+
+	t.CallbackConferenceMessageAdd(func(_ *tox.Tox, groupNumber uint32, peerNumber uint32, message string, userData interface{}) {
+		evt := thspbs.Event{}
+		evt.Name = "ConferenceMessage"
+		evt.Args = []string{fmt.Sprintf("%d", groupNumber), fmt.Sprintf("%d", peerNumber),
+			fmt.Sprintf("%d", 0), message}
+
+		peerPubkey, err := t.ConferencePeerGetPublicKey(groupNumber, peerNumber)
+		gopp.ErrPrint(err)
+		peerName, err := t.ConferencePeerGetName(groupNumber, peerNumber)
+		gopp.ErrPrint(err)
+
+		title, err := t.ConferenceGetTitle(groupNumber)
+		gopp.ErrPrint(err)
+
+		groupId, _ := xtox.ConferenceGetIdentifier(t, groupNumber)
+		if xtox.ConferenceIdIsEmpty(groupId) {
+			groupId, _ = t.ConferenceGetIdentifier(groupNumber)
+		}
+
+		evt.Margs = []string{peerName, peerPubkey, title, groupId}
+
+		this.pubmsg(&evt)
+	}, nil)
+
+	t.CallbackConferenceActionAdd(func(_ *tox.Tox, groupNumber uint32, peerNumber uint32, message string, userData interface{}) {
+		evt := thspbs.Event{}
+		evt.Name = "ConferenceMessage"
+		evt.Args = []string{fmt.Sprintf("%d", groupNumber), fmt.Sprintf("%d", peerNumber), "1", message}
+
+		peerPubkey, err := t.ConferencePeerGetPublicKey(groupNumber, peerNumber)
+		gopp.ErrPrint(err)
+		peerName, err := t.ConferencePeerGetName(groupNumber, peerNumber)
+		gopp.ErrPrint(err)
+
+		title, err := t.ConferenceGetTitle(groupNumber)
+		gopp.ErrPrint(err)
+
+		groupId, _ := xtox.ConferenceGetIdentifier(t, groupNumber)
+		if xtox.ConferenceIdIsEmpty(groupId) {
+			groupId, _ = t.ConferenceGetIdentifier(groupNumber)
+		}
+
+		evt.Margs = []string{peerName, peerPubkey, title, groupId}
+
+		this.pubmsg(&evt)
+	}, nil)
+
+	t.CallbackConferenceNameListChangeAdd(func(_ *tox.Tox, groupNumber uint32, peerNumber uint32, change uint8, userData interface{}) {
+		evt := thspbs.Event{}
+		evt.Name = "ConferenceNameListChange"
+		evt.Args = []string{fmt.Sprintf("%d", groupNumber),
+			fmt.Sprintf("%d", peerNumber), fmt.Sprintf("%d", change)}
+
+		peerPubkey, err := t.ConferencePeerGetPublicKey(groupNumber, peerNumber)
+		gopp.ErrPrint(err)
+		peerName, err := t.ConferencePeerGetName(groupNumber, peerNumber)
+		gopp.ErrPrint(err)
+
+		title, err := t.ConferenceGetTitle(groupNumber)
+		gopp.ErrPrint(err)
+
+		groupId, _ := xtox.ConferenceGetIdentifier(t, groupNumber)
+		if xtox.ConferenceIdIsEmpty(groupId) {
+			groupId, _ = t.ConferenceGetIdentifier(groupNumber)
+		}
+
+		evt.Margs = []string{peerName, peerPubkey, title, groupId}
+
+		this.pubmsg(&evt)
+	}, nil)
+
+	t.CallbackConferenceTitleAdd(func(_ *tox.Tox, groupNumber uint32, peerNumber uint32, title string, userData interface{}) {
+		evt := thspbs.Event{}
+		evt.Name = "ConferenceTitle"
+		evt.Args = []string{fmt.Sprintf("%d", groupNumber),
+			fmt.Sprintf("%d", peerNumber), title}
+
+		groupId, _ := xtox.ConferenceGetIdentifier(t, groupNumber)
+		if xtox.ConferenceIdIsEmpty(groupId) {
+			groupId, _ = t.ConferenceGetIdentifier(groupNumber)
+		}
+		peerPubkey, _ := xtox.ConferencePeerGetPubkey(t, groupNumber, peerNumber)
+		peerName, _ := xtox.ConferencePeerGetName(t, groupNumber, peerNumber)
+		if peerName == "" || peerPubkey == "" {
+			log.Println("not found:", peerName, peerPubkey)
+		}
+		evt.Margs = []string{groupId, peerName, peerPubkey}
+
+		this.pubmsg(&evt)
+	}, nil)
+
+	/*
+		// conference callback type
+		type cb_conference_invite_ftype func(this *Tox, friendNumber uint32, itype uint8, data []byte, userData interface{})
+		type cb_conference_message_ftype func(this *Tox, groupNumber uint32, peerNumber uint32, message string, userData interface{})
+
+		type cb_conference_action_ftype func(this *Tox, groupNumber uint32, peerNumber uint32, action string, userData interface{})
+		type cb_conference_title_ftype func(this *Tox, groupNumber uint32, peerNumber uint32, title string, userData interface{})
+		type cb_conference_namelist_change_ftype func(this *Tox, groupNumber uint32, peerNumber uint32, change uint8, userData interface{})
+	*/
 }
 
 func (this *ToxVM) pubmsg(evt *thspbs.Event) error {
@@ -97,6 +242,14 @@ func (this *ToxVM) pubmsg(evt *thspbs.Event) error {
 	gopp.ErrPrint(err)
 	err = appctx.rpcs.nc.Publish(common.CBEventBusName, bcc)
 	gopp.ErrPrint(err)
-	// TODO reconnect
+	// reconnect
+	if err != nil {
+		appctx.rpcs.checkOrReconnNats(err)
+		err = appctx.rpcs.nc.Publish(common.CBEventBusName, bcc)
+		gopp.ErrPrint(err)
+	}
+	if err == nil {
+		// log.Println("pubmsg ok", len(bcc))
+	}
 	return err
 }

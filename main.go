@@ -3,12 +3,16 @@ package main
 import (
 	"flag"
 	"fmt"
+	"gopp"
 	"log"
+	"net/http"
+	_ "net/http/pprof"
 	"strings"
 	"time"
 
 	"github.com/google/gops/agent"
 	"github.com/kitech/go-toxcore/xtox"
+	gnatsd "github.com/nats-io/gnatsd/server"
 )
 
 func init() {
@@ -29,15 +33,34 @@ func main() {
 		log.Fatalln(err)
 	}
 
+	go func() {
+		err := http.ListenAndServe(":8089", nil)
+		gopp.ErrPrint(err)
+	}()
+
 	rpcs := newGrpcServer()
 	appctx.rpcs = rpcs
 
 	appctx.tvm = newToxVM()
 
 	go xtox.Run(appctx.tvm.t)
-
+	time.Sleep(50 * time.Millisecond)
+	go runLocalNatsd()
 	time.Sleep(50 * time.Millisecond)
 	rpcs.run()
+}
+
+// should block
+func runLocalNatsd() {
+	fs := flag.NewFlagSet("nats-server", flag.ExitOnError)
+	opts, err := gnatsd.ConfigureOptions(fs, []string{"--port", "4111"}, func() {}, func() {}, func() {})
+	gopp.ErrPrint(err, "gnatsd options error")
+
+	ndsrv := gnatsd.New(opts)
+	ndsrv.ConfigureLogger()
+	if err := gnatsd.Run(ndsrv); err != nil {
+		gopp.ErrPrint(err, "gnatsd exited")
+	}
 }
 
 // build info

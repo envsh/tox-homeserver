@@ -1,6 +1,9 @@
 package client
 
-import "unsafe"
+import (
+	"strings"
+	"unsafe"
+)
 
 // conference callback type
 type cb_conference_invite_ftype func(this *LigTox, friendNumber uint32, itype int, cookie string, userData interface{})
@@ -83,4 +86,16 @@ func (this *LigTox) CallbackConferenceNameListChangeAdd(cbfn cb_conference_namel
 		return
 	}
 	this.cb_conference_namelist_changes[cbfnp] = userData
+}
+
+/////
+func ConferenceCookieToIdentifier(cookie string) string {
+	if len(cookie) >= 6 {
+		return cookie[6:]
+	}
+	return ""
+}
+
+func ConferenceIdIsEmpty(groupId string) bool {
+	return groupId == "" || strings.Replace(groupId, "0", "", -1) == ""
 }

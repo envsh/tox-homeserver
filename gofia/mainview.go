@@ -1,8 +1,10 @@
 package gofia
 
 import (
+	"gopp"
 	"image/color"
 	"log"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -212,9 +214,11 @@ func (v *TutorialView) Build(ctx view.Context) view.Model {
 	// contacts
 	log.Println("contacts:", appctx.contactStates.Size())
 	vtable := &table.Layouter{}
+	pkids := gopp.IV2Strings(appctx.contactStates.Keys())
+	sort.Strings(pkids)
 	// TODO 排序？？？
-	for _, idx := range appctx.contactStates.Keys() {
-		ctisx, _ := appctx.contactStates.Get(idx)
+	for _, pkid := range pkids {
+		ctisx, _ := appctx.contactStates.Get(pkid)
 		ctis := ctisx.(*ContactItemState)
 		ctv := NewContactItem(ctis.group)
 		ctv.ContactItemState = ctis
