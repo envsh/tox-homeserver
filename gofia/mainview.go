@@ -112,6 +112,7 @@ func (v *TutorialView) Build(ctx view.Context) view.Model {
 	})
 	setbtn := view.NewImageButton()
 	setbtn.Image = application.MustLoadImage("settings")
+	setbtn.Image = application.MustLoadImage("applications_system")
 	// setbtn := view.NewButton()
 	// setbtn.String = "SET?的"
 	hl.Add(setbtn, func(s *constraint.Solver) {
@@ -121,15 +122,26 @@ func (v *TutorialView) Build(ctx view.Context) view.Model {
 		s.Width(50)
 	})
 
+	netbtn := view.NewTextView()
+	netbtn.String = "NONE"
+	if appctx.mvst.netStatus > 0 {
+		netbtn.String = gopp.IfElseStr(appctx.mvst.netStatus == 1, "UDP", "TCP")
+	}
+	hl.Add(netbtn, func(s *constraint.Solver) {
+		// setViewGeometry4(s, 0, 50, 50, 50)
+		s.Left(50)
+	})
+
 	stbtn := view.NewImageButton()
 	stbtn.Image = application.MustLoadImage("dot_away_36")
 	// stbtn := view.NewButton()
 	// stbtn.String = "STS中"
 	hl.Add(stbtn, func(s *constraint.Solver) {
-		s.Top(0)
-		s.Left(50)
-		s.Height(50)
-		s.Width(100)
+		setViewGeometry4(s, 0, 100, 100, 50)
+		// s.Top(0)
+		// s.Left(50)
+		// s.Height(50)
+		// s.Width(100)
 	})
 
 	nlab := view.NewTextView()
@@ -140,12 +152,13 @@ func (v *TutorialView) Build(ctx view.Context) view.Model {
 	log.Println("align:", nlab.Style.Alignment())
 	hl.Add(nlab, func(s *constraint.Solver) {
 		// s.Top(0)
-		s.Left(150)
+		s.Left(180)
 		// s.Height(50)
 	})
 
 	addbtn := view.NewImageButton()
 	addbtn.Image = application.MustLoadImage("add")
+	addbtn.Image = application.MustLoadImage("list_add")
 	// addbtn := view.NewButton()
 	// addbtn.String = "F加++"
 	hl.Add(addbtn, func(s *constraint.Solver) {

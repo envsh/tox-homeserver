@@ -1,7 +1,12 @@
 package client
 
 import (
+	"context"
+	"fmt"
+	"gopp"
+	"log"
 	"strings"
+	"tox-homeserver/thspbs"
 	"unsafe"
 )
 
@@ -86,6 +91,19 @@ func (this *LigTox) CallbackConferenceNameListChangeAdd(cbfn cb_conference_namel
 		return
 	}
 	this.cb_conference_namelist_changes[cbfnp] = userData
+}
+
+//////
+func (this *LigTox) ConferenceSendMessage(groupNumber uint32, mtype int, msg string) error {
+	fname := this.getMethodName()
+	args := thspbs.Event{}
+	args.Name = fname
+	args.Args = []string{fmt.Sprintf("%d", groupNumber), fmt.Sprintf("%d", mtype), msg}
+	cli := thspbs.NewToxhsClient(this.rpcli)
+	rsp, err := cli.RmtCall(context.Background(), &args)
+	gopp.ErrPrint(err, rsp)
+	log.Println(rsp)
+	return err
 }
 
 /////

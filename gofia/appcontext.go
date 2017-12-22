@@ -50,6 +50,7 @@ var appctxOnce sync.Once
 func AppOnCreate() {
 	appctxOnce.Do(func() {
 		printBuildInfo(true)
+		log.Println("Start pprof server: *:8089")
 		go func() { gopp.ErrPrint(http.ListenAndServe(":8089", nil)) }()
 
 		appctx = &AppContext{}

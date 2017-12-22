@@ -146,7 +146,8 @@ func (v *ChatFormView) Buildfc(ctx view.Context) view.Model {
 	// TODO 设置首次加载消息最大数，然后滚动下拉持续加载
 	msgcnt := 0
 	v.cfst.msgs.Each(func(index int, value interface{}) {
-		msgv := NewMessageView(value.(*ContactMessage))
+		msgo := value.(*ContactMessage)
+		msgv := NewMessageView(msgo)
 		cctablo.Add(msgv, nil)
 		msgcnt += 1
 	})
@@ -246,9 +247,20 @@ func (v *ChatFormView) Buildfc(ctx view.Context) view.Model {
 	imgrc2 := application.MustLoadImage("send")
 	ftstbtn.Image = imgrc2
 	ftstbtn.OnPress = func() {
-		log.Println("OnPress")
+		log.Println("OnPress, group?", v.cfst.group)
 		log.Println(ftipt.RWText.String())
-		appctx.vtcli.FriendSendMessage(v.cfst.cnum, ftipt.RWText.String())
+		if v.cfst.group {
+			appctx.vtcli.ConferenceSendMessage(v.cfst.cnum, 0, ftipt.RWText.String())
+		} else {
+			appctx.vtcli.FriendSendMessage(v.cfst.cnum, ftipt.RWText.String())
+		}
+		msgo := &ContactMessage{}
+		msgo.mine = true
+		msgo.msg = ftipt.RWText.String()
+		msgo.mtype = 0
+		msgo.tm = time.Now()
+		v.cfst.msgs.Add(msgo)
+		v.Signal()
 	}
 	log.Println("heree")
 	fl.Add(ftstbtn, func(s *constraint.Solver) {

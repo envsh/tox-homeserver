@@ -12,7 +12,7 @@ democ: com
 
 com:
 	protoc -I. ths.proto --go_out=plugins=grpc:./thspbs/
-	go install -v ./thspbs/ ./common/
+	go install -v ./thspbs/ ./common/ ./client/
 
 
 allfia: gofiab tofiab tofiai
@@ -21,12 +21,16 @@ gofiab: #build
 	echo -e "const isandroid = true\n" >> gofia/btversion.go
 	matcha build --target android/arm -v -x --ldflags "${GOVVV2}" tox-homeserver/gofia
 	ls -l ${HOME}/golib/src/gomatcha.io/matcha/android/matchabridge.aar
+	cd ./bin/ && unzip -o ${HOME}/golib/src/gomatcha.io/matcha/android/matchabridge.aar
+	ls -l ./bin/jni/armeabi*/
 
 gofiac: # check quickly
 	echo -e "package gofia\nconst btversion = \"${GOVVV2}\"\n" > gofia/btversion.go
 	echo -e "const isandroid = true\n" >> gofia/btversion.go
 	go build -v --ldflags "${GOVVV2}" tox-homeserver/gofia
 	ls -l ${HOME}/golib/src/gomatcha.io/matcha/android/matchabridge.aar
+	cd ./bin/ && unzip ${HOME}/golib/src/gomatcha.io/matcha/android/matchabridge.aar
+	ls -l ./bin/jni/armeabi*/
 
 tofiab: # build
 	cd tofia && ./gradlew build  --console plain --build-cache --warn build

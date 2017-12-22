@@ -145,15 +145,20 @@ func (this *GrpcService) RmtCall(ctx context.Context, req *thspbs.Event) (*thspb
 	log.Println(req.Id, req.Name, req.Args, req.Margs)
 	out := thspbs.Event{}
 
+	var err error
 	t := appctx.tvm.t
 	switch req.Name {
-	case "FriendSendMessage":
+	case "FriendSendMessage": // "friendNumber", "msg"
 		fnum := gopp.MustInt(req.Args[0])
-		_, err := t.FriendSendMessage(uint32(fnum), req.Args[1])
+		_, err = t.FriendSendMessage(uint32(fnum), req.Args[1])
 		gopp.ErrPrint(err)
 		// groups
-	case "ConferenceDelete":
-
+	case "ConferenceDelete": // "groupNumber"
+	case "ConferenceSendMessage": // "groupNumber","mtype","msg"
+		gnum := gopp.MustInt(req.Args[0])
+		mtype := gopp.MustInt(req.Args[1])
+		_, err = t.ConferenceSendMessage(uint32(gnum), mtype, req.Args[2])
+		gopp.ErrPrint(err)
 	}
 	return &out, nil
 }

@@ -156,7 +156,10 @@ func (this *ToxVM) setupCallbacks() {
 
 		evt.Margs = []string{peerName, peerPubkey, title, groupId}
 
-		this.pubmsg(&evt)
+		if t.SelfGetPublicKey() == peerPubkey {
+		} else {
+			this.pubmsg(&evt)
+		}
 	}, nil)
 
 	t.CallbackConferenceActionAdd(func(_ *tox.Tox, groupNumber uint32, peerNumber uint32, message string, userData interface{}) {

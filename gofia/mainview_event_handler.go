@@ -20,7 +20,8 @@ func init() {
 }
 
 type mainViewState struct {
-	nickName string
+	nickName  string
+	netStatus uint32
 }
 
 func (this *TutorialView) registerEvents() {
@@ -31,6 +32,7 @@ func (this *TutorialView) registerEvents() {
 		log.Println("hehrereh")
 		appctx.mvst.nickName = bi.GetName() + "." + bi.GetId()[:5]
 		log.Println("hehrereh", appctx.mvst.nickName)
+		appctx.mvst.netStatus = bi.Status
 
 		for fn, frnd := range bi.Friends {
 			cti := NewContactItem(false)
