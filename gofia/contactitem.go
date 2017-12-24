@@ -9,6 +9,7 @@ import (
 
 	"golang.org/x/image/colornames"
 	"gomatcha.io/matcha/application"
+	"gomatcha.io/matcha/keyboard"
 	"gomatcha.io/matcha/layout/constraint"
 	"gomatcha.io/matcha/paint"
 	"gomatcha.io/matcha/text"
@@ -32,25 +33,31 @@ type ContactItemState struct {
 	avatar string
 
 	// *ContactMessage
-	msgs *arraylist.List
+	msgs           *arraylist.List
+	Text           *text.Text
+	Responder      *keyboard.Responder
+	ScrollPosition *view.ScrollPosition
 }
 
 func newContactItemState() *ContactItemState {
 	this := &ContactItemState{}
 	this.msgs = arraylist.New()
+	this.Text = text.New("")
+	this.Responder = &keyboard.Responder{}
+	this.ScrollPosition = &view.ScrollPosition{}
 	return this
 }
 
 type ContactItem struct {
 	view.Embed
 
-	*ContactItemState
+	ctis *ContactItemState
 }
 
 func NewContactItem(group bool) *ContactItem {
 	this := &ContactItem{}
-	this.ContactItemState = &ContactItemState{msgs: arraylist.New()}
-	this.group = group
+	// this.ContactItemState = &ContactItemState{msgs: arraylist.New()}
+	// this.group = group
 
 	return this
 }
@@ -70,21 +77,22 @@ func (this *ContactItem) Build(ctx view.Context) view.Model {
 	})
 
 	avtbtn := view.NewImageButton()
-	avtbtn.Image = application.MustLoadImage("ic_launcher")
-	avtbtn.Image = application.MustLoadImage("identity")
-	if this.group {
-		//avtbtn.Image = application.MustLoadImage("group")
-		avtbtn.Image = application.MustLoadImage("ic_launcher")
+	//avtbtn.Image = application.MustLoadImage("ic_launcher")
+	// avtbtn.Image = application.MustLoadImage("identity")
+	if this.ctis.group {
+		// avtbtn.Image = application.MustLoadImage("ic_launcher")
+		avtbtn.Image = application.MustLoadImage("ff_icongroup_2x")
 	} else {
 		//avtbtn.Image = application.MustLoadImage("contact")
+		avtbtn.Image = application.MustLoadImage("user_2x")
 	}
 	avtbtn.OnPress = func() {
-		log.Println("clicked:", this.ContactItemState)
+		log.Println("clicked:", this.ctis)
 		log.Println("view path:", ctx.Path())
 
 		// always new view
 		cf := NewChatFormView()
-		cf.cfst = this.ContactItemState
+		cf.cfst = this.ctis
 		// appctx.cfvs.Put(this.ctid, cf)
 		// if !appctx.cfvs.Has(this.ctid) {
 		// }
@@ -104,11 +112,15 @@ func (this *ContactItem) Build(ctx view.Context) view.Model {
 	})
 
 	stsbtn := view.NewImageButton()
-	stsbtn.Image = application.MustLoadImage("dot_online22")
+	if this.ctis.status > 0 {
+		stsbtn.Image = application.MustLoadImage("online_30")
+	} else {
+		stsbtn.Image = application.MustLoadImage("offline_30")
+	}
 	// stsbtn := view.NewButton()
 	// stsbtn.String = "STS图"
 	stsbtn.OnPress = func() {
-		key := this.ctid
+		key := this.ctis.ctid
 		if cfsx, found := appctx.chatFormStates.Get(key); found {
 			cfst := cfsx.(*ChatFormState)
 			cfv := NewChatFormView()
@@ -139,7 +151,7 @@ func (this *ContactItem) Build(ctx view.Context) view.Model {
 
 	titlab := view.NewTextView()
 	titlab.String = "TITLE TEXT字"
-	titlab.String = this.ctname + "." + gopp.SubStr(this.ctid, 5)
+	titlab.String = this.ctis.ctname + "." + gopp.SubStr(this.ctis.ctid, 5)
 	l.Add(titlab, func(s *constraint.Solver) {
 		// setViewGeometry4(s, 0, 140, 60, 20)
 		s.Top(0)
@@ -149,7 +161,7 @@ func (this *ContactItem) Build(ctx view.Context) view.Model {
 
 	stslab := view.NewTextView()
 	stslab.String = "STS TEXT字"
-	stslab.String = this.stmsg
+	stslab.String = this.ctis.stmsg
 	stslab.Style.SetWrap(text.WrapWord)
 	l.Add(stslab, func(s *constraint.Solver) {
 		s.Top(20)
@@ -188,7 +200,7 @@ func setViewGeometry4(s *constraint.Solver, top, left, width, height float64) {
 	}
 }
 
-//
+/////////////////
 type MessageView struct {
 	view.Embed
 
@@ -205,14 +217,42 @@ func NewMessageView(msg *ContactMessage) *MessageView {
 func (this *MessageView) Build(ctx view.Context) view.Model {
 	l := &constraint.Layouter{}
 	l.Solve(func(s *constraint.Solver) {
-		s.Height(20)
+		s.Height(30)
 	})
 
-	msgtxt := view.NewTextView()
-	msgtxt.String = gopp.IfElseStr(this.msg.mine, "mine:", "frnd:") + this.msg.msg
-	l.Add(msgtxt, func(s *constraint.Solver) {
-		setViewGeometry4(s, 0, 0, -1, 20)
-	})
+	// 自己消息与对方消息的view排列
+	if this.msg.mine {
+		icobtn := view.NewImageButton()
+		icobtn.Image = application.MustLoadImage("icon_avatar_40")
+		l.Add(icobtn, func(s *constraint.Solver) {
+			setViewGeometry4(s, 0, -1, 30, 30)
+			s.RightEqual(l.Right())
+		})
+
+		msgtxt := view.NewTextView()
+		msgtxt.Style.SetAlignment(text.AlignmentCenter)
+		msgtxt.Style.SetWrap(text.WrapWord)
+		msgtxt.PaintStyle = &paint.Style{BackgroundColor: colornames.Greenyellow}
+		msgtxt.String = gopp.IfElseStr(this.msg.mine, "mine:", "frnd:") + this.msg.msg
+		l.Add(msgtxt, func(s *constraint.Solver) {
+			setViewGeometry4(s, 0, 40, -1, 30)
+			s.RightEqual(l.Right().Add(-40))
+		})
+
+	} else {
+		icobtn := view.NewImageButton()
+		icobtn.Image = application.MustLoadImage("user_40")
+		l.Add(icobtn, func(s *constraint.Solver) {
+			setViewGeometry4(s, 0, 0, 30, 30)
+		})
+
+		msgtxt := view.NewTextView()
+		msgtxt.String = gopp.IfElseStr(this.msg.mine, "mine:", "frnd:") + this.msg.msg
+		l.Add(msgtxt, func(s *constraint.Solver) {
+			setViewGeometry4(s, 0, 40, -1, 30)
+			s.RightEqual(l.Right().Add(-40))
+		})
+	}
 
 	vm := view.Model{}
 	vm.Layouter = l

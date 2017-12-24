@@ -67,6 +67,17 @@ func (this *ToxVM) setupCallbacks() {
 		this.pubmsg(&evt)
 	}, nil)
 
+	t.CallbackFriendConnectionStatusAdd(func(_ *tox.Tox, friendNumber uint32, status int, userData interface{}) {
+		evt := thspbs.Event{}
+		evt.Name = "FriendConnectionStatus"
+		evt.Args = []string{fmt.Sprintf("%d", friendNumber), fmt.Sprintf("%d", status)}
+		pubkey, err := t.FriendGetPublicKey(friendNumber)
+		gopp.ErrPrint(err)
+		fname, err := t.FriendGetName(friendNumber)
+		gopp.ErrPrint(err)
+		evt.Margs = []string{fname, pubkey, tox.ConnStatusString(status)}
+		this.pubmsg(&evt)
+	}, nil)
 	/*
 	   type cb_friend_request_ftype func(this *Tox, pubkey string, message string, userData interface{})
 	   type cb_friend_message_ftype func(this *Tox, friendNumber uint32, message string, userData interface{})

@@ -148,6 +148,19 @@ func (this *AppContext) dispatchEvent(jso *simplejson.Json) {
 			}
 			// InterBackRelay.Signal()
 		}
+	case "FriendConnectionStatus":
+		fname := jso.Get("margs").GetIndex(0).MustString()
+		pubkey := jso.Get("margs").GetIndex(1).MustString()
+		// cfx, found := this.cfvs.Get(pubkey)
+		cfsx, found := this.chatFormStates.Get(pubkey)
+		if !found {
+			log.Println("wtf, chat form view not found:", fname, pubkey)
+		} else {
+			cfs := cfsx.(*ChatFormState)
+			cfs.status = uint32(gopp.MustInt(jso.Get("args").GetIndex(1).MustString()))
+			this.signalProperView(cfs)
+		}
+
 	case "ConferenceInvite":
 		groupNumber := jso.Get("margs").GetIndex(2).MustString()
 		cookie := jso.Get("args").GetIndex(2).MustString()
@@ -241,6 +254,16 @@ func (this *AppContext) dispatchEvent(jso *simplejson.Json) {
 		}
 
 	default:
+	}
+}
+
+func (this *AppContext) signalProperView(curst *ChatFormState) {
+	if appctx.app.Child == nil {
+		InterBackRelay.Signal()
+	} else if appctx.app.Child != nil && appctx.app.Child.(*ChatFormView).cfst == curst {
+		appctx.app.Child.(*ChatFormView).Signal()
+	} else {
+		log.Panicf("wtf??? %p,\n", curst)
 	}
 }
 

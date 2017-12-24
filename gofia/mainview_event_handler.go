@@ -6,8 +6,6 @@ import (
 	"runtime"
 	thscli "tox-homeserver/client"
 	"tox-homeserver/thspbs"
-
-	"github.com/kitech/godsts/lists/arraylist"
 )
 
 func init() {
@@ -35,37 +33,40 @@ func (this *TutorialView) registerEvents() {
 		appctx.mvst.netStatus = bi.Status
 
 		for fn, frnd := range bi.Friends {
-			cti := NewContactItem(false)
-			cti.cnum = fn
-			cti.ctid = frnd.GetPubkey()
-			cti.ctname = frnd.GetName()
-			cti.stmsg = frnd.GetStmsg()
-			cti.status = frnd.GetStatus()
-
+			// cti := NewContactItem(false)
+			/*
+				cti.cnum = fn
+				cti.ctid = frnd.GetPubkey()
+				cti.ctname = frnd.GetName()
+				cti.stmsg = frnd.GetStmsg()
+				cti.status = frnd.GetStatus()
+			*/
 			// appctx.contacts = append(appctx.contacts, cti)
 			// appctx.contactsv = append(appctx.contactsv, cti)
 
 			// appctx.ctvs.Put(cti.ctid, cti)
-			cf := NewChatFormView()
-			cf.cfst = cti.ContactItemState
-			// appctx.cfvs.Put(cti.ctid, cf)
-			_, _ = cti, cf
 
 			//
-			ctis := &ContactItemState{}
+			ctis := newContactItemState()
 			ctis.cnum = fn
 			ctis.ctid = frnd.GetPubkey()
 			ctis.ctname = frnd.GetName()
 			ctis.stmsg = frnd.GetStmsg()
 			ctis.status = frnd.GetStatus()
-			ctis.msgs = arraylist.New()
+			// cti.ctis = ctis
+
+			// cf := NewChatFormView()
+			// cf.cfst = ctis
+			// appctx.cfvs.Put(cti.ctid, cf)
+			// _, _ = cti, cf
+
 			appctx.contactStates.Put(ctis.ctid, ctis)
 			cfst := &*ctis
 			appctx.chatFormStates.Put(ctis.ctid, cfst)
 		}
 
 		for gn, grp := range bi.Groups {
-			ctis := &ContactItemState{}
+			ctis := newContactItemState()
 			ctis.group = true
 			ctis.cnum = gn
 			ctis.ctid = fmt.Sprintf("%d", gn)
@@ -73,7 +74,7 @@ func (this *TutorialView) registerEvents() {
 			ctis.ctname = grp.Title
 			ctis.stmsg = grp.Stmsg
 			ctis.stmsg = grp.Title + "SS"
-			ctis.msgs = arraylist.New()
+
 			appctx.contactStates.Put(ctis.ctid, ctis)
 			ctsf := &*ctis
 			appctx.chatFormStates.Put(ctis.ctid, ctsf)

@@ -106,15 +106,21 @@ func (v *TutorialView) Build(ctx view.Context) view.Model {
 		return view.Model{Children: l.Views(), Layouter: l}
 	}
 
+	log.Println("Herehere")
 	hl := &constraint.Layouter{}
 	hl.Solve(func(s *constraint.Solver) {
 		s.Height(50)
 	})
+	log.Println("Herehere")
 	setbtn := view.NewImageButton()
-	setbtn.Image = application.MustLoadImage("settings")
-	setbtn.Image = application.MustLoadImage("applications_system")
+	log.Println("Herehere")
+	// setbtn.Image = application.MustLoadImage("settings")
+	// setbtn.Image = application.MustLoadImage("app_system")
+	setbtn.Image = application.MustLoadImage("barbuttonicon_set")
+	log.Println("Herehere")
 	// setbtn := view.NewButton()
 	// setbtn.String = "SET?的"
+	setbtn.OnPress = func() {}
 	hl.Add(setbtn, func(s *constraint.Solver) {
 		s.Top(0)
 		s.Left(0)
@@ -122,6 +128,7 @@ func (v *TutorialView) Build(ctx view.Context) view.Model {
 		s.Width(50)
 	})
 
+	log.Println("Herehere")
 	netbtn := view.NewTextView()
 	netbtn.String = "NONE"
 	if appctx.mvst.netStatus > 0 {
@@ -132,18 +139,23 @@ func (v *TutorialView) Build(ctx view.Context) view.Model {
 		s.Left(50)
 	})
 
-	stbtn := view.NewImageButton()
-	stbtn.Image = application.MustLoadImage("dot_away_36")
+	log.Println("Herehere")
+	stsbtn := view.NewImageButton()
+	if appctx.mvst.netStatus > 0 {
+		stsbtn.Image = application.MustLoadImage("online_30")
+	} else {
+		stsbtn.Image = application.MustLoadImage("offline_30")
+	}
 	// stbtn := view.NewButton()
 	// stbtn.String = "STS中"
-	hl.Add(stbtn, func(s *constraint.Solver) {
-		setViewGeometry4(s, 0, 100, 100, 50)
+	hl.Add(stsbtn, func(s *constraint.Solver) {
+		setViewGeometry4(s, 0, 80, 50, 50)
 		// s.Top(0)
 		// s.Left(50)
 		// s.Height(50)
-		// s.Width(100)
 	})
 
+	log.Println("Herehere")
 	nlab := view.NewTextView()
 	nlab.String = "名字Tofia"
 	nlab.String = appctx.mvst.nickName
@@ -152,22 +164,26 @@ func (v *TutorialView) Build(ctx view.Context) view.Model {
 	log.Println("align:", nlab.Style.Alignment())
 	hl.Add(nlab, func(s *constraint.Solver) {
 		// s.Top(0)
-		s.Left(180)
+		s.Left(130)
 		// s.Height(50)
 	})
 
+	log.Println("Herehere")
 	addbtn := view.NewImageButton()
-	addbtn.Image = application.MustLoadImage("add")
-	addbtn.Image = application.MustLoadImage("list_add")
+	// addbtn.Image = application.MustLoadImage("add")
+	// addbtn.Image = application.MustLoadImage("list_add")
+	addbtn.Image = application.MustLoadImage("contacts_add_friend_2x")
 	// addbtn := view.NewButton()
 	// addbtn.String = "F加++"
+	addbtn.OnPress = func() {}
 	hl.Add(addbtn, func(s *constraint.Solver) {
 		s.Top(0)
 		s.RightEqual(hl.Right())
-		// s.Height(50)
-		s.Width(100)
+		s.Height(50)
+		s.Width(50)
 	})
 
+	log.Println("Herehere")
 	hv := view.NewBasicView()
 	hv.Layouter = hl
 	hv.Children = hl.Views()
@@ -178,6 +194,7 @@ func (v *TutorialView) Build(ctx view.Context) view.Model {
 		s.RightEqual(l.Right())
 	})
 
+	log.Println("Herehere")
 	// Create a new textview.
 	child := view.NewTextView()
 	child.String = "Hello World"
@@ -192,6 +209,7 @@ func (v *TutorialView) Build(ctx view.Context) view.Model {
 		s.Left(0)
 	})
 
+	log.Println("Herehere")
 	logipt := view.NewTextInput()
 	logipt.RWText = v.text
 	logipt.Placeholder = "input log here:"
@@ -234,7 +252,7 @@ func (v *TutorialView) Build(ctx view.Context) view.Model {
 		ctisx, _ := appctx.contactStates.Get(pkid)
 		ctis := ctisx.(*ContactItemState)
 		ctv := NewContactItem(ctis.group)
-		ctv.ContactItemState = ctis
+		ctv.ctis = ctis
 		vtable.Add(ctv, nil)
 	}
 	/*
@@ -259,6 +277,7 @@ func (v *TutorialView) Build(ctx view.Context) view.Model {
 			}
 		}
 	}
+	log.Println("Herehere")
 	lstwin := view.NewScrollView()
 	lstwin.ScrollAxes = layout.AxisY
 	lstwin.ScrollPosition = &view.ScrollPosition{}

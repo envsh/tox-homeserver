@@ -19,7 +19,8 @@ allfia: gofiab tofiab tofiai
 gofiab: #build
 	echo -e "package gofia\nconst btversion = \"${GOVVV2}\"\n" > gofia/btversion.go
 	echo -e "const isandroid = true\n" >> gofia/btversion.go
-	matcha build --target android/arm -v -x --ldflags "${GOVVV2}" tox-homeserver/gofia
+	# matcha build --target android/arm -v -x --ldflags "${GOVVV2}" tox-homeserver/gofia
+	matcha build --target android/386 -v -x --ldflags "${GOVVV2}" tox-homeserver/gofia
 	ls -l ${HOME}/golib/src/gomatcha.io/matcha/android/matchabridge.aar
 	cd ./bin/ && unzip -o ${HOME}/golib/src/gomatcha.io/matcha/android/matchabridge.aar
 	ls -l ./bin/jni/armeabi*/

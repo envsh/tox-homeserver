@@ -4,7 +4,6 @@ import (
 	"log"
 	"time"
 
-	"github.com/kitech/godsts/lists/arraylist"
 	"golang.org/x/image/colornames"
 	"gomatcha.io/matcha/animate"
 	"gomatcha.io/matcha/application"
@@ -25,13 +24,14 @@ type ChatFormView struct {
 
 	cfst *ChatFormState
 	// scrollPosition *view.ScrollPosition
+	Text      *text.Text
+	Responder *keyboard.Responder
 }
 
 func NewChatFormView() *ChatFormView {
 	this := &ChatFormView{}
-	this.cfst = &ChatFormState{msgs: arraylist.New()}
+	// this.cfst = &ChatFormState{msgs: arraylist.New()}
 	// this.scrollPosition = &view.ScrollPosition{}
-
 	return this
 }
 
@@ -64,7 +64,12 @@ func (v *ChatFormView) Buildfc(ctx view.Context) view.Model {
 	hl := &constraint.Layouter{}
 	hl.Solve(func(s *constraint.Solver) { s.Height(60) })
 	avtbtn := view.NewImageButton()
-	imgrc := application.MustLoadImage("ic_launcher")
+	var imgrc *application.ImageResource
+	if v.cfst.group {
+		imgrc = application.MustLoadImage("ff_icongroup_2x")
+	} else {
+		imgrc = application.MustLoadImage("user_2x")
+	}
 	avtbtn.Image = imgrc
 	hl.Add(avtbtn, func(s *constraint.Solver) {
 		setViewGeometry4(s, 0, 0, 50, 50)
@@ -91,7 +96,7 @@ func (v *ChatFormView) Buildfc(ctx view.Context) view.Model {
 
 	//TODO mute/mic/audio/video
 	vdobtn := view.NewImageButton()
-	vdobtn.Image = application.MustLoadImage("av")
+	vdobtn.Image = application.MustLoadImage("video_40")
 	//vdobtn := view.NewButton()
 	//vdobtn.String = "VDO图+"
 	hl.Add(vdobtn, func(s *constraint.Solver) {
@@ -100,7 +105,7 @@ func (v *ChatFormView) Buildfc(ctx view.Context) view.Model {
 		s.RightEqual(hl.Right())
 	})
 	adobtn := view.NewImageButton()
-	adobtn.Image = application.MustLoadImage("av")
+	adobtn.Image = application.MustLoadImage("voice_40")
 	//adobtn := view.NewButton()
 	//adobtn.String = "ADO图+"
 	hl.Add(adobtn, func(s *constraint.Solver) {
@@ -108,18 +113,24 @@ func (v *ChatFormView) Buildfc(ctx view.Context) view.Model {
 		setViewGeometry4(s, 0, -1, 50, 50)
 		s.RightEqual(hl.Right().Add(-50))
 	})
-	mutebtn := view.NewButton()
-	mutebtn.String = "M图+"
-	hl.Add(mutebtn, func(s *constraint.Solver) {
+	micbtn := view.NewImageButton()
+	micbtn.Image = application.MustLoadImage("mic_30")
+	micbtn.PaintStyle = &paint.Style{BackgroundColor: colornames.Gray}
+	//micbtn := view.NewButton()
+	// micbtn.String = "C图+"
+	hl.Add(micbtn, func(s *constraint.Solver) {
 		s.RightEqual(hl.Right().Add(-100))
 		setViewGeometry4(s, 0, -1, 30, 30)
 		s.RightEqual(hl.Right().Add(-100))
 	})
-	micbtn := view.NewButton()
-	micbtn.String = "C图+"
-	hl.Add(micbtn, func(s *constraint.Solver) {
+	mutebtn := view.NewImageButton()
+	mutebtn.Image = application.MustLoadImage("volum_40")
+	mutebtn.PaintStyle = &paint.Style{BackgroundColor: colornames.Gray}
+	// mutebtn := view.NewButton()
+	// mutebtn.String = "M图+"
+	hl.Add(mutebtn, func(s *constraint.Solver) {
 		s.RightEqual(hl.Right().Add(-100))
-		setViewGeometry4(s, 30, -1, 30, 30)
+		setViewGeometry4(s, 26, -1, 30, 30)
 		s.RightEqual(hl.Right().Add(-100))
 	})
 
@@ -168,7 +179,7 @@ func (v *ChatFormView) Buildfc(ctx view.Context) view.Model {
 	})
 	_ = guide
 
-	scrollBottom := 200*12 + msgcnt*20 // 或者给一个无限大的值滚动到底部？
+	scrollBottom := 200*12 + msgcnt*30 // 或者给一个无限大的值滚动到底部？
 	log.Println(ccsv.ScrollPosition == nil, scrollBottom)
 	if ccsv.ScrollPosition != nil {
 		log.Println(ccsv.ScrollPosition.Value()) //{0, 1770.5714111328125}
@@ -203,9 +214,11 @@ func (v *ChatFormView) Buildfc(ctx view.Context) view.Model {
 		s.RightEqual(l.Right())
 	})
 	log.Println("heree")
+	log.Printf("%p, %p, %p, %v\n", v.cfst, v.cfst.Text, v.cfst.Responder, v.cfst.Responder.Visible())
 	ftipt := view.NewTextInput()
-	ftipt.RWText = text.New("")
+	ftipt.RWText = v.cfst.Text
 	ftipt.KeyboardType = keyboard.TextType
+	ftipt.Responder = v.cfst.Responder
 	ftipt.Placeholder = "input hereeee..."
 	ftipt.MaxLines = 5
 	ftipt.PaintStyle = &paint.Style{BackgroundColor: colornames.Blue}
@@ -260,6 +273,7 @@ func (v *ChatFormView) Buildfc(ctx view.Context) view.Model {
 		msgo.mtype = 0
 		msgo.tm = time.Now()
 		v.cfst.msgs.Add(msgo)
+		ftipt.RWText.SetString("") // clear old
 		v.Signal()
 	}
 	log.Println("heree")
@@ -268,18 +282,22 @@ func (v *ChatFormView) Buildfc(ctx view.Context) view.Model {
 		s.RightEqual(fl.Right())
 	})
 	log.Println("heree")
-	ftemojibtn := view.NewButton()
-	ftemojibtn.String = "Emoji图+"
+	ftemojibtn := view.NewImageButton()
+	ftemojibtn.Image = application.MustLoadImage("emoji_22")
+	// ftemojibtn := view.NewButton()
+	// ftemojibtn.String = "Emoji图+"
 	fl.Add(ftemojibtn, func(s *constraint.Solver) {
 		s.RightEqual(fl.Right().Add(-50))
 		setViewGeometry4(s, 0, -1, 30, 30)
 	})
 	log.Println("heree")
-	ftfilebtn := view.NewButton()
-	ftfilebtn.String = "File图+"
+	ftfilebtn := view.NewImageButton()
+	ftfilebtn.Image = application.MustLoadImage("file_22")
+	// ftfilebtn := view.NewButton()
+	// ftfilebtn.String = "File图+"
 	fl.Add(ftfilebtn, func(s *constraint.Solver) {
 		s.RightEqual(fl.Right().Add(-50))
-		setViewGeometry4(s, 30, -1, 30, 30)
+		setViewGeometry4(s, 26, -1, 30, 30)
 	})
 	log.Println("heree")
 	fv := view.NewBasicView()
