@@ -2,6 +2,7 @@ package gofia
 
 import (
 	"fmt"
+	"gopp"
 	"log"
 	"runtime"
 	thscli "tox-homeserver/client"
@@ -33,19 +34,6 @@ func (this *TutorialView) registerEvents() {
 		appctx.mvst.netStatus = bi.Status
 
 		for fn, frnd := range bi.Friends {
-			// cti := NewContactItem(false)
-			/*
-				cti.cnum = fn
-				cti.ctid = frnd.GetPubkey()
-				cti.ctname = frnd.GetName()
-				cti.stmsg = frnd.GetStmsg()
-				cti.status = frnd.GetStatus()
-			*/
-			// appctx.contacts = append(appctx.contacts, cti)
-			// appctx.contactsv = append(appctx.contactsv, cti)
-
-			// appctx.ctvs.Put(cti.ctid, cti)
-
 			//
 			ctis := newContactItemState()
 			ctis.cnum = fn
@@ -63,6 +51,9 @@ func (this *TutorialView) registerEvents() {
 			appctx.contactStates.Put(ctis.ctid, ctis)
 			cfst := &*ctis
 			appctx.chatFormStates.Put(ctis.ctid, cfst)
+
+			err := appctx.store.addFriend(frnd.Pubkey, fn, frnd.Name, frnd.Stmsg)
+			gopp.ErrPrint(err, frnd)
 		}
 
 		for gn, grp := range bi.Groups {
@@ -78,6 +69,9 @@ func (this *TutorialView) registerEvents() {
 			appctx.contactStates.Put(ctis.ctid, ctis)
 			ctsf := &*ctis
 			appctx.chatFormStates.Put(ctis.ctid, ctsf)
+
+			err := appctx.store.addGroup(grp.GroupId, gn, grp.Title)
+			gopp.ErrPrint(err, grp)
 		}
 
 		this.Signal()

@@ -1,6 +1,7 @@
 VERSION         :=      $(shell cat ./VERSION)
 GOVVV=`govvv -flags -version ${VERSION}|sed 's/=/=GOVVV-/g'`
 GOVVV2=`govvv -flags -version ${VERSION}|sed 's/=/=GOVVV-/g'|sed 's/main./gofia./g'`
+CPWD=$(shell pwd)
 
 all: bd
 
@@ -12,6 +13,7 @@ democ: com
 
 com:
 	protoc -I. ths.proto --go_out=plugins=grpc:./thspbs/
+	# cd ${HOME}/golib/src/github.com/go-xorm/cmd/xorm && xorm reverse -s sqlite3 "${CPWD}/data/toxhs.sqlite" templates/goxorm "${CPWD}/gofia/"
 	go install -v ./thspbs/ ./common/ ./client/
 
 

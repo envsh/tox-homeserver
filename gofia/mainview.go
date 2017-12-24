@@ -221,7 +221,8 @@ func (v *TutorialView) Build(ctx view.Context) view.Model {
 	// t.SetString("")
 	//}
 	logipt.OnChange = func(t *text.Text) {
-		v.Signal()
+		// v.Signal()
+		logipt.Signal()
 	}
 
 	/*
@@ -316,7 +317,9 @@ func (v *TutorialView) logFn(s string) {
 	v.text.SetString(ns)
 	matcha.MainLocker.Unlock()
 	v.tnum += 1
-	v.Signal()
+
+	// appctx.signalProperView(nil, true)
+	// v.Signal()
 }
 
 ///

@@ -34,6 +34,8 @@ type AppContext struct {
 	// currV view.View
 	app *App
 
+	store *Storage
+
 	// friend: pubkey => *ChatFormView,
 	// invited group: cookie => *ChatFormView
 	// ours group: 无法直接获取自己创建的群组的cookie
@@ -53,6 +55,7 @@ func AppOnCreate() {
 		log.Println("Start pprof server: *:8089")
 		go func() { gopp.ErrPrint(http.ListenAndServe(":8089", nil)) }()
 
+		// 初始化顺序: server => memory => disk => network
 		appctx = &AppContext{}
 		appctx.vtcli = thscli.NewLigTox()
 		//appctx.cfvs = hashmap.New()
@@ -63,6 +66,18 @@ func AppOnCreate() {
 		// appctx.contactsv = make([]view.View, 0)
 		appctx.mvst = &mainViewState{}
 		appctx.mvst.nickName = "Tofia User"
+
+		appctx.store = newStorage()
+		if appctx.store.deviceEmpty() {
+			err := appctx.store.addDevice()
+			gopp.ErrPrint(err)
+		}
+		dv := appctx.store.getDevice()
+		if dv != nil {
+			log.Println("my device:", dv.Uuid)
+		} else {
+			log.Println("my device not exist: wtf")
+		}
 
 		log.Println("connecting gnats:", thscom.GnatsAddr)
 		nc, err := nats.Connect(thscom.GnatsAddr)
@@ -125,11 +140,17 @@ func (this *AppContext) dispatchEvent(jso *simplejson.Json) {
 	switch evtName {
 	case "SelfConnectionStatus":
 	case "FriendRequest":
+		///
+		pubkey := jso.Get("args").GetIndex(0).MustString()
+		err := appctx.store.addFriend(pubkey, 0, "", "")
+		gopp.ErrPrint(err, jso.Get("args"))
+
 	case "FriendMessage":
 		// jso.Get("args").GetIndex(0).MustString()
 		msg := jso.Get("args").GetIndex(1).MustString()
 		fname := jso.Get("margs").GetIndex(0).MustString()
 		pubkey := jso.Get("margs").GetIndex(1).MustString()
+
 		// cfx, found := this.cfvs.Get(pubkey)
 		cfsx, found := this.chatFormStates.Get(pubkey)
 		if !found {
@@ -148,6 +169,11 @@ func (this *AppContext) dispatchEvent(jso *simplejson.Json) {
 			}
 			// InterBackRelay.Signal()
 		}
+
+		///
+		err := appctx.store.addFriendMessage(msg, pubkey)
+		gopp.ErrPrint(err)
+
 	case "FriendConnectionStatus":
 		fname := jso.Get("margs").GetIndex(0).MustString()
 		pubkey := jso.Get("margs").GetIndex(1).MustString()
@@ -158,7 +184,7 @@ func (this *AppContext) dispatchEvent(jso *simplejson.Json) {
 		} else {
 			cfs := cfsx.(*ChatFormState)
 			cfs.status = uint32(gopp.MustInt(jso.Get("args").GetIndex(1).MustString()))
-			this.signalProperView(cfs)
+			this.signalProperView(cfs, true)
 		}
 
 	case "ConferenceInvite":
@@ -182,6 +208,11 @@ func (this *AppContext) dispatchEvent(jso *simplejson.Json) {
 		if appctx.app.Child == nil {
 			InterBackRelay.Signal()
 		}
+
+		///
+		err := appctx.store.addGroup(groupId, ctis.cnum, ctis.ctname)
+		gopp.ErrPrint(err)
+
 	case "ConferenceTitle":
 		groupTitle := jso.Get("args").GetIndex(2).MustString()
 		groupId := jso.Get("margs").GetIndex(0).MustString()
@@ -210,6 +241,7 @@ func (this *AppContext) dispatchEvent(jso *simplejson.Json) {
 		groupId := jso.Get("margs").GetIndex(3).MustString()
 		log.Println(groupId)
 		if thscli.ConferenceIdIsEmpty(groupId) {
+			log.Println("empty")
 			break
 		}
 		valuex, found := appctx.contactStates.Get(groupId)
@@ -228,6 +260,12 @@ func (this *AppContext) dispatchEvent(jso *simplejson.Json) {
 				InterBackRelay.Signal()
 			}
 		}
+
+		///
+		peerPubkey := jso.Get("margs").GetIndex(1).MustString()
+		err := appctx.store.addPeer(peerPubkey, 0)
+		gopp.ErrPrint(err)
+
 	case "ConferenceMessage":
 		groupId := jso.Get("margs").GetIndex(3).MustString()
 		log.Println(groupId)
@@ -241,6 +279,7 @@ func (this *AppContext) dispatchEvent(jso *simplejson.Json) {
 		} else {
 			ctis = valuex.(*ContactItemState)
 		}
+
 		message := jso.Get("args").GetIndex(3).MustString()
 		if ctis != nil {
 			msgo := &ContactMessage{}
@@ -248,22 +287,38 @@ func (this *AppContext) dispatchEvent(jso *simplejson.Json) {
 			msgo.tm = time.Now()
 			ctis.msgs.Add(msgo)
 
-			if appctx.app.Child != nil && appctx.app.Child.(*ChatFormView).cfst == ctis {
-				appctx.app.Child.(*ChatFormView).Signal()
-			}
+			this.signalProperView(ctis, false)
+			/*
+				if appctx.app.Child != nil && appctx.app.Child.(*ChatFormView).cfst == ctis {
+					appctx.app.Child.(*ChatFormView).Signal()
+				}
+			*/
 		}
+
+		//
+		peerPubkey := jso.Get("margs").GetIndex(1).MustString()
+		err := appctx.store.addGroupMessage(message, "0", groupId, peerPubkey)
+		gopp.ErrPrint(err)
 
 	default:
 	}
 }
 
-func (this *AppContext) signalProperView(curst *ChatFormState) {
+func (this *AppContext) signalProperView(curst *ChatFormState, sigmain bool) {
 	if appctx.app.Child == nil {
-		InterBackRelay.Signal()
+		if sigmain {
+			InterBackRelay.Signal()
+		}
 	} else if appctx.app.Child != nil && appctx.app.Child.(*ChatFormView).cfst == curst {
+		log.Println("hehrere")
 		appctx.app.Child.(*ChatFormView).Signal()
 	} else {
 		log.Panicf("wtf??? %p,\n", curst)
+	}
+	// TODO
+	if appctx.app.Child != nil {
+		switch appctx.app.Child.(type) {
+		}
 	}
 }
 

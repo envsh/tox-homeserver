@@ -23,7 +23,7 @@ func newToxVM() *ToxVM {
 	this := &ToxVM{}
 	this.t = xtox.New(tvmCtx)
 	log.Println(this.t == nil)
-	xtox.SetAutoBotFeatures(this.t, xtox.FOTA_ADD_NET_HELP_BOTS|
+	xtox.SetAutoBotFeatures(this.t, xtox.FOTA_ADD_NET_HELP_BOTS|xtox.FOTA_REMOVE_ONLY_ME_ALL|
 		xtox.FOTA_ACCEPT_FRIEND_REQUEST|xtox.FOTA_ACCEPT_GROUP_INVITE)
 	this.setupCallbacks()
 	err := xtox.Connect(this.t)
