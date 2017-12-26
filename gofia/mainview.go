@@ -2,10 +2,8 @@ package gofia
 
 import (
 	"gopp"
-	"image/color"
 	"log"
 	"sort"
-	"strconv"
 	"strings"
 	"time"
 
@@ -13,7 +11,6 @@ import (
 	"gomatcha.io/matcha"
 	"gomatcha.io/matcha/application"
 	"gomatcha.io/matcha/bridge"
-	"gomatcha.io/matcha/keyboard"
 	"gomatcha.io/matcha/layout"
 	"gomatcha.io/matcha/layout/constraint"
 	"gomatcha.io/matcha/layout/table"
@@ -27,21 +24,17 @@ func init() {
 	// Registers a function with the objc bridge. This function returns
 	// a view.View, which can be displayed in a MatchaViewController.
 	bridge.RegisterFunc("tox-homeserver/gofia NewGofiaView", func() view.View {
-		// Call the TutorialView initializer.
-		v := NewTutorialView()
+		// Call the MainView initializer.
+		v := NewMainView()
 		return v
 	})
 }
 
 // Here is our root view.
-type TutorialView struct {
+type MainView struct {
 	// All components must implement the view.View interface. A basic implementation
 	// is provided by view.Embed.
 	view.Embed
-	TextColor color.Color
-	text      *text.Text
-	tnum      int
-	responder *keyboard.Responder
 
 	// contacts  []*ContactItem
 	// contactsv []view.View
@@ -49,13 +42,10 @@ type TutorialView struct {
 }
 
 // This is our view's initializer.
-func NewTutorialView() *TutorialView {
+func NewMainView() *MainView {
 	log.Println("herere", appctx != nil)
 	// AppOnCreate()
-	this := &TutorialView{}
-	this.TextColor = colornames.Red
-	this.text = text.New("")
-	this.responder = &keyboard.Responder{}
+	this := &MainView{}
 	appctx.logFn = this.logFn
 
 	// this.contacts = make([]*ContactItem, 0)
@@ -67,7 +57,7 @@ func NewTutorialView() *TutorialView {
 	return this
 }
 
-func (v *TutorialView) Lifecycle(from, to view.Stage) {
+func (v *MainView) Lifecycle(from, to view.Stage) {
 	if view.EntersStage(from, to, view.StageMounted) {
 		log.Println("hehre")
 	} else if view.EntersStage(from, to, view.StageVisible) {
@@ -85,7 +75,7 @@ func (v *TutorialView) Lifecycle(from, to view.Stage) {
 
 // Similar to React's render function. Views specify their properties and
 // children in Build().
-func (v *TutorialView) Build(ctx view.Context) view.Model {
+func (v *MainView) BuildTestView(ctx view.Context) view.Model {
 	/*
 		if appctx.currV != nil {
 			return view.Model{Children: []view.View{appctx.currV}}
@@ -93,19 +83,27 @@ func (v *TutorialView) Build(ctx view.Context) view.Model {
 	*/
 
 	l := &constraint.Layouter{}
+
+	log.Println("111")
+	// tpubkey := "398C8161D038FD328A573FFAA0F5FAAF7FFDE5E8B4350E7D15E6AFD0B993FC52"
+	// subv  := NewChatFormView()
+	subv := newLogView()
+	l.Add(subv, func(s *constraint.Solver) {
+		s.LeftEqual(l.Left())
+		s.TopEqual(l.Top())
+		s.RightEqual(l.Right())
+		s.BottomEqual(l.Bottom())
+	})
+
+	return view.Model{Children: l.Views(), Layouter: l}
+}
+
+func (v *MainView) Build(ctx view.Context) view.Model {
 	if false { // for test fixed chat form view
-		log.Println("111")
-		// tpubkey := "398C8161D038FD328A573FFAA0F5FAAF7FFDE5E8B4350E7D15E6AFD0B993FC52"
-		cf := NewChatFormView()
-		l.Add(cf, func(s *constraint.Solver) {
-			s.LeftEqual(l.Left())
-			s.TopEqual(l.Top())
-			s.RightEqual(l.Right())
-			s.BottomEqual(l.Bottom())
-		})
-		return view.Model{Children: l.Views(), Layouter: l}
+		return v.BuildTestView(ctx)
 	}
 
+	l := &constraint.Layouter{}
 	log.Println("Herehere")
 	hl := &constraint.Layouter{}
 	hl.Solve(func(s *constraint.Solver) {
@@ -194,58 +192,10 @@ func (v *TutorialView) Build(ctx view.Context) view.Model {
 		s.RightEqual(l.Right())
 	})
 
-	log.Println("Herehere")
-	// Create a new textview.
-	child := view.NewTextView()
-	child.String = "Hello World"
-	child.Style.SetTextColor(v.TextColor)
-	child.Style.SetFont(text.DefaultBoldFont(50))
-	child.PaintStyle = &paint.Style{BackgroundColor: colornames.Blue}
-
-	// Layout is primarily done using constraints. More info can be
-	// found in the matcha/layout/constraints docs.
-	l.Add(child, func(s *constraint.Solver) {
-		s.Top(50)
-		s.Left(0)
-	})
-
-	log.Println("Herehere")
-	logipt := view.NewTextInput()
-	logipt.RWText = v.text
-	logipt.Placeholder = "input log here:"
-	logipt.KeyboardType = keyboard.TextType
-	logipt.MaxLines = 5
-	logipt.Responder = v.responder
-	//logipt.OnSubmit = func(t *text.Text) {
-	// v.responder.Dismiss()
-	// t.SetString("")
-	//}
-	logipt.OnChange = func(t *text.Text) {
-		// v.Signal()
-		logipt.Signal()
-	}
-
-	/*
-		go func() {
-			time.Sleep(3 * time.Second)
-			matcha.MainLocker.Lock()
-			v.text.SetString("aaaa在aaaa" + "\n")
-			matcha.MainLocker.Unlock()
-			v.Signal()
-		}()
-	*/
-
-	// logipt.RWText.SetString("hehe呵呵")
-	l.Add(logipt, func(s *constraint.Solver) {
-		s.Top(100)
-		s.Left(0)
-		s.WidthEqual(l.Width())
-		s.Height(200)
-	})
-
 	// contacts
 	log.Println("contacts:", appctx.contactStates.Size())
 	vtable := &table.Layouter{}
+	vtable.StartEdge = layout.EdgeTop
 	pkids := gopp.IV2Strings(appctx.contactStates.Keys())
 	sort.Strings(pkids)
 	// TODO 排序？？？
@@ -256,18 +206,6 @@ func (v *TutorialView) Build(ctx view.Context) view.Model {
 		ctv.ctis = ctis
 		vtable.Add(ctv, nil)
 	}
-	/*
-		for i, ctv := range appctx.contactsv {
-			cell := NewTableCell()
-			cell.Axis = layout.AxisY
-			cell.Index = i
-			if false {
-				vtable.Add(cell, nil)
-			} else {
-				vtable.Add(ctv, nil)
-			}
-		}
-	*/
 	if appctx.contactStates.Size() < 12 {
 		for i := 0; i < 12-appctx.contactStates.Size(); i++ {
 			cell := NewTableCell()
@@ -286,12 +224,17 @@ func (v *TutorialView) Build(ctx view.Context) view.Model {
 	lstwin.ContentChildren = vtable.Views()
 	lstwin.OnScroll = func(p layout.Point) {
 	}
-	l.Add(lstwin, func(s *constraint.Solver) {
-		s.Top(200)
-		s.Left(0)
-		s.WidthEqual(l.Width())
+	guide := l.Add(lstwin, func(s *constraint.Solver) {
+		s.TopEqual(l.Top().Add(52))
+		s.LeftEqual(l.Left())
+		s.RightEqual(l.Right())
 		s.BottomEqual(l.Bottom())
+		s.WidthEqual(l.Width())
+		log.Println(l.Width())
+		// s.Debug()
 	})
+	log.Println(guide)
+	log.Println(ctx)
 
 	// Returns the view's children, layout, and styling.
 	return view.Model{
@@ -302,66 +245,25 @@ func (v *TutorialView) Build(ctx view.Context) view.Model {
 	}
 }
 
-func (v *TutorialView) logFn(s string) {
-	if v.tnum >= 10 {
+func (v *MainView) logFn(s string) {
+	lst := appctx.logState
+	if lst.tnum >= 10 {
 		matcha.MainLocker.Lock()
-		parts := strings.Split(v.text.String(), "\n")
+		parts := strings.Split(lst.text.String(), "\n")
 		tails := parts[1:]
-		v.text.SetString(strings.Join(tails, "\n"))
+		lst.text.SetString(strings.Join(tails, "\n"))
 		matcha.MainLocker.Unlock()
-		v.tnum = len(tails)
+		lst.tnum = len(tails)
 	}
 
 	matcha.MainLocker.Lock()
-	ns := v.text.String() + s + "\n"
-	v.text.SetString(ns)
+	ns := lst.text.String() + s + "\n"
+	lst.text.SetString(ns)
 	matcha.MainLocker.Unlock()
-	v.tnum += 1
+	lst.tnum += 1
 
 	// appctx.signalProperView(nil, true)
 	// v.Signal()
-}
-
-///
-type TableCell struct {
-	view.Embed
-	Axis  layout.Axis
-	Index int
-}
-
-func NewTableCell() *TableCell {
-	return &TableCell{}
-}
-
-func (v *TableCell) Build(ctx view.Context) view.Model {
-	l := &constraint.Layouter{}
-	l.Solve(func(s *constraint.Solver) {
-		if v.Axis == layout.AxisY {
-			s.Height(200)
-		} else {
-			s.Width(200)
-		}
-	})
-
-	label := view.NewTextView()
-	label.String = strconv.Itoa(v.Index)
-	l.Add(label, func(s *constraint.Solver) {
-	})
-
-	border := view.NewBasicView()
-	border.Painter = &paint.Style{BackgroundColor: colornames.Gray}
-	l.Add(border, func(s *constraint.Solver) {
-		s.Height(1)
-		s.LeftEqual(l.Left())
-		s.RightEqual(l.Right())
-		s.BottomEqual(l.Bottom())
-	})
-
-	return view.Model{
-		Children: l.Views(),
-		Layouter: l,
-		Painter:  &paint.Style{BackgroundColor: colornames.White},
-	}
 }
 
 //
@@ -392,7 +294,7 @@ func OnBackPressed() int {
 		clearLastBackPressed() //切换view，重新计数
 		appctx.app.Child = nil
 		appctx.app.ChildRelay.Signal()
-		// appctx.mainV.(*TutorialView).Signal()
+		// appctx.mainV.(*MainView).Signal()
 	}
 
 	return 0

@@ -179,7 +179,7 @@ func (v *ChatFormView) Buildfc(ctx view.Context) view.Model {
 	})
 	_ = guide
 
-	scrollBottom := 200*12 + msgcnt*30 // 或者给一个无限大的值滚动到底部？
+	scrollBottom := 12*200 + msgcnt*30 // 或者给一个无限大的值滚动到底部？
 	log.Println(ccsv.ScrollPosition == nil, scrollBottom)
 	if ccsv.ScrollPosition != nil {
 		log.Println(ccsv.ScrollPosition.Value()) //{0, 1770.5714111328125}
@@ -192,7 +192,7 @@ func (v *ChatFormView) Buildfc(ctx view.Context) view.Model {
 		if ccsv.ScrollPosition.Y.Value() < float64(scrollBottom) {
 			a := &animate.Basic{
 				Start: ccsv.ScrollPosition.Y.Value(),
-				End:   float64(scrollBottom * 2 / 3),
+				End:   float64(scrollBottom * 73 / 100),
 				Dur:   time.Second / 5,
 			}
 			log.Println("heree", ccsv.ScrollPosition.Y.Value(), scrollBottom)
@@ -208,7 +208,7 @@ func (v *ChatFormView) Buildfc(ctx view.Context) view.Model {
 	////// footer layout begin
 	fl := &constraint.Layouter{}
 	fl.Solve(func(s *constraint.Solver) {
-		setViewGeometry4(s, -1, -1, -1, 80)
+		setViewGeometry4(s, -1, -1, -1, 81)
 		s.LeftEqual(l.Left())
 		s.BottomEqual(l.Bottom())
 		s.RightEqual(l.Right())
@@ -247,7 +247,7 @@ func (v *ChatFormView) Buildfc(ctx view.Context) view.Model {
 	log.Println("heree")
 	//ftsv.PaintStyle = &paint.Style{BackgroundColor: colornames.Blue}
 	fl.Add(ftsv, func(s *constraint.Solver) {
-		setViewGeometry4(s, 0, 0, -1, 50)
+		// setViewGeometry4(s, 0, 0, -1, 53)
 		s.TopEqual(fl.Top())
 		s.LeftEqual(fl.Left())
 		s.BottomEqual(fl.Bottom())

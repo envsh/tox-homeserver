@@ -35,40 +35,44 @@ var smpRecv = metrics.NewUniformSample(10000)
 var smpSent = metrics.NewUniformSample(10000)
 var smpTotal = metrics.NewUniformSample(10000)
 
+const csuf = ".c"
+const msuf = ".m"
+const hsuf = ".h"
+
 func BytesRecved(n int) {
-	metrics.GetOrRegisterCounter(ByteRecv, MetReg).Inc(int64(n))
-	metrics.GetOrRegisterMeter(ByteRecv, MetReg).Mark(int64(n))
-	metrics.GetOrRegisterHistogram(ByteRecv, MetReg, smpRecv).Update(int64(n))
-	metrics.GetOrRegisterHistogram(ByteTotal, MetReg, smpTotal).Update(int64(n))
+	metrics.GetOrRegisterCounter(ByteRecv+csuf, MetReg).Inc(int64(n))
+	metrics.GetOrRegisterMeter(ByteRecv+msuf, MetReg).Mark(int64(n))
+	metrics.GetOrRegisterHistogram(ByteRecv+hsuf, MetReg, smpRecv).Update(int64(n))
+	metrics.GetOrRegisterHistogram(ByteTotal+hsuf, MetReg, smpTotal).Update(int64(n))
 }
 
 func BytesSent(n int) {
-	metrics.GetOrRegisterCounter(ByteSent, MetReg).Inc(int64(n))
-	metrics.GetOrRegisterMeter(ByteSent, MetReg).Mark(int64(n))
-	metrics.GetOrRegisterHistogram(ByteSent, MetReg, smpSent).Update(int64(n))
-	metrics.GetOrRegisterHistogram(ByteTotal, MetReg, smpTotal).Update(int64(n))
+	metrics.GetOrRegisterCounter(ByteSent+csuf, MetReg).Inc(int64(n))
+	metrics.GetOrRegisterMeter(ByteSent+msuf, MetReg).Mark(int64(n))
+	metrics.GetOrRegisterHistogram(ByteSent+hsuf, MetReg, smpSent).Update(int64(n))
+	metrics.GetOrRegisterHistogram(ByteTotal+hsuf, MetReg, smpTotal).Update(int64(n))
 }
 
 func MsgRecved(group bool) {
 	if group {
-		metrics.GetOrRegisterCounter(GmsgRecv, MetReg).Inc(1)
-		metrics.GetOrRegisterCounter(GmsgTotal, MetReg).Inc(1)
-		metrics.GetOrRegisterCounter(MsgTotal, MetReg).Inc(1)
+		metrics.GetOrRegisterCounter(GmsgRecv+csuf, MetReg).Inc(1)
+		metrics.GetOrRegisterCounter(GmsgTotal+csuf, MetReg).Inc(1)
+		metrics.GetOrRegisterCounter(MsgTotal+csuf, MetReg).Inc(1)
 	} else {
-		metrics.GetOrRegisterCounter(FmsgRecv, MetReg).Inc(1)
-		metrics.GetOrRegisterCounter(FmsgTotal, MetReg).Inc(1)
-		metrics.GetOrRegisterCounter(MsgTotal, MetReg).Inc(1)
+		metrics.GetOrRegisterCounter(FmsgRecv+csuf, MetReg).Inc(1)
+		metrics.GetOrRegisterCounter(FmsgTotal+csuf, MetReg).Inc(1)
+		metrics.GetOrRegisterCounter(MsgTotal+csuf, MetReg).Inc(1)
 	}
 }
 
 func MsgSent(group bool) {
 	if group {
-		metrics.GetOrRegisterCounter(GmsgSent, MetReg).Inc(1)
-		metrics.GetOrRegisterCounter(GmsgTotal, MetReg).Inc(1)
-		metrics.GetOrRegisterCounter(MsgTotal, MetReg).Inc(1)
+		metrics.GetOrRegisterCounter(GmsgSent+csuf, MetReg).Inc(1)
+		metrics.GetOrRegisterCounter(GmsgTotal+csuf, MetReg).Inc(1)
+		metrics.GetOrRegisterCounter(MsgTotal+csuf, MetReg).Inc(1)
 	} else {
-		metrics.GetOrRegisterCounter(FmsgSent, MetReg).Inc(1)
-		metrics.GetOrRegisterCounter(FmsgTotal, MetReg).Inc(1)
-		metrics.GetOrRegisterCounter(MsgTotal, MetReg).Inc(1)
+		metrics.GetOrRegisterCounter(FmsgSent+csuf, MetReg).Inc(1)
+		metrics.GetOrRegisterCounter(FmsgTotal+csuf, MetReg).Inc(1)
+		metrics.GetOrRegisterCounter(MsgTotal+csuf, MetReg).Inc(1)
 	}
 }

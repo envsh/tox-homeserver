@@ -265,5 +265,6 @@ func (this *ToxVM) pubmsg(evt *thspbs.Event) error {
 	if err == nil {
 		// log.Println("pubmsg ok", len(bcc))
 	}
+	common.BytesSent(len(bcc))
 	return err
 }

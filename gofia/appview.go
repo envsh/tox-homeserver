@@ -29,7 +29,7 @@ func NewApp() *App {
 	app.Stack = NewStack()
 	app.ChildRelay = &comm.Relay{}
 
-	v := NewTutorialView()
+	v := NewMainView()
 	app.Stack.SetViews(v)
 
 	return app
@@ -79,6 +79,6 @@ func (v *AppView) Build(ctx view.Context) view.Model {
 	// Otherwise display the stack view
 	// var stack view.View = NewStackViewWithStack(v.app.Stack)
 	// return view.Model{Children: []view.View{stack}}
-	nv := NewTutorialView()
+	nv := NewMainView()
 	return view.Model{Children: []view.View{nv}}
 }

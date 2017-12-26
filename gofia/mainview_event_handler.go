@@ -23,7 +23,7 @@ type mainViewState struct {
 	netStatus uint32
 }
 
-func (this *TutorialView) registerEvents() {
+func (this *MainView) registerEvents() {
 	vtc := appctx.vtcli
 	// appctx.mvst.nickName = "Tofia User"
 

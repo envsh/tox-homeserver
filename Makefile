@@ -32,7 +32,7 @@ gofiac: # check quickly
 	echo -e "const isandroid = true\n" >> gofia/btversion.go
 	go build -v --ldflags "${GOVVV2}" tox-homeserver/gofia
 	ls -l ${HOME}/golib/src/gomatcha.io/matcha/android/matchabridge.aar
-	cd ./bin/ && unzip ${HOME}/golib/src/gomatcha.io/matcha/android/matchabridge.aar
+	cd ./bin/ && unzip -o ${HOME}/golib/src/gomatcha.io/matcha/android/matchabridge.aar
 	ls -l ./bin/jni/armeabi*/
 
 tofiab: # build

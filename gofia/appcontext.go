@@ -44,6 +44,8 @@ type AppContext struct {
 
 	chatFormStates *hashmap.Map // id => chat form state datas
 	contactStates  *hashmap.Map // id => contact state datas
+
+	logState *LogState
 }
 
 var appctx *AppContext
@@ -57,6 +59,7 @@ func AppOnCreate() {
 
 		// 初始化顺序: server => memory => disk => network
 		appctx = &AppContext{}
+		appctx.logState = newLogState()
 		appctx.vtcli = thscli.NewLigTox()
 		//appctx.cfvs = hashmap.New()
 		//appctx.ctvs = hashmap.New()

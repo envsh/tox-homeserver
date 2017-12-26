@@ -138,12 +138,14 @@ func (this *GrpcService) GetBaseInfo(ctx context.Context, req *thspbs.EmptyReq) 
 		out.Groups[gn] = gi
 	}
 
+	common.BytesRecved(len(req.String()))
+	common.BytesSent(len(out.String()))
 	return out, nil
 }
 
 func (this *GrpcService) RmtCall(ctx context.Context, req *thspbs.Event) (*thspbs.Event, error) {
 	log.Println(req.Id, req.Name, req.Args, req.Margs)
-	out := thspbs.Event{}
+	out := &thspbs.Event{}
 
 	var err error
 	t := appctx.tvm.t
@@ -160,11 +162,17 @@ func (this *GrpcService) RmtCall(ctx context.Context, req *thspbs.Event) (*thspb
 		_, err = t.ConferenceSendMessage(uint32(gnum), mtype, req.Args[2])
 		gopp.ErrPrint(err)
 	}
-	return &out, nil
+
+	common.BytesRecved(len(req.String()))
+	common.BytesSent(len(out.String()))
+	return out, nil
 }
 
 func (this *GrpcService) Ping(ctx context.Context, req *thspbs.EmptyReq) (*thspbs.EmptyReq, error) {
-	return &thspbs.EmptyReq{}, nil
+	out := &thspbs.EmptyReq{}
+	common.BytesRecved(len(req.String()))
+	common.BytesSent(len(out.String()))
+	return out, nil
 }
 
 func (this *GrpcService) PollCallback(req *thspbs.EmptyReq, stm thspbs.Toxhs_PollCallbackServer) error {
