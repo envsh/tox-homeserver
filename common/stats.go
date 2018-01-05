@@ -2,10 +2,10 @@ package common
 
 import (
 	"log"
-	"os"
 	"sync"
 	"time"
 
+	"github.com/dustin/go-humanize"
 	metrics "github.com/rcrowley/go-metrics"
 )
 
@@ -23,11 +23,35 @@ const (
 )
 
 var MetReg = metrics.NewRegistry()
-var logMet sync.Once
+var logMet1 sync.Once
+
+var ffn = func(n float64) string { return humanize.FormatFloat("#.##", n) }
+
+func logMetFancy() {
+	recvMeter := metrics.GetOrRegisterMeter(ByteRecv+msuf, MetReg)
+	sentMeter := metrics.GetOrRegisterMeter(ByteSent+msuf, MetReg)
+	log.Println("meter:", ByteRecv+msuf, "count:", recvMeter.Count(), ",",
+		"1-min rate:", ffn(recvMeter.Rate1()), ",",
+		"5-min rate:", ffn(recvMeter.Rate5()), ",",
+		"15-min rate:", ffn(recvMeter.Rate15()), ",",
+		"mean rate:", ffn(recvMeter.RateMean()))
+	log.Println("meter:", ByteSent+msuf, "count:", sentMeter.Count(), ",",
+		"1-min rate:", ffn(sentMeter.Rate1()), ",",
+		"5-min rate:", ffn(sentMeter.Rate5()), ",",
+		"15-min rate:", ffn(sentMeter.Rate15()), ",",
+		"mean rate:", ffn(sentMeter.RateMean()))
+}
 
 func SetLogMetrics() {
-	logMet.Do(func() {
-		go metrics.Log(MetReg, 30*time.Second, log.New(os.Stdout, LogPrefix, log.Lmicroseconds|log.Lshortfile))
+	logMet1.Do(func() {
+		freq := 30 * time.Second
+		// go metrics.Log(MetReg, freq, log.New(os.Stdout, LogPrefix, log.Lmicroseconds|log.Lshortfile))
+		go func() {
+			for {
+				time.Sleep(freq)
+				logMetFancy()
+			}
+		}()
 	})
 }
 

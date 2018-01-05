@@ -36,6 +36,7 @@ type MainView struct {
 	// is provided by view.Embed.
 	view.Embed
 
+	OnTouch func()
 	// contacts  []*ContactItem
 	// contactsv []view.View
 	// mvst *mainViewState
@@ -87,7 +88,8 @@ func (v *MainView) BuildTestView(ctx view.Context) view.Model {
 	log.Println("111")
 	// tpubkey := "398C8161D038FD328A573FFAA0F5FAAF7FFDE5E8B4350E7D15E6AFD0B993FC52"
 	// subv  := NewChatFormView()
-	subv := newLogView()
+	// subv := newLogView()
+	subv := NewTouchView()
 	l.Add(subv, func(s *constraint.Solver) {
 		s.LeftEqual(l.Left())
 		s.TopEqual(l.Top())
@@ -95,7 +97,8 @@ func (v *MainView) BuildTestView(ctx view.Context) view.Model {
 		s.BottomEqual(l.Bottom())
 	})
 
-	return view.Model{Children: l.Views(), Layouter: l}
+	vm := view.Model{Children: l.Views(), Layouter: l}
+	return vm
 }
 
 func (v *MainView) Build(ctx view.Context) view.Model {
@@ -237,12 +240,14 @@ func (v *MainView) Build(ctx view.Context) view.Model {
 	log.Println(ctx)
 
 	// Returns the view's children, layout, and styling.
-	return view.Model{
+	vm := view.Model{
 		Children: l.Views(),
 		// Children: []view.View{setbtn, stbtn, nlab, child},
 		Layouter: l,
 		Painter:  &paint.Style{BackgroundColor: colornames.Lightgray},
 	}
+
+	return vm
 }
 
 func (v *MainView) logFn(s string) {

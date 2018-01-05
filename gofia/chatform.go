@@ -156,10 +156,12 @@ func (v *ChatFormView) Buildfc(ctx view.Context) view.Model {
 	}
 	// TODO 设置首次加载消息最大数，然后滚动下拉持续加载
 	msgcnt := 0
+	msgLines := 0
 	v.cfst.msgs.Each(func(index int, value interface{}) {
 		msgo := value.(*ContactMessage)
 		msgv := NewMessageView(msgo)
 		cctablo.Add(msgv, nil)
+		msgLines += msgv.lineCnt
 		msgcnt += 1
 	})
 	ccsv := view.NewScrollView()
@@ -180,6 +182,7 @@ func (v *ChatFormView) Buildfc(ctx view.Context) view.Model {
 	_ = guide
 
 	scrollBottom := 12*200 + msgcnt*30 // 或者给一个无限大的值滚动到底部？
+	scrollBottom = 12*200 + msgLines*30
 	log.Println(ccsv.ScrollPosition == nil, scrollBottom)
 	if ccsv.ScrollPosition != nil {
 		log.Println(ccsv.ScrollPosition.Value()) //{0, 1770.5714111328125}

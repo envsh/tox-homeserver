@@ -3,6 +3,7 @@ package gofia
 import (
 	"gopp"
 	"log"
+	"math"
 	"time"
 
 	"github.com/kitech/godsts/lists/arraylist"
@@ -12,6 +13,7 @@ import (
 	"gomatcha.io/matcha/keyboard"
 	"gomatcha.io/matcha/layout/constraint"
 	"gomatcha.io/matcha/paint"
+	"gomatcha.io/matcha/pointer"
 	"gomatcha.io/matcha/text"
 	"gomatcha.io/matcha/view"
 )
@@ -50,6 +52,8 @@ func newContactItemState() *ContactItemState {
 
 type ContactItem struct {
 	view.Embed
+
+	OnTouch func()
 
 	ctis *ContactItemState
 }
@@ -182,6 +186,26 @@ func (this *ContactItem) Build(ctx view.Context) view.Model {
 	vm.Children = l.Views()
 	vm.Painter = &paint.Style{BackgroundColor: colornames.White}
 
+	vm.Options = []view.Option{
+		pointer.GestureList{&pointer.PressGesture{
+			MinDuration: time.Second / 2,
+			OnEvent: func(e *pointer.PressEvent) {
+				if e.Kind == pointer.EventKindPossible {
+					log.Println("Press Possible")
+				} else if e.Kind == pointer.EventKindChanged {
+					log.Println("Press Changed")
+				} else if e.Kind == pointer.EventKindFailed {
+					log.Println("Press Failed")
+				} else if e.Kind == pointer.EventKindRecognized {
+					log.Println("Press Recognized")
+					if this.OnTouch != nil {
+						this.OnTouch()
+					}
+				}
+			},
+		}},
+	}
+
 	return vm
 }
 
@@ -205,51 +229,68 @@ type MessageView struct {
 	view.Embed
 
 	msg *ContactMessage
+
+	width   int
+	lineNo  int
+	lineCnt int
+
+	OnTouch func()
+}
+
+func calcLineCnt(s string) int {
+	charsPerLine := 21
+	slen := len(s)
+	n := math.Ceil(float64(slen) / float64(charsPerLine) / 3)
+	if true {
+		return int(n)
+	}
+	return 1
 }
 
 func NewMessageView(msg *ContactMessage) *MessageView {
 	this := &MessageView{}
 	this.msg = msg
 
+	this.lineCnt = calcLineCnt(msg.msg)
 	return this
 }
 
 func (this *MessageView) Build(ctx view.Context) view.Model {
 	l := &constraint.Layouter{}
 	l.Solve(func(s *constraint.Solver) {
-		s.Height(30)
+		s.Height(float64(30 * this.lineCnt))
 	})
+
+	icobtn := view.NewImageButton()
+	icobtn.Image = application.MustLoadImage("icon_avatar_40")
+	icobtn.OnPress = func() {
+		// TODO show contact info
+	}
+
+	msgtxt := view.NewTextView()
+	msgtxt.Style.SetAlignment(text.AlignmentLeft)
+	msgtxt.Style.SetWrap(text.WrapWord)
+	msgtxt.PaintStyle = &paint.Style{BackgroundColor: colornames.Greenyellow}
+	msgtxt.String = gopp.IfElseStr(this.msg.mine, "mine:", "frnd:") + this.msg.msg
 
 	// 自己消息与对方消息的view排列
 	if this.msg.mine {
-		icobtn := view.NewImageButton()
-		icobtn.Image = application.MustLoadImage("icon_avatar_40")
 		l.Add(icobtn, func(s *constraint.Solver) {
 			setViewGeometry4(s, 0, -1, 30, 30)
 			s.RightEqual(l.Right())
 		})
 
-		msgtxt := view.NewTextView()
-		msgtxt.Style.SetAlignment(text.AlignmentCenter)
-		msgtxt.Style.SetWrap(text.WrapWord)
-		msgtxt.PaintStyle = &paint.Style{BackgroundColor: colornames.Greenyellow}
-		msgtxt.String = gopp.IfElseStr(this.msg.mine, "mine:", "frnd:") + this.msg.msg
 		l.Add(msgtxt, func(s *constraint.Solver) {
-			setViewGeometry4(s, 0, 40, -1, 30)
+			setViewGeometry4(s, 0, 40, -1, float64(30*this.lineCnt))
 			s.RightEqual(l.Right().Add(-40))
 		})
-
 	} else {
-		icobtn := view.NewImageButton()
-		icobtn.Image = application.MustLoadImage("user_40")
 		l.Add(icobtn, func(s *constraint.Solver) {
 			setViewGeometry4(s, 0, 0, 30, 30)
 		})
 
-		msgtxt := view.NewTextView()
-		msgtxt.String = gopp.IfElseStr(this.msg.mine, "mine:", "frnd:") + this.msg.msg
 		l.Add(msgtxt, func(s *constraint.Solver) {
-			setViewGeometry4(s, 0, 40, -1, 30)
+			setViewGeometry4(s, 0, 40, -1, float64(30*this.lineCnt))
 			s.RightEqual(l.Right().Add(-40))
 		})
 	}

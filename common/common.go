@@ -24,7 +24,7 @@ var GnatsAddrlo = fmt.Sprintf("nats://%s:%d", "127.0.0.1", GnatsPort)
 const DefaultUserName = "Tox User"
 const GroupTitleSep = " ::: " // group title and group stmsg title, "@title@ ::: @stmsg@"
 
-const LogPrefix = "gofiat"
+const LogPrefix = "[gofiat] "
 
 func init() {
 
