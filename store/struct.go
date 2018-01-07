@@ -1,4 +1,4 @@
-package gofia
+package store
 
 type Contact struct {
 	Id         int    `xorm:"pk autoincr INTEGER"`

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"gopp"
 	"log"
+	"math"
 	"time"
 	"tox-homeserver/common"
 	"tox-homeserver/thspbs"
@@ -28,7 +29,23 @@ func newToxVM() *ToxVM {
 	this.setupCallbacks()
 	err := xtox.Connect(this.t)
 	gopp.ErrPrint(err)
+
+	this.exportFriendInfoToDb()
 	return this
+}
+
+func (this *ToxVM) exportFriendInfoToDb() {
+	for i := uint32(0); i < math.MaxUint32; i++ {
+		if !this.t.FriendExists(i) {
+			break
+		}
+		name, err := this.t.FriendGetName(i)
+		stmsg, err := this.t.FriendGetStatusMessage(i)
+		pubkey, err := this.t.FriendGetPublicKey(i)
+		gopp.ErrPrint(err)
+		_, err = appctx.st.AddFriend(pubkey, i, name, stmsg)
+		gopp.ErrPrint(err)
+	}
 }
 
 func (this *ToxVM) setupCallbacks() {
@@ -52,6 +69,10 @@ func (this *ToxVM) setupCallbacks() {
 		evt.Name = "FriendRequest"
 		evt.Args = []string{pubkey, message}
 
+		ctid, err := appctx.st.AddFriend(pubkey, 0, "", "")
+		gopp.ErrPrint(err)
+		evt.Margs = append(evt.Margs, fmt.Sprintf("%d", ctid))
+
 		this.pubmsg(&evt)
 	}, nil)
 
@@ -63,7 +84,11 @@ func (this *ToxVM) setupCallbacks() {
 		gopp.ErrPrint(err)
 		fname, err := t.FriendGetName(friendNumber)
 		gopp.ErrPrint(err)
-		evt.Margs = []string{fname, pubkey}
+
+		msgid, err := appctx.st.AddFriendMessage(message, pubkey)
+		gopp.ErrPrint(err)
+
+		evt.Margs = []string{fname, pubkey, fmt.Sprintf("%d", msgid)}
 		this.pubmsg(&evt)
 	}, nil)
 
@@ -143,6 +168,10 @@ func (this *ToxVM) setupCallbacks() {
 		cookie2, _ := t.ConferenceGetIdentifier(gn)
 		log.Println(cookie2 == cookie, cookie, cookie2)
 
+		ctid, err := appctx.st.AddGroup(cookie2, gn, "")
+		gopp.ErrPrint(err)
+		evt.Margs = append(evt.Margs, fmt.Sprintf("%d", ctid))
+
 		this.pubmsg(&evt)
 	}, nil)
 
@@ -165,8 +194,10 @@ func (this *ToxVM) setupCallbacks() {
 			groupId, _ = t.ConferenceGetIdentifier(groupNumber)
 		}
 
-		evt.Margs = []string{peerName, peerPubkey, title, groupId}
+		msgid, err := appctx.st.AddGroupMessage(message, "0", groupId, peerPubkey)
+		gopp.ErrPrint(err)
 
+		evt.Margs = []string{peerName, peerPubkey, title, groupId, fmt.Sprintf("%d", msgid)}
 		if t.SelfGetPublicKey() == peerPubkey {
 		} else {
 			this.pubmsg(&evt)
@@ -215,7 +246,9 @@ func (this *ToxVM) setupCallbacks() {
 			groupId, _ = t.ConferenceGetIdentifier(groupNumber)
 		}
 
-		evt.Margs = []string{peerName, peerPubkey, title, groupId}
+		ctid, err := appctx.st.AddPeer(peerPubkey, groupNumber)
+		gopp.ErrPrint(err)
+		evt.Margs = []string{peerName, peerPubkey, title, groupId, fmt.Sprintf("%d", ctid)}
 
 		this.pubmsg(&evt)
 	}, nil)

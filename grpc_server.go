@@ -154,6 +154,10 @@ func (this *GrpcService) RmtCall(ctx context.Context, req *thspbs.Event) (*thspb
 		fnum := gopp.MustInt(req.Args[0])
 		_, err = t.FriendSendMessage(uint32(fnum), req.Args[1])
 		gopp.ErrPrint(err)
+		pubkey := t.SelfGetPublicKey()
+		msgid, err := appctx.st.AddFriendMessage(req.Args[1], pubkey)
+		gopp.ErrPrint(err, msgid)
+		out.Mid = msgid
 		// groups
 	case "ConferenceDelete": // "groupNumber"
 	case "ConferenceSendMessage": // "groupNumber","mtype","msg"
@@ -161,6 +165,11 @@ func (this *GrpcService) RmtCall(ctx context.Context, req *thspbs.Event) (*thspb
 		mtype := gopp.MustInt(req.Args[1])
 		_, err = t.ConferenceSendMessage(uint32(gnum), mtype, req.Args[2])
 		gopp.ErrPrint(err)
+		cookie, _ := xtox.ConferenceGetCookie(t, uint32(gnum))
+		pubkey := t.SelfGetPublicKey()
+		msgid, err := appctx.st.AddGroupMessage(req.Args[2], "0", cookie, pubkey)
+		gopp.ErrPrint(err, msgid)
+		out.Mid = msgid
 	}
 
 	common.BytesRecved(len(req.String()))

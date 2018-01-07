@@ -14,7 +14,7 @@ democ: com
 com:
 	protoc -I. ths.proto --go_out=plugins=grpc:./thspbs/
 	# cd ${HOME}/golib/src/github.com/go-xorm/cmd/xorm && xorm reverse -s sqlite3 "${CPWD}/data/toxhs.sqlite" templates/goxorm "${CPWD}/gofia/"
-	go install -v ./thspbs/ ./common/ ./client/
+	go install -v ./thspbs/ ./common/ ./client/ ./store/
 
 
 allfia: gofiab tofiab tofiai

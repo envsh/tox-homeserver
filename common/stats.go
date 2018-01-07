@@ -30,16 +30,13 @@ var ffn = func(n float64) string { return humanize.FormatFloat("#.##", n) }
 func logMetFancy() {
 	recvMeter := metrics.GetOrRegisterMeter(ByteRecv+msuf, MetReg)
 	sentMeter := metrics.GetOrRegisterMeter(ByteSent+msuf, MetReg)
-	log.Println("meter:", ByteRecv+msuf, "count:", recvMeter.Count(), ",",
-		"1-min rate:", ffn(recvMeter.Rate1()), ",",
-		"5-min rate:", ffn(recvMeter.Rate5()), ",",
-		"15-min rate:", ffn(recvMeter.Rate15()), ",",
-		"mean rate:", ffn(recvMeter.RateMean()))
-	log.Println("meter:", ByteSent+msuf, "count:", sentMeter.Count(), ",",
-		"1-min rate:", ffn(sentMeter.Rate1()), ",",
-		"5-min rate:", ffn(sentMeter.Rate5()), ",",
-		"15-min rate:", ffn(sentMeter.Rate15()), ",",
-		"mean rate:", ffn(sentMeter.RateMean()))
+	tplstr := "meter: %s, count: %d, 1-min rate: %s, 5-min rate: %s, 15-min rate: %s, mean rate: %s\n"
+	log.Printf(tplstr, ByteRecv+msuf, recvMeter.Count(),
+		ffn(recvMeter.Rate1()), ffn(recvMeter.Rate5()),
+		ffn(recvMeter.Rate15()), ffn(recvMeter.RateMean()))
+	log.Printf(tplstr, ByteSent+msuf, sentMeter.Count(),
+		ffn(sentMeter.Rate1()), ffn(sentMeter.Rate5()),
+		ffn(sentMeter.Rate15()), ffn(sentMeter.RateMean()))
 }
 
 func SetLogMetrics() {

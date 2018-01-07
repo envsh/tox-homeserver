@@ -11,6 +11,7 @@ import (
 
 	thscli "tox-homeserver/client"
 	thscom "tox-homeserver/common"
+	"tox-homeserver/store"
 	"tox-homeserver/thspbs"
 
 	simplejson "github.com/bitly/go-simplejson"
@@ -70,12 +71,12 @@ func AppOnCreate() {
 		appctx.mvst = &mainViewState{}
 		appctx.mvst.nickName = "Tofia User"
 
-		appctx.store = newStorage()
-		if appctx.store.deviceEmpty() {
-			err := appctx.store.addDevice()
+		appctx.store = store.NewStorage()
+		if appctx.store.DeviceEmpty() {
+			err := appctx.store.AddDevice()
 			gopp.ErrPrint(err)
 		}
-		dv := appctx.store.getDevice()
+		dv := appctx.store.GetDevice()
 		if dv != nil {
 			log.Println("my device:", dv.Uuid)
 		} else {
@@ -145,7 +146,7 @@ func (this *AppContext) dispatchEvent(jso *simplejson.Json) {
 	case "FriendRequest":
 		///
 		pubkey := jso.Get("args").GetIndex(0).MustString()
-		err := appctx.store.addFriend(pubkey, 0, "", "")
+		_, err := appctx.store.AddFriend(pubkey, 0, "", "")
 		gopp.ErrPrint(err, jso.Get("args"))
 
 	case "FriendMessage":
@@ -174,7 +175,7 @@ func (this *AppContext) dispatchEvent(jso *simplejson.Json) {
 		}
 
 		///
-		err := appctx.store.addFriendMessage(msg, pubkey)
+		_, err := appctx.store.AddFriendMessage(msg, pubkey)
 		gopp.ErrPrint(err)
 
 	case "FriendConnectionStatus":
@@ -213,7 +214,7 @@ func (this *AppContext) dispatchEvent(jso *simplejson.Json) {
 		}
 
 		///
-		err := appctx.store.addGroup(groupId, ctis.cnum, ctis.ctname)
+		_, err := appctx.store.AddGroup(groupId, ctis.cnum, ctis.ctname)
 		gopp.ErrPrint(err)
 
 	case "ConferenceTitle":
@@ -266,7 +267,7 @@ func (this *AppContext) dispatchEvent(jso *simplejson.Json) {
 
 		///
 		peerPubkey := jso.Get("margs").GetIndex(1).MustString()
-		err := appctx.store.addPeer(peerPubkey, 0)
+		_, err := appctx.store.AddPeer(peerPubkey, 0)
 		gopp.ErrPrint(err)
 
 	case "ConferenceMessage":
@@ -300,7 +301,7 @@ func (this *AppContext) dispatchEvent(jso *simplejson.Json) {
 
 		//
 		peerPubkey := jso.Get("margs").GetIndex(1).MustString()
-		err := appctx.store.addGroupMessage(message, "0", groupId, peerPubkey)
+		_, err := appctx.store.AddGroupMessage(message, "0", groupId, peerPubkey)
 		gopp.ErrPrint(err)
 
 	default:

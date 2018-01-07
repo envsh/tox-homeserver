@@ -14,6 +14,7 @@ import (
 	"syscall"
 	"time"
 	"tox-homeserver/common"
+	"tox-homeserver/store"
 
 	"github.com/google/gops/agent"
 	"github.com/kitech/go-toxcore/xtox"
@@ -27,6 +28,7 @@ func init() {
 type appContext struct {
 	tvm  *ToxVM
 	rpcs *GrpcServer
+	st   *store.Storage
 }
 
 var appctx = &appContext{}
@@ -51,6 +53,7 @@ func main() {
 		log.Fatalln(err)
 	}
 
+	appctx.st = store.NewStorage()
 	common.SetLogMetrics()
 	go func() {
 		err := http.ListenAndServe(":8089", nil)

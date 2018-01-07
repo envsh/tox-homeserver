@@ -52,7 +52,7 @@ func (this *MainView) registerEvents() {
 			cfst := &*ctis
 			appctx.chatFormStates.Put(ctis.ctid, cfst)
 
-			err := appctx.store.addFriend(frnd.Pubkey, fn, frnd.Name, frnd.Stmsg)
+			_, err := appctx.store.AddFriend(frnd.Pubkey, fn, frnd.Name, frnd.Stmsg)
 			gopp.ErrPrint(err, frnd)
 		}
 
@@ -70,7 +70,7 @@ func (this *MainView) registerEvents() {
 			ctsf := &*ctis
 			appctx.chatFormStates.Put(ctis.ctid, ctsf)
 
-			err := appctx.store.addGroup(grp.GroupId, gn, grp.Title)
+			_, err := appctx.store.AddGroup(grp.GroupId, gn, grp.Title)
 			gopp.ErrPrint(err, grp)
 		}
 
