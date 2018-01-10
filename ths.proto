@@ -24,6 +24,7 @@ message BaseInfo {
     uint32 status = 4;
     map<uint32,FriendInfo> friends = 5;
     map<uint32,GroupInfo> groups = 6;
+    int32 connStatus = 7;
 }
 
 message FriendInfo {
@@ -34,6 +35,7 @@ message FriendInfo {
     string stmsg = 5;
     string avatar = 6;
     uint64 seen  = 7;
+    int32 connStatus = 8;
 }
 
 message GroupInfo {

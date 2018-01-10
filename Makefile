@@ -43,6 +43,14 @@ tofiai: # install
 tofiac: # clean
 	rm -vf ./tofia/app/build/outputs/apk/*/*.apk
 
+emu:
+	go build -v -buildmode=c-shared -o bin/libtoxcore.so ./toxemu/
+	chmod +x bin/libtoxcore.so
+	rm -f ~/.config/tox/tox_save.lock
+
+emuc:
+	go build -v -o /tmp/toxemu.out ./toxemu/
+
 lint:
 
 pprof:

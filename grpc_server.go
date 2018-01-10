@@ -78,7 +78,8 @@ func (this *GrpcService) GetBaseInfo(ctx context.Context, req *thspbs.EmptyReq) 
 	out.Id = t.SelfGetAddress()
 	out.Name = t.SelfGetName()
 	out.Stmsg, _ = t.SelfGetStatusMessage()
-	out.Status = uint32(t.SelfGetConnectionStatus())
+	out.Status = uint32(t.SelfGetStatus())
+	out.ConnStatus = int32(t.SelfGetConnectionStatus())
 	out.Friends = make(map[uint32]*thspbs.FriendInfo)
 	out.Groups = make(map[uint32]*thspbs.GroupInfo)
 
@@ -95,6 +96,7 @@ func (this *GrpcService) GetBaseInfo(ctx context.Context, req *thspbs.EmptyReq) 
 		fi.Name = fname
 		fi.Stmsg = stmsg
 		fi.Status = uint32(fstatus)
+		fi.ConnStatus = int32(fstatus)
 
 		out.Friends[fn] = fi
 	}

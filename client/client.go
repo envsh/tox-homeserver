@@ -12,6 +12,8 @@ import (
 
 	thscom "tox-homeserver/common"
 
+	simplejson "github.com/bitly/go-simplejson"
+	"github.com/nats-io/go-nats"
 	"google.golang.org/grpc"
 )
 
@@ -48,7 +50,8 @@ type LigTox struct {
 	Stmsg  string
 	Binfo  *thspbs.BaseInfo
 
-	rpcli *grpc.ClientConn
+	rpcli  *grpc.ClientConn
+	ntscli *nats.Conn
 
 	// some callbacks, should be private. &fn => ud
 	cb_friend_requests           map[unsafe.Pointer]interface{}
@@ -90,6 +93,12 @@ func NewLigTox() *LigTox {
 	gopp.ErrPrint(err, rpcli)
 	this.rpcli = rpcli
 
+	ntscli, err := nats.Connect(thscom.GnatsAddr)
+	gopp.ErrPrint(err)
+	this.ntscli = ntscli
+	log.Println("gnats connected:", ntscli.IsConnected(), thscom.GnatsAddr)
+	ntscli.Subscribe(thscom.CBEventBusName, this.onBackendEvent)
+
 	return this
 }
 
@@ -119,6 +128,33 @@ func (this *LigTox) initCbmap() {
 
 	this.cb_baseinfos = make(map[unsafe.Pointer]interface{})
 
+}
+
+func (this *LigTox) onBackendEvent(msg *nats.Msg) {
+	log.Println(msg.Subject, string(msg.Data))
+	jso, err := simplejson.NewJson(msg.Data)
+	gopp.ErrPrint(err)
+
+	evtName := jso.Get("name").MustString()
+	switch evtName {
+	case "FriendConnectionStatus":
+		fnum := uint32(jso.Get("args").GetIndex(0).MustInt())
+		st := jso.Get("args").GetIndex(1).MustInt()
+		this.callbackFriendConnectionStatus(fnum, st)
+	case "FriendMessage":
+		fnums := jso.Get("args").GetIndex(0).MustString()
+		fnum := uint32(gopp.MustInt(fnums))
+		log.Println(fnum)
+		this.callbackFriendMessage(fnum, 0, jso.Get("args").GetIndex(1).MustString())
+	}
+}
+
+func (this *LigTox) GetBaseInfo() {
+	c := thspbs.NewToxhsClient(this.rpcli)
+	in := &thspbs.EmptyReq{}
+	bi, err := c.GetBaseInfo(context.Background(), in)
+	gopp.ErrPrint(err)
+	this.ParseBaseInfo(bi)
 }
 
 func (this *LigTox) ParseBaseInfo(bi *thspbs.BaseInfo) {
@@ -475,11 +511,41 @@ func (this *LigTox) Bootstrap(addr string, port uint16, pubkey string) (bool, er
 }
 
 func (this *LigTox) SelfGetAddress() string {
-	return ""
+	return this.Binfo.GetId()
 }
 
 func (this *LigTox) SelfGetConnectionStatus() int {
-	return int(0)
+	return int(this.Binfo.GetConnStatus())
+}
+func (this *LigTox) SelfSetName(name string) error {
+	return nil
+}
+
+func (this *LigTox) SelfGetName() string {
+	return this.Binfo.GetName()
+}
+
+func (this *LigTox) SelfGetNameSize() int {
+	return len(this.Binfo.GetName())
+}
+
+func (this *LigTox) SelfSetStatusMessage(status string) (bool, error) {
+	return true, nil
+}
+
+func (this *LigTox) SelfSetStatus(status uint8) {
+}
+
+func (this *LigTox) SelfGetStatusMessageSize() int {
+	return len(this.Binfo.GetStmsg())
+}
+
+func (this *LigTox) SelfGetStatusMessage() (string, error) {
+	return this.Binfo.GetStmsg(), nil
+}
+
+func (this *LigTox) SelfGetStatus() int {
+	return int(this.Binfo.GetStatus())
 }
 
 func (this *LigTox) FriendAdd(friendId string, message string) (uint32, error) {
@@ -495,6 +561,10 @@ func (this *LigTox) FriendByPublicKey(pubkey string) (uint32, error) {
 }
 
 func (this *LigTox) FriendGetPublicKey(friendNumber uint32) (string, error) {
+	frnds := this.Binfo.GetFriends()
+	if frndo, ok := frnds[friendNumber]; ok {
+		return frndo.Pubkey, nil
+	}
 	return "", nil
 }
 
@@ -503,6 +573,10 @@ func (this *LigTox) FriendDelete(friendNumber uint32) (bool, error) {
 }
 
 func (this *LigTox) FriendGetConnectionStatus(friendNumber uint32) (int, error) {
+	frnds := this.Binfo.GetFriends()
+	if frndo, ok := frnds[friendNumber]; ok {
+		return int(frndo.ConnStatus), nil
+	}
 	return int(0), nil
 }
 
@@ -526,55 +600,44 @@ func (this *LigTox) FriendSendAction(friendNumber uint32, action string) (uint32
 	return uint32(0), nil
 }
 
-func (this *LigTox) SelfSetName(name string) error {
-	return nil
-}
-
-func (this *LigTox) SelfGetName() string {
-	return string("")
-}
-
 func (this *LigTox) FriendGetName(friendNumber uint32) (string, error) {
+	frnds := this.Binfo.GetFriends()
+	if frndo, ok := frnds[friendNumber]; ok {
+		return frndo.Name, nil
+	}
 	return string(""), nil
 }
 
 func (this *LigTox) FriendGetNameSize(friendNumber uint32) (int, error) {
+	frnds := this.Binfo.GetFriends()
+	if frndo, ok := frnds[friendNumber]; ok {
+		return len(frndo.Name), nil
+	}
 	return int(0), nil
-}
-
-func (this *LigTox) SelfGetNameSize() int {
-	return int(0)
-}
-
-func (this *LigTox) SelfSetStatusMessage(status string) (bool, error) {
-	return true, nil
-}
-
-func (this *LigTox) SelfSetStatus(status uint8) {
 }
 
 func (this *LigTox) FriendGetStatusMessageSize(friendNumber uint32) (int, error) {
+	frnds := this.Binfo.GetFriends()
+	if frndo, ok := frnds[friendNumber]; ok {
+		return len(frndo.Stmsg), nil
+	}
 	return int(0), nil
 }
 
-func (this *LigTox) SelfGetStatusMessageSize() int {
-	return int(0)
-}
-
 func (this *LigTox) FriendGetStatusMessage(friendNumber uint32) (string, error) {
-	return string(""), nil
-}
-
-func (this *LigTox) SelfGetStatusMessage() (string, error) {
+	frnds := this.Binfo.GetFriends()
+	if frndo, ok := frnds[friendNumber]; ok {
+		return frndo.Stmsg, nil
+	}
 	return string(""), nil
 }
 
 func (this *LigTox) FriendGetStatus(friendNumber uint32) (int, error) {
+	frnds := this.Binfo.GetFriends()
+	if frndo, ok := frnds[friendNumber]; ok {
+		return int(frndo.Status), nil
+	}
 	return int(0), nil
-}
-
-func (this *LigTox) SelfGetStatus() int {
-	return int(0)
 }
 
 func (this *LigTox) FriendGetLastOnline(friendNumber uint32) (uint64, error) {
@@ -590,11 +653,15 @@ func (this *LigTox) FriendGetTyping(friendNumber uint32) (bool, error) {
 }
 
 func (this *LigTox) SelfGetFriendListSize() uint32 {
-	return uint32(0)
+	return uint32(len(this.Binfo.GetFriends()))
 }
 
 func (this *LigTox) SelfGetFriendList() []uint32 {
-	return nil
+	fns := []uint32{}
+	for _, fo := range this.Binfo.GetFriends() {
+		fns = append(fns, fo.GetFnum())
+	}
+	return fns
 }
 
 // tox_callback_***
@@ -607,7 +674,7 @@ func (this *LigTox) SelfSetNospam(nospam uint32) {
 }
 
 func (this *LigTox) SelfGetPublicKey() string {
-	return strings.ToUpper("")
+	return this.Binfo.GetId()[:64]
 }
 
 func (this *LigTox) SelfGetSecretKey() string {
