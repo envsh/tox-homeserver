@@ -14,7 +14,8 @@ var GrpcIp = "10.0.0.31"
 const GrpcPort = uint16(2080)
 
 // const GnatsIp = "10.0.0.6"
-const GnatsIp = "10.0.0.31"
+// const GnatsIp = "10.0.0.31"
+const GnatsIp = "txhs.duckdns.org"
 const GnatsPort = uint16(4111) //uint16(4222)
 
 var GrpcAddr = fmt.Sprintf("%s:%d", GrpcIp, GrpcPort)

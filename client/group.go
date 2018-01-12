@@ -106,6 +106,43 @@ func (this *LigTox) ConferenceSendMessage(groupNumber uint32, mtype int, msg str
 	return err
 }
 
+func (this *LigTox) ConferenceJoin(friendNumber uint32, cookie string) (uint32, error) {
+	fname := this.getMethodName()
+	args := thspbs.Event{}
+	args.Name = fname
+	args.Args = []string{fmt.Sprintf("%d", friendNumber), cookie}
+	cli := thspbs.NewToxhsClient(this.rpcli)
+	rsp, err := cli.RmtCall(context.Background(), &args)
+	gopp.ErrPrint(err, rsp)
+	log.Println(rsp)
+	return uint32(rsp.Mid), nil
+}
+
+func (this *LigTox) ConferencePeerCount(groupNumber uint32) (uint32, error) {
+	fname := this.getMethodName()
+	args := thspbs.Event{}
+	args.Name = fname
+	args.Args = []string{fmt.Sprintf("%d", groupNumber)}
+	cli := thspbs.NewToxhsClient(this.rpcli)
+	rsp, err := cli.RmtCall(context.Background(), &args)
+	gopp.ErrPrint(err, rsp)
+	log.Println(rsp)
+	return uint32(rsp.Mid), nil
+}
+
+func (this *LigTox) ConferencePeerGetName(groupNumber uint32, peerNumber uint32) (string, error) {
+	fname := this.getMethodName()
+	args := thspbs.Event{}
+	args.Name = fname
+	args.Args = []string{fmt.Sprintf("%d", groupNumber), fmt.Sprintf("%d", peerNumber)}
+	cli := thspbs.NewToxhsClient(this.rpcli)
+	rsp, err := cli.RmtCall(context.Background(), &args)
+	gopp.ErrPrint(err, rsp)
+	log.Println(rsp)
+	return rsp.Args[0], nil
+}
+
+// utils
 /////
 func ConferenceCookieToIdentifier(cookie string) string {
 	if len(cookie) >= 6 {

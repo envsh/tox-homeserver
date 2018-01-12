@@ -7,6 +7,7 @@ import (
 	"log"
 	"runtime"
 	"strings"
+	"sync"
 	"tox-homeserver/thspbs"
 	"unsafe"
 
@@ -45,10 +46,12 @@ type cb_file_chunk_request_ftype func(this *LigTox, friend_number uint32, file_n
 type cb_baseinfo_ftype func(this *LigTox, bi *thspbs.BaseInfo, user_data interface{})
 
 type LigTox struct {
-	ToxId  string
-	Status int
-	Stmsg  string
-	Binfo  *thspbs.BaseInfo
+	ToxId    string
+	Status   int
+	Stmsg    string
+	Binfo    *thspbs.BaseInfo
+	bemsgs   [][]byte
+	bemsgsmu sync.RWMutex
 
 	rpcli  *grpc.ClientConn
 	ntscli *nats.Conn
@@ -85,6 +88,7 @@ type LigTox struct {
 
 func NewLigTox() *LigTox {
 	this := &LigTox{}
+	this.bemsgs = make([][]byte, 0)
 	this.initCbmap()
 
 	// this.initConnections()
@@ -135,17 +139,48 @@ func (this *LigTox) onBackendEvent(msg *nats.Msg) {
 	jso, err := simplejson.NewJson(msg.Data)
 	gopp.ErrPrint(err)
 
+	defer func() {
+		this.bemsgsmu.Lock()
+		this.bemsgs = append(this.bemsgs, msg.Data)
+		if len(this.bemsgs) > 500 {
+			log.Println("queue too large.", len(this.bemsgs))
+			this.bemsgs = this.bemsgs[len(this.bemsgs)-500:]
+		}
+		this.bemsgsmu.Unlock()
+	}()
+
+	argso := jso.Get("args")
 	evtName := jso.Get("name").MustString()
 	switch evtName {
 	case "FriendConnectionStatus":
-		fnum := uint32(jso.Get("args").GetIndex(0).MustInt())
-		st := jso.Get("args").GetIndex(1).MustInt()
+		fnum := gopp.MustUint32(argso.GetIndex(0).MustString())
+		st := gopp.MustInt(argso.GetIndex(1).MustString())
 		this.callbackFriendConnectionStatus(fnum, st)
 	case "FriendMessage":
-		fnums := jso.Get("args").GetIndex(0).MustString()
-		fnum := uint32(gopp.MustInt(fnums))
+		fnum := gopp.MustUint32(argso.GetIndex(0).MustString())
 		log.Println(fnum)
-		this.callbackFriendMessage(fnum, 0, jso.Get("args").GetIndex(1).MustString())
+		this.callbackFriendMessage(fnum, 0, argso.GetIndex(1).MustString())
+	case "ConferenceInvite":
+		fnum := gopp.MustUint32(argso.GetIndex(0).MustString())
+		itype := gopp.MustInt(argso.GetIndex(1).MustString())
+		cookie := argso.GetIndex(2).MustString()
+		this.callbackConferenceInvite(fnum, itype, cookie)
+	case "ConferenceMessage":
+		gnum := gopp.MustUint32(argso.GetIndex(0).MustString())
+		pnum := gopp.MustUint32(argso.GetIndex(1).MustString())
+		mtype := gopp.MustInt(argso.GetIndex(2).MustString())
+		msg := argso.GetIndex(3).MustString()
+		this.callbackConferenceMessage(gnum, pnum, mtype, msg)
+	case "ConferenceTitle":
+		gnum := gopp.MustUint32(argso.GetIndex(0).MustString())
+		pnum := gopp.MustUint32(argso.GetIndex(1).MustString())
+		title := argso.GetIndex(2).MustString()
+		this.callbackConferenceTitle(gnum, pnum, title)
+	case "ConferenceNameListChange":
+		gnum := gopp.MustUint32(argso.GetIndex(0).MustString())
+		pnum := gopp.MustUint32(argso.GetIndex(1).MustString())
+		change := gopp.MustInt(argso.GetIndex(2).MustString())
+		this.callbackConferenceNameListChange(gnum, pnum, change)
 	}
 }
 
@@ -160,6 +195,18 @@ func (this *LigTox) GetBaseInfo() {
 func (this *LigTox) ParseBaseInfo(bi *thspbs.BaseInfo) {
 	this.Binfo = bi
 	this.callbackBaseInfo(bi)
+}
+
+func (this *LigTox) GetNextBackenEvent() []byte {
+	this.bemsgsmu.Lock()
+	defer this.bemsgsmu.Unlock()
+
+	if len(this.bemsgs) > 0 {
+		ret := this.bemsgs[0]
+		this.bemsgs = this.bemsgs[1:]
+		return ret
+	}
+	return nil
 }
 
 func (this *LigTox) putcbevts(cbfn func()) { cbfn() }
@@ -593,7 +640,8 @@ func (this *LigTox) FriendSendMessage(friendNumber uint32, message string) (uint
 	rsp, err := cli.RmtCall(context.Background(), &args)
 	gopp.ErrPrint(err, rsp)
 	log.Println(rsp)
-	return uint32(0), nil
+	wn := gopp.MustUint32(rsp.Args[0])
+	return wn, nil
 }
 
 func (this *LigTox) FriendSendAction(friendNumber uint32, action string) (uint32, error) {

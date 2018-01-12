@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"gopp"
 	"log"
 	"net"
@@ -154,12 +155,13 @@ func (this *GrpcService) RmtCall(ctx context.Context, req *thspbs.Event) (*thspb
 	switch req.Name {
 	case "FriendSendMessage": // "friendNumber", "msg"
 		fnum := gopp.MustInt(req.Args[0])
-		_, err = t.FriendSendMessage(uint32(fnum), req.Args[1])
+		wn, err := t.FriendSendMessage(uint32(fnum), req.Args[1])
 		gopp.ErrPrint(err)
 		pubkey := t.SelfGetPublicKey()
 		msgid, err := appctx.st.AddFriendMessage(req.Args[1], pubkey)
 		gopp.ErrPrint(err, msgid)
 		out.Mid = msgid
+		out.Args = append(out.Args, fmt.Sprintf("%d", wn))
 		// groups
 	case "ConferenceDelete": // "groupNumber"
 	case "ConferenceSendMessage": // "groupNumber","mtype","msg"
@@ -172,6 +174,22 @@ func (this *GrpcService) RmtCall(ctx context.Context, req *thspbs.Event) (*thspb
 		msgid, err := appctx.st.AddGroupMessage(req.Args[2], "0", cookie, pubkey)
 		gopp.ErrPrint(err, msgid)
 		out.Mid = msgid
+	case "ConferenceJoin": // friendNumber, cookie
+		fnum := gopp.MustUint32(req.Args[0])
+		cookie := req.Args[1]
+		gn, err := t.ConferenceJoin(fnum, cookie)
+		gopp.ErrPrint(err, fnum, len(cookie))
+		out.Mid = int64(gn)
+	case "ConferencePeerCount": // groupNumber
+		gnum := gopp.MustUint32(req.Args[0])
+		cnt := t.ConferencePeerCount(gnum)
+		out.Mid = int64(cnt)
+	case "ConferencePeerGetName": // groupNumber, peerNumber
+		gnum := gopp.MustUint32(req.Args[0])
+		pnum := gopp.MustUint32(req.Args[1])
+		pname, err := t.ConferencePeerGetName(gnum, pnum)
+		gopp.ErrPrint(err)
+		out.Args = append(out.Args, pname)
 	}
 
 	common.BytesRecved(len(req.String()))
