@@ -98,7 +98,7 @@ func NewLigTox() *LigTox {
 	this.rpcli = rpcli
 
 	ntscli, err := nats.Connect(thscom.GnatsAddr)
-	gopp.ErrPrint(err)
+	gopp.ErrPrint(err, thscom.GnatsAddr)
 	this.ntscli = ntscli
 	log.Println("gnats connected:", ntscli.IsConnected(), thscom.GnatsAddr)
 	ntscli.Subscribe(thscom.CBEventBusName, this.onBackendEvent)

@@ -1,8 +1,8 @@
 
 import logging
-logger = logging.getLogger()
-FORMAT = "[%(filename)s:%(lineno)s - %(funcName)12s() ] %(message)s"
+FORMAT = "[%(filename)s:%(lineno)s - %(funcName)s() ] %(message)s"
 logging.basicConfig(format=FORMAT)
+logger = logging.getLogger('customized')
 logger.setLevel(logging.DEBUG)
 
 l = logger
