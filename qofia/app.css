@@ -1,0 +1,119 @@
+/* ScrollBar */
+QScrollBar:vertical {
+    border: 0px solid grey;
+    background: #efefef;
+    width: 8px;
+    margin: 0px 0 0px 0;
+}
+QScrollBar::handle:vertical {
+    background: #ccc;
+    min-height: 2px;
+}
+QScrollBar::add-line:vertical {
+    border: 0px solid grey;
+    background: #32CC99;
+    height: 0px;
+    subcontrol-position: bottom;
+    subcontrol-origin: margin;
+}
+
+QScrollBar::sub-line:vertical {
+    border: 0px solid grey;
+    background: #32CC99;
+    height: 0px;
+    subcontrol-position: top;
+    subcontrol-origin: margin;
+}
+QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {
+    border: 2px solid grey;
+    width: 3px;
+    height: 3px;
+    background: white;
+}
+
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+    background: none;
+}
+
+/************/
+QScrollBar:horizontal {
+    border: 0px solid grey;
+    background: #efefef;
+    height: 8px;
+    margin: 0px 0 0px 0;
+}
+QScrollBar::handle:horizontal {
+    background: #ccc;
+    min-height: 2px;
+}
+QScrollBar::add-line:horizontal {
+    border: 0px solid grey;
+    background: #32CC99;
+    height: 0px;
+    subcontrol-position: bottom;
+    subcontrol-origin: margin;
+}
+
+QScrollBar::sub-line:horizontal {
+    border: 0px solid grey;
+    background: #32CC99;
+    height: 0px;
+    subcontrol-position: top;
+    subcontrol-origin: margin;
+}
+QScrollBar::up-arrow:horizontal, QScrollBar::down-arrow:horizontal {
+    border: 2px solid grey;
+    width: 3px;
+    height: 3px;
+    background: white;
+}
+
+QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
+    background: none;
+}
+
+/************/
+QLabel {
+    color: #333;
+    background: white;
+}
+
+QMainWindow {
+    background: white;
+}
+
+QLineEdit {
+    background: none;
+    border: none;
+}
+
+QListWidget {
+    border: none;
+}
+
+QListView {
+    border: none;
+}
+
+QWidget#centralwidget111 {
+    background-color: white;
+}
+
+QWidget {
+    margin: 1px;
+}
+
+QListWidget {
+    margin: 0px;
+    qproperty-alternatingRowColors: true;
+    alternate-background-color: #f6f6f6;
+    background: white;
+}
+
+QListView {
+    margin: 0px;
+    qproperty-alternatingRowColors: true;
+    alternate-background-color: #f6f6f6;
+    background: white;
+
+}

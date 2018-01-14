@@ -1,7 +1,7 @@
 <RCC>
   <qresource>
-    <file>icons/remove-symbol.png</file>
     <file>icons/add-square-button_gray64.png</file>
+    <file>icons/remove-symbol_gray64.png</file>
     <file>icons/add-square-button-gray.png</file>
     <file>icons/add.png</file>
     <file>icons/app_system.png</file>

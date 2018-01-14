@@ -1,3 +1,7 @@
+VERSION         :=      $(shell cat ./VERSION)
+GOVVV=`govvv -flags -version ${VERSION}|sed 's/=/=GOVVV-/g'`
+GOVVV2=`govvv -flags -version ${VERSION}|sed 's/=/=GOVVV-/g'|sed 's/main./gofia./g'`
+CPWD=$(shell pwd)
 
 all:
 
@@ -15,7 +19,10 @@ gen:
 	qtrcc
 
 bud:
-	go build -v
+	go install -v tox-homeserver/gofia
+	echo -e "package main\nconst btversion = \"${GOVVV2}\"\n" > btversion.go
+	echo -e "const isandroid = true\n" >> btversion.go
+	go build -v -ldflags "${GOVVV}"
 
 run:
 	./qofia

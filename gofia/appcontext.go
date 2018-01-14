@@ -52,6 +52,8 @@ type AppContext struct {
 var appctx *AppContext
 var appctxOnce sync.Once
 
+func GetAppCtx() *AppContext { return appctx }
+
 func AppOnCreate() {
 	appctxOnce.Do(func() {
 		printBuildInfo(true)
@@ -110,6 +112,8 @@ func AppOnCreate() {
 		}()
 	})
 }
+
+func (this *AppContext) GetLigTox() *thscli.LigTox { return this.vtcli }
 
 func (this *AppContext) pollNats() {
 
