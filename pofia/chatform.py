@@ -47,7 +47,9 @@ class LeftHead(BoxLayout):
 
         losearch = BoxLayout(orientation='horizontal', size_hint_y=None, height=25)
         searchbtn = Button(text='search text')
-        searchbtn = TextInput(text='......')#, size_hint_y=None, height=29)
+        searchbtn = TextInput(text='......', size_hint_y=None, height=29, readonly=False)
+        # searchbtn.background_color = (0,0,0,0)
+        # searchbtn.foreground_color = (0,1,255,0.7)
         losearch.add_widget(searchbtn)
         orderbtn = Button(text='order menu')
         losearch.add_widget(orderbtn)

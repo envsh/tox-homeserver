@@ -137,3 +137,4 @@ class TextInput(ctxip.TextInput):
         if mybg: self.background_color = get_color_from_hex('#ffffff00')
         if mybg: self.color = get_color_from_hex('#00000088')
         return
+

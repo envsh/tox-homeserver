@@ -19,8 +19,8 @@ from widgetu import Button, Label, LabelSR, TextInput
 
 
 class MessageItemView(RecycleDataViewBehavior, BoxLayout):
-    _latest_data = None
     _rv = None
+    _selectedIndexes = []
 
     def __init__(self):
         super(MessageItemView, self).__init__()
@@ -53,27 +53,25 @@ class MessageItemView(RecycleDataViewBehavior, BoxLayout):
         self.add_widget(lo0)
         lo1 = BoxLayout(orientation='horizontal', size_hint_y=None, height=32)
         self.nmbtn = Button(text=self.name, size_hint_y=None, height=30)
-        self.nmbtn = Label(text=self.name, size_hint_y=None, height=30)
+        self.nmbtn = LabelSR(text=self.name, size_hint_y=None, height=30)
         lo1.add_widget(self.nmbtn)
+
         self.tmbtn = Button(text=self.time, size_hint_y=None, height=30)
-        self.tmbtn = Label(text=self.time, size_hint_y=None, height=30)
+        self.tmbtn = LabelSR(text=self.time, size_hint_y=None, height=30)
         lo1.add_widget(self.tmbtn)
+
         self.lcbtn = Label(text='000', size_hint_x=None, width=32)
         lo1.add_widget(self.lcbtn)
         lo = BoxLayout(orientation='vertical')
         lo.add_widget(lo1)
+
         self.ctbtn = Label(text=self.text)  # , size_hint_y=None)
         self.ctbtn.halign = 'left'
         self.ctbtn.valign = 'top'
         self.ctbtn.bind(size=self.on_set_ctbtn_size)
         self.ctbtn.bind(texture_size=self.on_content_texture_size)
-        # self.ctbtn.text_size = (self.ctbtn.width*4, None)
-        # TODO 高度还不对，文字太长的话由于折成多行然后会和上下的重叠
-        # btn = self.ctbtn
-        # btn.bind(width=lambda *x: btn.setter('text_size')(btn, (btn.width, None)),
-        #            texture_size=lambda *x: btn.setter('height')(btn, btn.texture_size[1]))
-        # log.l.debug('text size:' + str(self.ctbtn.text_size) + str(self.ctbtn.max_lines))
         lo.add_widget(self.ctbtn)
+
         lo.add_widget(Label(size_hint_y=None, height=3))
         self.add_widget(lo)
         self.icoPeerBtn = Button(text=self.icon2, size_hint_x=None, width=50, size_hint_y=None, height=50)
@@ -89,9 +87,6 @@ class MessageItemView(RecycleDataViewBehavior, BoxLayout):
         ''' Catch and handle the view changes '''
         self.pdata = data
         self._rv = rv
-        if self._latest_data is not None:
-            self._latest_data["height"] = self.height
-        self._latest_data = data
 
         # log.l.debug(str(index)+str(data))
         self.ctbtn.markup = True
@@ -117,7 +112,7 @@ class MessageItemView(RecycleDataViewBehavior, BoxLayout):
 
     def on_height(self, instance, value):
         self.cttxusz = self.ctbtn.texture_size
-        data = self._latest_data
+        data = self.pdata
         log.l.debug(str(value) + str(self.cttxusz) + str(self.pdata))
         log.l.debug(str(self.height) + str(self.cttxusz) + str(self.pdata))
         if data is not None and 'height' not in data: return
@@ -135,7 +130,7 @@ class MessageItemView(RecycleDataViewBehavior, BoxLayout):
 
     def on_content_texture_size(self, obj, txusz):
         log.l.debug(str(txusz) + str(self.pdata))
-        data = self._latest_data
+        data = self.pdata
         # if True: return
         self.lcbtn.text = str(txusz[1] + 33)
         if data is not None and 'height' not in data: return

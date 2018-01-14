@@ -7,7 +7,8 @@
 
 ### TODOs
 
-* --
-* --
+* Label text select
+* TextInput height self-adapter
+
 
 
