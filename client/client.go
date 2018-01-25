@@ -99,6 +99,10 @@ func NewLigTox() *LigTox {
 
 	ntscli, err := nats.Connect(thscom.GnatsAddr)
 	gopp.ErrPrint(err, thscom.GnatsAddr)
+	if err == nats.ErrNoServers {
+		// try local
+		ntscli, err = nats.Connect(thscom.GnatsAddrlo)
+	}
 	this.ntscli = ntscli
 	log.Println("gnats connected:", ntscli.IsConnected(), thscom.GnatsAddr)
 	ntscli.Subscribe(thscom.CBEventBusName, this.onBackendEvent)

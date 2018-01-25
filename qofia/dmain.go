@@ -13,6 +13,8 @@ import (
 	"tox-homeserver/gofia"
 
 	simplejson "github.com/bitly/go-simplejson"
+	"github.com/therecipe/qt/core"
+	"github.com/therecipe/qt/gui"
 	"github.com/therecipe/qt/widgets"
 )
 
@@ -52,7 +54,30 @@ func main() {
 		app.SetStyleSheet(string(bcc))
 	})
 
+	a2 := widgets.NewQScrollAreaFromPointer(Ui_MainWindow_Get_scrollArea_2(uiw))
+	toval := a2.VerticalScrollBar().Maximum() + 80
+	log.Println(a2.VerticalScrollBar().Value(), toval)
+	a2.VerticalScrollBar().ConnectRangeChanged(func(min int, max int) {
+		log.Println(min, max)
+	})
+
 	go initAppBackend()
+
+	tmer := core.NewQTimer(nil)
+	tmer.Start(500)
+	tmer.ConnectTimeout(func() {
+		tryReadEvent()
+	})
+
+	vlo10p := Ui_MainWindow_Get_verticalLayout_10(uiw)
+	vlo10 := widgets.NewQLayoutFromPointer(vlo10p)
+
+	for i := 0; i < 30; i++ {
+		itext := fmt.Sprintf("hehe %d", i)
+		ctivw := widgets.NewQPushButton2(itext, nil)
+		vlo10.AddWidget(ctivw)
+	}
+
 	// Execute app
 	app.Exec()
 }
@@ -91,10 +116,23 @@ func initAppBackend() {
 		listw.AddItem(itext)
 	}
 
+	baseInfoGot = true
+	select {}
+}
+
+var baseInfoGot bool = false
+var lastMsgIvw *widgets.QWidget
+
+func tryReadEvent() {
+
+	if !baseInfoGot {
+		return
+	}
+
 	for {
 		bcc := vtcli.GetNextBackenEvent()
 		if bcc == nil {
-			time.Sleep(500 * time.Millisecond)
+			break
 		} else {
 			jso, err := simplejson.NewJson(bcc)
 			gopp.ErrPrint(err, jso)
@@ -275,7 +313,87 @@ func dispatchEvent(jso *simplejson.Json) {
 		itext := fmt.Sprintf("%s@%s: %s", peerName, groupTitle, message)
 		listw1.AddItem(itext)
 		listw1.ScrollToBottom()
+		log.Println("item:", itext)
 
+		vlo8p := Ui_MainWindow_Get_verticalLayout_8(uiw)
+		vlo8 := widgets.NewQLayoutFromPointer(vlo8p)
+		msgivw := widgets.NewQWidget(nil, 0)
+		msgivp := Ui_MessageItemView_new()
+		Ui_MessageItemView_setupUi(msgivp, msgivw.Pointer())
+		log.Println(msgivp, msgivw, vlo8)
+		tbrw := widgets.NewQTextBrowserFromPointer(Ui_MessageItemView_Get_textBrowser(msgivp))
+
+		tbtnp := Ui_MessageItemView_Get_toolButton(msgivp)
+		tbtn := widgets.NewQToolButtonFromPointer(tbtnp)
+		tbtn.ConnectClicked(func(bool) {
+			log.Println(tbrw.Document().Size().Rheight())
+			log.Println(tbrw.Size().Rheight())
+			// tbrw.SetFixedHeight(int(tbrw.Document().Size().Rheight()))
+		})
+		// not called
+		tbrw.ConnectSizeHint(func() *core.QSize {
+			log.Println(tbrw.Document().Size().Rheight())
+			log.Println(tbrw.Size().Rheight())
+			return core.NewQSize2(int(tbrw.Document().Size().Rwidth()), int(tbrw.Document().Size().Rheight()))
+		})
+
+		// 这个只在有滚动条的时候有效
+		tbrw.VerticalScrollBar().ConnectRangeChanged(func(min int, max int) {
+			log.Println(min, max, tbrw.Viewport().Size().Rheight())
+			log.Print(tbrw.Document().Size().Rheight())
+			// tbrw.SetFixedHeight(int(tbrw.Document().Size().Rheight()) + max)
+			// tbrw.Document().AdjustSize() // 依旧有滚动条
+		})
+		tbrw.HorizontalScrollBar().ConnectRangeChanged(func(min int, max int) {
+			log.Println(min, max, tbrw.Viewport().Size().Rheight())
+			log.Print(tbrw.Document().Size().Rheight())
+		})
+		// not called
+		msgivw.ConnectResizeEvent(func(event *gui.QResizeEvent) {
+			oldWidth := event.OldSize().Rwidth()
+			newWidth := event.Size().Rwidth()
+			log.Println(oldWidth, "=>", newWidth, tbrw.Document().Size().Rheight())
+			fixnum := 2
+			if tbrw.Size().Rheight() != int(tbrw.Document().Size().Rheight())+fixnum {
+				tbrw.SetFixedHeight(int(tbrw.Document().Size().Rheight()) + fixnum)
+
+			}
+		})
+		// not called
+		tbrw.Viewport().ConnectResizeEvent(func(event *gui.QResizeEvent) {
+			oldWidth := event.OldSize().Rwidth()
+			newWidth := event.Size().Rwidth()
+			log.Println(oldWidth, "=>", newWidth, tbrw.Document().Size().Rheight())
+		})
+		tbrw.Document().ConnectBlockCountChanged(func(newBlockCount int) {
+			log.Println(newBlockCount)
+		})
+		tbrw.Document().ConnectDocumentLayoutChanged(func() {
+			log.Println("111")
+		})
+		tbrw.Document().ConnectContentsChanged(func() {
+			log.Print(tbrw.Document().Size().Rheight())
+			log.Print(tbrw.Size().Rheight())
+		})
+		vlo8.AddWidget(msgivw)
+		tbrw.SetText(itext)
+
+		a2 := widgets.NewQScrollAreaFromPointer(Ui_MainWindow_Get_scrollArea_2(uiw))
+		toval := a2.VerticalScrollBar().Maximum() + int(tbrw.Document().Size().Rheight()) + 80
+		log.Println(a2.VerticalScrollBar().Value(), toval)
+		if a2.VerticalScrollBar().Value() != toval {
+			// a2.EnsureWidgetVisible(msgivw, 0, 0)
+			a2.VerticalScrollBar().SetValue(toval)
+		}
+		if lastMsgIvw != nil {
+			lastMsgIvw.DisconnectResizeEvent()
+			lastMsgIvw = msgivw
+		}
+		a2.Viewport().ConnectResizeEvent(func(event *gui.QResizeEvent) {
+			oldWidth := event.OldSize().Rwidth()
+			newWidth := event.Size().Rwidth()
+			log.Println(oldWidth, "=>", newWidth, tbrw.Document().Size().Rheight())
+		})
 		/*
 			valuex, found := appctx.contactStates.Get(groupId)
 			var ctis *ContactItemState

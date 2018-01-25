@@ -1,5 +1,5 @@
 package main
-const btversion = "-X gofia.GitState=GOVVV-dirty -X gofia.GitSummary=GOVVV-6915ea2-dirty -X gofia.Version=GOVVV-0.0.0 -X gofia.BuildDate=GOVVV-2018-01-14T16:02:37Z -X gofia.GitCommit=GOVVV-6915ea2 -X gofia.GitBranch=GOVVV-master"
+const btversion = "-X gofia.BuildDate=GOVVV-2018-01-24T01:50:51Z -X gofia.GitCommit=GOVVV-9d9aab7 -X gofia.GitBranch=GOVVV-master -X gofia.GitState=GOVVV-dirty -X gofia.GitSummary=GOVVV-9d9aab7-dirty -X gofia.Version=GOVVV-0.0.0"
 
 const isandroid = true
 

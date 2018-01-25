@@ -101,6 +101,7 @@ QWidget#centralwidget111 {
 
 QWidget {
     margin: 1px;
+    background: white;
 }
 
 QListWidget {
@@ -116,4 +117,14 @@ QListView {
     alternate-background-color: #f6f6f6;
     background: white;
 
+}
+
+QScrollArea {
+    background: white;
+}
+
+QTextBrowser {
+    border: 0px;
+    background: #f6f6f6;
+    height: 50px;
 }
