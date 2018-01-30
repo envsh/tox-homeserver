@@ -128,3 +128,7 @@ QTextBrowser {
     background: #f6f6f6;
     height: 50px;
 }
+
+QLabel {
+    background: white;
+}

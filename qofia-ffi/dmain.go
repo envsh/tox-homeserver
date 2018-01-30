@@ -43,8 +43,7 @@ func main() {
 	uiw = NewUi_MainWindow()
 	log.Println(uiw)
 	uiw.SetupUi(window)
-	uiw.ListWidget_2.AddItem(qtcore.NewQString_5("aaaaaaaaaaa"))
-
+	// uiw.ListWidget_2.AddItem(qtcore.NewQString_5("aaaaaaaaaaa"))
 	// Show the window
 	window.Show()
 
@@ -322,7 +321,7 @@ func dispatchEvent(jso *simplejson.Json) {
 		tbrw := msgivp.TextBrowser
 		tbrw.SetText(qtcore.NewQString_5(itext))
 		msgivp.Label_3.SetText(qtcore.NewQString_5(fmt.Sprintf("%s@%s", peerName, groupTitle)))
-		msgivp.Label_4.SetText(qtcore.NewQString_5(time.Now().String()))
+		msgivp.Label_4.SetText(qtcore.NewQString_5(gopp.TimeToFmt1(time.Now())))
 
 		dyslot.Connect(msgivp.ToolButton, "clicked(bool)", func(bool) {
 			log.Println(tbrw)
