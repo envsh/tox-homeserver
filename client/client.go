@@ -52,6 +52,7 @@ type LigTox struct {
 	Binfo    *thspbs.BaseInfo
 	bemsgs   [][]byte
 	bemsgsmu sync.RWMutex
+	OnNewMsg func()
 
 	rpcli  *grpc.ClientConn
 	ntscli *nats.Conn
@@ -151,6 +152,9 @@ func (this *LigTox) onBackendEvent(msg *nats.Msg) {
 			this.bemsgs = this.bemsgs[len(this.bemsgs)-500:]
 		}
 		this.bemsgsmu.Unlock()
+		if this.OnNewMsg != nil {
+			this.OnNewMsg()
+		}
 	}()
 
 	argso := jso.Get("args")

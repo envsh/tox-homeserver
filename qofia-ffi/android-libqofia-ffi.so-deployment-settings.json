@@ -1,0 +1,16 @@
+{
+    
+    "qt": "/home/me/Qt5.10.0/5.10.0/android_armv7",
+    "sdk": "/opt/android-sdk",
+    "sdkBuildToolsRevision":"26.0.0",
+    "ndk": "/opt/android-ndk",
+    "toolchain-prefix":"arm-linux-androideabi",
+    "tool-prefix":"arm-linux-androideabi",
+    "toolchain-version":"4.9",
+    "ndk-host":"linux-x86_64",
+    "target-architecture": "armeabi-v7a",
+    "android-extra-libs":"./libmain.so,./libs/libffi.so,/usr/lib/libQt5Inline.so,/home/me/Qt5.10.0/5.10.0/android_armv7/lib/libQt5Widgets.so,/home/me/Qt5.10.0/5.10.0/android_armv7/lib/libQt5Network.so",
+    "android-package-source-directory":"",
+    "qml-root-path":"",
+    "application-binary": "./libgo.so"
+}

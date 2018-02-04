@@ -6,6 +6,9 @@ import "qt.go/qtgui"
 import "qt.go/qtwidgets"
 import "qt.go/qtmock"
 
+func init() { qtcore.KeepMe() }
+func init() { qtmock.KeepMe() }
+
 //  header block end
 
 //  struct block begin
@@ -50,7 +53,7 @@ func (this *Ui_MessageItemView) SetupUi(MessageItemView *qtwidgets.QWidget) {
 	this.Label.SetObjectName(qtcore.NewQString_5("Label"))                                                                 // 112
 	this.Label.SetPixmap(qtgui.NewQPixmap_3(qtcore.NewQString_5(":/Icons/Icon_avatar_40.Png"), "dummy123", 0))             // 114
 
-	this.VerticalLayout_3.AddWidget(qtwidgets.NewQWidgetFromPointer(this.Label.GetCthis())) // 115
+	this.VerticalLayout_3.Layout().AddWidget(qtwidgets.NewQWidgetFromPointer(this.Label.GetCthis())) // 115
 
 	this.VerticalSpacer = qtwidgets.NewQSpacerItem(20, 40, qtwidgets.QSizePolicy__Minimum, qtwidgets.QSizePolicy__Expanding)
 
@@ -66,19 +69,19 @@ func (this *Ui_MessageItemView) SetupUi(MessageItemView *qtwidgets.QWidget) {
 	this.Label_3.SetObjectName(qtcore.NewQString_5("Label_3"))                                                 // 112
 	this.Label_3.SetTextInteractionFlags(qtcore.Qt__LinksAccessibleByMouse | qtcore.Qt__TextSelectableByMouse) // 114
 
-	this.HorizontalLayout.AddWidget(qtwidgets.NewQWidgetFromPointer(this.Label_3.GetCthis())) // 115
+	this.HorizontalLayout.Layout().AddWidget(qtwidgets.NewQWidgetFromPointer(this.Label_3.GetCthis())) // 115
 
 	this.Label_4 = qtwidgets.NewQLabel(this.MessageItemView, 0)                                                // 111
 	this.Label_4.SetObjectName(qtcore.NewQString_5("Label_4"))                                                 // 112
 	this.Label_4.SetTextInteractionFlags(qtcore.Qt__LinksAccessibleByMouse | qtcore.Qt__TextSelectableByMouse) // 114
 
-	this.HorizontalLayout.AddWidget(qtwidgets.NewQWidgetFromPointer(this.Label_4.GetCthis())) // 115
+	this.HorizontalLayout.Layout().AddWidget(qtwidgets.NewQWidgetFromPointer(this.Label_4.GetCthis())) // 115
 
 	this.ToolButton = qtwidgets.NewQToolButton(this.MessageItemView) // 111
 	this.ToolButton.SetObjectName(qtcore.NewQString_5("ToolButton")) // 112
 	this.ToolButton.SetAutoRaise(true)                               // 114
 
-	this.HorizontalLayout.AddWidget(qtwidgets.NewQWidgetFromPointer(this.ToolButton.GetCthis())) // 115
+	this.HorizontalLayout.Layout().AddWidget(qtwidgets.NewQWidgetFromPointer(this.ToolButton.GetCthis())) // 115
 
 	this.VerticalLayout.AddLayout(qtwidgets.NewQLayoutFromPointer(this.HorizontalLayout.GetCthis()), 0) // 115
 
@@ -93,7 +96,7 @@ func (this *Ui_MessageItemView) SetupUi(MessageItemView *qtwidgets.QWidget) {
 	this.TextBrowser.SetSizeAdjustPolicy(qtwidgets.QAbstractScrollArea__AdjustToContents) // 114
 	this.TextBrowser.SetOpenExternalLinks(true)                                           // 114
 
-	this.VerticalLayout.AddWidget(qtwidgets.NewQWidgetFromPointer(this.TextBrowser.GetCthis())) // 115
+	this.VerticalLayout.Layout().AddWidget(qtwidgets.NewQWidgetFromPointer(this.TextBrowser.GetCthis())) // 115
 
 	this.HorizontalLayout_2.AddLayout(qtwidgets.NewQLayoutFromPointer(this.VerticalLayout.GetCthis()), 0) // 115
 
@@ -103,7 +106,7 @@ func (this *Ui_MessageItemView) SetupUi(MessageItemView *qtwidgets.QWidget) {
 	this.Label_2.SetObjectName(qtcore.NewQString_5("Label_2"))                                                   // 112
 	this.Label_2.SetPixmap(qtgui.NewQPixmap_3(qtcore.NewQString_5(":/Icons/Icon_avatar_40.Png"), "dummy123", 0)) // 114
 
-	this.VerticalLayout_2.AddWidget(qtwidgets.NewQWidgetFromPointer(this.Label_2.GetCthis())) // 115
+	this.VerticalLayout_2.Layout().AddWidget(qtwidgets.NewQWidgetFromPointer(this.Label_2.GetCthis())) // 115
 
 	this.VerticalSpacer_2 = qtwidgets.NewQSpacerItem(20, 40, qtwidgets.QSizePolicy__Minimum, qtwidgets.QSizePolicy__Expanding)
 
@@ -123,10 +126,10 @@ func (this *Ui_MessageItemView) SetupUi(MessageItemView *qtwidgets.QWidget) {
 
 //  retranslateUi block begin
 func (this *Ui_MessageItemView) RetranslateUi(MessageItemView *qtwidgets.QWidget) {
-	this.MessageItemView.SetWindowTitle(qtmock.QCoreApplication_Translate("MessageItemView", "Form", "dummy123", 0))
-	this.Label_3.SetText(qtmock.QCoreApplication_Translate("MessageItemView", "TextLabel", "dummy123", 0))
-	this.Label_4.SetText(qtmock.QCoreApplication_Translate("MessageItemView", "TextLabel", "dummy123", 0))
-	this.ToolButton.SetText(qtmock.QCoreApplication_Translate("MessageItemView", "...", "dummy123", 0))
+	this.MessageItemView.SetWindowTitle(qtcore.QCoreApplication_Translate("MessageItemView", "Form", "dummy123", 0))
+	this.Label_3.SetText(qtcore.QCoreApplication_Translate("MessageItemView", "TextLabel", "dummy123", 0))
+	this.Label_4.SetText(qtcore.QCoreApplication_Translate("MessageItemView", "TextLabel", "dummy123", 0))
+	this.ToolButton.SetText(qtcore.QCoreApplication_Translate("MessageItemView", "...", "dummy123", 0))
 }
 
 //  retranslateUi block end

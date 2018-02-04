@@ -1,0 +1,7 @@
+extern void go_wrapper_main();
+
+int main(int argc, char**argv) {
+    go_wrapper_main();
+    return 0;
+}
+

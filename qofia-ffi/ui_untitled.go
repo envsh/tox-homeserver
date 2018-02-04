@@ -6,6 +6,9 @@ import "qt.go/qtgui"
 import "qt.go/qtwidgets"
 import "qt.go/qtmock"
 
+func init() { qtcore.KeepMe() }
+func init() { qtmock.KeepMe() }
+
 //  header block end
 
 //  struct block begin
@@ -138,7 +141,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.ToolButton_17.SetIcon(this.Icon)                                                                                          // 114
 	this.ToolButton_17.SetIconSize(qtcore.NewQSize_1(32, 32))                                                                      // 113
 
-	this.HorizontalLayout.AddWidget(qtwidgets.NewQWidgetFromPointer(this.ToolButton_17.GetCthis())) // 115
+	this.HorizontalLayout.Layout().AddWidget(qtwidgets.NewQWidgetFromPointer(this.ToolButton_17.GetCthis())) // 115
 
 	this.VerticalLayout = qtwidgets.NewQVBoxLayout()                         // 111
 	this.VerticalLayout.SetObjectName(qtcore.NewQString_5("VerticalLayout")) // 112
@@ -151,7 +154,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.Label_2.SetFont(this.Font)                                                                  // 114
 	this.Label_2.SetTextInteractionFlags(qtcore.Qt__TextEditable | qtcore.Qt__TextSelectableByMouse) // 114
 
-	this.VerticalLayout.AddWidget(qtwidgets.NewQWidgetFromPointer(this.Label_2.GetCthis())) // 115
+	this.VerticalLayout.Layout().AddWidget(qtwidgets.NewQWidgetFromPointer(this.Label_2.GetCthis())) // 115
 
 	this.Label_3 = qtwidgets.NewQLabel(this.LayoutWidget, 0)   // 111
 	this.Label_3.SetObjectName(qtcore.NewQString_5("Label_3")) // 112
@@ -162,7 +165,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.Label_3.SetSizePolicy(this.SizePolicy)                                                      // 114
 	this.Label_3.SetTextInteractionFlags(qtcore.Qt__TextEditable | qtcore.Qt__TextSelectableByMouse) // 114
 
-	this.VerticalLayout.AddWidget(qtwidgets.NewQWidgetFromPointer(this.Label_3.GetCthis())) // 115
+	this.VerticalLayout.Layout().AddWidget(qtwidgets.NewQWidgetFromPointer(this.Label_3.GetCthis())) // 115
 
 	this.HorizontalLayout.AddLayout(qtwidgets.NewQLayoutFromPointer(this.VerticalLayout.GetCthis()), 0) // 115
 
@@ -174,7 +177,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.ToolButton.SetToolButtonStyle(qtcore.Qt__ToolButtonIconOnly)                                                          // 114
 	this.ToolButton.SetAutoRaise(true)                                                                                         // 114
 
-	this.HorizontalLayout.AddWidget(qtwidgets.NewQWidgetFromPointer(this.ToolButton.GetCthis())) // 115
+	this.HorizontalLayout.Layout().AddWidget(qtwidgets.NewQWidgetFromPointer(this.ToolButton.GetCthis())) // 115
 
 	this.VerticalLayout_2.AddLayout(qtwidgets.NewQLayoutFromPointer(this.HorizontalLayout.GetCthis()), 0) // 115
 
@@ -183,14 +186,14 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.LineEdit = qtwidgets.NewQLineEdit(this.LayoutWidget)                        // 111
 	this.LineEdit.SetObjectName(qtcore.NewQString_5("LineEdit"))                     // 112
 
-	this.HorizontalLayout_2.AddWidget(qtwidgets.NewQWidgetFromPointer(this.LineEdit.GetCthis())) // 115
+	this.HorizontalLayout_2.Layout().AddWidget(qtwidgets.NewQWidgetFromPointer(this.LineEdit.GetCthis())) // 115
 
 	this.ToolButton_2 = qtwidgets.NewQToolButton(this.LayoutWidget)      // 111
 	this.ToolButton_2.SetObjectName(qtcore.NewQString_5("ToolButton_2")) // 112
 	this.ToolButton_2.SetMinimumSize_1(60, 0)                            // 113
 	this.ToolButton_2.SetAutoRaise(true)                                 // 114
 
-	this.HorizontalLayout_2.AddWidget(qtwidgets.NewQWidgetFromPointer(this.ToolButton_2.GetCthis())) // 115
+	this.HorizontalLayout_2.Layout().AddWidget(qtwidgets.NewQWidgetFromPointer(this.ToolButton_2.GetCthis())) // 115
 
 	this.ToolButton_3 = qtwidgets.NewQToolButton(this.LayoutWidget)      // 111
 	this.ToolButton_3.SetObjectName(qtcore.NewQString_5("ToolButton_3")) // 112
@@ -199,14 +202,14 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.ToolButton_3.SetIcon(this.Icon2)                                                                                                 // 114
 	this.ToolButton_3.SetAutoRaise(true)                                                                                                  // 114
 
-	this.HorizontalLayout_2.AddWidget(qtwidgets.NewQWidgetFromPointer(this.ToolButton_3.GetCthis())) // 115
+	this.HorizontalLayout_2.Layout().AddWidget(qtwidgets.NewQWidgetFromPointer(this.ToolButton_3.GetCthis())) // 115
 
 	this.VerticalLayout_2.AddLayout(qtwidgets.NewQLayoutFromPointer(this.HorizontalLayout_2.GetCthis()), 0) // 115
 
 	this.ListWidget_2 = qtwidgets.NewQListWidget(this.LayoutWidget)      // 111
 	this.ListWidget_2.SetObjectName(qtcore.NewQString_5("ListWidget_2")) // 112
 
-	this.VerticalLayout_2.AddWidget(qtwidgets.NewQWidgetFromPointer(this.ListWidget_2.GetCthis())) // 115
+	this.VerticalLayout_2.Layout().AddWidget(qtwidgets.NewQWidgetFromPointer(this.ListWidget_2.GetCthis())) // 115
 
 	this.ScrollArea = qtwidgets.NewQScrollArea(this.LayoutWidget)                                                                 // 111
 	this.ScrollArea.SetObjectName(qtcore.NewQString_5("ScrollArea"))                                                              // 112
@@ -226,7 +229,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 
 	this.ScrollArea.SetWidget(this.ScrollAreaWidgetContents) // 114
 
-	this.VerticalLayout_2.AddWidget(qtwidgets.NewQWidgetFromPointer(this.ScrollArea.GetCthis())) // 115
+	this.VerticalLayout_2.Layout().AddWidget(qtwidgets.NewQWidgetFromPointer(this.ScrollArea.GetCthis())) // 115
 
 	this.HorizontalLayout_3 = qtwidgets.NewQHBoxLayout()                             // 111
 	this.HorizontalLayout_3.SetSpacing(3)                                            // 114
@@ -238,7 +241,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.ToolButton_4.SetIcon(this.Icon3)                                                                                                   // 114
 	this.ToolButton_4.SetAutoRaise(true)                                                                                                    // 114
 
-	this.HorizontalLayout_3.AddWidget(qtwidgets.NewQWidgetFromPointer(this.ToolButton_4.GetCthis())) // 115
+	this.HorizontalLayout_3.Layout().AddWidget(qtwidgets.NewQWidgetFromPointer(this.ToolButton_4.GetCthis())) // 115
 
 	this.ToolButton_5 = qtwidgets.NewQToolButton(this.LayoutWidget)      // 111
 	this.ToolButton_5.SetObjectName(qtcore.NewQString_5("ToolButton_5")) // 112
@@ -247,7 +250,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.ToolButton_5.SetIcon(this.Icon4)                                                                                      // 114
 	this.ToolButton_5.SetAutoRaise(true)                                                                                       // 114
 
-	this.HorizontalLayout_3.AddWidget(qtwidgets.NewQWidgetFromPointer(this.ToolButton_5.GetCthis())) // 115
+	this.HorizontalLayout_3.Layout().AddWidget(qtwidgets.NewQWidgetFromPointer(this.ToolButton_5.GetCthis())) // 115
 
 	this.ToolButton_6 = qtwidgets.NewQToolButton(this.LayoutWidget)      // 111
 	this.ToolButton_6.SetObjectName(qtcore.NewQString_5("ToolButton_6")) // 112
@@ -256,7 +259,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.ToolButton_6.SetIcon(this.Icon5)                                                                                            // 114
 	this.ToolButton_6.SetAutoRaise(true)                                                                                             // 114
 
-	this.HorizontalLayout_3.AddWidget(qtwidgets.NewQWidgetFromPointer(this.ToolButton_6.GetCthis())) // 115
+	this.HorizontalLayout_3.Layout().AddWidget(qtwidgets.NewQWidgetFromPointer(this.ToolButton_6.GetCthis())) // 115
 
 	this.ToolButton_7 = qtwidgets.NewQToolButton(this.LayoutWidget)      // 111
 	this.ToolButton_7.SetObjectName(qtcore.NewQString_5("ToolButton_7")) // 112
@@ -265,7 +268,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.ToolButton_7.SetIcon(this.Icon6)                                                                                            // 114
 	this.ToolButton_7.SetAutoRaise(true)                                                                                             // 114
 
-	this.HorizontalLayout_3.AddWidget(qtwidgets.NewQWidgetFromPointer(this.ToolButton_7.GetCthis())) // 115
+	this.HorizontalLayout_3.Layout().AddWidget(qtwidgets.NewQWidgetFromPointer(this.ToolButton_7.GetCthis())) // 115
 
 	this.VerticalLayout_2.AddLayout(qtwidgets.NewQLayoutFromPointer(this.HorizontalLayout_3.GetCthis()), 0) // 115
 
@@ -284,7 +287,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.Label_4.SetMaximumSize_1(32, 32)                                                                              // 113
 	this.Label_4.SetPixmap(qtgui.NewQPixmap_3(qtcore.NewQString_5(":/Icons/Icon_avatar_40.Png"), "dummy123", 0))       // 114
 
-	this.HorizontalLayout_5.AddWidget(qtwidgets.NewQWidgetFromPointer(this.Label_4.GetCthis())) // 115
+	this.HorizontalLayout_5.Layout().AddWidget(qtwidgets.NewQWidgetFromPointer(this.Label_4.GetCthis())) // 115
 
 	this.VerticalLayout_4 = qtwidgets.NewQVBoxLayout()                               // 111
 	this.VerticalLayout_4.SetObjectName(qtcore.NewQString_5("VerticalLayout_4"))     // 112
@@ -298,7 +301,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.Label_5.SetFont(this.Font1)                                                                           // 114
 	this.Label_5.SetTextInteractionFlags(qtcore.Qt__LinksAccessibleByMouse | qtcore.Qt__TextSelectableByMouse) // 114
 
-	this.VerticalLayout_4.AddWidget(qtwidgets.NewQWidgetFromPointer(this.Label_5.GetCthis())) // 115
+	this.VerticalLayout_4.Layout().AddWidget(qtwidgets.NewQWidgetFromPointer(this.Label_5.GetCthis())) // 115
 
 	this.HorizontalLayout_4 = qtwidgets.NewQHBoxLayout()                                                       // 111
 	this.HorizontalLayout_4.SetObjectName(qtcore.NewQString_5("HorizontalLayout_4"))                           // 112
@@ -306,7 +309,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.Label_6.SetObjectName(qtcore.NewQString_5("Label_6"))                                                 // 112
 	this.Label_6.SetTextInteractionFlags(qtcore.Qt__LinksAccessibleByMouse | qtcore.Qt__TextSelectableByMouse) // 114
 
-	this.HorizontalLayout_4.AddWidget(qtwidgets.NewQWidgetFromPointer(this.Label_6.GetCthis())) // 115
+	this.HorizontalLayout_4.Layout().AddWidget(qtwidgets.NewQWidgetFromPointer(this.Label_6.GetCthis())) // 115
 
 	this.Label_7 = qtwidgets.NewQLabel(this.LayoutWidget1, 0)                                                  // 111
 	this.Label_7.SetObjectName(qtcore.NewQString_5("Label_7"))                                                 // 112
@@ -314,7 +317,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.Label_7.SetSizePolicy(this.SizePolicy)                                                                // 114
 	this.Label_7.SetTextInteractionFlags(qtcore.Qt__LinksAccessibleByMouse | qtcore.Qt__TextSelectableByMouse) // 114
 
-	this.HorizontalLayout_4.AddWidget(qtwidgets.NewQWidgetFromPointer(this.Label_7.GetCthis())) // 115
+	this.HorizontalLayout_4.Layout().AddWidget(qtwidgets.NewQWidgetFromPointer(this.Label_7.GetCthis())) // 115
 
 	this.VerticalLayout_4.AddLayout(qtwidgets.NewQLayoutFromPointer(this.HorizontalLayout_4.GetCthis()), 0) // 115
 
@@ -331,7 +334,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.ToolButton_15.SetIconSize(qtcore.NewQSize_1(12, 16))                                                                         // 113
 	this.ToolButton_15.SetAutoRaise(true)                                                                                             // 114
 
-	this.VerticalLayout_7.AddWidget(qtwidgets.NewQWidgetFromPointer(this.ToolButton_15.GetCthis())) // 115
+	this.VerticalLayout_7.Layout().AddWidget(qtwidgets.NewQWidgetFromPointer(this.ToolButton_15.GetCthis())) // 115
 
 	this.ToolButton_16 = qtwidgets.NewQToolButton(this.LayoutWidget1)      // 111
 	this.ToolButton_16.SetObjectName(qtcore.NewQString_5("ToolButton_16")) // 112
@@ -342,7 +345,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.ToolButton_16.SetIconSize(qtcore.NewQSize_1(12, 12))                                                                              // 113
 	this.ToolButton_16.SetAutoRaise(true)                                                                                                  // 114
 
-	this.VerticalLayout_7.AddWidget(qtwidgets.NewQWidgetFromPointer(this.ToolButton_16.GetCthis())) // 115
+	this.VerticalLayout_7.Layout().AddWidget(qtwidgets.NewQWidgetFromPointer(this.ToolButton_16.GetCthis())) // 115
 
 	this.HorizontalLayout_5.AddLayout(qtwidgets.NewQLayoutFromPointer(this.VerticalLayout_7.GetCthis()), 0) // 115
 
@@ -355,7 +358,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.ToolButton_13.SetIconSize(qtcore.NewQSize_1(32, 32))                                                                          // 113
 	this.ToolButton_13.SetAutoRaise(true)                                                                                              // 114
 
-	this.HorizontalLayout_5.AddWidget(qtwidgets.NewQWidgetFromPointer(this.ToolButton_13.GetCthis())) // 115
+	this.HorizontalLayout_5.Layout().AddWidget(qtwidgets.NewQWidgetFromPointer(this.ToolButton_13.GetCthis())) // 115
 
 	this.ToolButton_14 = qtwidgets.NewQToolButton(this.LayoutWidget1)      // 111
 	this.ToolButton_14.SetObjectName(qtcore.NewQString_5("ToolButton_14")) // 112
@@ -366,7 +369,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.ToolButton_14.SetIconSize(qtcore.NewQSize_1(32, 32))                                                                               // 113
 	this.ToolButton_14.SetAutoRaise(true)                                                                                                   // 114
 
-	this.HorizontalLayout_5.AddWidget(qtwidgets.NewQWidgetFromPointer(this.ToolButton_14.GetCthis())) // 115
+	this.HorizontalLayout_5.Layout().AddWidget(qtwidgets.NewQWidgetFromPointer(this.ToolButton_14.GetCthis())) // 115
 
 	this.VerticalLayout_5.AddLayout(qtwidgets.NewQLayoutFromPointer(this.HorizontalLayout_5.GetCthis()), 0) // 115
 
@@ -374,7 +377,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.ListWidget.SetObjectName(qtcore.NewQString_5("ListWidget")) // 112
 	this.ListWidget.SetAlternatingRowColors(false)                   // 114
 
-	this.VerticalLayout_5.AddWidget(qtwidgets.NewQWidgetFromPointer(this.ListWidget.GetCthis())) // 115
+	this.VerticalLayout_5.Layout().AddWidget(qtwidgets.NewQWidgetFromPointer(this.ListWidget.GetCthis())) // 115
 
 	this.ScrollArea_2 = qtwidgets.NewQScrollArea(this.LayoutWidget1)                                                                // 111
 	this.ScrollArea_2.SetObjectName(qtcore.NewQString_5("ScrollArea_2"))                                                            // 112
@@ -395,7 +398,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 
 	this.ScrollArea_2.SetWidget(this.ScrollAreaWidgetContents_2) // 114
 
-	this.VerticalLayout_5.AddWidget(qtwidgets.NewQWidgetFromPointer(this.ScrollArea_2.GetCthis())) // 115
+	this.VerticalLayout_5.Layout().AddWidget(qtwidgets.NewQWidgetFromPointer(this.ScrollArea_2.GetCthis())) // 115
 
 	this.HorizontalLayout_6 = qtwidgets.NewQHBoxLayout()                             // 111
 	this.HorizontalLayout_6.SetSpacing(3)                                            // 114
@@ -407,7 +410,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.ToolButton_8.SetIcon(this.Icon11)                                                                                                      // 114
 	this.ToolButton_8.SetAutoRaise(true)                                                                                                        // 114
 
-	this.HorizontalLayout_6.AddWidget(qtwidgets.NewQWidgetFromPointer(this.ToolButton_8.GetCthis())) // 115
+	this.HorizontalLayout_6.Layout().AddWidget(qtwidgets.NewQWidgetFromPointer(this.ToolButton_8.GetCthis())) // 115
 
 	this.ToolButton_9 = qtwidgets.NewQToolButton(this.LayoutWidget1)     // 111
 	this.ToolButton_9.SetObjectName(qtcore.NewQString_5("ToolButton_9")) // 112
@@ -416,7 +419,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.ToolButton_9.SetIcon(this.Icon12)                                                                                                 // 114
 	this.ToolButton_9.SetAutoRaise(true)                                                                                                   // 114
 
-	this.HorizontalLayout_6.AddWidget(qtwidgets.NewQWidgetFromPointer(this.ToolButton_9.GetCthis())) // 115
+	this.HorizontalLayout_6.Layout().AddWidget(qtwidgets.NewQWidgetFromPointer(this.ToolButton_9.GetCthis())) // 115
 
 	this.ToolButton_10 = qtwidgets.NewQToolButton(this.LayoutWidget1)      // 111
 	this.ToolButton_10.SetObjectName(qtcore.NewQString_5("ToolButton_10")) // 112
@@ -425,12 +428,12 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.ToolButton_10.SetIcon(this.Icon13)                                                                                        // 114
 	this.ToolButton_10.SetAutoRaise(true)                                                                                          // 114
 
-	this.HorizontalLayout_6.AddWidget(qtwidgets.NewQWidgetFromPointer(this.ToolButton_10.GetCthis())) // 115
+	this.HorizontalLayout_6.Layout().AddWidget(qtwidgets.NewQWidgetFromPointer(this.ToolButton_10.GetCthis())) // 115
 
 	this.LineEdit_2 = qtwidgets.NewQLineEdit(this.LayoutWidget1)     // 111
 	this.LineEdit_2.SetObjectName(qtcore.NewQString_5("LineEdit_2")) // 112
 
-	this.HorizontalLayout_6.AddWidget(qtwidgets.NewQWidgetFromPointer(this.LineEdit_2.GetCthis())) // 115
+	this.HorizontalLayout_6.Layout().AddWidget(qtwidgets.NewQWidgetFromPointer(this.LineEdit_2.GetCthis())) // 115
 
 	this.ToolButton_18 = qtwidgets.NewQToolButton(this.LayoutWidget1)      // 111
 	this.ToolButton_18.SetObjectName(qtcore.NewQString_5("ToolButton_18")) // 112
@@ -440,13 +443,13 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.ToolButton_18.SetToolButtonStyle(qtcore.Qt__ToolButtonTextBesideIcon)                                                      // 114
 	this.ToolButton_18.SetAutoRaise(true)                                                                                           // 114
 
-	this.HorizontalLayout_6.AddWidget(qtwidgets.NewQWidgetFromPointer(this.ToolButton_18.GetCthis())) // 115
+	this.HorizontalLayout_6.Layout().AddWidget(qtwidgets.NewQWidgetFromPointer(this.ToolButton_18.GetCthis())) // 115
 
 	this.VerticalLayout_5.AddLayout(qtwidgets.NewQLayoutFromPointer(this.HorizontalLayout_6.GetCthis()), 0) // 115
 
 	this.Splitter.AddWidget(qtwidgets.NewQWidgetFromPointer(this.LayoutWidget1.GetCthis())) // 115
 
-	this.VerticalLayout_6.AddWidget(qtwidgets.NewQWidgetFromPointer(this.Splitter.GetCthis())) // 115
+	this.VerticalLayout_6.Layout().AddWidget(qtwidgets.NewQWidgetFromPointer(this.Splitter.GetCthis())) // 115
 
 	this.MainWindow.SetCentralWidget(this.Centralwidget) // 114
 
@@ -462,33 +465,33 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 
 //  retranslateUi block begin
 func (this *Ui_MainWindow) RetranslateUi(MainWindow *qtwidgets.QMainWindow) {
-	this.MainWindow.SetWindowTitle(qtmock.QCoreApplication_Translate("MainWindow", "MainWindow", "dummy123", 0))
-	this.Actionooo.SetText(qtmock.QCoreApplication_Translate("MainWindow", "ooo", "dummy123", 0))
-	this.ActionQuit.SetText(qtmock.QCoreApplication_Translate("MainWindow", "&Quit", "dummy123", 0))
-	this.Action_About.SetText(qtmock.QCoreApplication_Translate("MainWindow", "&About", "dummy123", 0))
-	this.ToolButton_17.SetText(qtmock.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
-	this.Label_2.SetText(qtmock.QCoreApplication_Translate("MainWindow", "TextLabel", "dummy123", 0))
-	this.Label_3.SetText(qtmock.QCoreApplication_Translate("MainWindow", "TextLabel", "dummy123", 0))
-	this.ToolButton.SetText(qtmock.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
-	this.LineEdit.SetPlaceholderText(qtmock.QCoreApplication_Translate("MainWindow", "Filter...", "dummy123", 0))
-	this.ToolButton_2.SetText(qtmock.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
-	this.ToolButton_3.SetText(qtmock.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
-	this.ToolButton_4.SetText(qtmock.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
-	this.ToolButton_5.SetText(qtmock.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
-	this.ToolButton_6.SetText(qtmock.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
-	this.ToolButton_7.SetText(qtmock.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
-	this.Label_5.SetText(qtmock.QCoreApplication_Translate("MainWindow", "TextLabel", "dummy123", 0))
-	this.Label_6.SetText(qtmock.QCoreApplication_Translate("MainWindow", "0 people", "dummy123", 0))
-	this.Label_7.SetText(qtmock.QCoreApplication_Translate("MainWindow", "TextLabel", "dummy123", 0))
-	this.ToolButton_15.SetText(qtmock.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
-	this.ToolButton_16.SetText(qtmock.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
-	this.ToolButton_13.SetText(qtmock.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
-	this.ToolButton_14.SetText(qtmock.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
-	this.ToolButton_8.SetText(qtmock.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
-	this.ToolButton_9.SetText(qtmock.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
-	this.ToolButton_10.SetText(qtmock.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
-	this.LineEdit_2.SetPlaceholderText(qtmock.QCoreApplication_Translate("MainWindow", "Write a message...", "dummy123", 0))
-	this.ToolButton_18.SetText(qtmock.QCoreApplication_Translate("MainWindow", "&Send", "dummy123", 0))
+	this.MainWindow.SetWindowTitle(qtcore.QCoreApplication_Translate("MainWindow", "MainWindow", "dummy123", 0))
+	this.Actionooo.SetText(qtcore.QCoreApplication_Translate("MainWindow", "ooo", "dummy123", 0))
+	this.ActionQuit.SetText(qtcore.QCoreApplication_Translate("MainWindow", "&Quit", "dummy123", 0))
+	this.Action_About.SetText(qtcore.QCoreApplication_Translate("MainWindow", "&About", "dummy123", 0))
+	this.ToolButton_17.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
+	this.Label_2.SetText(qtcore.QCoreApplication_Translate("MainWindow", "TextLabel", "dummy123", 0))
+	this.Label_3.SetText(qtcore.QCoreApplication_Translate("MainWindow", "TextLabel", "dummy123", 0))
+	this.ToolButton.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
+	this.LineEdit.SetPlaceholderText(qtcore.QCoreApplication_Translate("MainWindow", "Filter...", "dummy123", 0))
+	this.ToolButton_2.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
+	this.ToolButton_3.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
+	this.ToolButton_4.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
+	this.ToolButton_5.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
+	this.ToolButton_6.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
+	this.ToolButton_7.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
+	this.Label_5.SetText(qtcore.QCoreApplication_Translate("MainWindow", "TextLabel", "dummy123", 0))
+	this.Label_6.SetText(qtcore.QCoreApplication_Translate("MainWindow", "0 people", "dummy123", 0))
+	this.Label_7.SetText(qtcore.QCoreApplication_Translate("MainWindow", "TextLabel", "dummy123", 0))
+	this.ToolButton_15.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
+	this.ToolButton_16.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
+	this.ToolButton_13.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
+	this.ToolButton_14.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
+	this.ToolButton_8.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
+	this.ToolButton_9.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
+	this.ToolButton_10.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
+	this.LineEdit_2.SetPlaceholderText(qtcore.QCoreApplication_Translate("MainWindow", "Write a message...", "dummy123", 0))
+	this.ToolButton_18.SetText(qtcore.QCoreApplication_Translate("MainWindow", "&Send", "dummy123", 0))
 }
 
 //  retranslateUi block end

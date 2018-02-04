@@ -6,10 +6,13 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"reflect"
+	"runtime"
+	"strings"
 	"time"
 
-	"qt.go/cffiqt"
 	"qt.go/qtcore"
+	"qt.go/qtrt"
 	"qt.go/qtwidgets"
 
 	thscli "tox-homeserver/client"
@@ -22,9 +25,48 @@ var appctx *gofia.AppContext
 var vtcli *thscli.LigTox
 
 var uiw *Ui_MainWindow
-var dyslot *ffiqt.QDynSlotObject
+var msgitmdl = []*Ui_MessageItemView{}
+
+// var dyslot *qtrt.QDynSlotObject
+var mech *qtcore.QBuffer
+
+func DumpCallers(pcs []uintptr) {
+	log.Println("DumpCallers...", len(pcs))
+	for idx, pc := range pcs {
+		pcfn := runtime.FuncForPC(pc)
+		file, line := pcfn.FileLine(pc)
+		log.Println(idx, pcfn.Name(), file, line)
+	}
+	if len(pcs) > 0 {
+		log.Println()
+	}
+}
+
+func finalizerFilter(ov reflect.Value) bool {
+	parts := strings.Split(ov.Type().String(), ".")
+	clsname := parts[len(parts)-1]
+	callers := qtrt.GetCtorAllocStack(clsname)
+	_ = callers
+
+	insure := false
+	switch ov.Type().String() {
+	// case "*qtcore.QString":
+	// case "*qtcore.QSize":
+	// case "*qtwidgets.QSpacerItem": // crash
+	//	insure = true
+	//	DumpCallers(callers)
+	default:
+		insure = true
+	}
+	if insure {
+		log.Println(ov.Type().String(), ov)
+	}
+	return insure
+}
 
 func main() {
+	qtrt.SetFinalizerObjectFilter(finalizerFilter)
+
 	// Create application
 	app := qtwidgets.NewQApplication(len(os.Args), os.Args, 0)
 
@@ -37,8 +79,8 @@ func main() {
 
 	// Create main window
 	window := qtwidgets.NewQMainWindow(nil, 0)
-	// window.SetWindowTitle("Hello World Example")
-	// window.SetMinimumSize2(200, 200)
+	window.SetWindowTitle(qtcore.NewQString_5("Hello World Example"))
+	window.SetMinimumSize_1(200, 200)
 
 	uiw = NewUi_MainWindow()
 	log.Println(uiw)
@@ -48,8 +90,8 @@ func main() {
 	window.Show()
 
 	tb9 := uiw.ToolButton_9
-	dyslot = ffiqt.NewQDynSlotObject("abc", 123)
-	dyslot.Connect(tb9, "clicked(bool)", func(checked bool) {
+	// dyslot = qtrt.NewQDynSlotObject("abc", 123)
+	qtrt.Connect(tb9, "clicked(bool)", func(checked bool) {
 		log.Println(checked)
 		setStyleSheet()
 	})
@@ -63,18 +105,27 @@ func main() {
 
 	*/
 
+	mech = qtcore.NewQBuffer(nil)
+	mech.Open(qtcore.QIODevice__ReadWrite)
+	qtrt.Connect(mech, "readyRead()", func() {
+		log.Println("hehehehhee")
+		mech.ReadAll()
+		tryReadEvent()
+	})
 	go initAppBackend()
 
-	tmer := qtcore.NewQTimer(nil)
-	tmer.Start(500)
-	dyslot.Connect(tmer, "timeout()", func() { tryReadEvent() })
+	if false {
+		tmer := qtcore.NewQTimer(nil)
+		tmer.Start(500)
+		qtrt.Connect(tmer, "timeout()", func() { tryReadEvent() }) // 去掉这个定时器会节省CPU
+	}
 
 	vlo10 := uiw.VerticalLayout_10
 	_ = vlo10
 	for i := 0; i < 30; i++ {
 		itext := fmt.Sprintf("hehe %d", i)
 		ctivw := qtwidgets.NewQPushButton_1(qtcore.NewQString_5(itext), nil)
-		vlo10.AddWidget(qtwidgets.NewQWidgetFromPointer(ctivw.GetCthis()))
+		vlo10.Layout().AddWidget(qtwidgets.NewQWidgetFromPointer(ctivw.GetCthis()))
 	}
 
 	// Execute app
@@ -85,6 +136,7 @@ func initAppBackend() {
 	gofia.AppOnCreate()
 	appctx = gofia.GetAppCtx()
 	vtcli = appctx.GetLigTox()
+	vtcli.OnNewMsg = func() { mech.Write_1("5") }
 
 	for {
 		time.Sleep(500 * time.Millisecond)
@@ -124,6 +176,11 @@ func tryReadEvent() {
 
 	if !baseInfoGot {
 		return
+	}
+
+	// 这个return不会节省cpu???
+	if true {
+		// return
 	}
 
 	for {
@@ -316,14 +373,15 @@ func dispatchEvent(jso *simplejson.Json) {
 		msgivw := qtwidgets.NewQWidget(nil, 0)
 		msgivp := NewUi_MessageItemView()
 		msgivp.SetupUi(msgivw)
-		vlo8.AddWidget(msgivw)
+		vlo8.Layout().AddWidget(msgivw)
+		msgitmdl = append(msgitmdl, msgivp)
 
 		tbrw := msgivp.TextBrowser
 		tbrw.SetText(qtcore.NewQString_5(itext))
 		msgivp.Label_3.SetText(qtcore.NewQString_5(fmt.Sprintf("%s@%s", peerName, groupTitle)))
 		msgivp.Label_4.SetText(qtcore.NewQString_5(gopp.TimeToFmt1(time.Now())))
 
-		dyslot.Connect(msgivp.ToolButton, "clicked(bool)", func(bool) {
+		qtrt.Connect(msgivp.ToolButton, "clicked(bool)", func(bool) {
 			log.Println(tbrw)
 			log.Println(tbrw.GetCthis())
 			log.Println(tbrw.Size())
