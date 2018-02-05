@@ -68,11 +68,21 @@ func main() {
 	qtrt.SetFinalizerObjectFilter(finalizerFilter)
 
 	// Create application
+	os.Setenv("QT_AUTO_SCREEN​_SCALE_FACTOR ", "1.5")
+	qtcore.QCoreApplication_SetAttribute(qtcore.Qt__AA_EnableHighDpiScaling, true)
 	app := qtwidgets.NewQApplication(len(os.Args), os.Args, 0)
+	if false {
+		app.SetAttribute(qtcore.Qt__AA_EnableHighDpiScaling, true) // for android
+	}
 
 	setStyleSheet := func() {
 		bcc, err := ioutil.ReadFile("../qofia/app.css")
 		gopp.ErrPrint(err)
+		if true {
+			fp := qtcore.NewQFile_1(qtcore.NewQString_5(":/app.css"))
+			fp.Open(qtcore.QIODevice__ReadOnly)
+			bcc = []byte(qtcore.NewQIODeviceFromPointer(fp.GetCthis()).ReadAll().Data())
+		}
 		app.SetStyleSheet(qtcore.NewQString_5(string(bcc)))
 	}
 	// setStyleSheet()
@@ -95,6 +105,20 @@ func main() {
 		log.Println(checked)
 		setStyleSheet()
 	})
+	stkw := uiw.StackedWidget
+	qtrt.Connect(uiw.ToolButton_11, "clicked(bool)", func(checked bool) {
+		cidx := stkw.CurrentIndex()
+		if cidx > 0 {
+			stkw.SetCurrentIndex(cidx - 1)
+		}
+	})
+	qtrt.Connect(uiw.ToolButton_12, "clicked(bool)", func(checked bool) {
+		cidx := stkw.CurrentIndex()
+		if cidx < 2 {
+			stkw.SetCurrentIndex(cidx + 1)
+		}
+	})
+
 	/*
 		a2 := widgets.NewQScrollAreaFromPointer(Ui_MainWindow_Get_scrollArea_2(uiw))
 		toval := a2.VerticalScrollBar().Maximum() + 80
