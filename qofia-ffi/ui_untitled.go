@@ -4,9 +4,12 @@ package main
 import "qt.go/qtcore"
 import "qt.go/qtgui"
 import "qt.go/qtwidgets"
+import "qt.go/qtquickwidgets"
 import "qt.go/qtmock"
 
 func init() { qtcore.KeepMe() }
+func init() { qtwidgets.KeepMe() }
+func init() { qtquickwidgets.KeepMe() }
 func init() { qtmock.KeepMe() }
 
 //  header block end
@@ -30,6 +33,8 @@ type Ui_MainWindow struct {
 	Page_3                     *qtwidgets.QWidget
 	VerticalLayout_11          *qtwidgets.QVBoxLayout
 	Widget                     *qtwidgets.QWidget
+	VerticalLayout_12          *qtwidgets.QVBoxLayout
+	QuickWidget                *qtquickwidgets.QQuickWidget
 	Page                       *qtwidgets.QWidget
 	VerticalLayout_5           *qtwidgets.QVBoxLayout
 	HorizontalLayout           *qtwidgets.QHBoxLayout
@@ -160,6 +165,14 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.VerticalLayout_11.SetObjectName(qtcore.NewQString_5("VerticalLayout_11"))                               // 112
 	this.Widget = qtwidgets.NewQWidget(qtwidgets.NewQWidgetFromPointer(this.Page_3.GetCthis()), 0)               // 111
 	this.Widget.SetObjectName(qtcore.NewQString_5("Widget"))                                                     // 112
+	this.VerticalLayout_12 = qtwidgets.NewQVBoxLayout_1(qtwidgets.NewQWidgetFromPointer(this.Widget.GetCthis())) // 111
+	this.VerticalLayout_12.SetObjectName(qtcore.NewQString_5("VerticalLayout_12"))                               // 112
+	this.QuickWidget = qtquickwidgets.NewQQuickWidget(this.Widget)                                               // 111
+	this.QuickWidget.SetObjectName(qtcore.NewQString_5("QuickWidget"))                                           // 112
+	this.QuickWidget.SetResizeMode(qtquickwidgets.QQuickWidget__SizeRootObjectToView)                            // 114
+	this.QuickWidget.SetSource(qtcore.NewQUrl_1(qtcore.NewQString_5("qrc:/qml/area.qml"), 0))                    // 114
+
+	this.VerticalLayout_12.Layout().AddWidget(qtwidgets.NewQWidgetFromPointer(this.QuickWidget.GetCthis())) // 115
 
 	this.VerticalLayout_11.Layout().AddWidget(qtwidgets.NewQWidgetFromPointer(this.Widget.GetCthis())) // 115
 
@@ -264,6 +277,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.Icon5 = qtgui.NewQIcon()
 	this.Icon5.AddFile(qtcore.NewQString_5(":/icons/add-square-button-gray.png"), qtcore.NewQSize(), qtgui.QIcon__Normal, qtgui.QIcon__Off) // 115
 	this.ToolButton_4.SetIcon(this.Icon5)                                                                                                   // 114
+	this.ToolButton_4.SetIconSize(qtcore.NewQSize_1(22, 22))                                                                                // 113
 	this.ToolButton_4.SetAutoRaise(true)                                                                                                    // 114
 
 	this.HorizontalLayout_3.Layout().AddWidget(qtwidgets.NewQWidgetFromPointer(this.ToolButton_4.GetCthis())) // 115
@@ -273,6 +287,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.Icon6 = qtgui.NewQIcon()
 	this.Icon6.AddFile(qtcore.NewQString_5(":/icons/groupgray.png"), qtcore.NewQSize(), qtgui.QIcon__Normal, qtgui.QIcon__Off) // 115
 	this.ToolButton_5.SetIcon(this.Icon6)                                                                                      // 114
+	this.ToolButton_5.SetIconSize(qtcore.NewQSize_1(22, 22))                                                                   // 113
 	this.ToolButton_5.SetAutoRaise(true)                                                                                       // 114
 
 	this.HorizontalLayout_3.Layout().AddWidget(qtwidgets.NewQWidgetFromPointer(this.ToolButton_5.GetCthis())) // 115
@@ -282,6 +297,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.Icon7 = qtgui.NewQIcon()
 	this.Icon7.AddFile(qtcore.NewQString_5(":/icons/transfer_gray64.png"), qtcore.NewQSize(), qtgui.QIcon__Normal, qtgui.QIcon__Off) // 115
 	this.ToolButton_6.SetIcon(this.Icon7)                                                                                            // 114
+	this.ToolButton_6.SetIconSize(qtcore.NewQSize_1(22, 22))                                                                         // 113
 	this.ToolButton_6.SetAutoRaise(true)                                                                                             // 114
 
 	this.HorizontalLayout_3.Layout().AddWidget(qtwidgets.NewQWidgetFromPointer(this.ToolButton_6.GetCthis())) // 115
@@ -291,6 +307,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.Icon8 = qtgui.NewQIcon()
 	this.Icon8.AddFile(qtcore.NewQString_5(":/icons/settings_gray64.png"), qtcore.NewQSize(), qtgui.QIcon__Normal, qtgui.QIcon__Off) // 115
 	this.ToolButton_7.SetIcon(this.Icon8)                                                                                            // 114
+	this.ToolButton_7.SetIconSize(qtcore.NewQSize_1(22, 22))                                                                         // 113
 	this.ToolButton_7.SetAutoRaise(true)                                                                                             // 114
 
 	this.HorizontalLayout_3.Layout().AddWidget(qtwidgets.NewQWidgetFromPointer(this.ToolButton_7.GetCthis())) // 115
@@ -402,7 +419,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.ScrollArea_2.SetWidgetResizable(true)                                                                                      // 114
 	this.ScrollAreaWidgetContents_2 = qtwidgets.NewQWidget(nil, 0)                                                                  // 111
 	this.ScrollAreaWidgetContents_2.SetObjectName(qtcore.NewQString_5("ScrollAreaWidgetContents_2"))                                // 112
-	this.ScrollAreaWidgetContents_2.SetGeometry(0, 0, 368, 214)                                                                     // 114
+	this.ScrollAreaWidgetContents_2.SetGeometry(0, 0, 368, 213)                                                                     // 114
 	this.VerticalLayout_3 = qtwidgets.NewQVBoxLayout_1(qtwidgets.NewQWidgetFromPointer(this.ScrollAreaWidgetContents_2.GetCthis())) // 111
 	this.VerticalLayout_3.SetObjectName(qtcore.NewQString_5("VerticalLayout_3"))                                                    // 112
 	this.VerticalLayout_8 = qtwidgets.NewQVBoxLayout()                                                                              // 111
@@ -422,7 +439,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.ScrollArea.SetWidgetResizable(true)                                                                                      // 114
 	this.ScrollAreaWidgetContents = qtwidgets.NewQWidget(nil, 0)                                                                  // 111
 	this.ScrollAreaWidgetContents.SetObjectName(qtcore.NewQString_5("ScrollAreaWidgetContents"))                                  // 112
-	this.ScrollAreaWidgetContents.SetGeometry(0, 0, 368, 214)                                                                     // 114
+	this.ScrollAreaWidgetContents.SetGeometry(0, 0, 368, 213)                                                                     // 114
 	this.VerticalLayout_9 = qtwidgets.NewQVBoxLayout_1(qtwidgets.NewQWidgetFromPointer(this.ScrollAreaWidgetContents.GetCthis())) // 111
 	this.VerticalLayout_9.SetObjectName(qtcore.NewQString_5("VerticalLayout_9"))                                                  // 112
 	this.VerticalLayout_10 = qtwidgets.NewQVBoxLayout()                                                                           // 111
@@ -445,6 +462,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.Icon13 = qtgui.NewQIcon()
 	this.Icon13.AddFile(qtcore.NewQString_5(":/icons/paper-clip-outline_gray64.png"), qtcore.NewQSize(), qtgui.QIcon__Normal, qtgui.QIcon__Off) // 115
 	this.ToolButton_8.SetIcon(this.Icon13)                                                                                                      // 114
+	this.ToolButton_8.SetIconSize(qtcore.NewQSize_1(22, 22))                                                                                    // 113
 	this.ToolButton_8.SetAutoRaise(true)                                                                                                        // 114
 
 	this.HorizontalLayout_6.Layout().AddWidget(qtwidgets.NewQWidgetFromPointer(this.ToolButton_8.GetCthis())) // 115
@@ -454,6 +472,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.Icon14 = qtgui.NewQIcon()
 	this.Icon14.AddFile(qtcore.NewQString_5(":/icons/question-mark-gray64.png"), qtcore.NewQSize(), qtgui.QIcon__Normal, qtgui.QIcon__Off) // 115
 	this.ToolButton_9.SetIcon(this.Icon14)                                                                                                 // 114
+	this.ToolButton_9.SetIconSize(qtcore.NewQSize_1(22, 22))                                                                               // 113
 	this.ToolButton_9.SetAutoRaise(true)                                                                                                   // 114
 
 	this.HorizontalLayout_6.Layout().AddWidget(qtwidgets.NewQWidgetFromPointer(this.ToolButton_9.GetCthis())) // 115
@@ -463,6 +482,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.Icon15 = qtgui.NewQIcon()
 	this.Icon15.AddFile(qtcore.NewQString_5(":/icons/smile_gray64.png"), qtcore.NewQSize(), qtgui.QIcon__Normal, qtgui.QIcon__Off) // 115
 	this.ToolButton_10.SetIcon(this.Icon15)                                                                                        // 114
+	this.ToolButton_10.SetIconSize(qtcore.NewQSize_1(22, 22))                                                                      // 113
 	this.ToolButton_10.SetAutoRaise(true)                                                                                          // 114
 
 	this.HorizontalLayout_6.Layout().AddWidget(qtwidgets.NewQWidgetFromPointer(this.ToolButton_10.GetCthis())) // 115
@@ -477,6 +497,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.Icon16 = qtgui.NewQIcon()
 	this.Icon16.AddFile(qtcore.NewQString_5(":/icons/cursor_gray64.png"), qtcore.NewQSize(), qtgui.QIcon__Normal, qtgui.QIcon__Off) // 115
 	this.ToolButton_18.SetIcon(this.Icon16)                                                                                         // 114
+	this.ToolButton_18.SetIconSize(qtcore.NewQSize_1(22, 22))                                                                       // 113
 	this.ToolButton_18.SetToolButtonStyle(qtcore.Qt__ToolButtonTextBesideIcon)                                                      // 114
 	this.ToolButton_18.SetAutoRaise(true)                                                                                           // 114
 

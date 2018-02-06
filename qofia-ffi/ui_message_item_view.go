@@ -4,9 +4,12 @@ package main
 import "qt.go/qtcore"
 import "qt.go/qtgui"
 import "qt.go/qtwidgets"
+import "qt.go/qtquickwidgets"
 import "qt.go/qtmock"
 
 func init() { qtcore.KeepMe() }
+func init() { qtwidgets.KeepMe() }
+func init() { qtquickwidgets.KeepMe() }
 func init() { qtmock.KeepMe() }
 
 //  header block end

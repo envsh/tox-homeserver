@@ -68,7 +68,22 @@
       <widget class="QWidget" name="page_3">
        <layout class="QVBoxLayout" name="verticalLayout_11">
         <item>
-         <widget class="QWidget" name="widget" native="true"/>
+         <widget class="QWidget" name="widget" native="true">
+          <layout class="QVBoxLayout" name="verticalLayout_12">
+           <item>
+            <widget class="QQuickWidget" name="quickWidget">
+             <property name="resizeMode">
+              <enum>QQuickWidget::SizeRootObjectToView</enum>
+             </property>
+             <property name="source">
+              <url>
+               <string>qrc:/qml/area.qml</string>
+              </url>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
         </item>
        </layout>
       </widget>
@@ -226,6 +241,12 @@
              <iconset resource="rcc.qrc">
               <normaloff>:/icons/add-square-button-gray.png</normaloff>:/icons/add-square-button-gray.png</iconset>
             </property>
+            <property name="iconSize">
+             <size>
+              <width>22</width>
+              <height>22</height>
+             </size>
+            </property>
             <property name="autoRaise">
              <bool>true</bool>
             </property>
@@ -239,6 +260,12 @@
             <property name="icon">
              <iconset resource="rcc.qrc">
               <normaloff>:/icons/groupgray.png</normaloff>:/icons/groupgray.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>22</width>
+              <height>22</height>
+             </size>
             </property>
             <property name="autoRaise">
              <bool>true</bool>
@@ -254,6 +281,12 @@
              <iconset resource="rcc.qrc">
               <normaloff>:/icons/transfer_gray64.png</normaloff>:/icons/transfer_gray64.png</iconset>
             </property>
+            <property name="iconSize">
+             <size>
+              <width>22</width>
+              <height>22</height>
+             </size>
+            </property>
             <property name="autoRaise">
              <bool>true</bool>
             </property>
@@ -267,6 +300,12 @@
             <property name="icon">
              <iconset resource="rcc.qrc">
               <normaloff>:/icons/settings_gray64.png</normaloff>:/icons/settings_gray64.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>22</width>
+              <height>22</height>
+             </size>
             </property>
             <property name="autoRaise">
              <bool>true</bool>
@@ -480,7 +519,7 @@
              <x>0</x>
              <y>0</y>
              <width>368</width>
-             <height>214</height>
+             <height>213</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -516,7 +555,7 @@
              <x>0</x>
              <y>0</y>
              <width>368</width>
-             <height>214</height>
+             <height>213</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_9">
@@ -555,6 +594,12 @@
              <iconset resource="rcc.qrc">
               <normaloff>:/icons/paper-clip-outline_gray64.png</normaloff>:/icons/paper-clip-outline_gray64.png</iconset>
             </property>
+            <property name="iconSize">
+             <size>
+              <width>22</width>
+              <height>22</height>
+             </size>
+            </property>
             <property name="autoRaise">
              <bool>true</bool>
             </property>
@@ -569,6 +614,12 @@
              <iconset resource="rcc.qrc">
               <normaloff>:/icons/question-mark-gray64.png</normaloff>:/icons/question-mark-gray64.png</iconset>
             </property>
+            <property name="iconSize">
+             <size>
+              <width>22</width>
+              <height>22</height>
+             </size>
+            </property>
             <property name="autoRaise">
              <bool>true</bool>
             </property>
@@ -582,6 +633,12 @@
             <property name="icon">
              <iconset resource="rcc.qrc">
               <normaloff>:/icons/smile_gray64.png</normaloff>:/icons/smile_gray64.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>22</width>
+              <height>22</height>
+             </size>
             </property>
             <property name="autoRaise">
              <bool>true</bool>
@@ -603,6 +660,12 @@
             <property name="icon">
              <iconset resource="rcc.qrc">
               <normaloff>:/icons/cursor_gray64.png</normaloff>:/icons/cursor_gray64.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>22</width>
+              <height>22</height>
+             </size>
             </property>
             <property name="toolButtonStyle">
              <enum>Qt::ToolButtonTextBesideIcon</enum>
@@ -636,6 +699,13 @@
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QQuickWidget</class>
+   <extends>QWidget</extends>
+   <header>QtQuickWidgets/QQuickWidget</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="rcc.qrc"/>
  </resources>

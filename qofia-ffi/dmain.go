@@ -119,6 +119,12 @@ func main() {
 		}
 	})
 
+	{
+		qw := uiw.QuickWidget
+		qw.SetSource(qtcore.NewQUrl_1(qtcore.NewQString_5("qrc:/qml/area.qml"), 0))
+		proot := qw.RootObject()
+		gopp.NilPrint(proot, "qml root object nil")
+	}
 	/*
 		a2 := widgets.NewQScrollAreaFromPointer(Ui_MainWindow_Get_scrollArea_2(uiw))
 		toval := a2.VerticalScrollBar().Maximum() + 80

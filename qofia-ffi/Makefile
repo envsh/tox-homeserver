@@ -7,12 +7,12 @@ all:
 
 
 gen:
-	go-uic ../qofia/ui_message_item_view.h
-	cp ../qofia/ui_message_item_view.go ./
-	go-uic ../qofia/ui_untitled.h
-	cp ../qofia/ui_untitled.go ./
-	go-rcc ../qofia/rcc.cpp
-	cp ../qofia/rcc_rc.go ./
+	# go-uic scroll_widget.ui
+	go-uic ./contact_item_view.ui
+	go-uic ./message_item_view.ui
+	go-uic untitled.ui
+
+	go-rcc ./rcc.qrc
 
 bd:
 	go install -v tox-homeserver/gofia-ffi
