@@ -1,4 +1,6 @@
 import QtQuick 2.1
+import StratifyLabs.UI 3.0
+
 
 Rectangle {
     id: root
@@ -11,6 +13,35 @@ Rectangle {
     // 从 Qt Widgets 接收到的信号
     signal cSignal
 
+        SRow {
+                SButton{
+                    span: 5;
+            text: "111";
+            }
+            
+            SButton{
+                id: btn233
+                span: 7;
+                text: "222333444";
+            }
+           }
+
+    SRow {
+        y: btn233.height
+  SLabel {
+    span: 2;
+    text: "4 Options";
+  }
+  SDropup {
+    style: "block";
+    span: 10;
+    model:
+        ["First",
+      "Second",
+      "Third",
+      "Fourth"];
+  }
+}
     Text {
         id: myText
         text: "Click me"

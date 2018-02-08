@@ -44,17 +44,17 @@ type Ui_MessageItemView struct {
 func (this *Ui_MessageItemView) SetupUi(MessageItemView *qtwidgets.QWidget) {
 	this.MessageItemView = MessageItemView
 	// { // 126
-	if MessageItemView.ObjectName().IsEmpty() {
-		MessageItemView.SetObjectName(qtcore.NewQString_5("MessageItemView"))
+	if MessageItemView.ObjectName() == "" {
+		MessageItemView.SetObjectName("MessageItemView")
 	}
 	MessageItemView.Resize(399, 133)
 	this.HorizontalLayout_2 = qtwidgets.NewQHBoxLayout_1(qtwidgets.NewQWidgetFromPointer(this.MessageItemView.GetCthis())) // 111
-	this.HorizontalLayout_2.SetObjectName(qtcore.NewQString_5("HorizontalLayout_2"))                                       // 112
+	this.HorizontalLayout_2.SetObjectName("HorizontalLayout_2")                                                            // 112
 	this.VerticalLayout_3 = qtwidgets.NewQVBoxLayout()                                                                     // 111
-	this.VerticalLayout_3.SetObjectName(qtcore.NewQString_5("VerticalLayout_3"))                                           // 112
+	this.VerticalLayout_3.SetObjectName("VerticalLayout_3")                                                                // 112
 	this.Label = qtwidgets.NewQLabel(this.MessageItemView, 0)                                                              // 111
-	this.Label.SetObjectName(qtcore.NewQString_5("Label"))                                                                 // 112
-	this.Label.SetPixmap(qtgui.NewQPixmap_3(qtcore.NewQString_5(":/Icons/Icon_avatar_40.Png"), "dummy123", 0))             // 114
+	this.Label.SetObjectName("Label")                                                                                      // 112
+	this.Label.SetPixmap(qtgui.NewQPixmap_3(":/Icons/Icon_avatar_40.Png", "dummy123", 0))                                  // 114
 
 	this.VerticalLayout_3.Layout().AddWidget(qtwidgets.NewQWidgetFromPointer(this.Label.GetCthis())) // 115
 
@@ -65,23 +65,23 @@ func (this *Ui_MessageItemView) SetupUi(MessageItemView *qtwidgets.QWidget) {
 	this.HorizontalLayout_2.AddLayout(qtwidgets.NewQLayoutFromPointer(this.VerticalLayout_3.GetCthis()), 0) // 115
 
 	this.VerticalLayout = qtwidgets.NewQVBoxLayout()                                                           // 111
-	this.VerticalLayout.SetObjectName(qtcore.NewQString_5("VerticalLayout"))                                   // 112
+	this.VerticalLayout.SetObjectName("VerticalLayout")                                                        // 112
 	this.HorizontalLayout = qtwidgets.NewQHBoxLayout()                                                         // 111
-	this.HorizontalLayout.SetObjectName(qtcore.NewQString_5("HorizontalLayout"))                               // 112
+	this.HorizontalLayout.SetObjectName("HorizontalLayout")                                                    // 112
 	this.Label_3 = qtwidgets.NewQLabel(this.MessageItemView, 0)                                                // 111
-	this.Label_3.SetObjectName(qtcore.NewQString_5("Label_3"))                                                 // 112
+	this.Label_3.SetObjectName("Label_3")                                                                      // 112
 	this.Label_3.SetTextInteractionFlags(qtcore.Qt__LinksAccessibleByMouse | qtcore.Qt__TextSelectableByMouse) // 114
 
 	this.HorizontalLayout.Layout().AddWidget(qtwidgets.NewQWidgetFromPointer(this.Label_3.GetCthis())) // 115
 
 	this.Label_4 = qtwidgets.NewQLabel(this.MessageItemView, 0)                                                // 111
-	this.Label_4.SetObjectName(qtcore.NewQString_5("Label_4"))                                                 // 112
+	this.Label_4.SetObjectName("Label_4")                                                                      // 112
 	this.Label_4.SetTextInteractionFlags(qtcore.Qt__LinksAccessibleByMouse | qtcore.Qt__TextSelectableByMouse) // 114
 
 	this.HorizontalLayout.Layout().AddWidget(qtwidgets.NewQWidgetFromPointer(this.Label_4.GetCthis())) // 115
 
 	this.ToolButton = qtwidgets.NewQToolButton(this.MessageItemView) // 111
-	this.ToolButton.SetObjectName(qtcore.NewQString_5("ToolButton")) // 112
+	this.ToolButton.SetObjectName("ToolButton")                      // 112
 	this.ToolButton.SetAutoRaise(true)                               // 114
 
 	this.HorizontalLayout.Layout().AddWidget(qtwidgets.NewQWidgetFromPointer(this.ToolButton.GetCthis())) // 115
@@ -89,7 +89,7 @@ func (this *Ui_MessageItemView) SetupUi(MessageItemView *qtwidgets.QWidget) {
 	this.VerticalLayout.AddLayout(qtwidgets.NewQLayoutFromPointer(this.HorizontalLayout.GetCthis()), 0) // 115
 
 	this.TextBrowser = qtwidgets.NewQTextBrowser(this.MessageItemView) // 111
-	this.TextBrowser.SetObjectName(qtcore.NewQString_5("TextBrowser")) // 112
+	this.TextBrowser.SetObjectName("TextBrowser")                      // 112
 	this.SizePolicy = qtwidgets.NewQSizePolicy_1(qtwidgets.QSizePolicy__Expanding, qtwidgets.QSizePolicy__Preferred, 1)
 	this.SizePolicy.SetHorizontalStretch(0)                                               // 114
 	this.SizePolicy.SetVerticalStretch(0)                                                 // 114
@@ -103,11 +103,11 @@ func (this *Ui_MessageItemView) SetupUi(MessageItemView *qtwidgets.QWidget) {
 
 	this.HorizontalLayout_2.AddLayout(qtwidgets.NewQLayoutFromPointer(this.VerticalLayout.GetCthis()), 0) // 115
 
-	this.VerticalLayout_2 = qtwidgets.NewQVBoxLayout()                                                           // 111
-	this.VerticalLayout_2.SetObjectName(qtcore.NewQString_5("VerticalLayout_2"))                                 // 112
-	this.Label_2 = qtwidgets.NewQLabel(this.MessageItemView, 0)                                                  // 111
-	this.Label_2.SetObjectName(qtcore.NewQString_5("Label_2"))                                                   // 112
-	this.Label_2.SetPixmap(qtgui.NewQPixmap_3(qtcore.NewQString_5(":/Icons/Icon_avatar_40.Png"), "dummy123", 0)) // 114
+	this.VerticalLayout_2 = qtwidgets.NewQVBoxLayout()                                      // 111
+	this.VerticalLayout_2.SetObjectName("VerticalLayout_2")                                 // 112
+	this.Label_2 = qtwidgets.NewQLabel(this.MessageItemView, 0)                             // 111
+	this.Label_2.SetObjectName("Label_2")                                                   // 112
+	this.Label_2.SetPixmap(qtgui.NewQPixmap_3(":/Icons/Icon_avatar_40.Png", "dummy123", 0)) // 114
 
 	this.VerticalLayout_2.Layout().AddWidget(qtwidgets.NewQWidgetFromPointer(this.Label_2.GetCthis())) // 115
 

@@ -1,6 +1,6 @@
 <RCC>
   <qresource>
-    <file>qml/area.qml</file>
+    <file>qmlapp/area.qml</file>
     <file>icons/barbuttonicon_forward_gray64.png</file>
     <file>icons/barbuttonicon_back_gray64.png</file>
     <file>app.css</file>

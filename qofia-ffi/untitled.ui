@@ -13,10 +13,31 @@
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
+  <property name="documentMode">
+   <bool>false</bool>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_6">
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_7">
+      <property name="spacing">
+       <number>0</number>
+      </property>
       <item>
        <widget class="QToolButton" name="toolButton_11">
         <property name="focusPolicy">
@@ -62,27 +83,65 @@
     </item>
     <item>
      <widget class="QStackedWidget" name="stackedWidget">
-      <property name="currentIndex">
+      <property name="lineWidth">
        <number>1</number>
       </property>
+      <property name="currentIndex">
+       <number>2</number>
+      </property>
+      <widget class="QWidget" name="page_4">
+       <layout class="QVBoxLayout" name="verticalLayout_13">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QQuickWidget" name="quickWidget_2">
+          <property name="resizeMode">
+           <enum>QQuickWidget::SizeRootObjectToView</enum>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
       <widget class="QWidget" name="page_3">
        <layout class="QVBoxLayout" name="verticalLayout_11">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
         <item>
-         <widget class="QWidget" name="widget" native="true">
-          <layout class="QVBoxLayout" name="verticalLayout_12">
-           <item>
-            <widget class="QQuickWidget" name="quickWidget">
-             <property name="resizeMode">
-              <enum>QQuickWidget::SizeRootObjectToView</enum>
-             </property>
-             <property name="source">
-              <url>
-               <string>qrc:/qml/area.qml</string>
-              </url>
-             </property>
-            </widget>
-           </item>
-          </layout>
+         <widget class="QQuickWidget" name="quickWidget">
+          <property name="resizeMode">
+           <enum>QQuickWidget::SizeRootObjectToView</enum>
+          </property>
+          <property name="source">
+           <url>
+            <string>qrc:/qml/area.qml</string>
+           </url>
+          </property>
          </widget>
         </item>
        </layout>
@@ -92,7 +151,7 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout">
           <property name="spacing">
-           <number>3</number>
+           <number>0</number>
           </property>
           <item>
            <widget class="QToolButton" name="toolButton_17">
@@ -122,6 +181,9 @@
           </item>
           <item>
            <layout class="QVBoxLayout" name="verticalLayout">
+            <property name="spacing">
+             <number>0</number>
+            </property>
             <item>
              <widget class="QLabel" name="label_2">
               <property name="font">
@@ -178,6 +240,9 @@
         </item>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <property name="spacing">
+           <number>0</number>
+          </property>
           <item>
            <widget class="QLineEdit" name="lineEdit">
             <property name="placeholderText">
@@ -230,7 +295,7 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_3">
           <property name="spacing">
-           <number>3</number>
+           <number>0</number>
           </property>
           <item>
            <widget class="QToolButton" name="toolButton_4">
@@ -321,7 +386,7 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_5">
           <property name="spacing">
-           <number>3</number>
+           <number>0</number>
           </property>
           <item>
            <widget class="QLabel" name="label_4">
@@ -341,6 +406,9 @@
           </item>
           <item>
            <layout class="QVBoxLayout" name="verticalLayout_4">
+            <property name="spacing">
+             <number>0</number>
+            </property>
             <item>
              <widget class="QLabel" name="label_5">
               <property name="sizePolicy">
@@ -365,6 +433,9 @@
             </item>
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_4">
+              <property name="spacing">
+               <number>0</number>
+              </property>
               <item>
                <widget class="QLabel" name="label_6">
                 <property name="text">
@@ -397,6 +468,9 @@
           </item>
           <item>
            <layout class="QVBoxLayout" name="verticalLayout_7">
+            <property name="spacing">
+             <number>0</number>
+            </property>
             <item>
              <widget class="QToolButton" name="toolButton_15">
               <property name="maximumSize">
@@ -518,13 +592,31 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>368</width>
-             <height>213</height>
+             <width>380</width>
+             <height>222</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_3">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
             <item>
              <layout class="QVBoxLayout" name="verticalLayout_8">
+              <property name="spacing">
+               <number>0</number>
+              </property>
               <item>
                <spacer name="verticalSpacer">
                 <property name="orientation">
@@ -554,13 +646,31 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>368</width>
-             <height>213</height>
+             <width>380</width>
+             <height>222</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_9">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
             <item>
              <layout class="QVBoxLayout" name="verticalLayout_10">
+              <property name="spacing">
+               <number>0</number>
+              </property>
               <item>
                <spacer name="verticalSpacer_2">
                 <property name="orientation">
@@ -583,7 +693,7 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_6">
           <property name="spacing">
-           <number>3</number>
+           <number>0</number>
           </property>
           <item>
            <widget class="QToolButton" name="toolButton_8">

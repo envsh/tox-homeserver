@@ -79,17 +79,17 @@ func main() {
 		bcc, err := ioutil.ReadFile("../qofia/app.css")
 		gopp.ErrPrint(err)
 		if true {
-			fp := qtcore.NewQFile_1(qtcore.NewQString_5(":/app.css"))
+			fp := qtcore.NewQFile_1(":/app.css")
 			fp.Open(qtcore.QIODevice__ReadOnly)
 			bcc = []byte(qtcore.NewQIODeviceFromPointer(fp.GetCthis()).ReadAll().Data())
 		}
-		app.SetStyleSheet(qtcore.NewQString_5(string(bcc)))
+		app.SetStyleSheet(string(bcc))
 	}
 	// setStyleSheet()
 
 	// Create main window
 	window := qtwidgets.NewQMainWindow(nil, 0)
-	window.SetWindowTitle(qtcore.NewQString_5("Hello World Example"))
+	window.SetWindowTitle("Hello World Example")
 	window.SetMinimumSize_1(200, 200)
 
 	uiw = NewUi_MainWindow()
@@ -114,14 +114,16 @@ func main() {
 	})
 	qtrt.Connect(uiw.ToolButton_12, "clicked(bool)", func(checked bool) {
 		cidx := stkw.CurrentIndex()
-		if cidx < 2 {
+		if cidx < stkw.Count()-1 {
 			stkw.SetCurrentIndex(cidx + 1)
 		}
 	})
 
 	{
 		qw := uiw.QuickWidget
-		qw.SetSource(qtcore.NewQUrl_1(qtcore.NewQString_5("qrc:/qml/area.qml"), 0))
+		// qw.Engine().AddImportPath(":/qmlsys")
+		qw.Engine().AddImportPath(":/qmlapp")
+		qw.SetSource(qtcore.NewQUrl_1("qrc:/qmlapp/area.qml", 0))
 		proot := qw.RootObject()
 		gopp.NilPrint(proot, "qml root object nil")
 	}
@@ -154,7 +156,7 @@ func main() {
 	_ = vlo10
 	for i := 0; i < 30; i++ {
 		itext := fmt.Sprintf("hehe %d", i)
-		ctivw := qtwidgets.NewQPushButton_1(qtcore.NewQString_5(itext), nil)
+		ctivw := qtwidgets.NewQPushButton_1(itext, nil)
 		vlo10.Layout().AddWidget(qtwidgets.NewQWidgetFromPointer(ctivw.GetCthis()))
 	}
 
@@ -177,21 +179,21 @@ func initAppBackend() {
 	log.Println(vtcli.SelfGetAddress())
 
 	lab := uiw.Label_2
-	lab.SetText(qtcore.NewQString_5(vtcli.SelfGetName()))
+	lab.SetText(vtcli.SelfGetName())
 	lab = uiw.Label_3
 	stmsg, _ := vtcli.SelfGetStatusMessage()
-	lab.SetText(qtcore.NewQString_5(stmsg))
+	lab.SetText(stmsg)
 
 	listw := uiw.ListWidget_2
 
 	for fn, frnd := range vtcli.Binfo.Friends {
 		itext := fmt.Sprintf("%d-%s", fn, frnd.GetName())
-		listw.AddItem(qtcore.NewQString_5(itext))
+		listw.AddItem(itext)
 	}
 
 	for gn, grp := range vtcli.Binfo.Groups {
 		itext := fmt.Sprintf("%d-%s", gn, grp.GetTitle())
-		listw.AddItem(qtcore.NewQString_5(itext))
+		listw.AddItem(itext)
 	}
 
 	baseInfoGot = true
@@ -248,7 +250,7 @@ func dispatchEvent(jso *simplejson.Json) {
 		_, _, _ = msg, fname, pubkey
 
 		itext := fmt.Sprintf("%s: %s", fname, msg)
-		uiw.ListWidget.AddItem(qtcore.NewQString_5(itext))
+		uiw.ListWidget.AddItem(itext)
 		uiw.ListWidget.ScrollToBottom()
 
 		// cfx, found := this.cfvs.Get(pubkey)
@@ -395,7 +397,7 @@ func dispatchEvent(jso *simplejson.Json) {
 		groupTitle := jso.Get("margs").GetIndex(2).MustString()
 
 		itext := fmt.Sprintf("%s@%s: %s", peerName, groupTitle, message)
-		uiw.ListWidget.AddItem(qtcore.NewQString_5(itext))
+		uiw.ListWidget.AddItem(itext)
 		uiw.ListWidget.ScrollToBottom()
 		log.Println("item:", itext)
 
@@ -407,9 +409,9 @@ func dispatchEvent(jso *simplejson.Json) {
 		msgitmdl = append(msgitmdl, msgivp)
 
 		tbrw := msgivp.TextBrowser
-		tbrw.SetText(qtcore.NewQString_5(itext))
-		msgivp.Label_3.SetText(qtcore.NewQString_5(fmt.Sprintf("%s@%s", peerName, groupTitle)))
-		msgivp.Label_4.SetText(qtcore.NewQString_5(gopp.TimeToFmt1(time.Now())))
+		tbrw.SetText(itext)
+		msgivp.Label_3.SetText(fmt.Sprintf("%s@%s", peerName, groupTitle))
+		msgivp.Label_4.SetText(gopp.TimeToFmt1(time.Now()))
 
 		qtrt.Connect(msgivp.ToolButton, "clicked(bool)", func(bool) {
 			log.Println(tbrw)

@@ -1,7 +1,10 @@
 package main
 
 import (
+	"fmt"
+	"gopp"
 	"log"
+	"runtime"
 
 	"qt.go/qtwidgets"
 )
@@ -15,4 +18,17 @@ func dbgpolicy(name string, p *qtwidgets.QSizePolicy) {
 		p.VerticalStretch(),
 		p.RetainSizeWhenHidden())
 
+}
+
+func resolveAppPath() string {
+	switch runtime.GOOS {
+	case "android":
+		for i := 1; i < 9; i++ {
+			d := fmt.Sprintf("/data/app/org.qtproject.example.go-%d/", i)
+			if gopp.FileExist(d) {
+				return d
+			}
+		}
+	}
+	return "/thedirshouldnotexists"
 }
