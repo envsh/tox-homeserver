@@ -26,6 +26,7 @@ var vtcli *thscli.LigTox
 
 var uiw *Ui_MainWindow
 var msgitmdl = []*Ui_MessageItemView{}
+var ctitmdl = []*RoomListItem{}
 
 // var dyslot *qtrt.QDynSlotObject
 var mech *qtcore.QBuffer
@@ -86,9 +87,14 @@ func main() {
 	}
 
 	setStyleSheet := func() {
-		bcc, err := ioutil.ReadFile("../qofia/app.css")
+		bcc, err := []byte{}, error(nil)
+		if gopp.IsAndroid() { // simple test
+			bcc, err = ioutil.ReadFile("/sdcard/app.css")
+		} else {
+			bcc, err = ioutil.ReadFile("./app.css")
+		}
 		gopp.ErrPrint(err)
-		if true {
+		if err != nil {
 			fp := qtcore.NewQFile_1(":/app.css")
 			fp.Open(qtcore.QIODevice__ReadOnly)
 			bcc = []byte(qtcore.NewQIODeviceFromPointer(fp.GetCthis()).ReadAll().Data())
@@ -173,10 +179,10 @@ func main() {
 
 	vlo10 := uiw.VerticalLayout_10
 	_ = vlo10
-	for i := 0; i < 30; i++ {
+	for i := 0; i < 3; i++ {
 		itext := fmt.Sprintf("hehe %d", i)
 		ctivw := qtwidgets.NewQPushButton_1(itext, nil)
-		vlo10.Layout().AddWidget(qtwidgets.NewQWidgetFromPointer(ctivw.GetCthis()))
+		vlo10.Layout().AddWidget(ctivw)
 	}
 
 	// Execute app
@@ -208,20 +214,23 @@ func initAppBackend() {
 	for fn, frnd := range vtcli.Binfo.Friends {
 		itext := fmt.Sprintf("%d-%s", fn, frnd.GetName())
 		listw.AddItem(itext)
+		contactQueue <- frnd
 	}
 
 	for gn, grp := range vtcli.Binfo.Groups {
 		itext := fmt.Sprintf("%d-%s", gn, grp.GetTitle())
 		listw.AddItem(itext)
+		contactQueue <- grp
 	}
 
+	log.Println("get base info done.")
 	baseInfoGot = true
+	mech.Write_1("z")
 	select {}
 }
 
 var baseInfoGot bool = false
-
-// var lastMsgIvw *widgets.QWidget
+var contactQueue = make(chan interface{}, 1234)
 
 func tryReadEvent() {
 
@@ -234,6 +243,26 @@ func tryReadEvent() {
 		// return
 	}
 
+	tryReadContactEvent()
+	tryReadMessageEvent()
+}
+
+func tryReadContactEvent() {
+
+	for len(contactQueue) > 0 {
+		contactx := <-contactQueue
+		ctv := NewRoomListItem()
+		uiw.VerticalLayout_10.InsertWidget(0, ctv.QWidget_PTR(), 0, 0)
+		ctitmdl = append(ctitmdl, ctv)
+		ctv.SetContactInfo(contactx)
+		log.Println("add contact...", len(ctitmdl))
+		if len(ctitmdl) == 1 {
+			ctv.SetPressState(true)
+		}
+	}
+}
+
+func tryReadMessageEvent() {
 	for {
 		bcc := vtcli.GetNextBackenEvent()
 		if bcc == nil {
@@ -435,6 +464,14 @@ func dispatchEvent(jso *simplejson.Json) {
 
 		qtrt.Connect(msgivp.ToolButton, "clicked(bool)", func(bool) {
 		})
+
+		for _, room := range ctitmdl {
+			log.Println(room.GetName(), ",", groupTitle, ",", room.GetId(), ",", groupId)
+			if room.GetId() == groupId && room.GetName() == groupTitle {
+				room.SetLastMsg(message)
+				break
+			}
+		}
 
 		/*
 			valuex, found := appctx.contactStates.Get(groupId)

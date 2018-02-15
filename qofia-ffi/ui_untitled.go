@@ -28,6 +28,7 @@ type Ui_MainWindow struct {
 	HorizontalLayout_7         *qtwidgets.QHBoxLayout
 	ToolButton_11              *qtwidgets.QToolButton
 	Label                      *qtwidgets.QLabel
+	ComboBox                   *qtwidgets.QComboBox
 	ToolButton_12              *qtwidgets.QToolButton
 	StackedWidget              *qtwidgets.QStackedWidget
 	Page_4                     *qtwidgets.QWidget
@@ -85,6 +86,9 @@ type Ui_MainWindow struct {
 	ToolButton_10              *qtwidgets.QToolButton
 	LineEdit_2                 *qtwidgets.QLineEdit
 	ToolButton_18              *qtwidgets.QToolButton
+	Page_5                     *qtwidgets.QWidget
+	VerticalLayout_12          *qtwidgets.QVBoxLayout
+	TextBrowser                *qtwidgets.QTextBrowser
 	MainWindow                 *qtwidgets.QMainWindow
 	Icon                       *qtgui.QIcon // 116
 	Icon1                      *qtgui.QIcon // 116
@@ -102,6 +106,7 @@ type Ui_MainWindow struct {
 	Icon10                     *qtgui.QIcon // 116
 	Icon11                     *qtgui.QIcon // 116
 	Icon12                     *qtgui.QIcon // 116
+	SizePolicy1                *qtwidgets.QSizePolicy
 	Icon13                     *qtgui.QIcon // 116
 	Icon14                     *qtgui.QIcon // 116
 	Icon15                     *qtgui.QIcon // 116
@@ -150,6 +155,17 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.Label.SetTextInteractionFlags(qtcore.Qt__LinksAccessibleByMouse | qtcore.Qt__TextSelectableByMouse) // 114
 
 	this.HorizontalLayout_7.Layout().AddWidget(this.Label) // 115
+
+	this.ComboBox = qtwidgets.NewQComboBox(this.Centralwidget) // 111
+	this.ComboBox.AddItem("", qtcore.NewQVariant_12("wtf"))    // 115
+	this.ComboBox.AddItem("", qtcore.NewQVariant_12("wtf"))    // 115
+	this.ComboBox.AddItem("", qtcore.NewQVariant_12("wtf"))    // 115
+	this.ComboBox.AddItem("", qtcore.NewQVariant_12("wtf"))    // 115
+	this.ComboBox.AddItem("", qtcore.NewQVariant_12("wtf"))    // 115
+	this.ComboBox.SetObjectName("ComboBox")                    // 112
+	this.ComboBox.SetFocusPolicy(qtcore.Qt__NoFocus)           // 114
+
+	this.HorizontalLayout_7.Layout().AddWidget(this.ComboBox) // 115
 
 	this.ToolButton_12 = qtwidgets.NewQToolButton(this.Centralwidget) // 111
 	this.ToolButton_12.SetObjectName("ToolButton_12")                 // 112
@@ -442,20 +458,26 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 
 	this.VerticalLayout_2.AddLayout(this.HorizontalLayout_5, 0) // 115
 
-	this.ScrollArea_2 = qtwidgets.NewQScrollArea(this.Page_2)                           // 111
-	this.ScrollArea_2.SetObjectName("ScrollArea_2")                                     // 112
-	this.ScrollArea_2.SetHorizontalScrollBarPolicy(qtcore.Qt__ScrollBarAlwaysOff)       // 114
-	this.ScrollArea_2.SetWidgetResizable(true)                                          // 114
-	this.ScrollAreaWidgetContents_2 = qtwidgets.NewQWidget(nil, 0)                      // 111
-	this.ScrollAreaWidgetContents_2.SetObjectName("ScrollAreaWidgetContents_2")         // 112
-	this.ScrollAreaWidgetContents_2.SetGeometry(0, 0, 392, 237)                         // 114
-	this.VerticalLayout_3 = qtwidgets.NewQVBoxLayout_1(this.ScrollAreaWidgetContents_2) // 111
-	this.VerticalLayout_3.SetSpacing(0)                                                 // 114
-	this.VerticalLayout_3.SetObjectName("VerticalLayout_3")                             // 112
-	this.VerticalLayout_3.SetContentsMargins(0, 0, 0, 0)                                // 114
-	this.VerticalLayout_8 = qtwidgets.NewQVBoxLayout()                                  // 111
-	this.VerticalLayout_8.SetSpacing(0)                                                 // 114
-	this.VerticalLayout_8.SetObjectName("VerticalLayout_8")                             // 112
+	this.ScrollArea_2 = qtwidgets.NewQScrollArea(this.Page_2) // 111
+	this.ScrollArea_2.SetObjectName("ScrollArea_2")           // 112
+	this.SizePolicy1 = qtwidgets.NewQSizePolicy_1(qtwidgets.QSizePolicy__Preferred, qtwidgets.QSizePolicy__Expanding, 1)
+	this.SizePolicy1.SetHorizontalStretch(0)                                               // 114
+	this.SizePolicy1.SetVerticalStretch(0)                                                 // 114
+	this.SizePolicy1.SetHeightForWidth(this.ScrollArea_2.SizePolicy().HasHeightForWidth()) // 114
+	this.ScrollArea_2.SetSizePolicy(this.SizePolicy1)                                      // 114
+	this.ScrollArea_2.SetFocusPolicy(qtcore.Qt__NoFocus)                                   // 114
+	this.ScrollArea_2.SetHorizontalScrollBarPolicy(qtcore.Qt__ScrollBarAlwaysOff)          // 114
+	this.ScrollArea_2.SetWidgetResizable(true)                                             // 114
+	this.ScrollAreaWidgetContents_2 = qtwidgets.NewQWidget(nil, 0)                         // 111
+	this.ScrollAreaWidgetContents_2.SetObjectName("ScrollAreaWidgetContents_2")            // 112
+	this.ScrollAreaWidgetContents_2.SetGeometry(0, 0, 392, 237)                            // 114
+	this.VerticalLayout_3 = qtwidgets.NewQVBoxLayout_1(this.ScrollAreaWidgetContents_2)    // 111
+	this.VerticalLayout_3.SetSpacing(0)                                                    // 114
+	this.VerticalLayout_3.SetObjectName("VerticalLayout_3")                                // 112
+	this.VerticalLayout_3.SetContentsMargins(0, 0, 0, 0)                                   // 114
+	this.VerticalLayout_8 = qtwidgets.NewQVBoxLayout()                                     // 111
+	this.VerticalLayout_8.SetSpacing(0)                                                    // 114
+	this.VerticalLayout_8.SetObjectName("VerticalLayout_8")                                // 112
 	this.VerticalSpacer = qtwidgets.NewQSpacerItem(20, 0, qtwidgets.QSizePolicy__Minimum, qtwidgets.QSizePolicy__Expanding)
 
 	this.VerticalLayout_8.AddItem(this.VerticalSpacer) // 115
@@ -466,20 +488,24 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 
 	this.VerticalLayout_2.Layout().AddWidget(this.ScrollArea_2) // 115
 
-	this.ScrollArea = qtwidgets.NewQScrollArea(this.Page_2)                           // 111
-	this.ScrollArea.SetObjectName("ScrollArea")                                       // 112
-	this.ScrollArea.SetWidgetResizable(true)                                          // 114
-	this.ScrollAreaWidgetContents = qtwidgets.NewQWidget(nil, 0)                      // 111
-	this.ScrollAreaWidgetContents.SetObjectName("ScrollAreaWidgetContents")           // 112
-	this.ScrollAreaWidgetContents.SetGeometry(0, 0, 392, 237)                         // 114
-	this.VerticalLayout_9 = qtwidgets.NewQVBoxLayout_1(this.ScrollAreaWidgetContents) // 111
-	this.VerticalLayout_9.SetSpacing(0)                                               // 114
-	this.VerticalLayout_9.SetObjectName("VerticalLayout_9")                           // 112
-	this.VerticalLayout_9.SetContentsMargins(0, 0, 0, 0)                              // 114
-	this.VerticalLayout_10 = qtwidgets.NewQVBoxLayout()                               // 111
-	this.VerticalLayout_10.SetSpacing(0)                                              // 114
-	this.VerticalLayout_10.SetObjectName("VerticalLayout_10")                         // 112
-	this.VerticalSpacer_2 = qtwidgets.NewQSpacerItem(20, 40, qtwidgets.QSizePolicy__Minimum, qtwidgets.QSizePolicy__Expanding)
+	this.ScrollArea = qtwidgets.NewQScrollArea(this.Page_2)                              // 111
+	this.ScrollArea.SetObjectName("ScrollArea")                                          // 112
+	this.SizePolicy1.SetHeightForWidth(this.ScrollArea.SizePolicy().HasHeightForWidth()) // 114
+	this.ScrollArea.SetSizePolicy(this.SizePolicy1)                                      // 114
+	this.ScrollArea.SetFocusPolicy(qtcore.Qt__NoFocus)                                   // 114
+	this.ScrollArea.SetHorizontalScrollBarPolicy(qtcore.Qt__ScrollBarAlwaysOff)          // 114
+	this.ScrollArea.SetWidgetResizable(true)                                             // 114
+	this.ScrollAreaWidgetContents = qtwidgets.NewQWidget(nil, 0)                         // 111
+	this.ScrollAreaWidgetContents.SetObjectName("ScrollAreaWidgetContents")              // 112
+	this.ScrollAreaWidgetContents.SetGeometry(0, 0, 392, 237)                            // 114
+	this.VerticalLayout_9 = qtwidgets.NewQVBoxLayout_1(this.ScrollAreaWidgetContents)    // 111
+	this.VerticalLayout_9.SetSpacing(0)                                                  // 114
+	this.VerticalLayout_9.SetObjectName("VerticalLayout_9")                              // 112
+	this.VerticalLayout_9.SetContentsMargins(0, 0, 0, 0)                                 // 114
+	this.VerticalLayout_10 = qtwidgets.NewQVBoxLayout()                                  // 111
+	this.VerticalLayout_10.SetSpacing(0)                                                 // 114
+	this.VerticalLayout_10.SetObjectName("VerticalLayout_10")                            // 112
+	this.VerticalSpacer_2 = qtwidgets.NewQSpacerItem(20, 0, qtwidgets.QSizePolicy__Minimum, qtwidgets.QSizePolicy__Expanding)
 
 	this.VerticalLayout_10.AddItem(this.VerticalSpacer_2) // 115
 
@@ -494,6 +520,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.HorizontalLayout_6.SetObjectName("HorizontalLayout_6") // 112
 	this.ToolButton_8 = qtwidgets.NewQToolButton(this.Page_2)   // 111
 	this.ToolButton_8.SetObjectName("ToolButton_8")             // 112
+	this.ToolButton_8.SetFocusPolicy(qtcore.Qt__NoFocus)        // 114
 	this.Icon13 = qtgui.NewQIcon()
 	this.Icon13.AddFile(":/icons/paper-clip-outline_gray64.png", qtcore.NewQSize(), qtgui.QIcon__Normal, qtgui.QIcon__Off) // 115
 	this.ToolButton_8.SetIcon(this.Icon13)                                                                                 // 114
@@ -504,6 +531,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 
 	this.ToolButton_9 = qtwidgets.NewQToolButton(this.Page_2) // 111
 	this.ToolButton_9.SetObjectName("ToolButton_9")           // 112
+	this.ToolButton_9.SetFocusPolicy(qtcore.Qt__NoFocus)      // 114
 	this.Icon14 = qtgui.NewQIcon()
 	this.Icon14.AddFile(":/icons/question-mark-gray64.png", qtcore.NewQSize(), qtgui.QIcon__Normal, qtgui.QIcon__Off) // 115
 	this.ToolButton_9.SetIcon(this.Icon14)                                                                            // 114
@@ -514,6 +542,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 
 	this.ToolButton_10 = qtwidgets.NewQToolButton(this.Page_2) // 111
 	this.ToolButton_10.SetObjectName("ToolButton_10")          // 112
+	this.ToolButton_10.SetFocusPolicy(qtcore.Qt__NoFocus)      // 114
 	this.Icon15 = qtgui.NewQIcon()
 	this.Icon15.AddFile(":/icons/smile_gray64.png", qtcore.NewQSize(), qtgui.QIcon__Normal, qtgui.QIcon__Off) // 115
 	this.ToolButton_10.SetIcon(this.Icon15)                                                                   // 114
@@ -529,6 +558,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 
 	this.ToolButton_18 = qtwidgets.NewQToolButton(this.Page_2) // 111
 	this.ToolButton_18.SetObjectName("ToolButton_18")          // 112
+	this.ToolButton_18.SetFocusPolicy(qtcore.Qt__NoFocus)      // 114
 	this.Icon16 = qtgui.NewQIcon()
 	this.Icon16.AddFile(":/icons/cursor_gray64.png", qtcore.NewQSize(), qtgui.QIcon__Normal, qtgui.QIcon__Off) // 115
 	this.ToolButton_18.SetIcon(this.Icon16)                                                                    // 114
@@ -540,7 +570,19 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 
 	this.VerticalLayout_2.AddLayout(this.HorizontalLayout_6, 0) // 115
 
-	this.StackedWidget.AddWidget(this.Page_2) // 115
+	this.StackedWidget.AddWidget(this.Page_2)                        // 115
+	this.Page_5 = qtwidgets.NewQWidget(nil, 0)                       // 111
+	this.Page_5.SetObjectName("Page_5")                              // 112
+	this.VerticalLayout_12 = qtwidgets.NewQVBoxLayout_1(this.Page_5) // 111
+	this.VerticalLayout_12.SetSpacing(0)                             // 114
+	this.VerticalLayout_12.SetObjectName("VerticalLayout_12")        // 112
+	this.VerticalLayout_12.SetContentsMargins(0, 0, 0, 0)            // 114
+	this.TextBrowser = qtwidgets.NewQTextBrowser(this.Page_5)        // 111
+	this.TextBrowser.SetObjectName("TextBrowser")                    // 112
+
+	this.VerticalLayout_12.Layout().AddWidget(this.TextBrowser) // 115
+
+	this.StackedWidget.AddWidget(this.Page_5) // 115
 
 	this.VerticalLayout_6.Layout().AddWidget(this.StackedWidget) // 115
 
@@ -548,7 +590,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 
 	this.RetranslateUi(MainWindow)
 
-	this.StackedWidget.SetCurrentIndex(2) // 114
+	this.StackedWidget.SetCurrentIndex(3) // 114
 
 	qtcore.QMetaObject_ConnectSlotsByName(MainWindow) // 100111
 	// } // setupUi // 126
@@ -566,6 +608,11 @@ func (this *Ui_MainWindow) RetranslateUi(MainWindow *qtwidgets.QMainWindow) {
 	this.Action_About.SetText(qtcore.QCoreApplication_Translate("MainWindow", "&About", "dummy123", 0))
 	this.ToolButton_11.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
 	this.Label.SetText(qtcore.QCoreApplication_Translate("MainWindow", "TextLabel", "dummy123", 0))
+	this.ComboBox.SetItemText(0, qtcore.QCoreApplication_Translate("MainWindow", "1", "dummy123", 0))
+	this.ComboBox.SetItemText(1, qtcore.QCoreApplication_Translate("MainWindow", "2", "dummy123", 0))
+	this.ComboBox.SetItemText(2, qtcore.QCoreApplication_Translate("MainWindow", "3", "dummy123", 0))
+	this.ComboBox.SetItemText(3, qtcore.QCoreApplication_Translate("MainWindow", "4", "dummy123", 0))
+	this.ComboBox.SetItemText(4, qtcore.QCoreApplication_Translate("MainWindow", "5", "dummy123", 0))
 	this.ToolButton_12.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
 	this.ToolButton_17.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
 	this.Label_2.SetText(qtcore.QCoreApplication_Translate("MainWindow", "TextLabel", "dummy123", 0))
@@ -593,3 +640,21 @@ func (this *Ui_MainWindow) RetranslateUi(MainWindow *qtwidgets.QMainWindow) {
 }
 
 //  retranslateUi block end
+
+//  new2 block begin
+func NewUi_MainWindow2() *Ui_MainWindow {
+	this := &Ui_MainWindow{}
+	w := qtwidgets.NewQMainWindow(nil, 0)
+	this.SetupUi(w)
+	return this
+}
+
+//  new2 block end
+
+//  done block begin
+
+func (this *Ui_MainWindow) QWidget_PTR() *qtwidgets.QWidget {
+	return this.MainWindow.QWidget_PTR()
+}
+
+//  done block end

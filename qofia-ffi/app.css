@@ -73,10 +73,6 @@ QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
 }
 
 /************/
-QLabel {
-    color: #333;
-    background: white;
-}
 
 QMainWindow {
     background: white;
@@ -121,6 +117,7 @@ QListView {
 
 QScrollArea {
     background: white;
+    border: 0px;
 }
 
 QTextBrowser {
@@ -129,6 +126,18 @@ QTextBrowser {
     height: 50px;
 }
 
+QToolTip {
+    color: #000000;
+}
+
+/*
 QLabel {
+    color: #333;
     background: white;
 }
+
+#ContactItemView > QWidget {
+    background-color: blue;
+}
+*/
+

@@ -27,6 +27,7 @@ type Ui_MessageItemView struct {
 	VerticalLayout     *qtwidgets.QVBoxLayout
 	HorizontalLayout   *qtwidgets.QHBoxLayout
 	Label_3            *qtwidgets.QLabel
+	HorizontalSpacer   *qtwidgets.QSpacerItem
 	Label_4            *qtwidgets.QLabel
 	ToolButton         *qtwidgets.QToolButton
 	Label_5            *qtwidgets.QLabel
@@ -56,6 +57,7 @@ func (this *Ui_MessageItemView) SetupUi(MessageItemView *qtwidgets.QWidget) {
 	this.SizePolicy.SetVerticalStretch(0)                                                    // 114
 	this.SizePolicy.SetHeightForWidth(this.MessageItemView.SizePolicy().HasHeightForWidth()) // 114
 	this.MessageItemView.SetSizePolicy(this.SizePolicy)                                      // 114
+	this.MessageItemView.SetFocusPolicy(qtcore.Qt__ClickFocus)                               // 114
 	this.HorizontalLayout_2 = qtwidgets.NewQHBoxLayout_1(this.MessageItemView)               // 111
 	this.HorizontalLayout_2.SetSpacing(0)                                                    // 114
 	this.HorizontalLayout_2.SetObjectName("HorizontalLayout_2")                              // 112
@@ -93,9 +95,14 @@ func (this *Ui_MessageItemView) SetupUi(MessageItemView *qtwidgets.QWidget) {
 
 	this.HorizontalLayout.Layout().AddWidget(this.Label_3) // 115
 
-	this.Label_4 = qtwidgets.NewQLabel(this.MessageItemView, 0)                                                // 111
-	this.Label_4.SetObjectName("Label_4")                                                                      // 112
-	this.Label_4.SetTextInteractionFlags(qtcore.Qt__LinksAccessibleByMouse | qtcore.Qt__TextSelectableByMouse) // 114
+	this.HorizontalSpacer = qtwidgets.NewQSpacerItem(10, 20, qtwidgets.QSizePolicy__Expanding, qtwidgets.QSizePolicy__Minimum)
+
+	this.HorizontalLayout.AddItem(this.HorizontalSpacer) // 115
+
+	this.Label_4 = qtwidgets.NewQLabel(this.MessageItemView, 0)                                           // 111
+	this.Label_4.SetObjectName("Label_4")                                                                 // 112
+	this.Label_4.SetAlignment(qtcore.Qt__AlignRight | qtcore.Qt__AlignTrailing | qtcore.Qt__AlignVCenter) // 114
+	this.Label_4.SetTextInteractionFlags(qtcore.Qt__TextBrowserInteraction)                               // 114
 
 	this.HorizontalLayout.Layout().AddWidget(this.Label_4) // 115
 
@@ -111,13 +118,13 @@ func (this *Ui_MessageItemView) SetupUi(MessageItemView *qtwidgets.QWidget) {
 	this.Label_5 = qtwidgets.NewQLabel(this.MessageItemView, 0) // 111
 	this.Label_5.SetObjectName("Label_5")                       // 112
 	this.SizePolicy1 = qtwidgets.NewQSizePolicy_1(qtwidgets.QSizePolicy__Expanding, qtwidgets.QSizePolicy__Preferred, 1)
-	this.SizePolicy1.SetHorizontalStretch(0)                                                                   // 114
-	this.SizePolicy1.SetVerticalStretch(0)                                                                     // 114
-	this.SizePolicy1.SetHeightForWidth(this.Label_5.SizePolicy().HasHeightForWidth())                          // 114
-	this.Label_5.SetSizePolicy(this.SizePolicy1)                                                               // 114
-	this.Label_5.SetWordWrap(true)                                                                             // 114
-	this.Label_5.SetOpenExternalLinks(true)                                                                    // 114
-	this.Label_5.SetTextInteractionFlags(qtcore.Qt__LinksAccessibleByMouse | qtcore.Qt__TextSelectableByMouse) // 114
+	this.SizePolicy1.SetHorizontalStretch(0)                                          // 114
+	this.SizePolicy1.SetVerticalStretch(0)                                            // 114
+	this.SizePolicy1.SetHeightForWidth(this.Label_5.SizePolicy().HasHeightForWidth()) // 114
+	this.Label_5.SetSizePolicy(this.SizePolicy1)                                      // 114
+	this.Label_5.SetWordWrap(true)                                                    // 114
+	this.Label_5.SetOpenExternalLinks(true)                                           // 114
+	this.Label_5.SetTextInteractionFlags(qtcore.Qt__TextBrowserInteraction)           // 114
 
 	this.VerticalLayout.Layout().AddWidget(this.Label_5) // 115
 
@@ -161,3 +168,21 @@ func (this *Ui_MessageItemView) RetranslateUi(MessageItemView *qtwidgets.QWidget
 }
 
 //  retranslateUi block end
+
+//  new2 block begin
+func NewUi_MessageItemView2() *Ui_MessageItemView {
+	this := &Ui_MessageItemView{}
+	w := qtwidgets.NewQWidget(nil, 0)
+	this.SetupUi(w)
+	return this
+}
+
+//  new2 block end
+
+//  done block begin
+
+func (this *Ui_MessageItemView) QWidget_PTR() *qtwidgets.QWidget {
+	return this.MessageItemView.QWidget_PTR()
+}
+
+//  done block end
