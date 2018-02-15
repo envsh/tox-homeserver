@@ -11,14 +11,14 @@ import (
 	"strings"
 	"time"
 
-	"qt.go/qtcore"
-	"qt.go/qtrt"
-	"qt.go/qtwidgets"
+	"github.com/kitech/qt.go/qtcore"
+	"github.com/kitech/qt.go/qtrt"
+	"github.com/kitech/qt.go/qtwidgets"
+
+	simplejson "github.com/bitly/go-simplejson"
 
 	thscli "tox-homeserver/client"
 	"tox-homeserver/gofia"
-
-	simplejson "github.com/bitly/go-simplejson"
 )
 
 var appctx *gofia.AppContext
@@ -64,12 +64,22 @@ func finalizerFilter(ov reflect.Value) bool {
 	return insure
 }
 
+type contentAreaState struct {
+	isBottom bool
+	curpos   int
+	maxpos   int
+}
+
+var ccstate = &contentAreaState{isBottom: true}
+
 func main() {
 	qtrt.SetFinalizerObjectFilter(finalizerFilter)
 
 	// Create application
-	os.Setenv("QT_AUTO_SCREEN​_SCALE_FACTOR ", "1.5")
-	qtcore.QCoreApplication_SetAttribute(qtcore.Qt__AA_EnableHighDpiScaling, true)
+	if runtime.GOOS == "android" {
+		os.Setenv("QT_AUTO_SCREEN_SCALE_FACTOR ", "1.5")
+		qtcore.QCoreApplication_SetAttribute(qtcore.Qt__AA_EnableHighDpiScaling, true)
+	}
 	app := qtwidgets.NewQApplication(len(os.Args), os.Args, 0)
 	if false {
 		app.SetAttribute(qtcore.Qt__AA_EnableHighDpiScaling, true) // for android
@@ -91,6 +101,10 @@ func main() {
 	window := qtwidgets.NewQMainWindow(nil, 0)
 	window.SetWindowTitle("Hello World Example")
 	window.SetMinimumSize_1(200, 200)
+
+	var winitf qtwidgets.QWidget_ITF
+	winitf = window
+	log.Println(winitf, winitf.QWidget_PTR())
 
 	uiw = NewUi_MainWindow()
 	log.Println(uiw)
@@ -127,15 +141,20 @@ func main() {
 		proot := qw.RootObject()
 		gopp.NilPrint(proot, "qml root object nil")
 	}
-	/*
-		a2 := widgets.NewQScrollAreaFromPointer(Ui_MainWindow_Get_scrollArea_2(uiw))
-		toval := a2.VerticalScrollBar().Maximum() + 80
-		log.Println(a2.VerticalScrollBar().Value(), toval)
-		a2.VerticalScrollBar().ConnectRangeChanged(func(min int, max int) {
-			log.Println(min, max)
-		})
 
-	*/
+	qtrt.Connect(uiw.ScrollArea_2.VerticalScrollBar(), "rangeChanged(int,int)", func(min int, max int) {
+		log.Println(min, max)
+		curpos := uiw.ScrollArea_2.VerticalScrollBar().Value()
+		if ccstate.isBottom && curpos < max {
+			uiw.ScrollArea_2.VerticalScrollBar().SetValue(max)
+		}
+		ccstate.maxpos = max
+	})
+	qtrt.Connect(uiw.ScrollArea_2.VerticalScrollBar(), "valueChanged(int)", func(value int) {
+		ccstate.curpos = value
+		maxval := ccstate.maxpos
+		ccstate.isBottom = gopp.IfElse(value == maxval, true, false).(bool)
+	})
 
 	mech = qtcore.NewQBuffer(nil)
 	mech.Open(qtcore.QIODevice__ReadWrite)
@@ -408,93 +427,15 @@ func dispatchEvent(jso *simplejson.Json) {
 		vlo8.Layout().AddWidget(msgivw)
 		msgitmdl = append(msgitmdl, msgivp)
 
-		tbrw := msgivp.TextBrowser
-		tbrw.SetText(itext)
+		ccstate.curpos = uiw.ScrollArea_2.VerticalScrollBar().Value()
+		ccstate.maxpos = uiw.ScrollArea_2.VerticalScrollBar().Maximum()
+		msgivp.Label_5.SetText(itext)
 		msgivp.Label_3.SetText(fmt.Sprintf("%s@%s", peerName, groupTitle))
 		msgivp.Label_4.SetText(gopp.TimeToFmt1(time.Now()))
 
 		qtrt.Connect(msgivp.ToolButton, "clicked(bool)", func(bool) {
-			log.Println(tbrw)
-			log.Println(tbrw.GetCthis())
-			log.Println(tbrw.Size())
-			log.Println(tbrw.Size().GetCthis())
-			log.Println(tbrw.Size().Height(), tbrw.Size().Width())
-			log.Println(tbrw.Size().Rheight(), tbrw.Size().Rwidth())
-			log.Println(tbrw.Document().Size().IsValid())
-			log.Println(tbrw.Document().Size().IsNull())
-			log.Println(tbrw.Document().Size().IsEmpty())
-			szo := tbrw.Document().Size()
-			log.Println(szo.Width(), szo.Height())
-			log.Println(szo.Rwidth(), szo.Rheight())
-			log.Println(tbrw.Document().Size().Rheight())
-			log.Println(tbrw.Document().Size().Height())
-			// tbrw.SetFixedHeight(int(tbrw.Document().Size().Rheight()))
 		})
 
-		/*
-			// not called
-			tbrw.ConnectSizeHint(func() *core.QSize {
-				log.Println(tbrw.Document().Size().Rheight())
-				log.Println(tbrw.Size().Rheight())
-				return core.NewQSize2(int(tbrw.Document().Size().Rwidth()), int(tbrw.Document().Size().Rheight()))
-			})
-
-			// 这个只在有滚动条的时候有效
-			tbrw.VerticalScrollBar().ConnectRangeChanged(func(min int, max int) {
-				log.Println(min, max, tbrw.Viewport().Size().Rheight())
-				log.Print(tbrw.Document().Size().Rheight())
-				// tbrw.SetFixedHeight(int(tbrw.Document().Size().Rheight()) + max)
-				// tbrw.Document().AdjustSize() // 依旧有滚动条
-			})
-			tbrw.HorizontalScrollBar().ConnectRangeChanged(func(min int, max int) {
-				log.Println(min, max, tbrw.Viewport().Size().Rheight())
-				log.Print(tbrw.Document().Size().Rheight())
-			})
-			// not called
-			msgivw.ConnectResizeEvent(func(event *gui.QResizeEvent) {
-				oldWidth := event.OldSize().Rwidth()
-				newWidth := event.Size().Rwidth()
-				log.Println(oldWidth, "=>", newWidth, tbrw.Document().Size().Rheight())
-				fixnum := 2
-				if tbrw.Size().Rheight() != int(tbrw.Document().Size().Rheight())+fixnum {
-					tbrw.SetFixedHeight(int(tbrw.Document().Size().Rheight()) + fixnum)
-
-				}
-			})
-			// not called
-			tbrw.Viewport().ConnectResizeEvent(func(event *gui.QResizeEvent) {
-				oldWidth := event.OldSize().Rwidth()
-				newWidth := event.Size().Rwidth()
-				log.Println(oldWidth, "=>", newWidth, tbrw.Document().Size().Rheight())
-			})
-			tbrw.Document().ConnectBlockCountChanged(func(newBlockCount int) {
-				log.Println(newBlockCount)
-			})
-			tbrw.Document().ConnectDocumentLayoutChanged(func() {
-				log.Println("111")
-			})
-			tbrw.Document().ConnectContentsChanged(func() {
-				log.Print(tbrw.Document().Size().Rheight())
-				log.Print(tbrw.Size().Rheight())
-			})
-
-			a2 := widgets.NewQScrollAreaFromPointer(Ui_MainWindow_Get_scrollArea_2(uiw))
-			toval := a2.VerticalScrollBar().Maximum() + int(tbrw.Document().Size().Rheight()) + 80
-			log.Println(a2.VerticalScrollBar().Value(), toval)
-			if a2.VerticalScrollBar().Value() != toval {
-				// a2.EnsureWidgetVisible(msgivw, 0, 0)
-				a2.VerticalScrollBar().SetValue(toval)
-			}
-			if lastMsgIvw != nil {
-				lastMsgIvw.DisconnectResizeEvent()
-				lastMsgIvw = msgivw
-			}
-			a2.Viewport().ConnectResizeEvent(func(event *gui.QResizeEvent) {
-				oldWidth := event.OldSize().Rwidth()
-				newWidth := event.Size().Rwidth()
-				log.Println(oldWidth, "=>", newWidth, tbrw.Document().Size().Rheight())
-			})
-		*/
 		/*
 			valuex, found := appctx.contactStates.Get(groupId)
 			var ctis *ContactItemState

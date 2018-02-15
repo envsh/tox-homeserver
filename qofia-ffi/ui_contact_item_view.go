@@ -1,11 +1,11 @@
 package main
 
 //  header block begin
-import "qt.go/qtcore"
-import "qt.go/qtgui"
-import "qt.go/qtwidgets"
-import "qt.go/qtquickwidgets"
-import "qt.go/qtmock"
+import "github.com/kitech/qt.go/qtcore"
+import "github.com/kitech/qt.go/qtgui"
+import "github.com/kitech/qt.go/qtwidgets"
+import "github.com/kitech/qt.go/qtquickwidgets"
+import "github.com/kitech/qt.go/qtmock"
 
 func init() { qtcore.KeepMe() }
 func init() { qtwidgets.KeepMe() }
@@ -46,13 +46,13 @@ func (this *Ui_ContactItemView) SetupUi(ContactItemView *qtwidgets.QWidget) {
 		ContactItemView.SetObjectName("ContactItemView")
 	}
 	ContactItemView.Resize(252, 99)
-	this.HorizontalLayout = qtwidgets.NewQHBoxLayout_1(qtwidgets.NewQWidgetFromPointer(this.ContactItemView.GetCthis())) // 111
-	this.HorizontalLayout.SetObjectName("HorizontalLayout")                                                              // 112
-	this.Label = qtwidgets.NewQLabel(this.ContactItemView, 0)                                                            // 111
-	this.Label.SetObjectName("Label")                                                                                    // 112
-	this.Label.SetMaximumSize_1(30, 0)                                                                                   // 113
+	this.HorizontalLayout = qtwidgets.NewQHBoxLayout_1(this.ContactItemView) // 111
+	this.HorizontalLayout.SetObjectName("HorizontalLayout")                  // 112
+	this.Label = qtwidgets.NewQLabel(this.ContactItemView, 0)                // 111
+	this.Label.SetObjectName("Label")                                        // 112
+	this.Label.SetMaximumSize_1(30, 0)                                       // 113
 
-	this.HorizontalLayout.Layout().AddWidget(qtwidgets.NewQWidgetFromPointer(this.Label.GetCthis())) // 115
+	this.HorizontalLayout.Layout().AddWidget(this.Label) // 115
 
 	this.VerticalLayout = qtwidgets.NewQVBoxLayout()            // 111
 	this.VerticalLayout.SetObjectName("VerticalLayout")         // 112
@@ -65,7 +65,7 @@ func (this *Ui_ContactItemView) SetupUi(ContactItemView *qtwidgets.QWidget) {
 	this.Label_2.SetSizePolicy(this.SizePolicy)                                                                // 114
 	this.Label_2.SetTextInteractionFlags(qtcore.Qt__LinksAccessibleByMouse | qtcore.Qt__TextSelectableByMouse) // 114
 
-	this.VerticalLayout.Layout().AddWidget(qtwidgets.NewQWidgetFromPointer(this.Label_2.GetCthis())) // 115
+	this.VerticalLayout.Layout().AddWidget(this.Label_2) // 115
 
 	this.Label_3 = qtwidgets.NewQLabel(this.ContactItemView, 0)                                                // 111
 	this.Label_3.SetObjectName("Label_3")                                                                      // 112
@@ -73,7 +73,7 @@ func (this *Ui_ContactItemView) SetupUi(ContactItemView *qtwidgets.QWidget) {
 	this.Label_3.SetSizePolicy(this.SizePolicy)                                                                // 114
 	this.Label_3.SetTextInteractionFlags(qtcore.Qt__LinksAccessibleByMouse | qtcore.Qt__TextSelectableByMouse) // 114
 
-	this.VerticalLayout.Layout().AddWidget(qtwidgets.NewQWidgetFromPointer(this.Label_3.GetCthis())) // 115
+	this.VerticalLayout.Layout().AddWidget(this.Label_3) // 115
 
 	this.Label_4 = qtwidgets.NewQLabel(this.ContactItemView, 0)                                                // 111
 	this.Label_4.SetObjectName("Label_4")                                                                      // 112
@@ -81,16 +81,16 @@ func (this *Ui_ContactItemView) SetupUi(ContactItemView *qtwidgets.QWidget) {
 	this.Label_4.SetSizePolicy(this.SizePolicy)                                                                // 114
 	this.Label_4.SetTextInteractionFlags(qtcore.Qt__LinksAccessibleByMouse | qtcore.Qt__TextSelectableByMouse) // 114
 
-	this.VerticalLayout.Layout().AddWidget(qtwidgets.NewQWidgetFromPointer(this.Label_4.GetCthis())) // 115
+	this.VerticalLayout.Layout().AddWidget(this.Label_4) // 115
 
-	this.HorizontalLayout.AddLayout(qtwidgets.NewQLayoutFromPointer(this.VerticalLayout.GetCthis()), 0) // 115
+	this.HorizontalLayout.AddLayout(this.VerticalLayout, 0) // 115
 
 	this.VerticalLayout_2 = qtwidgets.NewQVBoxLayout()                         // 111
 	this.VerticalLayout_2.SetObjectName("VerticalLayout_2")                    // 112
 	this.VerticalLayout_2.SetSizeConstraint(qtwidgets.QLayout__SetMinimumSize) // 114
 	this.VerticalSpacer = qtwidgets.NewQSpacerItem(20, 40, qtwidgets.QSizePolicy__Minimum, qtwidgets.QSizePolicy__Expanding)
 
-	this.VerticalLayout_2.AddItem(qtwidgets.NewQLayoutItemFromPointer(this.VerticalSpacer.GetCthis())) // 115
+	this.VerticalLayout_2.AddItem(this.VerticalSpacer) // 115
 
 	this.ToolButton = qtwidgets.NewQToolButton(this.ContactItemView) // 111
 	this.ToolButton.SetObjectName("ToolButton")                      // 112
@@ -102,17 +102,17 @@ func (this *Ui_ContactItemView) SetupUi(ContactItemView *qtwidgets.QWidget) {
 	this.ToolButton.SetToolButtonStyle(qtcore.Qt__ToolButtonTextUnderIcon)                               // 114
 	this.ToolButton.SetAutoRaise(true)                                                                   // 114
 
-	this.VerticalLayout_2.Layout().AddWidget(qtwidgets.NewQWidgetFromPointer(this.ToolButton.GetCthis())) // 115
+	this.VerticalLayout_2.Layout().AddWidget(this.ToolButton) // 115
 
 	this.VerticalSpacer_2 = qtwidgets.NewQSpacerItem(20, 40, qtwidgets.QSizePolicy__Minimum, qtwidgets.QSizePolicy__Expanding)
 
-	this.VerticalLayout_2.AddItem(qtwidgets.NewQLayoutItemFromPointer(this.VerticalSpacer_2.GetCthis())) // 115
+	this.VerticalLayout_2.AddItem(this.VerticalSpacer_2) // 115
 
-	this.HorizontalLayout.AddLayout(qtwidgets.NewQLayoutFromPointer(this.VerticalLayout_2.GetCthis()), 0) // 115
+	this.HorizontalLayout.AddLayout(this.VerticalLayout_2, 0) // 115
 
 	this.RetranslateUi(ContactItemView)
 
-	qtcore.QMetaObject_ConnectSlotsByName(qtcore.NewQObjectFromPointer(ContactItemView.GetCthis())) // 100111
+	qtcore.QMetaObject_ConnectSlotsByName(ContactItemView) // 100111
 	// } // setupUi // 126
 
 }

@@ -6,7 +6,7 @@ import (
 	"log"
 	"runtime"
 
-	"qt.go/qtwidgets"
+	"github.com/kitech/qt.go/qtwidgets"
 )
 
 func dbgpolicy(name string, p *qtwidgets.QSizePolicy) {
