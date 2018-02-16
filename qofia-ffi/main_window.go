@@ -5,10 +5,6 @@ import (
 	"gopp"
 	"io/ioutil"
 	"log"
-	"os"
-	"reflect"
-	"runtime"
-	"strings"
 	"time"
 
 	"github.com/kitech/qt.go/qtcore"
@@ -19,134 +15,122 @@ import (
 
 	thscli "tox-homeserver/client"
 	"tox-homeserver/gofia"
+	"tox-homeserver/thspbs"
 )
 
 var appctx *gofia.AppContext
 var vtcli *thscli.LigTox
 
-var uiw *Ui_MainWindow
-var msgitmdl = []*Ui_MessageItemView{}
-var ctitmdl = []*RoomListItem{}
+// ui context
+var uictx = NewUiContext()
 
-// var dyslot *qtrt.QDynSlotObject
-var mech *qtcore.QBuffer
+type UiContext struct {
+	qtapp   *qtwidgets.QApplication
+	uiw     *Ui_MainWindow
+	mw      *MainWindow
+	ctitmdl []*RoomListItem
+	msgwin  *MessageListWin
+	iteman  *RoomListMan
 
-func DumpCallers(pcs []uintptr) {
-	log.Println("DumpCallers...", len(pcs))
-	for idx, pc := range pcs {
-		pcfn := runtime.FuncForPC(pc)
-		file, line := pcfn.FileLine(pc)
-		log.Println(idx, pcfn.Name(), file, line)
-	}
-	if len(pcs) > 0 {
-		log.Println()
-	}
+	// 用于go的线程与qt主线程通知触发
+	mech    *qtcore.QBuffer
+	themeNo int
 }
 
-func finalizerFilter(ov reflect.Value) bool {
-	parts := strings.Split(ov.Type().String(), ".")
-	clsname := parts[len(parts)-1]
-	callers := qtrt.GetCtorAllocStack(clsname)
-	_ = callers
+func NewUiContext() *UiContext {
+	this := &UiContext{}
+	this.ctitmdl = []*RoomListItem{}
+	this.msgwin = NewMessageListWin()
+	this.iteman = NewRoomListMan()
 
-	insure := false
-	switch ov.Type().String() {
-	// case "*qtcore.QString":
-	// case "*qtcore.QSize":
-	// case "*qtwidgets.QSpacerItem": // crash
-	//	insure = true
-	//	DumpCallers(callers)
-	default:
-		insure = true
-	}
-	if insure {
-		log.Println(ov.Type().String(), ov)
-	}
-	return insure
+	this.mech = qtcore.NewQBuffer(nil)
+	this.themeNo = _STL_SYSTEM
+	return this
 }
 
-type contentAreaState struct {
-	isBottom bool
-	curpos   int
-	maxpos   int
+type MainWindow struct {
+	*Ui_MainWindow
+
+	roomCtxMenu        *qtwidgets.QMenu
+	rcact1             *qtwidgets.QAction
+	rcact2             *qtwidgets.QAction
+	rcact3             *qtwidgets.QAction
+	rcact4             *qtwidgets.QAction
+	curRoomCtxMenuItem *RoomListItem
 }
 
-var ccstate = &contentAreaState{isBottom: true}
+func NewMainWindow() *MainWindow {
+	this := &MainWindow{}
+	this.Ui_MainWindow = NewUi_MainWindow2()
+	uictx.uiw = this.Ui_MainWindow
 
-func main() {
-	qtrt.SetFinalizerObjectFilter(finalizerFilter)
+	this.init()
+	return this
+}
 
-	// Create application
-	if runtime.GOOS == "android" {
-		os.Setenv("QT_AUTO_SCREEN_SCALE_FACTOR ", "1.5")
-		qtcore.QCoreApplication_SetAttribute(qtcore.Qt__AA_EnableHighDpiScaling, true)
+func (this *MainWindow) init() {
+	this.initQml()
+	this.connectSignals()
+	this.switchUiStack(uictx.uiw.StackedWidget.CurrentIndex())
+	this.Widget.SetStyleSheet(GetBg(_HEADER_BG))
+
+	this.roomCtxMenu = qtwidgets.NewQMenu(nil)
+	this.rcact1 = this.roomCtxMenu.AddAction("Leave Group")
+	this.rcact2 = this.roomCtxMenu.AddAction("Remove Friend")
+	this.rcact3 = this.roomCtxMenu.AddAction("View Info")
+	this.rcact4 = this.roomCtxMenu.AddAction("PlaceHolder3")
+	qtrt.Connect(this.rcact1, "triggered(bool)", func(checked bool) {
+		this.onRoomContextTriggered(this.curRoomCtxMenuItem, checked, this.rcact1)
+	})
+	qtrt.Connect(this.rcact2, "triggered(bool)", func(checked bool) {
+		this.onRoomContextTriggered(this.curRoomCtxMenuItem, checked, this.rcact2)
+	})
+	qtrt.Connect(this.rcact3, "triggered(bool)", func(checked bool) {
+		this.onRoomContextTriggered(this.curRoomCtxMenuItem, checked, this.rcact3)
+	})
+	qtrt.Connect(this.rcact4, "triggered(bool)", func(checked bool) {
+		this.onRoomContextTriggered(this.curRoomCtxMenuItem, checked, this.rcact4)
+	})
+
+	go initAppBackend()
+}
+
+func setAppStyleSheet() {
+	bcc, err := []byte{}, error(nil)
+	if gopp.IsAndroid() { // simple test
+		bcc, err = ioutil.ReadFile("/sdcard/app.css")
+	} else {
+		bcc, err = ioutil.ReadFile("./app.css")
 	}
-	app := qtwidgets.NewQApplication(len(os.Args), os.Args, 0)
-	if false {
-		app.SetAttribute(qtcore.Qt__AA_EnableHighDpiScaling, true) // for android
+	gopp.ErrPrint(err)
+	if err != nil {
+		fp := qtcore.NewQFile_1(":/app.css")
+		fp.Open(qtcore.QIODevice__ReadOnly)
+		bcc = []byte(qtcore.NewQIODeviceFromPointer(fp.GetCthis()).ReadAll().Data())
 	}
+	uictx.qtapp.SetStyleSheet(string(bcc))
+}
 
-	setStyleSheet := func() {
-		bcc, err := []byte{}, error(nil)
-		if gopp.IsAndroid() { // simple test
-			bcc, err = ioutil.ReadFile("/sdcard/app.css")
-		} else {
-			bcc, err = ioutil.ReadFile("./app.css")
-		}
-		gopp.ErrPrint(err)
-		if err != nil {
-			fp := qtcore.NewQFile_1(":/app.css")
-			fp.Open(qtcore.QIODevice__ReadOnly)
-			bcc = []byte(qtcore.NewQIODeviceFromPointer(fp.GetCthis()).ReadAll().Data())
-		}
-		app.SetStyleSheet(string(bcc))
-	}
-	// setStyleSheet()
+func (this *MainWindow) connectSignals() {
+	uiw := uictx.uiw
 
-	// Create main window
-	window := qtwidgets.NewQMainWindow(nil, 0)
-	window.SetWindowTitle("Hello World Example")
-	window.SetMinimumSize_1(200, 200)
-
-	var winitf qtwidgets.QWidget_ITF
-	winitf = window
-	log.Println(winitf, winitf.QWidget_PTR())
-
-	uiw = NewUi_MainWindow()
-	log.Println(uiw)
-	uiw.SetupUi(window)
-	// uiw.ListWidget_2.AddItem(qtcore.NewQString_5("aaaaaaaaaaa"))
-	// Show the window
-	window.Show()
-
-	tb9 := uiw.ToolButton_9
-	// dyslot = qtrt.NewQDynSlotObject("abc", 123)
-	qtrt.Connect(tb9, "clicked(bool)", func(checked bool) {
+	qtrt.Connect(uiw.ToolButton_21, "clicked(bool)", func(checked bool) {
 		log.Println(checked)
-		setStyleSheet()
+		setAppStyleSheet()
 	})
 	stkw := uiw.StackedWidget
 	qtrt.Connect(uiw.ToolButton_11, "clicked(bool)", func(checked bool) {
 		cidx := stkw.CurrentIndex()
 		if cidx > 0 {
-			stkw.SetCurrentIndex(cidx - 1)
+			this.switchUiStack(cidx - 1)
 		}
 	})
 	qtrt.Connect(uiw.ToolButton_12, "clicked(bool)", func(checked bool) {
 		cidx := stkw.CurrentIndex()
 		if cidx < stkw.Count()-1 {
-			stkw.SetCurrentIndex(cidx + 1)
+			this.switchUiStack(cidx + 1)
 		}
 	})
-
-	{
-		qw := uiw.QuickWidget
-		// qw.Engine().AddImportPath(":/qmlsys")
-		qw.Engine().AddImportPath(":/qmlapp")
-		qw.SetSource(qtcore.NewQUrl_1("qrc:/qmlapp/area.qml", 0))
-		proot := qw.RootObject()
-		gopp.NilPrint(proot, "qml root object nil")
-	}
 
 	qtrt.Connect(uiw.ScrollArea_2.VerticalScrollBar(), "rangeChanged(int,int)", func(min int, max int) {
 		log.Println(min, max)
@@ -162,34 +146,57 @@ func main() {
 		ccstate.isBottom = gopp.IfElse(value == maxval, true, false).(bool)
 	})
 
-	mech = qtcore.NewQBuffer(nil)
+	mech := uictx.mech
 	mech.Open(qtcore.QIODevice__ReadWrite)
 	qtrt.Connect(mech, "readyRead()", func() {
 		log.Println("hehehehhee")
 		mech.ReadAll()
 		tryReadEvent()
 	})
-	go initAppBackend()
+}
 
-	if false {
-		tmer := qtcore.NewQTimer(nil)
-		tmer.Start(500)
-		qtrt.Connect(tmer, "timeout()", func() { tryReadEvent() }) // 去掉这个定时器会节省CPU
+func (this *MainWindow) initQml() {
+	qw := uictx.uiw.QuickWidget
+	// qw.Engine().AddImportPath(":/qmlsys")
+	qw.Engine().AddImportPath(":/qmlapp")
+	qw.SetSource(qtcore.NewQUrl_1("qrc:/qmlapp/area.qml", 0))
+	proot := qw.RootObject()
+	gopp.NilPrint(proot, "qml root object nil")
+}
+
+func (this *MainWindow) switchUiStack(x int) {
+	uictx.uiw.ComboBox.SetCurrentIndex(x)
+	uictx.uiw.StackedWidget.SetCurrentIndex(x)
+}
+
+func (this *MainWindow) onRoomContextMenu(item *RoomListItem, w *qtwidgets.QWidget, pos *qtcore.QPoint) {
+	this.curRoomCtxMenuItem = item
+	if item.isgroup {
+		this.rcact1.SetVisible(true)
+		this.rcact2.SetVisible(false)
+	} else {
+		this.rcact1.SetVisible(false)
+		this.rcact2.SetVisible(true)
 	}
+	this.roomCtxMenu.Popup(pos, nil)
+}
 
-	vlo10 := uiw.VerticalLayout_10
-	_ = vlo10
-	for i := 0; i < 3; i++ {
-		itext := fmt.Sprintf("hehe %d", i)
-		ctivw := qtwidgets.NewQPushButton_1(itext, nil)
-		vlo10.Layout().AddWidget(ctivw)
+func (this *MainWindow) onRoomContextTriggered(item *RoomListItem, checked bool, act *qtwidgets.QAction) {
+	log.Println(item, checked, act.Text(), item.GetName(), item.GetId())
+	if act == this.rcact1 {
+		log.Println(item.grpInfo.GetGnum())
+		vtcli.ConferenceDelete(item.grpInfo.GetGnum())
+		uictx.iteman.Delete(item)
+	} else if act == this.rcact2 {
+
+	} else if act == this.rcact3 {
+
 	}
-
-	// Execute app
-	app.Exec()
 }
 
 func initAppBackend() {
+	mech, uiw := uictx.mech, uictx.uiw
+
 	gofia.AppOnCreate()
 	appctx = gofia.GetAppCtx()
 	vtcli = appctx.GetLigTox()
@@ -203,11 +210,10 @@ func initAppBackend() {
 	}
 	log.Println(vtcli.SelfGetAddress())
 
-	lab := uiw.Label_2
-	lab.SetText(vtcli.SelfGetName())
-	lab = uiw.Label_3
+	uiw.Label_2.SetText(vtcli.SelfGetName())
 	stmsg, _ := vtcli.SelfGetStatusMessage()
-	lab.SetText(stmsg)
+	uiw.Label_3.SetText(stmsg)
+	uiw.ToolButton_17.SetToolTip(vtcli.SelfGetAddress())
 
 	listw := uiw.ListWidget_2
 
@@ -252,12 +258,15 @@ func tryReadContactEvent() {
 	for len(contactQueue) > 0 {
 		contactx := <-contactQueue
 		ctv := NewRoomListItem()
-		uiw.VerticalLayout_10.InsertWidget(0, ctv.QWidget_PTR(), 0, 0)
-		ctitmdl = append(ctitmdl, ctv)
+		ctv.OnConextMenu = func(w *qtwidgets.QWidget, pos *qtcore.QPoint) {
+			uictx.mw.onRoomContextMenu(ctv, w, pos)
+		}
+
+		uictx.iteman.addRoomItem(ctv)
 		ctv.SetContactInfo(contactx)
-		log.Println("add contact...", len(ctitmdl))
-		if len(ctitmdl) == 1 {
-			ctv.SetPressState(true)
+		log.Println("add contact...", len(uictx.ctitmdl))
+		if len(uictx.ctitmdl) == 1 {
+			// ctv.SetPressState(true)
 		}
 	}
 }
@@ -278,6 +287,7 @@ func tryReadMessageEvent() {
 }
 
 func dispatchEvent(jso *simplejson.Json) {
+	uiw, ctitmdl := uictx.uiw, uictx.ctitmdl
 	// listwp1 := Ui_MainWindow_Get_listWidget(uiw)
 	// listw1 := widgets.NewQListWidgetFromPointer(listwp1)
 
@@ -301,26 +311,13 @@ func dispatchEvent(jso *simplejson.Json) {
 		uiw.ListWidget.AddItem(itext)
 		uiw.ListWidget.ScrollToBottom()
 
-		// cfx, found := this.cfvs.Get(pubkey)
-		/*
-			cfsx, found := this.chatFormStates.Get(pubkey)
-			if !found {
-				log.Println("wtf, chat form view not found:", fname, pubkey)
-			} else {
-				cfs := cfsx.(*ChatFormState)
-				msgo := &ContactMessage{}
-				msgo.msg = msg
-				msgo.tm = time.Now()
-				cfs.msgs.Add(msgo)
-				// if this.currV != nil && this.currV.(*ChatFormView).cfst == cfs {
-				//	this.currV.(*ChatFormView).Signal()
-				// }
-				if appctx.app.Child != nil && appctx.app.Child.(*ChatFormView).cfst == cfs {
-					appctx.app.Child.(*ChatFormView).Signal()
-				}
-				// InterBackRelay.Signal()
-			}
-		*/
+		item := uictx.iteman.Get(pubkey)
+		if item == nil {
+			log.Println("wtf", fname, pubkey, msg)
+		} else {
+			msgo := NewMessageForFriend(jso)
+			item.AddMessage(msgo)
+		}
 
 		///
 		// _, err := appctx.store.AddFriendMessage(msg, pubkey)
@@ -350,29 +347,27 @@ func dispatchEvent(jso *simplejson.Json) {
 		log.Println(groupId)
 		_ = groupNumber
 
-		/*
-			valuex, found := appctx.contactStates.Get(groupId)
-			var ctis *ContactItemState
-			if !found {
-				ctis = newContactItemState()
-				appctx.contactStates.Put(groupId, ctis)
-				log.Println("new group contact:", groupId)
-			} else {
-				ctis = valuex.(*ContactItemState)
+		item := uictx.iteman.Get(groupId)
+		if item == nil {
+			item = NewRoomListItem()
+			item.OnConextMenu = func(w *qtwidgets.QWidget, pos *qtcore.QPoint) {
+				uictx.mw.onRoomContextMenu(item, w, pos)
 			}
-			ctis.group = true
-			ctis.cnum = uint32(gopp.MustInt(groupNumber))
-			ctis.ctid = groupId
+			uictx.iteman.addRoomItem(item)
+			grpInfo := &thspbs.GroupInfo{}
+			grpInfo.GroupId = groupId
+			grpInfo.Gnum = gopp.MustUint32(groupNumber)
+			grpInfo.Title = fmt.Sprintf("Group #%s", groupNumber)
+			item.SetContactInfo(grpInfo)
+			log.Println("new group contact:", groupNumber, grpInfo.Title, groupId)
+		}
 
-			if appctx.app.Child == nil {
-				InterBackRelay.Signal()
-			}
-		*/
 		///
 		// _, err := appctx.store.AddGroup(groupId, ctis.cnum, ctis.ctname)
 		// gopp.ErrPrint(err)
 
 	case "ConferenceTitle":
+		groupNumber := jso.Get("args").GetIndex(1).MustString()
 		groupTitle := jso.Get("args").GetIndex(2).MustString()
 		groupId := jso.Get("margs").GetIndex(0).MustString()
 		log.Println(groupId)
@@ -381,24 +376,24 @@ func dispatchEvent(jso *simplejson.Json) {
 		}
 		_ = groupTitle
 
-		/*
-			valuex, found := appctx.contactStates.Get(groupId)
-			var ctis *ContactItemState
-			if !found {
-				ctis = newContactItemState()
-				ctis.group = true
-				appctx.contactStates.Put(groupId, ctis)
-				log.Println("new group contact:", groupId)
-			} else {
-				ctis = valuex.(*ContactItemState)
+		item := uictx.iteman.Get(groupId)
+		if item != nil {
+			item.UpdateName(groupTitle)
+			log.Println("update group contact title:", groupNumber, groupId, groupTitle)
+		} else {
+			item = NewRoomListItem()
+			item.OnConextMenu = func(w *qtwidgets.QWidget, pos *qtcore.QPoint) {
+				uictx.mw.onRoomContextMenu(item, w, pos)
 			}
-			if groupTitle != "" && groupTitle != ctis.ctname {
-				ctis.ctname = groupTitle
-				if appctx.app.Child == nil {
-					InterBackRelay.Signal()
-				}
-			}
-		*/
+			uictx.iteman.addRoomItem(item)
+			grpInfo := &thspbs.GroupInfo{}
+			grpInfo.GroupId = groupId
+			grpInfo.Gnum = gopp.MustUint32(groupNumber)
+			grpInfo.Title = groupTitle
+			item.SetContactInfo(grpInfo)
+			log.Println("new group contact:", groupNumber, groupId, groupTitle)
+		}
+
 	case "ConferenceNameListChange":
 		groupTitle := jso.Get("margs").GetIndex(2).MustString()
 		groupId := jso.Get("margs").GetIndex(3).MustString()
@@ -449,53 +444,16 @@ func dispatchEvent(jso *simplejson.Json) {
 		uiw.ListWidget.ScrollToBottom()
 		log.Println("item:", itext)
 
-		vlo8 := uiw.VerticalLayout_8
-		msgivw := qtwidgets.NewQWidget(nil, 0)
-		msgivp := NewUi_MessageItemView()
-		msgivp.SetupUi(msgivw)
-		vlo8.Layout().AddWidget(msgivw)
-		msgitmdl = append(msgitmdl, msgivp)
-
 		ccstate.curpos = uiw.ScrollArea_2.VerticalScrollBar().Value()
 		ccstate.maxpos = uiw.ScrollArea_2.VerticalScrollBar().Maximum()
-		msgivp.Label_5.SetText(itext)
-		msgivp.Label_3.SetText(fmt.Sprintf("%s@%s", peerName, groupTitle))
-		msgivp.Label_4.SetText(gopp.TimeToFmt1(time.Now()))
-
-		qtrt.Connect(msgivp.ToolButton, "clicked(bool)", func(bool) {
-		})
 
 		for _, room := range ctitmdl {
 			log.Println(room.GetName(), ",", groupTitle, ",", room.GetId(), ",", groupId)
 			if room.GetId() == groupId && room.GetName() == groupTitle {
-				room.SetLastMsg(message)
+				room.AddMessage(NewMessageForGroup(jso))
 				break
 			}
 		}
-
-		/*
-			valuex, found := appctx.contactStates.Get(groupId)
-			var ctis *ContactItemState
-			if !found {
-				log.Println("group contact not found:", groupId)
-			} else {
-				ctis = valuex.(*ContactItemState)
-			}
-
-			if ctis != nil {
-				msgo := &ContactMessage{}
-				msgo.msg = message
-				msgo.tm = time.Now()
-				ctis.msgs.Add(msgo)
-
-				this.signalProperView(ctis, false)
-			}
-		*/
-
-		//
-		// peerPubkey := jso.Get("margs").GetIndex(1).MustString()
-		// _, err := appctx.store.AddGroupMessage(message, "0", groupId, peerPubkey)
-		// gopp.ErrPrint(err)
 
 	default:
 	}

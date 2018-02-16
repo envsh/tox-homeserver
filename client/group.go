@@ -118,6 +118,18 @@ func (this *LigTox) ConferenceJoin(friendNumber uint32, cookie string) (uint32, 
 	return uint32(rsp.Mid), nil
 }
 
+func (this *LigTox) ConferenceDelete(groupNumber uint32) (uint32, error) {
+	fname := this.getMethodName()
+	args := thspbs.Event{}
+	args.Name = fname
+	args.Args = []string{fmt.Sprintf("%d", groupNumber)}
+	cli := thspbs.NewToxhsClient(this.rpcli)
+	rsp, err := cli.RmtCall(context.Background(), &args)
+	gopp.ErrPrint(err, rsp)
+	log.Println(rsp)
+	return uint32(rsp.Mid), nil
+}
+
 func (this *LigTox) ConferencePeerCount(groupNumber uint32) (uint32, error) {
 	fname := this.getMethodName()
 	args := thspbs.Event{}

@@ -65,6 +65,7 @@ func (this *Ui_ContactItemView) SetupUi(ContactItemView *qtwidgets.QWidget) {
 	this.SizePolicy.SetHeightForWidth(this.ContactItemView.SizePolicy().HasHeightForWidth()) // 114
 	this.ContactItemView.SetSizePolicy(this.SizePolicy)                                      // 114
 	this.ContactItemView.SetFocusPolicy(qtcore.Qt__ClickFocus)                               // 114
+	this.ContactItemView.SetContextMenuPolicy(qtcore.Qt__DefaultContextMenu)                 // 114
 	this.HorizontalLayout_3 = qtwidgets.NewQHBoxLayout_1(this.ContactItemView)               // 111
 	this.HorizontalLayout_3.SetSpacing(0)                                                    // 114
 	this.HorizontalLayout_3.SetObjectName("HorizontalLayout_3")                              // 112
@@ -79,6 +80,7 @@ func (this *Ui_ContactItemView) SetupUi(ContactItemView *qtwidgets.QWidget) {
 	this.ToolButton_2 = qtwidgets.NewQToolButton(this.ContactItemView) // 111
 	this.ToolButton_2.SetObjectName("ToolButton_2")                    // 112
 	this.ToolButton_2.SetFocusPolicy(qtcore.Qt__NoFocus)               // 114
+	this.ToolButton_2.SetContextMenuPolicy(qtcore.Qt__NoContextMenu)   // 114
 	this.Icon = qtgui.NewQIcon()
 	this.Icon.AddFile(":/icons/icon_avatar_40.png", qtcore.NewQSize(), qtgui.QIcon__Normal, qtgui.QIcon__Off) // 115
 	this.ToolButton_2.SetIcon(this.Icon)                                                                      // 114
@@ -110,6 +112,7 @@ func (this *Ui_ContactItemView) SetupUi(ContactItemView *qtwidgets.QWidget) {
 	this.Font.SetBold(true)                                                                                    // 114
 	this.Font.SetWeight(75)                                                                                    // 114
 	this.Label_2.SetFont(this.Font)                                                                            // 114
+	this.Label_2.SetContextMenuPolicy(qtcore.Qt__NoContextMenu)                                                // 114
 	this.Label_2.SetTextInteractionFlags(qtcore.Qt__LinksAccessibleByMouse | qtcore.Qt__TextSelectableByMouse) // 114
 
 	this.HorizontalLayout.Layout().AddWidget(this.Label_2) // 115
@@ -125,6 +128,7 @@ func (this *Ui_ContactItemView) SetupUi(ContactItemView *qtwidgets.QWidget) {
 	this.SizePolicy2.SetVerticalStretch(0)                                                                // 114
 	this.SizePolicy2.SetHeightForWidth(this.Label_5.SizePolicy().HasHeightForWidth())                     // 114
 	this.Label_5.SetSizePolicy(this.SizePolicy2)                                                          // 114
+	this.Label_5.SetContextMenuPolicy(qtcore.Qt__NoContextMenu)                                           // 114
 	this.Label_5.SetAlignment(qtcore.Qt__AlignRight | qtcore.Qt__AlignTrailing | qtcore.Qt__AlignVCenter) // 114
 	this.Label_5.SetTextInteractionFlags(qtcore.Qt__TextBrowserInteraction)                               // 114
 
@@ -139,6 +143,7 @@ func (this *Ui_ContactItemView) SetupUi(ContactItemView *qtwidgets.QWidget) {
 	this.Label_3.SetObjectName("Label_3")                                             // 112
 	this.SizePolicy1.SetHeightForWidth(this.Label_3.SizePolicy().HasHeightForWidth()) // 114
 	this.Label_3.SetSizePolicy(this.SizePolicy1)                                      // 114
+	this.Label_3.SetContextMenuPolicy(qtcore.Qt__NoContextMenu)                       // 114
 	this.Label_3.SetTextInteractionFlags(qtcore.Qt__TextBrowserInteraction)           // 114
 
 	this.HorizontalLayout_2.Layout().AddWidget(this.Label_3) // 115
@@ -151,6 +156,7 @@ func (this *Ui_ContactItemView) SetupUi(ContactItemView *qtwidgets.QWidget) {
 	this.Label_6.SetObjectName("Label_6")                                                                 // 112
 	this.SizePolicy2.SetHeightForWidth(this.Label_6.SizePolicy().HasHeightForWidth())                     // 114
 	this.Label_6.SetSizePolicy(this.SizePolicy2)                                                          // 114
+	this.Label_6.SetContextMenuPolicy(qtcore.Qt__NoContextMenu)                                           // 114
 	this.Label_6.SetAlignment(qtcore.Qt__AlignRight | qtcore.Qt__AlignTrailing | qtcore.Qt__AlignVCenter) // 114
 	this.Label_6.SetTextInteractionFlags(qtcore.Qt__TextBrowserInteraction)                               // 114
 
@@ -162,6 +168,7 @@ func (this *Ui_ContactItemView) SetupUi(ContactItemView *qtwidgets.QWidget) {
 	this.Label_4.SetObjectName("Label_4")                                             // 112
 	this.SizePolicy1.SetHeightForWidth(this.Label_4.SizePolicy().HasHeightForWidth()) // 114
 	this.Label_4.SetSizePolicy(this.SizePolicy1)                                      // 114
+	this.Label_4.SetContextMenuPolicy(qtcore.Qt__NoContextMenu)                       // 114
 	this.Label_4.SetTextInteractionFlags(qtcore.Qt__TextBrowserInteraction)           // 114
 
 	this.VerticalLayout.Layout().AddWidget(this.Label_4) // 115
@@ -179,6 +186,7 @@ func (this *Ui_ContactItemView) SetupUi(ContactItemView *qtwidgets.QWidget) {
 	this.ToolButton = qtwidgets.NewQToolButton(this.ContactItemView) // 111
 	this.ToolButton.SetObjectName("ToolButton")                      // 112
 	this.ToolButton.SetFocusPolicy(qtcore.Qt__NoFocus)               // 114
+	this.ToolButton.SetContextMenuPolicy(qtcore.Qt__NoContextMenu)   // 114
 	this.Icon1 = qtgui.NewQIcon()
 	this.Icon1.AddFile(":/icons/online_30.png", qtcore.NewQSize(), qtgui.QIcon__Normal, qtgui.QIcon__Off) // 115
 	this.ToolButton.SetIcon(this.Icon1)                                                                   // 114

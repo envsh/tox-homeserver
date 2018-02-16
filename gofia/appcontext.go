@@ -213,7 +213,7 @@ func (this *AppContext) dispatchEvent(jso *simplejson.Json) {
 		ctis.cnum = uint32(gopp.MustInt(groupNumber))
 		ctis.ctid = groupId
 
-		if appctx.app.Child == nil {
+		if appctx.app != nil && appctx.app.Child == nil {
 			InterBackRelay.Signal()
 		}
 
@@ -240,7 +240,7 @@ func (this *AppContext) dispatchEvent(jso *simplejson.Json) {
 		}
 		if groupTitle != "" && groupTitle != ctis.ctname {
 			ctis.ctname = groupTitle
-			if appctx.app.Child == nil {
+			if appctx.app != nil && appctx.app.Child == nil {
 				InterBackRelay.Signal()
 			}
 		}
@@ -264,7 +264,7 @@ func (this *AppContext) dispatchEvent(jso *simplejson.Json) {
 		}
 		if groupTitle != "" && groupTitle != ctis.ctname {
 			ctis.ctname = groupTitle
-			if appctx.app.Child == nil {
+			if appctx.app != nil && appctx.app.Child == nil {
 				InterBackRelay.Signal()
 			}
 		}
@@ -313,18 +313,18 @@ func (this *AppContext) dispatchEvent(jso *simplejson.Json) {
 }
 
 func (this *AppContext) signalProperView(curst *ChatFormState, sigmain bool) {
-	if appctx.app.Child == nil {
+	if appctx.app != nil && appctx.app.Child == nil {
 		if sigmain {
 			InterBackRelay.Signal()
 		}
-	} else if appctx.app.Child != nil && appctx.app.Child.(*ChatFormView).cfst == curst {
+	} else if appctx.app != nil && appctx.app.Child != nil && appctx.app.Child.(*ChatFormView).cfst == curst {
 		log.Println("hehrere")
 		appctx.app.Child.(*ChatFormView).Signal()
 	} else {
-		log.Panicf("wtf??? %p,\n", curst)
+		log.Printf("wtf??? %p,\n", curst)
 	}
 	// TODO
-	if appctx.app.Child != nil {
+	if appctx.app != nil && appctx.app.Child != nil {
 		switch appctx.app.Child.(type) {
 		}
 	}

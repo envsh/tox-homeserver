@@ -2,7 +2,7 @@
 QScrollBar:vertical {
     border: 0px solid grey;
     background: #efefef;
-    width: 8px;
+    width: 10px;
     margin: 0px 0 0px 0;
 }
 QScrollBar::handle:vertical {
@@ -39,7 +39,7 @@ QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
 QScrollBar:horizontal {
     border: 0px solid grey;
     background: #efefef;
-    height: 8px;
+    height: 10px;
     margin: 0px 0 0px 0;
 }
 QScrollBar::handle:horizontal {
@@ -105,6 +105,7 @@ QListWidget {
     qproperty-alternatingRowColors: true;
     alternate-background-color: #f6f6f6;
     background: white;
+    border: 0px;
 }
 
 QListView {
@@ -128,7 +129,12 @@ QTextBrowser {
 
 QToolTip {
     color: #000000;
+    border: 0px solid darkkhaki;
 }
+
+QLabel {
+    border: 0px;
+ }
 
 /*
 QLabel {
@@ -140,4 +146,17 @@ QLabel {
     background-color: blue;
 }
 */
+
+
+QGroupBox {
+    font: bold;
+    border: 0px solid silver;
+    border-radius: 6px;
+    margin-top: 6px;
+}
+QGroupBox::title {
+    subcontrol-origin:  margin;
+    subcontrol-position: top left;
+    padding: 0 2px 0 2px;
+}
 

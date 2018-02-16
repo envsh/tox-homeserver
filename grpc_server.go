@@ -164,6 +164,10 @@ func (this *GrpcService) RmtCall(ctx context.Context, req *thspbs.Event) (*thspb
 		out.Args = append(out.Args, fmt.Sprintf("%d", wn))
 		// groups
 	case "ConferenceDelete": // "groupNumber"
+		gnum := gopp.MustUint32(req.Args[0])
+		_, err = t.ConferenceDelete(gnum)
+		gopp.ErrPrint(err, req.Args)
+
 	case "ConferenceSendMessage": // "groupNumber","mtype","msg"
 		gnum := gopp.MustInt(req.Args[0])
 		mtype := gopp.MustInt(req.Args[1])
@@ -190,6 +194,8 @@ func (this *GrpcService) RmtCall(ctx context.Context, req *thspbs.Event) (*thspb
 		pname, err := t.ConferencePeerGetName(gnum, pnum)
 		gopp.ErrPrint(err)
 		out.Args = append(out.Args, pname)
+	default:
+		log.Println("unimpled:", req.Name)
 	}
 
 	common.BytesRecved(len(req.String()))
