@@ -33,7 +33,9 @@ type UiContext struct {
 	iteman  *RoomListMan
 
 	// 用于go的线程与qt主线程通知触发
-	mech    *qtcore.QBuffer
+	// mech    *qtcore.QBuffer
+	metmer  *qtcore.QTimer
+	meflag  bool
 	themeNo int
 }
 
@@ -43,7 +45,8 @@ func NewUiContext() *UiContext {
 	this.msgwin = NewMessageListWin()
 	this.iteman = NewRoomListMan()
 
-	this.mech = qtcore.NewQBuffer(nil)
+	// this.mech = qtcore.NewQBuffer(nil)
+	// this.metmer = qtcore.NewQTimer(nil)
 	this.themeNo = _STL_SYSTEM
 	return this
 }
@@ -72,7 +75,7 @@ func (this *MainWindow) init() {
 	this.initQml()
 	this.connectSignals()
 	this.switchUiStack(uictx.uiw.StackedWidget.CurrentIndex())
-	this.Widget.SetStyleSheet(GetBg(_HEADER_BG))
+	// this.Widget.SetStyleSheet(GetBg(_HEADER_BG))
 
 	this.roomCtxMenu = qtwidgets.NewQMenu(nil)
 	this.rcact1 = this.roomCtxMenu.AddAction("Leave Group")
@@ -107,7 +110,18 @@ func setAppStyleSheet() {
 		fp := qtcore.NewQFile_1(":/app.css")
 		fp.Open(qtcore.QIODevice__ReadOnly)
 		bcc = []byte(qtcore.NewQIODeviceFromPointer(fp.GetCthis()).ReadAll().Data())
+		qtcore.NewQIODeviceFromPointer(fp.GetCthis()).Close()
 	}
+	uictx.qtapp.SetStyleSheet(string(bcc))
+}
+
+func setAppStyleSheetTheme(index int) {
+
+	fp := qtcore.NewQFile_1(fmt.Sprintf(":/styles/%s.css", styleSheets[index]))
+	fp.Open(qtcore.QIODevice__ReadOnly)
+	bcc := []byte(qtcore.NewQIODeviceFromPointer(fp.GetCthis()).ReadAll().Data())
+	qtcore.NewQIODeviceFromPointer(fp.GetCthis()).Close()
+
 	uictx.qtapp.SetStyleSheet(string(bcc))
 }
 
@@ -146,14 +160,41 @@ func (this *MainWindow) connectSignals() {
 		ccstate.isBottom = gopp.IfElse(value == maxval, true, false).(bool)
 	})
 
-	mech := uictx.mech
-	mech.Open(qtcore.QIODevice__ReadWrite)
-	qtrt.Connect(mech, "readyRead()", func() {
-		log.Println("hehehehhee")
-		mech.ReadAll()
-		tryReadEvent()
+	/*
+		mech := uictx.mech
+		mech.Open(qtcore.QIODevice__ReadWrite | qtcore.QIODevice__Unbuffered)
+		qtrt.Connect(mech, "readyRead()", func() {
+			log.Println("hehehehhee")
+			mech.ReadAll()
+			tryReadEvent()
+		})
+	*/
+	uictx.metmer = qtcore.NewQTimer(nil)
+	uictx.metmer.SetSingleShot(false)
+	uictx.metmer.SetInterval(200)
+	// TODO android上timer事件会在休眠时累积，导致唤醒时需要处理大师的累积事件
+	qtrt.Connect(uictx.metmer, "timeout()", func() {
+		if uictx.meflag {
+			log.Println("hehehehhee")
+			uictx.meflag = false
+			tryReadEvent()
+		}
+	})
+	uictx.metmer.Start(200)
+
+	// send message button
+	qtrt.Connect(uiw.ToolButton_18, "clicked(bool)", func(checked bool) {
+		this.sendMessage()
+	})
+	qtrt.Connect(uiw.LineEdit_2, "returnPressed()", this.sendMessage)
+
+	// switch theme
+	qtrt.Connect(uiw.ComboBox_2, "currentIndexChanged(int)", func(index int) {
+		setAppStyleSheetTheme(index)
 	})
 }
+
+var ipcname = gopp.IfElseStr(gopp.IsAndroid(), "/cache", "@/tmp") + "/itisasockforgofia"
 
 func (this *MainWindow) initQml() {
 	qw := uictx.uiw.QuickWidget
@@ -194,13 +235,39 @@ func (this *MainWindow) onRoomContextTriggered(item *RoomListItem, checked bool,
 	}
 }
 
+func (this *MainWindow) sendMessage() {
+	uiw := uictx.uiw
+	itext := uiw.LineEdit_2.Text()
+	item := uictx.msgwin.item
+	if item != nil && len(itext) > 0 {
+		if item.isgroup {
+			vtcli.ConferenceSendMessage(item.grpInfo.Gnum, 0, itext)
+		} else {
+			vtcli.FriendSendMessage(item.frndInfo.Fnum, itext)
+		}
+		uiw.LineEdit_2.Clear()
+		msgo := &Message{}
+		msgo.Msg = itext
+		msgo.Peer = vtcli.SelfGetName()
+		msgo.Time = time.Now()
+		msgo.Me = true
+		msgo.refmtmsg()
+		log.Println(msgo)
+		item.AddMessage(msgo)
+	} else {
+		log.Println("not send:", len(itext), item)
+	}
+}
+
 func initAppBackend() {
-	mech, uiw := uictx.mech, uictx.uiw
+	// mech, uiw := uictx.mech, uictx.uiw
+	uiw := uictx.uiw
 
 	gofia.AppOnCreate()
 	appctx = gofia.GetAppCtx()
 	vtcli = appctx.GetLigTox()
-	vtcli.OnNewMsg = func() { mech.Write_1("5") }
+	// vtcli.OnNewMsg = func() { mech.Write_1("5") }
+	vtcli.OnNewMsg = func() { uictx.meflag = true }
 
 	for {
 		time.Sleep(500 * time.Millisecond)
@@ -231,7 +298,16 @@ func initAppBackend() {
 
 	log.Println("get base info done.")
 	baseInfoGot = true
-	mech.Write_1("z")
+	/*
+		n := mech.Write_1("zyx")
+		if n != 3 {
+			log.Println("write error:", n)
+		}
+		log.Println("", mech.Size())
+		mech.WaitForBytesWritten(-1)
+		log.Println("", mech.Size())
+	*/
+	uictx.meflag = true
 	select {}
 }
 

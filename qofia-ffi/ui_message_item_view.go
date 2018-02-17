@@ -28,7 +28,7 @@ type Ui_MessageItemView struct {
 	HorizontalLayout   *qtwidgets.QHBoxLayout
 	Label_3            *qtwidgets.QLabel
 	HorizontalSpacer   *qtwidgets.QSpacerItem
-	Label_4            *qtwidgets.QLabel
+	LabelMsgTime       *qtwidgets.QLabel
 	ToolButton         *qtwidgets.QToolButton
 	Label_5            *qtwidgets.QLabel
 	VerticalLayout_2   *qtwidgets.QVBoxLayout
@@ -75,7 +75,7 @@ func (this *Ui_MessageItemView) SetupUi(MessageItemView *qtwidgets.QWidget) {
 
 	this.VerticalLayout_3.Layout().AddWidget(this.ToolButton_2) // 115
 
-	this.VerticalSpacer = qtwidgets.NewQSpacerItem(20, 10, qtwidgets.QSizePolicy__Minimum, qtwidgets.QSizePolicy__Expanding)
+	this.VerticalSpacer = qtwidgets.NewQSpacerItem(36, 10, qtwidgets.QSizePolicy__Minimum, qtwidgets.QSizePolicy__Expanding)
 
 	this.VerticalLayout_3.AddItem(this.VerticalSpacer) // 115
 
@@ -99,12 +99,12 @@ func (this *Ui_MessageItemView) SetupUi(MessageItemView *qtwidgets.QWidget) {
 
 	this.HorizontalLayout.AddItem(this.HorizontalSpacer) // 115
 
-	this.Label_4 = qtwidgets.NewQLabel(this.MessageItemView, 0)                                           // 111
-	this.Label_4.SetObjectName("Label_4")                                                                 // 112
-	this.Label_4.SetAlignment(qtcore.Qt__AlignRight | qtcore.Qt__AlignTrailing | qtcore.Qt__AlignVCenter) // 114
-	this.Label_4.SetTextInteractionFlags(qtcore.Qt__TextBrowserInteraction)                               // 114
+	this.LabelMsgTime = qtwidgets.NewQLabel(this.MessageItemView, 0)                                           // 111
+	this.LabelMsgTime.SetObjectName("LabelMsgTime")                                                            // 112
+	this.LabelMsgTime.SetAlignment(qtcore.Qt__AlignRight | qtcore.Qt__AlignTrailing | qtcore.Qt__AlignVCenter) // 114
+	this.LabelMsgTime.SetTextInteractionFlags(qtcore.Qt__TextBrowserInteraction)                               // 114
 
-	this.HorizontalLayout.Layout().AddWidget(this.Label_4) // 115
+	this.HorizontalLayout.Layout().AddWidget(this.LabelMsgTime) // 115
 
 	this.ToolButton = qtwidgets.NewQToolButton(this.MessageItemView) // 111
 	this.ToolButton.SetObjectName("ToolButton")                      // 112
@@ -141,7 +141,7 @@ func (this *Ui_MessageItemView) SetupUi(MessageItemView *qtwidgets.QWidget) {
 
 	this.VerticalLayout_2.Layout().AddWidget(this.ToolButton_3) // 115
 
-	this.VerticalSpacer_2 = qtwidgets.NewQSpacerItem(20, 10, qtwidgets.QSizePolicy__Minimum, qtwidgets.QSizePolicy__Expanding)
+	this.VerticalSpacer_2 = qtwidgets.NewQSpacerItem(36, 10, qtwidgets.QSizePolicy__Minimum, qtwidgets.QSizePolicy__Expanding)
 
 	this.VerticalLayout_2.AddItem(this.VerticalSpacer_2) // 115
 
@@ -162,7 +162,7 @@ func (this *Ui_MessageItemView) RetranslateUi(MessageItemView *qtwidgets.QWidget
 	this.MessageItemView.SetWindowTitle(qtcore.QCoreApplication_Translate("MessageItemView", "Form", "dummy123", 0))
 	this.ToolButton_2.SetText(qtcore.QCoreApplication_Translate("MessageItemView", "...", "dummy123", 0))
 	this.Label_3.SetText(qtcore.QCoreApplication_Translate("MessageItemView", "TextLabel", "dummy123", 0))
-	this.Label_4.SetText(qtcore.QCoreApplication_Translate("MessageItemView", "TextLabel", "dummy123", 0))
+	this.LabelMsgTime.SetText(qtcore.QCoreApplication_Translate("MessageItemView", "TextLabel", "dummy123", 0))
 	this.ToolButton.SetText(qtcore.QCoreApplication_Translate("MessageItemView", "...", "dummy123", 0))
 	this.ToolButton_3.SetText(qtcore.QCoreApplication_Translate("MessageItemView", "...", "dummy123", 0))
 }

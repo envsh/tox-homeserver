@@ -7,6 +7,7 @@ import (
 	"time"
 )
 
+// for message list page usage
 type MessageListWin struct {
 	item *RoomListItem
 }
@@ -21,16 +22,18 @@ func (this *MessageListWin) SetRoom(item *RoomListItem) {
 	this.item = item
 
 	mw := uictx.mw
-	mw.Label_5.SetText(gopp.StrSuf4ui(item.GetName(), 36))
+	mw.Label_5.SetText(gopp.StrSuf4ui(item.GetName(), 32))
 	if item.isgroup {
 		mw.Label_6.SetVisible(true)
 		mw.Label_7.SetVisible(false)
-		mw.Label_6.SetText(fmt.Sprintf("%d users in chat", 0))
+		mw.Label_6.SetText(fmt.Sprintf("%d users in chat", item.peerCount))
 	} else {
 		mw.Label_6.SetVisible(false)
 		mw.Label_7.SetVisible(true)
-		mw.Label_7.SetText(gopp.StrSuf4ui(item.frndInfo.GetStmsg(), 36))
+		mw.Label_7.SetText(gopp.StrSuf4ui(item.frndInfo.GetStmsg(), 32))
 	}
+	mw.LabelMsgCount2.SetText(fmt.Sprintf("%3d", item.totalCount))
+	mw.LabelMsgCount.SetText(fmt.Sprintf("%3d", item.totalCount))
 
 	this.ReloadMessages(oldItem)
 }

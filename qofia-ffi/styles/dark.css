@@ -1,0 +1,64 @@
+
+#ContactItemView[istate=selected] {
+    background: #5294e2;
+}
+#ContactItemView[istate=hover] {
+    background: #39679e;
+}
+#MainWindow,#ContactItemView[istate=default] {
+    background: #383c4a;
+}
+#LabelMsgCount,#LabelMsgCount2,#LabelMsgTime,#LabelLastMsgTimecc {
+    color: #a4a4a4;
+}
+QToolButtonc,QLineEdit,QScrollArea,QListWidget,QTextBrowser,QLabel {
+    background: transparent;
+    border: 0px;
+    color: #caccd1;
+}
+QToolButton{
+    color: #caccd1;
+}
+QMenu {
+    background-color: #383c4a;
+    color: #caccd1;
+}
+QMenu::item:selected {
+    background-color: #5294e2;
+    color: white;
+}
+QMenu::item:disabled {
+    color: #646464;
+}
+QScrollBar {
+    border: 0px;
+    width: 10px;
+    margin: 0px 0 0px 0;
+    background: #383c4e;
+}
+QScrollBar::handle{
+    background: #caccd1;
+    radius: 10px;
+}
+QScrollBar::add-line,QScrollBar::sub-line{
+    height: 0px;    width: 0px;
+}
+
+
+QComboBox QAbstractItemView {
+    background: #383c4a;
+    color: #caccd1;
+}
+QComboBox {
+    margin: 0px 0 0px 0;
+    color: #caccd1;
+}
+QComboBox:on {
+    color: black;
+}
+
+
+#LineHeadSepLeft,#LineHeadSepRight {
+    border-top: 1px solid #646464;
+}
+

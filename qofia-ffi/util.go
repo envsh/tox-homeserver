@@ -5,6 +5,7 @@ import (
 	"gopp"
 	"log"
 	"runtime"
+	"time"
 
 	"github.com/kitech/qt.go/qtwidgets"
 )
@@ -31,4 +32,13 @@ func resolveAppPath() string {
 		}
 	}
 	return "/thedirshouldnotexists"
+}
+
+// 中文常用格式
+func Time2Today(t time.Time) string {
+	return t.Format("15:04:05")
+}
+
+func Time2TodayMinute(t time.Time) string {
+	return t.Format("15:04")
 }

@@ -146,6 +146,7 @@ func (this *GrpcService) GetBaseInfo(ctx context.Context, req *thspbs.EmptyReq) 
 	return out, nil
 }
 
+// TODO 自己的消息做多终端同步转发
 func (this *GrpcService) RmtCall(ctx context.Context, req *thspbs.Event) (*thspbs.Event, error) {
 	log.Println(req.Id, req.Name, req.Args, req.Margs)
 	out := &thspbs.Event{}

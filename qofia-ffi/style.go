@@ -60,3 +60,5 @@ func GetColor(c int) string {
 
 func GetBg(c int) string { return fmt.Sprintf("background:%s;", GetColor(c)) }
 func GetFg(c int) string { return fmt.Sprintf("color:%s;", GetColor(c)) }
+
+var styleSheets = map[int]string{0: "material", 1: "dark", 2: "system"}

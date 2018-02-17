@@ -31,6 +31,7 @@ func main() {
 	// Create main window
 	uictx.mw = NewMainWindow()
 	uictx.uiw.MainWindow.Show()
+	setAppStyleSheetTheme(0)
 
 	// Execute app
 	app.Exec()

@@ -1,0 +1,69 @@
+
+#ContactItemView[istate=selected] {
+    background: palette(highlight);
+}
+#ContactItemView[istate=hover] {
+    background: palette(mid);
+}
+#MainWindow,#ContactItemView[istate=default] {
+    background: palette(window);
+}
+#LabelMsgCount,#LabelMsgCount2,#LabelMsgTime,#LabelLastMsgTime {
+    color: palette(dark);
+}
+QToolButtonc,QLineEdit,QScrollArea,QListWidget,QTextBrowser,QLabel {
+    background: transparent;
+    border: 0px;
+    color: palette(text);
+}
+QToolButton{
+    color: palette(text);
+}
+/*
+QMenu {
+    background-color: palette(window);
+    color: palette(text);
+}
+QMenu::item:selected {
+    background-color: palette(highlight);
+    color: palette(text);
+}
+QMenu::item:disabled {
+    color: palette(mid);
+}
+*/
+QScrollBar {
+    border: 0px;
+    width: 10px;
+    margin: 0px 0 0px 0;
+    background: palette(window);
+}
+QScrollBar::handle {
+    background: palette(dark);
+    radius: 10px;
+}
+QScrollBar::add-line,QScrollBar::sub-line{
+    height: 0px;    width: 0px;
+}
+
+
+QComboBox QAbstractItemView {
+    background: palette(window);
+    color: palette(text);
+}
+QComboBox {
+    margin: 0px 0 0px 0;
+    color: palette(text);
+}
+QComboBox:on {
+    color: palette(text);
+}
+
+
+#LineHeadSepLeft,#LineHeadSepRight {
+    border-top: 1px solid palette(mid);
+}
+
+#page_4 {
+    background-color: palette(window);
+}
