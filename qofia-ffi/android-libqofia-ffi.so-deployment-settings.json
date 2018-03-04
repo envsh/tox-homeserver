@@ -1,5 +1,5 @@
 {
-    "qt": "/home/me/Qt5.10.0/5.10.0/android_armv7",
+    "qt": "/home/me/Qt5.10.1/5.10.1/android_armv7",
     "sdk": "/opt/android-sdk",
     "sdkBuildToolsRevision":"26.0.0",
     "ndk": "/opt/android-ndk",

@@ -1,8 +1,8 @@
 <RCC>
   <qresource>
-    <file>styles/dark.css</file>
-    <file>styles/material.css</file>
-    <file>styles/system.css</file>
+    <file>theme/dark.css</file>
+    <file>theme/material.css</file>
+    <file>theme/system.css</file>
     <file>qmlapp/area.qml</file>
     <file>icons/barbuttonicon_forward_gray64.png</file>
     <file>icons/barbuttonicon_back_gray64.png</file>

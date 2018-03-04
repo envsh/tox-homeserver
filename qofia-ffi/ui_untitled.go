@@ -468,7 +468,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.ScrollArea.SetWidgetResizable(true)                                             // 114
 	this.ScrollAreaWidgetContents = qtwidgets.NewQWidget(nil, 0)                         // 111
 	this.ScrollAreaWidgetContents.SetObjectName("ScrollAreaWidgetContents")              // 112
-	this.ScrollAreaWidgetContents.SetGeometry(0, 0, 378, 437)                            // 114
+	this.ScrollAreaWidgetContents.SetGeometry(0, 0, 378, 441)                            // 114
 	this.VerticalLayout_9 = qtwidgets.NewQVBoxLayout_1(this.ScrollAreaWidgetContents)    // 111
 	this.VerticalLayout_9.SetSpacing(0)                                                  // 114
 	this.VerticalLayout_9.SetObjectName("VerticalLayout_9")                              // 112
@@ -696,7 +696,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.ScrollArea_2.SetWidgetResizable(true)                                             // 114
 	this.ScrollAreaWidgetContents_2 = qtwidgets.NewQWidget(nil, 0)                         // 111
 	this.ScrollAreaWidgetContents_2.SetObjectName("ScrollAreaWidgetContents_2")            // 112
-	this.ScrollAreaWidgetContents_2.SetGeometry(0, 0, 366, 422)                            // 114
+	this.ScrollAreaWidgetContents_2.SetGeometry(0, 0, 96, 26)                              // 114
 	this.VerticalLayout_3 = qtwidgets.NewQVBoxLayout_1(this.ScrollAreaWidgetContents_2)    // 111
 	this.VerticalLayout_3.SetSpacing(0)                                                    // 114
 	this.VerticalLayout_3.SetObjectName("VerticalLayout_3")                                // 112

@@ -5,7 +5,6 @@ env | grep CGO_
 set -x
 
 
-go install -v -pkgdir ~/oss/pkg/android_arm github.com/gonuts/ffi
 go install -v -pkgdir ~/oss/pkg/android_arm github.com/kitech/qt.go/qtqt
 go install -v -pkgdir ~/oss/pkg/android_arm github.com/kitech/qt.go/qtrt
 go install -v -pkgdir ~/oss/pkg/android_arm github.com/mattn/go-sqlite3

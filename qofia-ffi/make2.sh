@@ -3,7 +3,7 @@ mkdir -p ./build/libs/armeabi-v7a
 cp -v libgo.so ./build/
 cp -v libgo.so ./build/libs/armeabi-v7a/
 
-time /home/me/Qt5.10.0/5.10.0/android_armv7/bin/androiddeployqt --output ./build/ --verbose --gradle --deployment bundled --android-platform android-26
+time /home/me/Qt5.10.1/5.10.1/android_armv7/bin/androiddeployqt --output ./build/ --verbose --gradle --deployment bundled --android-platform android-26
 
 find -name "*.apk" | xargs ls -lh
 

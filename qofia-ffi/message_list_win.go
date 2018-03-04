@@ -18,6 +18,9 @@ func NewMessageListWin() *MessageListWin {
 }
 
 func (this *MessageListWin) SetRoom(item *RoomListItem) {
+	if item == this.item {
+		return
+	}
 	oldItem := this.item
 	this.item = item
 

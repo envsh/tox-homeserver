@@ -20,6 +20,16 @@ bd:
 	echo -e "const isandroid = true\n" >> btversion.go
 	go build -p 1 -v -ldflags "${GOVVV}"
 
+droid: droidso droidapk
+
+droidso:
+	sh make.sh
+droidapk:
+	sh make2.sh
+
+droidins:
+	adb install -r ./build/build/outputs/apk/build-debug.apk
+
 run:
 	./qofia-ffi
 

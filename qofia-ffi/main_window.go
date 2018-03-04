@@ -31,11 +31,11 @@ type UiContext struct {
 	ctitmdl []*RoomListItem
 	msgwin  *MessageListWin
 	iteman  *RoomListMan
+	gtreco  *RoomGestureReco
 
 	// 用于go的线程与qt主线程通知触发
-	// mech    *qtcore.QBuffer
-	metmer  *qtcore.QTimer
-	meflag  bool
+	mech *Notifier
+	// metmer  *qtcore.QTimer
 	themeNo int
 }
 
@@ -44,10 +44,16 @@ func NewUiContext() *UiContext {
 	this.ctitmdl = []*RoomListItem{}
 	this.msgwin = NewMessageListWin()
 	this.iteman = NewRoomListMan()
+	this.gtreco = NewRoomGestureReco()
 
-	// this.mech = qtcore.NewQBuffer(nil)
 	// this.metmer = qtcore.NewQTimer(nil)
 	this.themeNo = _STL_SYSTEM
+	return this
+}
+
+func (this *UiContext) init() *UiContext {
+	this.gtreco.OnClick = this.iteman.onClicked
+	this.gtreco.OnLongTouch = this.iteman.onLongTouched
 	return this
 }
 
@@ -55,6 +61,7 @@ type MainWindow struct {
 	*Ui_MainWindow
 
 	roomCtxMenu        *qtwidgets.QMenu
+	rcactOpen          *qtwidgets.QAction
 	rcact1             *qtwidgets.QAction
 	rcact2             *qtwidgets.QAction
 	rcact3             *qtwidgets.QAction
@@ -78,16 +85,24 @@ func (this *MainWindow) init() {
 	// this.Widget.SetStyleSheet(GetBg(_HEADER_BG))
 
 	this.roomCtxMenu = qtwidgets.NewQMenu(nil)
+	this.rcactOpen = this.roomCtxMenu.AddAction("Open Chat")
 	this.rcact1 = this.roomCtxMenu.AddAction("Leave Group")
 	this.rcact2 = this.roomCtxMenu.AddAction("Remove Friend")
 	this.rcact3 = this.roomCtxMenu.AddAction("View Info")
 	this.rcact4 = this.roomCtxMenu.AddAction("PlaceHolder3")
+
+	qtrt.Connect(this.rcactOpen, "triggered(bool)", func(checked bool) {
+		this.onRoomContextTriggered(this.curRoomCtxMenuItem, checked, this.rcactOpen)
+	})
+
 	qtrt.Connect(this.rcact1, "triggered(bool)", func(checked bool) {
 		this.onRoomContextTriggered(this.curRoomCtxMenuItem, checked, this.rcact1)
 	})
+
 	qtrt.Connect(this.rcact2, "triggered(bool)", func(checked bool) {
 		this.onRoomContextTriggered(this.curRoomCtxMenuItem, checked, this.rcact2)
 	})
+
 	qtrt.Connect(this.rcact3, "triggered(bool)", func(checked bool) {
 		this.onRoomContextTriggered(this.curRoomCtxMenuItem, checked, this.rcact3)
 	})
@@ -95,7 +110,23 @@ func (this *MainWindow) init() {
 		this.onRoomContextTriggered(this.curRoomCtxMenuItem, checked, this.rcact4)
 	})
 
+	//
+	uictx.uiw.ScrollArea.GrabGesture(qtcore.Qt__SwipeGesture, 0)
+	uictx.uiw.ScrollArea.GrabGesture(qtcore.Qt__PanGesture, 0)
+	uictx.uiw.ScrollArea.GrabGesture(qtcore.Qt__PinchGesture, 0)
+	qtwidgets.QScroller_GrabGesture(uictx.uiw.ScrollArea, qtwidgets.QScroller__LeftMouseButtonGesture)
+	qtwidgets.QScroller_GrabGesture(uictx.uiw.ScrollArea_2, qtwidgets.QScroller__LeftMouseButtonGesture)
+
+	/*
+		uictx.uiw.ScrollArea.InheritEvent(func(event *qtcore.QEvent) bool {
+			log.Println(event.Type())
+			// return false
+			return uictx.uiw.ScrollArea.Event(event)
+		})
+	*/
+
 	go initAppBackend()
+
 }
 
 func setAppStyleSheet() {
@@ -117,7 +148,7 @@ func setAppStyleSheet() {
 
 func setAppStyleSheetTheme(index int) {
 
-	fp := qtcore.NewQFile_1(fmt.Sprintf(":/styles/%s.css", styleSheets[index]))
+	fp := qtcore.NewQFile_1(fmt.Sprintf(":/theme/%s.css", styleSheets[index]))
 	fp.Open(qtcore.QIODevice__ReadOnly)
 	bcc := []byte(qtcore.NewQIODeviceFromPointer(fp.GetCthis()).ReadAll().Data())
 	qtcore.NewQIODeviceFromPointer(fp.GetCthis()).Close()
@@ -160,27 +191,7 @@ func (this *MainWindow) connectSignals() {
 		ccstate.isBottom = gopp.IfElse(value == maxval, true, false).(bool)
 	})
 
-	/*
-		mech := uictx.mech
-		mech.Open(qtcore.QIODevice__ReadWrite | qtcore.QIODevice__Unbuffered)
-		qtrt.Connect(mech, "readyRead()", func() {
-			log.Println("hehehehhee")
-			mech.ReadAll()
-			tryReadEvent()
-		})
-	*/
-	uictx.metmer = qtcore.NewQTimer(nil)
-	uictx.metmer.SetSingleShot(false)
-	uictx.metmer.SetInterval(200)
-	// TODO android上timer事件会在休眠时累积，导致唤醒时需要处理大师的累积事件
-	qtrt.Connect(uictx.metmer, "timeout()", func() {
-		if uictx.meflag {
-			log.Println("hehehehhee")
-			uictx.meflag = false
-			tryReadEvent()
-		}
-	})
-	uictx.metmer.Start(200)
+	uictx.mech = NewNotifier(func() { tryReadEvent() })
 
 	// send message button
 	qtrt.Connect(uiw.ToolButton_18, "clicked(bool)", func(checked bool) {
@@ -193,8 +204,6 @@ func (this *MainWindow) connectSignals() {
 		setAppStyleSheetTheme(index)
 	})
 }
-
-var ipcname = gopp.IfElseStr(gopp.IsAndroid(), "/cache", "@/tmp") + "/itisasockforgofia"
 
 func (this *MainWindow) initQml() {
 	qw := uictx.uiw.QuickWidget
@@ -224,7 +233,10 @@ func (this *MainWindow) onRoomContextMenu(item *RoomListItem, w *qtwidgets.QWidg
 
 func (this *MainWindow) onRoomContextTriggered(item *RoomListItem, checked bool, act *qtwidgets.QAction) {
 	log.Println(item, checked, act.Text(), item.GetName(), item.GetId())
-	if act == this.rcact1 {
+	if act == this.rcactOpen {
+		uictx.mw.switchUiStack(4)
+		uictx.msgwin.SetRoom(item)
+	} else if act == this.rcact1 {
 		log.Println(item.grpInfo.GetGnum())
 		vtcli.ConferenceDelete(item.grpInfo.GetGnum())
 		uictx.iteman.Delete(item)
@@ -260,14 +272,12 @@ func (this *MainWindow) sendMessage() {
 }
 
 func initAppBackend() {
-	// mech, uiw := uictx.mech, uictx.uiw
-	uiw := uictx.uiw
+	mech, uiw := uictx.mech, uictx.uiw
 
 	gofia.AppOnCreate()
 	appctx = gofia.GetAppCtx()
 	vtcli = appctx.GetLigTox()
-	// vtcli.OnNewMsg = func() { mech.Write_1("5") }
-	vtcli.OnNewMsg = func() { uictx.meflag = true }
+	vtcli.OnNewMsg = func() { mech.Trigger() }
 
 	for {
 		time.Sleep(500 * time.Millisecond)
@@ -286,28 +296,23 @@ func initAppBackend() {
 
 	for fn, frnd := range vtcli.Binfo.Friends {
 		itext := fmt.Sprintf("%d-%s", fn, frnd.GetName())
+		_ = itext
 		listw.AddItem(itext)
 		contactQueue <- frnd
 	}
 
 	for gn, grp := range vtcli.Binfo.Groups {
 		itext := fmt.Sprintf("%d-%s", gn, grp.GetTitle())
+		_ = itext
 		listw.AddItem(itext)
 		contactQueue <- grp
 	}
 
 	log.Println("get base info done.")
 	baseInfoGot = true
-	/*
-		n := mech.Write_1("zyx")
-		if n != 3 {
-			log.Println("write error:", n)
-		}
-		log.Println("", mech.Size())
-		mech.WaitForBytesWritten(-1)
-		log.Println("", mech.Size())
-	*/
-	uictx.meflag = true
+
+	mech.Trigger()
+
 	select {}
 }
 

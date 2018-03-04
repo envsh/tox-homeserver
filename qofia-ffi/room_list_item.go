@@ -5,7 +5,6 @@ import (
 	"gopp"
 	"log"
 	"os"
-	"regexp"
 	"strings"
 	"time"
 
@@ -17,6 +16,7 @@ import (
 	"github.com/kitech/qt.go/qtcore"
 	"github.com/kitech/qt.go/qtgui"
 	"github.com/kitech/qt.go/qtwidgets"
+	"mvdan.cc/xurls"
 )
 
 type Message struct {
@@ -24,10 +24,11 @@ type Message struct {
 	Peer string
 	Time time.Time
 
-	Me     bool
-	MsgUi  string
-	PeerUi string
-	TimeUi string
+	Me        bool
+	MsgUi     string
+	PeerUi    string
+	TimeUi    string
+	LastMsgUi string
 }
 
 func NewMessageForGroup(jso *simplejson.Json) *Message {
@@ -67,13 +68,30 @@ func NewMessageForFriend(jso *simplejson.Json) *Message {
 }
 
 func (this *Message) refmtmsg() {
+	this.LastMsgUi = this.Msg
+
+	refmtmsgfns := []func(){this.refmtmsgRUser, this.refmtmsgLink}
+	for _, fn := range refmtmsgfns {
+		fn()
+	}
+}
+func (this *Message) refmtmsgRUser() {
 	if this.Me {
 		this.PeerUi, this.MsgUi = this.Peer, this.Msg
 	} else {
 		newPeer, newMsg, _ := bridges.ExtractRealUser(this.Peer, this.Msg)
 		this.PeerUi = newPeer
 		this.MsgUi = newMsg
+		this.LastMsgUi = newMsg
 	}
+}
+func (this *Message) refmtmsgLink() {
+	urls := xurls.Strict().FindAllString(this.MsgUi, -1)
+	s := this.MsgUi
+	for _, u := range urls {
+		s = strings.Replace(s, u, fmt.Sprintf(`<a href="%s">%s</a>`, u, u), -1)
+	}
+	this.MsgUi = s
 }
 
 ////////////////
@@ -108,6 +126,15 @@ func (this *RoomListMan) Delete(item *RoomListItem) {
 	uictx.uiw.VerticalLayout_10.RemoveWidget(item.QWidget_PTR())
 	item.QWidget_PTR().SetVisible(false)
 	// TODO really destroy
+}
+
+func (this *RoomListMan) onClicked(item *RoomListItem, pos *qtcore.QPoint) {
+	uictx.mw.switchUiStack(4)
+
+	uictx.msgwin.SetRoom(item)
+}
+func (this *RoomListMan) onLongTouched(item *RoomListItem, gpos *qtcore.QPoint) {
+	item.OnContextMenu2(gpos)
 }
 
 /////////////////
@@ -175,6 +202,7 @@ func (this *RoomListItem) init() {
 	w.SetMouseTracking(true)
 
 	onMousePress := func(event *qtgui.QMouseEvent) {
+		uictx.gtreco.onMousePress(this, event)
 		// log.Println(event)
 		if event.Button() == qtcore.Qt__LeftButton {
 			for _, room := range uictx.ctitmdl {
@@ -187,8 +215,10 @@ func (this *RoomListItem) init() {
 	}
 	onMouseRelease := func(event *qtgui.QMouseEvent) {
 		// log.Println(event)
+		uictx.gtreco.onMouseRelease(this, event)
 	}
 	onMouseMove := func(event *qtgui.QMouseEvent) {
+		uictx.gtreco.onMouseMove(this, event)
 		if true {
 			return
 		}
@@ -232,6 +262,14 @@ func (this *RoomListItem) init() {
 			this.OnConextMenu(w, gpos)
 		}
 	})
+
+}
+
+func (this *RoomListItem) OnContextMenu2(gpos *qtcore.QPoint) {
+	w := this.ContactItemView
+	if this.OnConextMenu != nil {
+		this.OnConextMenu(w, gpos)
+	}
 }
 
 func (this *RoomListItem) SetContactInfo(info interface{}) {
@@ -306,7 +344,7 @@ func (this *RoomListItem) AddMessage(msgo *Message) {
 		vlo8 := uictx.uiw.VerticalLayout_8
 		vlo8.Layout().AddWidget(msgiw.QWidget_PTR())
 	}
-	this.SetLastMsg(fmt.Sprintf("%s: %s", gopp.StrSuf4ui(msgo.PeerUi, 8, 1), msgo.MsgUi))
+	this.SetLastMsg(fmt.Sprintf("%s: %s", gopp.StrSuf4ui(msgo.PeerUi, 8, 1), msgo.LastMsgUi))
 
 	this.totalCount += 1
 	if uictx.msgwin.item == this {
@@ -356,15 +394,6 @@ func (this *RoomListItem) UpdateReaded() {
 
 func (this *RoomListItem) SetLastMsg(msg string) {
 	cmsg := msg
-	if strings.HasPrefix(msg, "toxync:") {
-		reg := regexp.MustCompile(`toxync: \[(.+)@([^\[]+)\] (.+)`)
-		if reg.MatchString(msg) {
-			mats := reg.FindAllStringSubmatch(msg, -1)
-			if len(mats) > 0 {
-				cmsg = fmt.Sprintf("%s@%s: %s", mats[0][1], mats[0][2], mats[0][3])
-			}
-		}
-	}
 	this.Label_3.SetText(gopp.StrSuf4ui(cmsg, 36))
 	this.Label_3.SetToolTip(cmsg)
 	tm := time.Now()
@@ -380,13 +409,17 @@ func (this *RoomListItem) SetPressState(pressed bool) {
 		this.SetBgColor(gopp.IfElseStr(pressed, "selected", "default"))
 	}
 
-	uictx.mw.switchUiStack(4)
+	// uictx.mw.switchUiStack(4)
 	if changed {
-		uictx.msgwin.SetRoom(this)
+		// uictx.msgwin.SetRoom(this)
 	}
 	if pressed {
 		this.UpdateReaded()
 	}
+}
+
+func (this *RoomListItem) IsPressStateChanged(pressed bool) bool {
+	return this.pressed != pressed
 }
 
 func (this *RoomListItem) OnHover(hover bool) {

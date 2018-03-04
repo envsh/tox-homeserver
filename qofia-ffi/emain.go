@@ -6,6 +6,7 @@ import (
 	"reflect"
 	"runtime"
 	"strings"
+	"time"
 
 	"github.com/kitech/qt.go/qtcore"
 	"github.com/kitech/qt.go/qtrt"
@@ -26,13 +27,17 @@ func main() {
 	}
 	uictx.qtapp = app
 
-	// setAppStyleSheet()
-
+	setAppStyleSheet()
 	// Create main window
 	uictx.mw = NewMainWindow()
 	uictx.uiw.MainWindow.Show()
 	setAppStyleSheetTheme(0)
+	uictx.init()
 
+	go func() {
+		time.Sleep(2 * time.Second)
+		// app.Exit(0)
+	}()
 	// Execute app
 	app.Exec()
 }
