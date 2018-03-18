@@ -303,6 +303,13 @@
            <property name="spacing">
             <number>12</number>
            </property>
+           <item row="4" column="0">
+            <widget class="QLabel" name="label_13">
+             <property name="text">
+              <string>PlaceHolder...</string>
+             </property>
+            </widget>
+           </item>
            <item row="0" column="0">
             <widget class="QLabel" name="label_8">
              <property name="text">
@@ -335,24 +342,14 @@
            <item row="1" column="0">
             <widget class="QLabel" name="label_9">
              <property name="text">
-              <string>Theme</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="QCheckBox" name="checkBox">
-             <property name="text">
-              <string/>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
+              <string>ToxHS IP:</string>
              </property>
             </widget>
            </item>
            <item row="2" column="0">
             <widget class="QLabel" name="label_10">
              <property name="text">
-              <string>Theme</string>
+              <string>Use HS</string>
              </property>
             </widget>
            </item>
@@ -375,6 +372,33 @@
            </item>
            <item row="3" column="1">
             <widget class="QCheckBox" name="checkBox_3">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QComboBox" name="comboBox_3">
+             <property name="editable">
+              <bool>true</bool>
+             </property>
+             <item>
+              <property name="text">
+               <string>txhs.duckdns.org</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>10.0.0.31</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item row="4" column="1">
+            <widget class="QCheckBox" name="checkBox">
              <property name="text">
               <string/>
              </property>
@@ -1067,8 +1091,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>96</width>
-             <height>26</height>
+             <width>366</width>
+             <height>426</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_3">

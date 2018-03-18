@@ -166,13 +166,13 @@ func (this *GrpcService) RmtCall(ctx context.Context, req *thspbs.Event) (*thspb
 		// groups
 	case "ConferenceDelete": // "groupNumber"
 		gnum := gopp.MustUint32(req.Args[0])
-		_, err = t.ConferenceDelete(gnum)
+		err = t.ConferenceDelete(gnum)
 		gopp.ErrPrint(err, req.Args)
 
 	case "ConferenceSendMessage": // "groupNumber","mtype","msg"
 		gnum := gopp.MustInt(req.Args[0])
 		mtype := gopp.MustInt(req.Args[1])
-		_, err = t.ConferenceSendMessage(uint32(gnum), mtype, req.Args[2])
+		err = t.ConferenceSendMessage(uint32(gnum), mtype, req.Args[2])
 		gopp.ErrPrint(err)
 		cookie, _ := xtox.ConferenceGetCookie(t, uint32(gnum))
 		pubkey := t.SelfGetPublicKey()

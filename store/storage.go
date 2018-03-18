@@ -44,34 +44,25 @@ func (this *Storage) initTables() {
 	tbls, err := this.dbh.DBMetas()
 	gopp.ErrPrint(err, len(tbls))
 
-	ctrec := &Contact{}
-	msgrec := &Message{}
-	dvrec := &Device{}
+	dmrecs := []interface{}{&Contact{}, &Message{}, &Device{}, &Idgen{}}
+	for _, dmrec := range dmrecs {
+		recval := fmt.Sprintf("%+v", dmrec)
+		if ok, err := this.dbh.IsTableExist(dmrec); !ok && err == nil {
+			err := this.dbh.CreateTables(dmrec)
+			gopp.ErrPrint(err, recval)
+		} else {
+			err := this.dbh.Sync(dmrec)
+			gopp.ErrPrint(err, recval)
+		}
 
-	if ok, err := this.dbh.IsTableExist(ctrec); !ok && err == nil {
-		this.dbh.CreateTables(ctrec)
-	}
-	if ok, err := this.dbh.IsTableExist(msgrec); !ok && err == nil {
-		this.dbh.CreateTables(msgrec)
-	}
-	if ok, err := this.dbh.IsTableExist(dvrec); !ok && err == nil {
-		this.dbh.CreateTables(dvrec)
-	}
+		if true {
+			err = this.dbh.CreateUniques(dmrec)
+			gopp.ErrPrint(err, recval)
 
-	if true {
-		err = this.dbh.CreateUniques(ctrec)
-		gopp.ErrPrint(err)
-		err = this.dbh.CreateUniques(msgrec)
-		gopp.ErrPrint(err)
-		err = this.dbh.CreateUniques(dvrec)
-		gopp.ErrPrint(err)
+			err = this.dbh.CreateIndexes(dmrec)
+			gopp.ErrPrint(err, recval)
 
-		err = this.dbh.CreateIndexes(ctrec)
-		gopp.ErrPrint(err)
-		err = this.dbh.CreateIndexes(msgrec)
-		gopp.ErrPrint(err)
-		err = this.dbh.CreateIndexes(dvrec)
-		gopp.ErrPrint(err)
+		}
 	}
 }
 
@@ -164,14 +155,20 @@ func (this *Storage) AddMessage(m *Message) (int64, error) {
 	nowt := time.Now().String()
 	m.Created = nowt
 	m.Updated = nowt
+	m.EventId = this.NextId()
+
 	id, err := this.dbh.InsertOne(m)
 	gopp.ErrPrint(err, id)
 	return id, err
 }
 
 func (this *Storage) AddDevice() error {
+	return this.AddDevice2(uuid.NewV4().String())
+}
+
+func (this *Storage) AddDevice2(name string) error {
 	dv := Device{}
-	dv.Uuid = uuid.NewV4().String()
+	dv.Uuid = name
 	dv.Created = time.Now().String()
 	dv.Updated = time.Now().String()
 
@@ -195,6 +192,14 @@ func (this *Storage) GetDevice() *Device {
 		return nil
 	}
 	return dv
+}
+
+func (this *Storage) NextId() int64 {
+	idv := &Idgen{}
+	affected, err := this.dbh.InsertOne(idv)
+	gopp.ErrPrint(err, affected)
+	log.Println(affected, idv)
+	return idv.Id
 }
 
 func init() {

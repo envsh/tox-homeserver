@@ -24,6 +24,7 @@ type Message struct {
 	Mtype     int    `xorm:"INTEGER"`
 	ContactId int    `xorm:"index INTEGER"`
 	RoomId    int    `xorm:"index INTEGER"`
+	EventId   int64  `xorm:"unique INTEGER"`
 }
 
 type Device struct {
@@ -32,4 +33,8 @@ type Device struct {
 	Uuid      string `xorm:"unique TEXT"`
 	Created   string `xorm:"TEXT"`
 	Updated   string `xorm:"TEXT"`
+}
+
+type Idgen struct {
+	Id int64 `xorm:"pk autoincr INTEGER"`
 }

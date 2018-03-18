@@ -46,14 +46,16 @@ type Ui_MainWindow struct {
 	VerticalLayout_15          *qtwidgets.QVBoxLayout
 	GroupBox                   *qtwidgets.QGroupBox
 	GridLayout                 *qtwidgets.QGridLayout
+	Label_13                   *qtwidgets.QLabel
 	Label_8                    *qtwidgets.QLabel
 	ComboBox_2                 *qtwidgets.QComboBox
 	Label_9                    *qtwidgets.QLabel
-	CheckBox                   *qtwidgets.QCheckBox
 	Label_10                   *qtwidgets.QLabel
 	CheckBox_2                 *qtwidgets.QCheckBox
 	Label_11                   *qtwidgets.QLabel
 	CheckBox_3                 *qtwidgets.QCheckBox
+	ComboBox_3                 *qtwidgets.QComboBox
+	CheckBox                   *qtwidgets.QCheckBox
 	GroupBox_2                 *qtwidgets.QGroupBox
 	VerticalLayout_16          *qtwidgets.QVBoxLayout
 	Label_12                   *qtwidgets.QLabel
@@ -295,8 +297,13 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.GridLayout.SetSpacing(12)                                   // 114
 	this.GridLayout.SetObjectName("GridLayout")                      // 112
 	this.GridLayout.SetContentsMargins(12, 12, 12, 12)               // 114
-	this.Label_8 = qtwidgets.NewQLabel(this.GroupBox, 0)             // 111
-	this.Label_8.SetObjectName("Label_8")                            // 112
+	this.Label_13 = qtwidgets.NewQLabel(this.GroupBox, 0)            // 111
+	this.Label_13.SetObjectName("Label_13")                          // 112
+
+	this.GridLayout.AddWidget_2(this.Label_13, 4, 0, 1, 1, 0) // 115
+
+	this.Label_8 = qtwidgets.NewQLabel(this.GroupBox, 0) // 111
+	this.Label_8.SetObjectName("Label_8")                // 112
 
 	this.GridLayout.AddWidget_2(this.Label_8, 0, 0, 1, 1, 0) // 115
 
@@ -313,12 +320,6 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.Label_9.SetObjectName("Label_9")                // 112
 
 	this.GridLayout.AddWidget_2(this.Label_9, 1, 0, 1, 1, 0) // 115
-
-	this.CheckBox = qtwidgets.NewQCheckBox(this.GroupBox) // 111
-	this.CheckBox.SetObjectName("CheckBox")               // 112
-	this.CheckBox.SetChecked(true)                        // 114
-
-	this.GridLayout.AddWidget_2(this.CheckBox, 1, 1, 1, 1, 0) // 115
 
 	this.Label_10 = qtwidgets.NewQLabel(this.GroupBox, 0) // 111
 	this.Label_10.SetObjectName("Label_10")               // 112
@@ -341,6 +342,20 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.CheckBox_3.SetChecked(true)                        // 114
 
 	this.GridLayout.AddWidget_2(this.CheckBox_3, 3, 1, 1, 1, 0) // 115
+
+	this.ComboBox_3 = qtwidgets.NewQComboBox(this.GroupBox)   // 111
+	this.ComboBox_3.AddItem("", qtcore.NewQVariant_12("wtf")) // 115
+	this.ComboBox_3.AddItem("", qtcore.NewQVariant_12("wtf")) // 115
+	this.ComboBox_3.SetObjectName("ComboBox_3")               // 112
+	this.ComboBox_3.SetEditable(true)                         // 114
+
+	this.GridLayout.AddWidget_2(this.ComboBox_3, 1, 1, 1, 1, 0) // 115
+
+	this.CheckBox = qtwidgets.NewQCheckBox(this.GroupBox) // 111
+	this.CheckBox.SetObjectName("CheckBox")               // 112
+	this.CheckBox.SetChecked(true)                        // 114
+
+	this.GridLayout.AddWidget_2(this.CheckBox, 4, 1, 1, 1, 0) // 115
 
 	this.VerticalLayout_15.Layout().AddWidget(this.GroupBox) // 115
 
@@ -696,7 +711,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.ScrollArea_2.SetWidgetResizable(true)                                             // 114
 	this.ScrollAreaWidgetContents_2 = qtwidgets.NewQWidget(nil, 0)                         // 111
 	this.ScrollAreaWidgetContents_2.SetObjectName("ScrollAreaWidgetContents_2")            // 112
-	this.ScrollAreaWidgetContents_2.SetGeometry(0, 0, 96, 26)                              // 114
+	this.ScrollAreaWidgetContents_2.SetGeometry(0, 0, 366, 426)                            // 114
 	this.VerticalLayout_3 = qtwidgets.NewQVBoxLayout_1(this.ScrollAreaWidgetContents_2)    // 111
 	this.VerticalLayout_3.SetSpacing(0)                                                    // 114
 	this.VerticalLayout_3.SetObjectName("VerticalLayout_3")                                // 112
@@ -838,13 +853,16 @@ func (this *Ui_MainWindow) RetranslateUi(MainWindow *qtwidgets.QMainWindow) {
 	this.ComboBox.SetItemText(6, qtcore.QCoreApplication_Translate("MainWindow", "7 logui", "dummy123", 0))
 	this.ToolButton_12.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
 	this.GroupBox.SetTitle(qtcore.QCoreApplication_Translate("MainWindow", "General", "dummy123", 0))
+	this.Label_13.SetText(qtcore.QCoreApplication_Translate("MainWindow", "PlaceHolder...", "dummy123", 0))
 	this.Label_8.SetText(qtcore.QCoreApplication_Translate("MainWindow", "Theme", "dummy123", 0))
 	this.ComboBox_2.SetItemText(0, qtcore.QCoreApplication_Translate("MainWindow", "Light", "dummy123", 0))
 	this.ComboBox_2.SetItemText(1, qtcore.QCoreApplication_Translate("MainWindow", "Dark", "dummy123", 0))
 	this.ComboBox_2.SetItemText(2, qtcore.QCoreApplication_Translate("MainWindow", "System", "dummy123", 0))
-	this.Label_9.SetText(qtcore.QCoreApplication_Translate("MainWindow", "Theme", "dummy123", 0))
-	this.Label_10.SetText(qtcore.QCoreApplication_Translate("MainWindow", "Theme", "dummy123", 0))
+	this.Label_9.SetText(qtcore.QCoreApplication_Translate("MainWindow", "ToxHS IP:", "dummy123", 0))
+	this.Label_10.SetText(qtcore.QCoreApplication_Translate("MainWindow", "Use HS", "dummy123", 0))
 	this.Label_11.SetText(qtcore.QCoreApplication_Translate("MainWindow", "Theme", "dummy123", 0))
+	this.ComboBox_3.SetItemText(0, qtcore.QCoreApplication_Translate("MainWindow", "txhs.duckdns.org", "dummy123", 0))
+	this.ComboBox_3.SetItemText(1, qtcore.QCoreApplication_Translate("MainWindow", "10.0.0.31", "dummy123", 0))
 	this.GroupBox_2.SetTitle(qtcore.QCoreApplication_Translate("MainWindow", "PlaceHolder...", "dummy123", 0))
 	this.Label_12.SetText(qtcore.QCoreApplication_Translate("MainWindow", "PlaceHolder...", "dummy123", 0))
 	this.ToolButton_17.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
