@@ -48,3 +48,14 @@ QComboBox QAbstractItemView {
 QComboBox {
     margin: 0px 0 0px 0;
 }
+
+QDialog {
+    background: white;
+}
+
+QDialog > #LineEdit {
+    background: white;
+    border-bottom-style: solid;
+    border-bottom-color: black;
+    border-bottom-width: 1px;
+}

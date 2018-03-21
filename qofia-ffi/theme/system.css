@@ -67,3 +67,14 @@ QComboBox:on {
 #page_4 {
     background-color: palette(window);
 }
+
+QDialog {
+    background: palette(window);
+}
+
+#Dialog > #LineEdit {
+    background: palette(text);
+    border-bottom-style: solid;
+    border-bottom-color: palette(window);
+    border-bottom-width: 1px;
+}

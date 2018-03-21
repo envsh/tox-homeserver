@@ -15,6 +15,8 @@ message Event {
     string name = 3; // event name
     repeated string args = 4;
     repeated string margs = 5; // more info based on args
+    uint64 gid = 6; // global sequnce
+    map<string,string> nargs = 7; // named args
 }
 
 message BaseInfo {
@@ -53,6 +55,21 @@ message MemberInfo {
     string pubkey = 2;
     string name = 3;
 }
+
+message Message 
+{
+    uint64 gid = 1;
+    string content = 2;
+    MemberInfo peer = 3;
+    uint64 created = 4;
+    uint64 updated = 5;
+}
+
+message Messages
+{
+    repeated Message msgs = 1;
+}
+
 
 ///////
 service Greeter {

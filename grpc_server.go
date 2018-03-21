@@ -7,6 +7,7 @@ import (
 	"log"
 	"net"
 
+	tox "github.com/kitech/go-toxcore"
 	"github.com/kitech/go-toxcore/xtox"
 	"github.com/nats-io/nats"
 
@@ -74,8 +75,17 @@ type GrpcService struct {
 
 func (this *GrpcService) GetBaseInfo(ctx context.Context, req *thspbs.EmptyReq) (*thspbs.BaseInfo, error) {
 	log.Println(req, appctx.tvm.t.SelfGetAddress())
+	out, err := packBaseInfo(appctx.tvm.t)
+	gopp.ErrPrint(err)
+
+	common.BytesRecved(len(req.String()))
+	common.BytesSent(len(out.String()))
+	return out, nil
+}
+
+func packBaseInfo(t *tox.Tox) (*thspbs.BaseInfo, error) {
+
 	out := &thspbs.BaseInfo{}
-	t := appctx.tvm.t
 	out.Id = t.SelfGetAddress()
 	out.Name = t.SelfGetName()
 	out.Stmsg, _ = t.SelfGetStatusMessage()
@@ -141,8 +151,6 @@ func (this *GrpcService) GetBaseInfo(ctx context.Context, req *thspbs.EmptyReq) 
 		out.Groups[gn] = gi
 	}
 
-	common.BytesRecved(len(req.String()))
-	common.BytesSent(len(out.String()))
 	return out, nil
 }
 
@@ -195,6 +203,8 @@ func (this *GrpcService) RmtCall(ctx context.Context, req *thspbs.Event) (*thspb
 		pname, err := t.ConferencePeerGetName(gnum, pnum)
 		gopp.ErrPrint(err)
 		out.Args = append(out.Args, pname)
+		// TODO
+		// case "GetHistory":
 	default:
 		log.Println("unimpled:", req.Name)
 	}

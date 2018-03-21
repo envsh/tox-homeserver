@@ -14,11 +14,10 @@ import (
 	simplejson "github.com/bitly/go-simplejson"
 
 	thscli "tox-homeserver/client"
-	"tox-homeserver/gofia"
 	"tox-homeserver/thspbs"
 )
 
-var appctx *gofia.AppContext
+var appctx *thscli.AppContext
 var vtcli *thscli.LigTox
 
 // ui context
@@ -70,6 +69,7 @@ type MainWindow struct {
 }
 
 func NewMainWindow() *MainWindow {
+	qtrt.SetDebugFFICall(false)
 	this := &MainWindow{}
 	this.Ui_MainWindow = NewUi_MainWindow2()
 	uictx.uiw = this.Ui_MainWindow
@@ -203,7 +203,47 @@ func (this *MainWindow) connectSignals() {
 	qtrt.Connect(uiw.ComboBox_2, "currentIndexChanged(int)", func(index int) {
 		setAppStyleSheetTheme(index)
 	})
+
+	//
+	qtrt.Connect(uiw.ToolButton_4, "clicked(bool)", func(bool) {
+		if add_friend_dlg == nil {
+			add_friend_dlg = NewUi_AddFriendDialog2()
+			qtrt.ConnectSlot(add_friend_dlg.ButtonBox, "accepted()", add_friend_dlg.AddFriendDialog, "accept()")
+			qtrt.ConnectSlot(add_friend_dlg.ButtonBox, "rejected()", add_friend_dlg.AddFriendDialog, "reject()")
+			setAppStyleSheet()
+		} else {
+			add_friend_dlg.LineEdit.Clear()
+		}
+
+		log.Println(add_friend_dlg.ButtonBox.GetCthis(), add_friend_dlg.AddFriendDialog.GetCthis())
+		r := add_friend_dlg.AddFriendDialog.Exec()
+		log.Println(r, qtwidgets.QDialog__Accepted, qtwidgets.QDialog__Rejected)
+		if r == qtwidgets.QDialog__Accepted {
+			log.Println(add_friend_dlg.LineEdit.Text())
+		}
+	})
+	qtrt.Connect(uiw.ToolButton_5, "clicked(bool)", func(bool) {
+		if create_room_dlg == nil {
+			create_room_dlg = NewUi_Dialog2()
+			qtrt.ConnectSlot(create_room_dlg.ButtonBox, "accepted()", create_room_dlg.Dialog, "accept()")
+			qtrt.ConnectSlot(create_room_dlg.ButtonBox, "rejected()", create_room_dlg.Dialog, "reject()")
+			setAppStyleSheet()
+		} else {
+			create_room_dlg.LineEdit.Clear()
+		}
+
+		log.Println(create_room_dlg.ButtonBox.GetCthis(), create_room_dlg.Dialog.GetCthis())
+		r := create_room_dlg.Dialog.Exec()
+		log.Println(r, qtwidgets.QDialog__Accepted, qtwidgets.QDialog__Rejected)
+		if r == qtwidgets.QDialog__Accepted {
+			log.Println(create_room_dlg.LineEdit.Text())
+		}
+	})
+	qtrt.Connect(uiw.ToolButton_7, "clicked(bool)", func(bool) { this.switchUiStack(2) })
 }
+
+var create_room_dlg *Ui_Dialog
+var add_friend_dlg *Ui_AddFriendDialog
 
 func (this *MainWindow) initQml() {
 	qw := uictx.uiw.QuickWidget
@@ -274,8 +314,8 @@ func (this *MainWindow) sendMessage() {
 func initAppBackend() {
 	mech, uiw := uictx.mech, uictx.uiw
 
-	gofia.AppOnCreate()
-	appctx = gofia.GetAppCtx()
+	thscli.AppOnCreate()
+	appctx = thscli.GetAppCtx()
 	vtcli = appctx.GetLigTox()
 	vtcli.OnNewMsg = func() { mech.Trigger() }
 

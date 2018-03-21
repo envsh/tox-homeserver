@@ -62,3 +62,13 @@ QComboBox:on {
     border-top: 1px solid #646464;
 }
 
+QDialog {
+    background: black;
+}
+
+#Dialog > #LineEdit {
+    background: black;
+    border-bottom-style: solid;
+    border-bottom-color: white;
+    border-bottom-width: 1px;
+}

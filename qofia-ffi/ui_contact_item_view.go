@@ -8,6 +8,7 @@ import "github.com/kitech/qt.go/qtquickwidgets"
 import "github.com/kitech/qt.go/qtmock"
 
 func init() { qtcore.KeepMe() }
+func init() { qtgui.KeepMe() }
 func init() { qtwidgets.KeepMe() }
 func init() { qtquickwidgets.KeepMe() }
 func init() { qtmock.KeepMe() }
@@ -215,6 +216,7 @@ func (this *Ui_ContactItemView) SetupUi(ContactItemView *qtwidgets.QWidget) {
 
 //  retranslateUi block begin
 func (this *Ui_ContactItemView) RetranslateUi(ContactItemView *qtwidgets.QWidget) {
+	// noimpl: {
 	this.ContactItemView.SetWindowTitle(qtcore.QCoreApplication_Translate("ContactItemView", "Form", "dummy123", 0))
 	this.ToolButton_2.SetText(qtcore.QCoreApplication_Translate("ContactItemView", "...", "dummy123", 0))
 	this.Label_2.SetText(qtcore.QCoreApplication_Translate("ContactItemView", "TextLabel", "dummy123", 0))
@@ -222,8 +224,14 @@ func (this *Ui_ContactItemView) RetranslateUi(ContactItemView *qtwidgets.QWidget
 	this.Label_3.SetText(qtcore.QCoreApplication_Translate("ContactItemView", "TextLabel", "dummy123", 0))
 	this.LabelLastMsgTime.SetText(qtcore.QCoreApplication_Translate("ContactItemView", "TextLabel", "dummy123", 0))
 	this.Label_4.SetText(qtcore.QCoreApplication_Translate("ContactItemView", "TextLabel", "dummy123", 0))
+	// noimpl: #ifndef QT_NO_TOOLTIP
 	this.ToolButton.SetToolTip(qtcore.QCoreApplication_Translate("ContactItemView", "1 Online status. 2 Unread message count.", "dummy123", 0))
+	// noimpl: #endif // QT_NO_TOOLTIP
 	this.ToolButton.SetText(qtcore.QCoreApplication_Translate("ContactItemView", "999", "dummy123", 0))
+	// noimpl: } // retranslateUi
+	// noimpl:
+	// noimpl: };
+	// noimpl:
 }
 
 //  retranslateUi block end

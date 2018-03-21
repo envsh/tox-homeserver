@@ -8,6 +8,7 @@ import "github.com/kitech/qt.go/qtquickwidgets"
 import "github.com/kitech/qt.go/qtmock"
 
 func init() { qtcore.KeepMe() }
+func init() { qtgui.KeepMe() }
 func init() { qtwidgets.KeepMe() }
 func init() { qtquickwidgets.KeepMe() }
 func init() { qtmock.KeepMe() }
@@ -344,6 +345,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.GridLayout.AddWidget_2(this.CheckBox_3, 3, 1, 1, 1, 0) // 115
 
 	this.ComboBox_3 = qtwidgets.NewQComboBox(this.GroupBox)   // 111
+	this.ComboBox_3.AddItem("", qtcore.NewQVariant_12("wtf")) // 115
 	this.ComboBox_3.AddItem("", qtcore.NewQVariant_12("wtf")) // 115
 	this.ComboBox_3.AddItem("", qtcore.NewQVariant_12("wtf")) // 115
 	this.ComboBox_3.SetObjectName("ComboBox_3")               // 112
@@ -711,7 +713,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.ScrollArea_2.SetWidgetResizable(true)                                             // 114
 	this.ScrollAreaWidgetContents_2 = qtwidgets.NewQWidget(nil, 0)                         // 111
 	this.ScrollAreaWidgetContents_2.SetObjectName("ScrollAreaWidgetContents_2")            // 112
-	this.ScrollAreaWidgetContents_2.SetGeometry(0, 0, 366, 426)                            // 114
+	this.ScrollAreaWidgetContents_2.SetGeometry(0, 0, 96, 26)                              // 114
 	this.VerticalLayout_3 = qtwidgets.NewQVBoxLayout_1(this.ScrollAreaWidgetContents_2)    // 111
 	this.VerticalLayout_3.SetSpacing(0)                                                    // 114
 	this.VerticalLayout_3.SetObjectName("VerticalLayout_3")                                // 112
@@ -834,6 +836,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 
 //  retranslateUi block begin
 func (this *Ui_MainWindow) RetranslateUi(MainWindow *qtwidgets.QMainWindow) {
+	// noimpl: {
 	this.MainWindow.SetWindowTitle(qtcore.QCoreApplication_Translate("MainWindow", "go-toxhsui", "dummy123", 0))
 	this.Actionooo.SetText(qtcore.QCoreApplication_Translate("MainWindow", "ooo", "dummy123", 0))
 	this.ActionQuit.SetText(qtcore.QCoreApplication_Translate("MainWindow", "&Quit", "dummy123", 0))
@@ -841,7 +844,9 @@ func (this *Ui_MainWindow) RetranslateUi(MainWindow *qtwidgets.QMainWindow) {
 	this.ToolButton_11.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
 	this.ToolButton_19.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
 	this.ToolButton_20.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
+	// noimpl: #ifndef QT_NO_TOOLTIP
 	this.ToolButton_21.SetToolTip(qtcore.QCoreApplication_Translate("MainWindow", "Load css for test", "dummy123", 0))
+	// noimpl: #endif // QT_NO_TOOLTIP
 	this.ToolButton_21.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
 	this.Label.SetText(qtcore.QCoreApplication_Translate("MainWindow", "curwin: ", "dummy123", 0))
 	this.ComboBox.SetItemText(0, qtcore.QCoreApplication_Translate("MainWindow", "1 qmlmctrl", "dummy123", 0))
@@ -851,6 +856,7 @@ func (this *Ui_MainWindow) RetranslateUi(MainWindow *qtwidgets.QMainWindow) {
 	this.ComboBox.SetItemText(4, qtcore.QCoreApplication_Translate("MainWindow", "5 messageui", "dummy123", 0))
 	this.ComboBox.SetItemText(5, qtcore.QCoreApplication_Translate("MainWindow", "6 testui", "dummy123", 0))
 	this.ComboBox.SetItemText(6, qtcore.QCoreApplication_Translate("MainWindow", "7 logui", "dummy123", 0))
+	// noimpl:
 	this.ToolButton_12.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
 	this.GroupBox.SetTitle(qtcore.QCoreApplication_Translate("MainWindow", "General", "dummy123", 0))
 	this.Label_13.SetText(qtcore.QCoreApplication_Translate("MainWindow", "PlaceHolder...", "dummy123", 0))
@@ -858,11 +864,17 @@ func (this *Ui_MainWindow) RetranslateUi(MainWindow *qtwidgets.QMainWindow) {
 	this.ComboBox_2.SetItemText(0, qtcore.QCoreApplication_Translate("MainWindow", "Light", "dummy123", 0))
 	this.ComboBox_2.SetItemText(1, qtcore.QCoreApplication_Translate("MainWindow", "Dark", "dummy123", 0))
 	this.ComboBox_2.SetItemText(2, qtcore.QCoreApplication_Translate("MainWindow", "System", "dummy123", 0))
+	// noimpl:
 	this.Label_9.SetText(qtcore.QCoreApplication_Translate("MainWindow", "ToxHS IP:", "dummy123", 0))
 	this.Label_10.SetText(qtcore.QCoreApplication_Translate("MainWindow", "Use HS", "dummy123", 0))
+	// noimpl: checkBox_2->setText(QString());
 	this.Label_11.SetText(qtcore.QCoreApplication_Translate("MainWindow", "Theme", "dummy123", 0))
+	// noimpl: checkBox_3->setText(QString());
 	this.ComboBox_3.SetItemText(0, qtcore.QCoreApplication_Translate("MainWindow", "txhs.duckdns.org", "dummy123", 0))
 	this.ComboBox_3.SetItemText(1, qtcore.QCoreApplication_Translate("MainWindow", "10.0.0.31", "dummy123", 0))
+	this.ComboBox_3.SetItemText(2, qtcore.QCoreApplication_Translate("MainWindow", "127.0.0.1", "dummy123", 0))
+	// noimpl:
+	// noimpl: checkBox->setText(QString());
 	this.GroupBox_2.SetTitle(qtcore.QCoreApplication_Translate("MainWindow", "PlaceHolder...", "dummy123", 0))
 	this.Label_12.SetText(qtcore.QCoreApplication_Translate("MainWindow", "PlaceHolder...", "dummy123", 0))
 	this.ToolButton_17.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
@@ -876,6 +888,7 @@ func (this *Ui_MainWindow) RetranslateUi(MainWindow *qtwidgets.QMainWindow) {
 	this.ToolButton_5.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
 	this.ToolButton_6.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
 	this.ToolButton_7.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
+	// noimpl: label_4->setText(QString());
 	this.Label_5.SetText(qtcore.QCoreApplication_Translate("MainWindow", "TextLabel", "dummy123", 0))
 	this.LabelMsgCount.SetText(qtcore.QCoreApplication_Translate("MainWindow", "0", "dummy123", 0))
 	this.Label_6.SetText(qtcore.QCoreApplication_Translate("MainWindow", "0 people", "dummy123", 0))
@@ -890,6 +903,10 @@ func (this *Ui_MainWindow) RetranslateUi(MainWindow *qtwidgets.QMainWindow) {
 	this.ToolButton_10.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
 	this.LineEdit_2.SetPlaceholderText(qtcore.QCoreApplication_Translate("MainWindow", "Write a message...", "dummy123", 0))
 	this.ToolButton_18.SetText(qtcore.QCoreApplication_Translate("MainWindow", "&Send", "dummy123", 0))
+	// noimpl: } // retranslateUi
+	// noimpl:
+	// noimpl: };
+	// noimpl:
 }
 
 //  retranslateUi block end

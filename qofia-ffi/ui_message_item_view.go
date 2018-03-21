@@ -8,6 +8,7 @@ import "github.com/kitech/qt.go/qtquickwidgets"
 import "github.com/kitech/qt.go/qtmock"
 
 func init() { qtcore.KeepMe() }
+func init() { qtgui.KeepMe() }
 func init() { qtwidgets.KeepMe() }
 func init() { qtquickwidgets.KeepMe() }
 func init() { qtmock.KeepMe() }
@@ -159,12 +160,18 @@ func (this *Ui_MessageItemView) SetupUi(MessageItemView *qtwidgets.QWidget) {
 
 //  retranslateUi block begin
 func (this *Ui_MessageItemView) RetranslateUi(MessageItemView *qtwidgets.QWidget) {
+	// noimpl: {
 	this.MessageItemView.SetWindowTitle(qtcore.QCoreApplication_Translate("MessageItemView", "Form", "dummy123", 0))
 	this.ToolButton_2.SetText(qtcore.QCoreApplication_Translate("MessageItemView", "...", "dummy123", 0))
 	this.Label_3.SetText(qtcore.QCoreApplication_Translate("MessageItemView", "TextLabel", "dummy123", 0))
 	this.LabelMsgTime.SetText(qtcore.QCoreApplication_Translate("MessageItemView", "TextLabel", "dummy123", 0))
 	this.ToolButton.SetText(qtcore.QCoreApplication_Translate("MessageItemView", "...", "dummy123", 0))
+	// noimpl: label_5->setText(QString());
 	this.ToolButton_3.SetText(qtcore.QCoreApplication_Translate("MessageItemView", "...", "dummy123", 0))
+	// noimpl: } // retranslateUi
+	// noimpl:
+	// noimpl: };
+	// noimpl:
 }
 
 //  retranslateUi block end
