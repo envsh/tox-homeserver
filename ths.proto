@@ -17,6 +17,8 @@ message Event {
     repeated string margs = 5; // more info based on args
     uint64 gid = 6; // global sequnce
     map<string,string> nargs = 7; // named args
+    int32 ecode = 8; // error code
+    string emsg = 9; // error msg
 }
 
 message BaseInfo {

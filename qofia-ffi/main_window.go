@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/kitech/qt.go/qtcore"
+	"github.com/kitech/qt.go/qtgui"
 	"github.com/kitech/qt.go/qtrt"
 	"github.com/kitech/qt.go/qtwidgets"
 
@@ -66,6 +67,8 @@ type MainWindow struct {
 	rcact3             *qtwidgets.QAction
 	rcact4             *qtwidgets.QAction
 	curRoomCtxMenuItem *RoomListItem
+
+	sticon *qtgui.QIcon
 }
 
 func NewMainWindow() *MainWindow {
@@ -78,7 +81,12 @@ func NewMainWindow() *MainWindow {
 	return this
 }
 
+func (this *MainWindow) initui() {
+	this.setConnStatus(false)
+}
+
 func (this *MainWindow) init() {
+	this.initui()
 	this.initQml()
 	this.connectSignals()
 	this.switchUiStack(uictx.uiw.StackedWidget.CurrentIndex())
@@ -125,7 +133,7 @@ func (this *MainWindow) init() {
 		})
 	*/
 
-	go initAppBackend()
+	go this.initAppBackend()
 
 }
 
@@ -236,7 +244,21 @@ func (this *MainWindow) connectSignals() {
 		r := create_room_dlg.Dialog.Exec()
 		log.Println(r, qtwidgets.QDialog__Accepted, qtwidgets.QDialog__Rejected)
 		if r == qtwidgets.QDialog__Accepted {
+			name := create_room_dlg.LineEdit.Text()
 			log.Println(create_room_dlg.LineEdit.Text())
+			go func() {
+				vtcli := appctx.GetLigTox()
+				gn, id, err := vtcli.ConferenceNew(name)
+				gopp.ErrPrint(err, name)
+				log.Println("Group created:", gn, name)
+				grp := &thspbs.GroupInfo{}
+				grp.Gnum = gn
+				grp.Mtype = 0
+				grp.Title = name
+				grp.GroupId = id
+				contactQueue <- grp
+				uictx.mech.Trigger()
+			}()
 		}
 	})
 	qtrt.Connect(uiw.ToolButton_7, "clicked(bool)", func(bool) { this.switchUiStack(2) })
@@ -287,6 +309,18 @@ func (this *MainWindow) onRoomContextTriggered(item *RoomListItem, checked bool,
 	}
 }
 
+func (this *MainWindow) setConnStatus(on bool) {
+	if on {
+		this.sticon = qtgui.NewQIcon_2(":/icons/online_30.png")
+		this.ToolButton.SetIcon(this.sticon)
+		this.ToolButton.SetToolTip("online")
+	} else {
+		this.sticon = qtgui.NewQIcon_2(":/icons/offline_30.png")
+		this.ToolButton.SetIcon(this.sticon)
+		this.ToolButton.SetToolTip("offline")
+	}
+}
+
 func (this *MainWindow) sendMessage() {
 	uiw := uictx.uiw
 	itext := uiw.LineEdit_2.Text()
@@ -311,7 +345,7 @@ func (this *MainWindow) sendMessage() {
 	}
 }
 
-func initAppBackend() {
+func (this *MainWindow) initAppBackend() {
 	mech, uiw := uictx.mech, uictx.uiw
 
 	thscli.AppOnCreate()
@@ -348,6 +382,8 @@ func initAppBackend() {
 		contactQueue <- grp
 	}
 
+	uifnQueue <- func() { this.setConnStatus(gopp.IfElse(vtcli.Binfo.ConnStatus > 0, true, false).(bool)) }
+
 	log.Println("get base info done.")
 	baseInfoGot = true
 
@@ -358,10 +394,12 @@ func initAppBackend() {
 
 var baseInfoGot bool = false
 var contactQueue = make(chan interface{}, 1234)
+var uifnQueue = make(chan func(), 1234)
 
 func tryReadEvent() {
 
 	if !baseInfoGot {
+		log.Println("wtf")
 		return
 	}
 
@@ -370,8 +408,16 @@ func tryReadEvent() {
 		// return
 	}
 
+	tryReadUifnEvent()
 	tryReadContactEvent()
 	tryReadMessageEvent()
+}
+
+func tryReadUifnEvent() {
+	for len(uifnQueue) > 0 {
+		uifn := <-uifnQueue
+		uifn()
+	}
 }
 
 func tryReadContactEvent() {
@@ -414,7 +460,9 @@ func dispatchEvent(jso *simplejson.Json) {
 
 	evtName := jso.Get("name").MustString()
 	switch evtName {
-	case "SelfConnectionStatus":
+	case "SelfConnectionStatus": // {"name":"SelfConnectionStatus","args":["2"],"margs":["CONNECTION_UDP"]}
+		status := gopp.MustUint32(jso.Get("args").GetIndex(0).MustString())
+		uictx.mw.setConnStatus(status > 0)
 	case "FriendRequest":
 		///
 		// pubkey := jso.Get("args").GetIndex(0).MustString()
@@ -448,18 +496,14 @@ func dispatchEvent(jso *simplejson.Json) {
 		fname := jso.Get("margs").GetIndex(0).MustString()
 		pubkey := jso.Get("margs").GetIndex(1).MustString()
 		_, _ = fname, pubkey
+		st := gopp.MustInt(jso.Get("args").GetIndex(1).MustString())
 
-		// cfx, found := this.cfvs.Get(pubkey)
-		/*
-			cfsx, found := this.chatFormStates.Get(pubkey)
-			if !found {
-				log.Println("wtf, chat form view not found:", fname, pubkey)
-			} else {
-				cfs := cfsx.(*ChatFormState)
-				cfs.status = uint32(gopp.MustInt(jso.Get("args").GetIndex(1).MustString()))
-				this.signalProperView(cfs, true)
-			}
-		*/
+		item := uictx.iteman.Get(pubkey)
+		if item != nil {
+			item.setConnStatus(int32(st))
+		} else {
+			log.Println("item not found:", fname, pubkey)
+		}
 
 	case "ConferenceInvite":
 		groupNumber := jso.Get("margs").GetIndex(2).MustString()

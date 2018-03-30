@@ -310,7 +310,7 @@ func (this *RoomListItem) SetContactInfo(info interface{}) {
 	default:
 		log.Fatalln("wtf")
 	}
-	this.ToolButton_2.SetToolTip(this.GetName() + "." + this.GetId()[:7])
+	this.ToolButton_2.SetToolTip(this.GetName() + "." + gopp.SubStr(this.GetId(), 7))
 }
 
 func (this *RoomListItem) AddMessage(msgo *Message) {
@@ -456,5 +456,15 @@ func (this *RoomListItem) SetBgColor(p string) {
 				w.QWidget_PTR().SetStyleSheet(css)
 			}
 		}
+	}
+}
+
+func (this *RoomListItem) setConnStatus(st int32) {
+	if st > 0 {
+		this.sticon = qtgui.NewQIcon_2(":/icons/online_30.png")
+		this.ToolButton.SetIcon(this.sticon)
+	} else {
+		this.sticon = qtgui.NewQIcon_2(":/icons/offline_30.png")
+		this.ToolButton.SetIcon(this.sticon)
 	}
 }

@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"gopp"
 	"log"
@@ -103,6 +104,9 @@ func (this *LigTox) ConferenceSendMessage(groupNumber uint32, mtype int, msg str
 	rsp, err := cli.RmtCall(context.Background(), &args)
 	gopp.ErrPrint(err, rsp)
 	log.Println(rsp)
+	if rsp.Ecode != 0 {
+		return errors.New(rsp.Emsg)
+	}
 	return err
 }
 
@@ -115,7 +119,25 @@ func (this *LigTox) ConferenceJoin(friendNumber uint32, cookie string) (uint32, 
 	rsp, err := cli.RmtCall(context.Background(), &args)
 	gopp.ErrPrint(err, rsp)
 	log.Println(rsp)
+	if rsp.Ecode != 0 {
+		return 0, errors.New(rsp.Emsg)
+	}
 	return uint32(rsp.Mid), nil
+}
+
+func (this *LigTox) ConferenceNew(name string) (uint32, string, error) {
+	fname := this.getMethodName()
+	args := thspbs.Event{}
+	args.Name = fname
+	args.Args = []string{fmt.Sprintf("%s", name)}
+	cli := thspbs.NewToxhsClient(this.rpcli)
+	rsp, err := cli.RmtCall(context.Background(), &args)
+	gopp.ErrPrint(err, rsp)
+	log.Println(rsp)
+	if rsp.Ecode != 0 {
+		return 0, "", errors.New(rsp.Emsg)
+	}
+	return uint32(rsp.Mid), rsp.Args[0], nil
 }
 
 func (this *LigTox) ConferenceDelete(groupNumber uint32) (uint32, error) {
@@ -127,6 +149,9 @@ func (this *LigTox) ConferenceDelete(groupNumber uint32) (uint32, error) {
 	rsp, err := cli.RmtCall(context.Background(), &args)
 	gopp.ErrPrint(err, rsp)
 	log.Println(rsp)
+	if rsp.Ecode != 0 {
+		return 0, errors.New(rsp.Emsg)
+	}
 	return uint32(rsp.Mid), nil
 }
 
@@ -139,6 +164,9 @@ func (this *LigTox) ConferencePeerCount(groupNumber uint32) (uint32, error) {
 	rsp, err := cli.RmtCall(context.Background(), &args)
 	gopp.ErrPrint(err, rsp)
 	log.Println(rsp)
+	if rsp.Ecode != 0 {
+		return 0, errors.New(rsp.Emsg)
+	}
 	return uint32(rsp.Mid), nil
 }
 
@@ -151,6 +179,9 @@ func (this *LigTox) ConferencePeerGetName(groupNumber uint32, peerNumber uint32)
 	rsp, err := cli.RmtCall(context.Background(), &args)
 	gopp.ErrPrint(err, rsp)
 	log.Println(rsp)
+	if rsp.Ecode != 0 {
+		return "", errors.New(rsp.Emsg)
+	}
 	return rsp.Args[0], nil
 }
 

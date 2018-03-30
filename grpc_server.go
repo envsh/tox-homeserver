@@ -171,7 +171,18 @@ func (this *GrpcService) RmtCall(ctx context.Context, req *thspbs.Event) (*thspb
 		gopp.ErrPrint(err, msgid)
 		out.Mid = msgid
 		out.Args = append(out.Args, fmt.Sprintf("%d", wn))
+
 		// groups
+	case "ConferenceNew": // args:name,returns:
+		rname := req.Args[0]
+		gn, err := t.ConferenceNew()
+		gopp.ErrPrint(err, rname)
+		out.Mid = int64(gn)
+		err = t.ConferenceSetTitle(gn, rname)
+		gopp.ErrPrint(err, gn, rname)
+		groupId, _ := t.ConferenceGetIdentifier(gn)
+		out.Args = append(out.Args, groupId)
+
 	case "ConferenceDelete": // "groupNumber"
 		gnum := gopp.MustUint32(req.Args[0])
 		err = t.ConferenceDelete(gnum)
@@ -182,6 +193,10 @@ func (this *GrpcService) RmtCall(ctx context.Context, req *thspbs.Event) (*thspb
 		mtype := gopp.MustInt(req.Args[1])
 		err = t.ConferenceSendMessage(uint32(gnum), mtype, req.Args[2])
 		gopp.ErrPrint(err)
+		if err != nil {
+			out.Ecode = -1
+			out.Emsg = err.Error()
+		}
 		cookie, _ := xtox.ConferenceGetCookie(t, uint32(gnum))
 		pubkey := t.SelfGetPublicKey()
 		msgid, err := appctx.st.AddGroupMessage(req.Args[2], "0", cookie, pubkey)
@@ -193,6 +208,7 @@ func (this *GrpcService) RmtCall(ctx context.Context, req *thspbs.Event) (*thspb
 		gn, err := t.ConferenceJoin(fnum, cookie)
 		gopp.ErrPrint(err, fnum, len(cookie))
 		out.Mid = int64(gn)
+
 	case "ConferencePeerCount": // groupNumber
 		gnum := gopp.MustUint32(req.Args[0])
 		cnt := t.ConferencePeerCount(gnum)
@@ -206,7 +222,9 @@ func (this *GrpcService) RmtCall(ctx context.Context, req *thspbs.Event) (*thspb
 		// TODO
 		// case "GetHistory":
 	default:
-		log.Println("unimpled:", req.Name)
+		log.Println("unimpled:", req.Name, req.Args)
+		out.Ecode = -1
+		out.Emsg = fmt.Sprintf("Unimpled: %s", req.Name)
 	}
 
 	common.BytesRecved(len(req.String()))
