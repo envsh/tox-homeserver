@@ -116,6 +116,46 @@ type Ui_MainWindow struct {
 	ToolButton_10              *qtwidgets.QToolButton
 	LineEdit_2                 *qtwidgets.QLineEdit
 	ToolButton_18              *qtwidgets.QToolButton
+	Page_add_group             *qtwidgets.QWidget
+	VerticalLayout_21          *qtwidgets.QVBoxLayout
+	HorizontalLayout_13        *qtwidgets.QHBoxLayout
+	PushButton_5               *qtwidgets.QPushButton
+	Label_19                   *qtwidgets.QLabel
+	PushButton_6               *qtwidgets.QPushButton
+	Label_20                   *qtwidgets.QLabel
+	ComboBox_5                 *qtwidgets.QComboBox
+	RadioButton                *qtwidgets.QRadioButton
+	RadioButton_2              *qtwidgets.QRadioButton
+	HorizontalLayout_14        *qtwidgets.QHBoxLayout
+	Label_21                   *qtwidgets.QLabel
+	ComboBox_4                 *qtwidgets.QComboBox
+	VerticalSpacer_6           *qtwidgets.QSpacerItem
+	Page_add_friend            *qtwidgets.QWidget
+	VerticalLayout_20          *qtwidgets.QVBoxLayout
+	HorizontalLayout_12        *qtwidgets.QHBoxLayout
+	PushButton_3               *qtwidgets.QPushButton
+	Label_16                   *qtwidgets.QLabel
+	PushButton_4               *qtwidgets.QPushButton
+	VerticalLayout_19          *qtwidgets.QVBoxLayout
+	Label_17                   *qtwidgets.QLabel
+	LineEdit_4                 *qtwidgets.QLineEdit
+	Label_18                   *qtwidgets.QLabel
+	TextEdit                   *qtwidgets.QTextEdit
+	VerticalSpacer_5           *qtwidgets.QSpacerItem
+	Page_invite_friend         *qtwidgets.QWidget
+	VerticalLayout_18          *qtwidgets.QVBoxLayout
+	HorizontalLayout_10        *qtwidgets.QHBoxLayout
+	PushButton                 *qtwidgets.QPushButton
+	Label_14                   *qtwidgets.QLabel
+	PushButton_2               *qtwidgets.QPushButton
+	HorizontalLayout_11        *qtwidgets.QHBoxLayout
+	Label_15                   *qtwidgets.QLabel
+	LineEdit_3                 *qtwidgets.QLineEdit
+	ScrollArea_3               *qtwidgets.QScrollArea
+	ScrollAreaWidgetContents_3 *qtwidgets.QWidget
+	VerticalLayout_17          *qtwidgets.QVBoxLayout
+	VerticalSpacer_4           *qtwidgets.QSpacerItem
+	TableWidget                *qtwidgets.QTableWidget
 	Page_6                     *qtwidgets.QWidget
 	VerticalLayout_5           *qtwidgets.QVBoxLayout
 	ListWidget_2               *qtwidgets.QListWidget
@@ -226,6 +266,9 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.HorizontalLayout_7.Layout().AddWidget(this.Label) // 115
 
 	this.ComboBox = qtwidgets.NewQComboBox(this.Centralwidget) // 111
+	this.ComboBox.AddItem("", qtcore.NewQVariant_12("wtf"))    // 115
+	this.ComboBox.AddItem("", qtcore.NewQVariant_12("wtf"))    // 115
+	this.ComboBox.AddItem("", qtcore.NewQVariant_12("wtf"))    // 115
 	this.ComboBox.AddItem("", qtcore.NewQVariant_12("wtf"))    // 115
 	this.ComboBox.AddItem("", qtcore.NewQVariant_12("wtf"))    // 115
 	this.ComboBox.AddItem("", qtcore.NewQVariant_12("wtf"))    // 115
@@ -485,7 +528,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.ScrollArea.SetWidgetResizable(true)                                             // 114
 	this.ScrollAreaWidgetContents = qtwidgets.NewQWidget(nil, 0)                         // 111
 	this.ScrollAreaWidgetContents.SetObjectName("ScrollAreaWidgetContents")              // 112
-	this.ScrollAreaWidgetContents.SetGeometry(0, 0, 378, 441)                            // 114
+	this.ScrollAreaWidgetContents.SetGeometry(0, 0, 378, 437)                            // 114
 	this.VerticalLayout_9 = qtwidgets.NewQVBoxLayout_1(this.ScrollAreaWidgetContents)    // 111
 	this.VerticalLayout_9.SetSpacing(0)                                                  // 114
 	this.VerticalLayout_9.SetObjectName("VerticalLayout_9")                              // 112
@@ -713,7 +756,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.ScrollArea_2.SetWidgetResizable(true)                                             // 114
 	this.ScrollAreaWidgetContents_2 = qtwidgets.NewQWidget(nil, 0)                         // 111
 	this.ScrollAreaWidgetContents_2.SetObjectName("ScrollAreaWidgetContents_2")            // 112
-	this.ScrollAreaWidgetContents_2.SetGeometry(0, 0, 96, 26)                              // 114
+	this.ScrollAreaWidgetContents_2.SetGeometry(0, 0, 366, 424)                            // 114
 	this.VerticalLayout_3 = qtwidgets.NewQVBoxLayout_1(this.ScrollAreaWidgetContents_2)    // 111
 	this.VerticalLayout_3.SetSpacing(0)                                                    // 114
 	this.VerticalLayout_3.SetObjectName("VerticalLayout_3")                                // 112
@@ -786,7 +829,196 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 
 	this.VerticalLayout_14.AddLayout(this.HorizontalLayout_6, 0) // 115
 
-	this.StackedWidget.AddWidget(this.Page_2)                       // 115
+	this.StackedWidget.AddWidget(this.Page_2)                                // 115
+	this.Page_add_group = qtwidgets.NewQWidget(nil, 0)                       // 111
+	this.Page_add_group.SetObjectName("Page_add_group")                      // 112
+	this.VerticalLayout_21 = qtwidgets.NewQVBoxLayout_1(this.Page_add_group) // 111
+	this.VerticalLayout_21.SetObjectName("VerticalLayout_21")                // 112
+	this.HorizontalLayout_13 = qtwidgets.NewQHBoxLayout()                    // 111
+	this.HorizontalLayout_13.SetObjectName("HorizontalLayout_13")            // 112
+	this.PushButton_5 = qtwidgets.NewQPushButton(this.Page_add_group)        // 111
+	this.PushButton_5.SetObjectName("PushButton_5")                          // 112
+	this.PushButton_5.SetFlat(true)                                          // 114
+
+	this.HorizontalLayout_13.Layout().AddWidget(this.PushButton_5) // 115
+
+	this.Label_19 = qtwidgets.NewQLabel(this.Page_add_group, 0) // 111
+	this.Label_19.SetObjectName("Label_19")                     // 112
+	this.Label_19.SetAlignment(qtcore.Qt__AlignCenter)          // 114
+
+	this.HorizontalLayout_13.Layout().AddWidget(this.Label_19) // 115
+
+	this.PushButton_6 = qtwidgets.NewQPushButton(this.Page_add_group) // 111
+	this.PushButton_6.SetObjectName("PushButton_6")                   // 112
+	this.PushButton_6.SetFlat(true)                                   // 114
+
+	this.HorizontalLayout_13.Layout().AddWidget(this.PushButton_6) // 115
+
+	this.VerticalLayout_21.AddLayout(this.HorizontalLayout_13, 0) // 115
+
+	this.Label_20 = qtwidgets.NewQLabel(this.Page_add_group, 0) // 111
+	this.Label_20.SetObjectName("Label_20")                     // 112
+
+	this.VerticalLayout_21.Layout().AddWidget(this.Label_20) // 115
+
+	this.ComboBox_5 = qtwidgets.NewQComboBox(this.Page_add_group) // 111
+	this.ComboBox_5.SetObjectName("ComboBox_5")                   // 112
+	this.ComboBox_5.SetEditable(true)                             // 114
+
+	this.VerticalLayout_21.Layout().AddWidget(this.ComboBox_5) // 115
+
+	this.RadioButton = qtwidgets.NewQRadioButton(this.Page_add_group) // 111
+	this.RadioButton.SetObjectName("RadioButton")                     // 112
+	this.RadioButton.SetChecked(true)                                 // 114
+
+	this.VerticalLayout_21.Layout().AddWidget(this.RadioButton) // 115
+
+	this.RadioButton_2 = qtwidgets.NewQRadioButton(this.Page_add_group) // 111
+	this.RadioButton_2.SetObjectName("RadioButton_2")                   // 112
+
+	this.VerticalLayout_21.Layout().AddWidget(this.RadioButton_2) // 115
+
+	this.HorizontalLayout_14 = qtwidgets.NewQHBoxLayout()         // 111
+	this.HorizontalLayout_14.SetObjectName("HorizontalLayout_14") // 112
+	this.Label_21 = qtwidgets.NewQLabel(this.Page_add_group, 0)   // 111
+	this.Label_21.SetObjectName("Label_21")                       // 112
+
+	this.HorizontalLayout_14.Layout().AddWidget(this.Label_21) // 115
+
+	this.ComboBox_4 = qtwidgets.NewQComboBox(this.Page_add_group) // 111
+	this.ComboBox_4.AddItem("", qtcore.NewQVariant_12("wtf"))     // 115
+	this.ComboBox_4.AddItem("", qtcore.NewQVariant_12("wtf"))     // 115
+	this.ComboBox_4.SetObjectName("ComboBox_4")                   // 112
+	this.ComboBox_4.SetFrame(false)                               // 114
+
+	this.HorizontalLayout_14.Layout().AddWidget(this.ComboBox_4) // 115
+
+	this.VerticalLayout_21.AddLayout(this.HorizontalLayout_14, 0) // 115
+
+	this.VerticalSpacer_6 = qtwidgets.NewQSpacerItem(20, 369, qtwidgets.QSizePolicy__Minimum, qtwidgets.QSizePolicy__Expanding)
+
+	this.VerticalLayout_21.AddItem(this.VerticalSpacer_6) // 115
+
+	this.StackedWidget.AddWidget(this.Page_add_group)                         // 115
+	this.Page_add_friend = qtwidgets.NewQWidget(nil, 0)                       // 111
+	this.Page_add_friend.SetObjectName("Page_add_friend")                     // 112
+	this.VerticalLayout_20 = qtwidgets.NewQVBoxLayout_1(this.Page_add_friend) // 111
+	this.VerticalLayout_20.SetObjectName("VerticalLayout_20")                 // 112
+	this.HorizontalLayout_12 = qtwidgets.NewQHBoxLayout()                     // 111
+	this.HorizontalLayout_12.SetObjectName("HorizontalLayout_12")             // 112
+	this.PushButton_3 = qtwidgets.NewQPushButton(this.Page_add_friend)        // 111
+	this.PushButton_3.SetObjectName("PushButton_3")                           // 112
+	this.PushButton_3.SetFlat(true)                                           // 114
+
+	this.HorizontalLayout_12.Layout().AddWidget(this.PushButton_3) // 115
+
+	this.Label_16 = qtwidgets.NewQLabel(this.Page_add_friend, 0) // 111
+	this.Label_16.SetObjectName("Label_16")                      // 112
+	this.Label_16.SetAlignment(qtcore.Qt__AlignCenter)           // 114
+
+	this.HorizontalLayout_12.Layout().AddWidget(this.Label_16) // 115
+
+	this.PushButton_4 = qtwidgets.NewQPushButton(this.Page_add_friend) // 111
+	this.PushButton_4.SetObjectName("PushButton_4")                    // 112
+	this.PushButton_4.SetFlat(true)                                    // 114
+
+	this.HorizontalLayout_12.Layout().AddWidget(this.PushButton_4) // 115
+
+	this.VerticalLayout_20.AddLayout(this.HorizontalLayout_12, 0) // 115
+
+	this.VerticalLayout_19 = qtwidgets.NewQVBoxLayout()                                                         // 111
+	this.VerticalLayout_19.SetObjectName("VerticalLayout_19")                                                   // 112
+	this.Label_17 = qtwidgets.NewQLabel(this.Page_add_friend, 0)                                                // 111
+	this.Label_17.SetObjectName("Label_17")                                                                     // 112
+	this.Label_17.SetWordWrap(true)                                                                             // 114
+	this.Label_17.SetTextInteractionFlags(qtcore.Qt__LinksAccessibleByMouse | qtcore.Qt__TextSelectableByMouse) // 114
+
+	this.VerticalLayout_19.Layout().AddWidget(this.Label_17) // 115
+
+	this.LineEdit_4 = qtwidgets.NewQLineEdit(this.Page_add_friend) // 111
+	this.LineEdit_4.SetObjectName("LineEdit_4")                    // 112
+
+	this.VerticalLayout_19.Layout().AddWidget(this.LineEdit_4) // 115
+
+	this.Label_18 = qtwidgets.NewQLabel(this.Page_add_friend, 0) // 111
+	this.Label_18.SetObjectName("Label_18")                      // 112
+
+	this.VerticalLayout_19.Layout().AddWidget(this.Label_18) // 115
+
+	this.TextEdit = qtwidgets.NewQTextEdit(this.Page_add_friend) // 111
+	this.TextEdit.SetObjectName("TextEdit")                      // 112
+
+	this.VerticalLayout_19.Layout().AddWidget(this.TextEdit) // 115
+
+	this.VerticalLayout_20.AddLayout(this.VerticalLayout_19, 0) // 115
+
+	this.VerticalSpacer_5 = qtwidgets.NewQSpacerItem(20, 209, qtwidgets.QSizePolicy__Minimum, qtwidgets.QSizePolicy__Expanding)
+
+	this.VerticalLayout_20.AddItem(this.VerticalSpacer_5) // 115
+
+	this.StackedWidget.AddWidget(this.Page_add_friend)                           // 115
+	this.Page_invite_friend = qtwidgets.NewQWidget(nil, 0)                       // 111
+	this.Page_invite_friend.SetObjectName("Page_invite_friend")                  // 112
+	this.VerticalLayout_18 = qtwidgets.NewQVBoxLayout_1(this.Page_invite_friend) // 111
+	this.VerticalLayout_18.SetObjectName("VerticalLayout_18")                    // 112
+	this.HorizontalLayout_10 = qtwidgets.NewQHBoxLayout()                        // 111
+	this.HorizontalLayout_10.SetObjectName("HorizontalLayout_10")                // 112
+	this.PushButton = qtwidgets.NewQPushButton(this.Page_invite_friend)          // 111
+	this.PushButton.SetObjectName("PushButton")                                  // 112
+	this.PushButton.SetFlat(true)                                                // 114
+
+	this.HorizontalLayout_10.Layout().AddWidget(this.PushButton) // 115
+
+	this.Label_14 = qtwidgets.NewQLabel(this.Page_invite_friend, 0) // 111
+	this.Label_14.SetObjectName("Label_14")                         // 112
+	this.Label_14.SetAlignment(qtcore.Qt__AlignCenter)              // 114
+
+	this.HorizontalLayout_10.Layout().AddWidget(this.Label_14) // 115
+
+	this.PushButton_2 = qtwidgets.NewQPushButton(this.Page_invite_friend) // 111
+	this.PushButton_2.SetObjectName("PushButton_2")                       // 112
+	this.PushButton_2.SetFlat(true)                                       // 114
+
+	this.HorizontalLayout_10.Layout().AddWidget(this.PushButton_2) // 115
+
+	this.VerticalLayout_18.AddLayout(this.HorizontalLayout_10, 0) // 115
+
+	this.HorizontalLayout_11 = qtwidgets.NewQHBoxLayout()           // 111
+	this.HorizontalLayout_11.SetObjectName("HorizontalLayout_11")   // 112
+	this.Label_15 = qtwidgets.NewQLabel(this.Page_invite_friend, 0) // 111
+	this.Label_15.SetObjectName("Label_15")                         // 112
+
+	this.HorizontalLayout_11.Layout().AddWidget(this.Label_15) // 115
+
+	this.LineEdit_3 = qtwidgets.NewQLineEdit(this.Page_invite_friend) // 111
+	this.LineEdit_3.SetObjectName("LineEdit_3")                       // 112
+
+	this.HorizontalLayout_11.Layout().AddWidget(this.LineEdit_3) // 115
+
+	this.VerticalLayout_18.AddLayout(this.HorizontalLayout_11, 0) // 115
+
+	this.ScrollArea_3 = qtwidgets.NewQScrollArea(this.Page_invite_friend)                // 111
+	this.ScrollArea_3.SetObjectName("ScrollArea_3")                                      // 112
+	this.ScrollArea_3.SetWidgetResizable(true)                                           // 114
+	this.ScrollAreaWidgetContents_3 = qtwidgets.NewQWidget(nil, 0)                       // 111
+	this.ScrollAreaWidgetContents_3.SetObjectName("ScrollAreaWidgetContents_3")          // 112
+	this.ScrollAreaWidgetContents_3.SetGeometry(0, 0, 366, 231)                          // 114
+	this.VerticalLayout_17 = qtwidgets.NewQVBoxLayout_1(this.ScrollAreaWidgetContents_3) // 111
+	this.VerticalLayout_17.SetObjectName("VerticalLayout_17")                            // 112
+	this.VerticalSpacer_4 = qtwidgets.NewQSpacerItem(20, 216, qtwidgets.QSizePolicy__Minimum, qtwidgets.QSizePolicy__Expanding)
+
+	this.VerticalLayout_17.AddItem(this.VerticalSpacer_4) // 115
+
+	this.ScrollArea_3.SetWidget(this.ScrollAreaWidgetContents_3) // 114
+
+	this.VerticalLayout_18.Layout().AddWidget(this.ScrollArea_3) // 115
+
+	this.TableWidget = qtwidgets.NewQTableWidget(this.Page_invite_friend) // 111
+	this.TableWidget.SetObjectName("TableWidget")                         // 112
+
+	this.VerticalLayout_18.Layout().AddWidget(this.TableWidget) // 115
+
+	this.StackedWidget.AddWidget(this.Page_invite_friend)           // 115
 	this.Page_6 = qtwidgets.NewQWidget(nil, 0)                      // 111
 	this.Page_6.SetObjectName("Page_6")                             // 112
 	this.VerticalLayout_5 = qtwidgets.NewQVBoxLayout_1(this.Page_6) // 111
@@ -854,8 +1086,11 @@ func (this *Ui_MainWindow) RetranslateUi(MainWindow *qtwidgets.QMainWindow) {
 	this.ComboBox.SetItemText(2, qtcore.QCoreApplication_Translate("MainWindow", "3 settings", "dummy123", 0))
 	this.ComboBox.SetItemText(3, qtcore.QCoreApplication_Translate("MainWindow", "4 mainui", "dummy123", 0))
 	this.ComboBox.SetItemText(4, qtcore.QCoreApplication_Translate("MainWindow", "5 messageui", "dummy123", 0))
-	this.ComboBox.SetItemText(5, qtcore.QCoreApplication_Translate("MainWindow", "6 testui", "dummy123", 0))
-	this.ComboBox.SetItemText(6, qtcore.QCoreApplication_Translate("MainWindow", "7 logui", "dummy123", 0))
+	this.ComboBox.SetItemText(5, qtcore.QCoreApplication_Translate("MainWindow", "6 add group", "dummy123", 0))
+	this.ComboBox.SetItemText(6, qtcore.QCoreApplication_Translate("MainWindow", "7 add friend", "dummy123", 0))
+	this.ComboBox.SetItemText(7, qtcore.QCoreApplication_Translate("MainWindow", "8 invite friend", "dummy123", 0))
+	this.ComboBox.SetItemText(8, qtcore.QCoreApplication_Translate("MainWindow", "9 testui", "dummy123", 0))
+	this.ComboBox.SetItemText(9, qtcore.QCoreApplication_Translate("MainWindow", "10 logui", "dummy123", 0))
 	// noimpl:
 	this.ToolButton_12.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
 	this.GroupBox.SetTitle(qtcore.QCoreApplication_Translate("MainWindow", "General", "dummy123", 0))
@@ -878,8 +1113,8 @@ func (this *Ui_MainWindow) RetranslateUi(MainWindow *qtwidgets.QMainWindow) {
 	this.GroupBox_2.SetTitle(qtcore.QCoreApplication_Translate("MainWindow", "PlaceHolder...", "dummy123", 0))
 	this.Label_12.SetText(qtcore.QCoreApplication_Translate("MainWindow", "PlaceHolder...", "dummy123", 0))
 	this.ToolButton_17.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
-	this.Label_2.SetText(qtcore.QCoreApplication_Translate("MainWindow", "TextLabel", "dummy123", 0))
-	this.Label_3.SetText(qtcore.QCoreApplication_Translate("MainWindow", "TextLabel", "dummy123", 0))
+	this.Label_2.SetText(qtcore.QCoreApplication_Translate("MainWindow", "Loading ...", "dummy123", 0))
+	this.Label_3.SetText(qtcore.QCoreApplication_Translate("MainWindow", "Loading ...", "dummy123", 0))
 	this.ToolButton.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
 	this.LineEdit.SetPlaceholderText(qtcore.QCoreApplication_Translate("MainWindow", "Filter...", "dummy123", 0))
 	this.ToolButton_2.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
@@ -903,6 +1138,25 @@ func (this *Ui_MainWindow) RetranslateUi(MainWindow *qtwidgets.QMainWindow) {
 	this.ToolButton_10.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
 	this.LineEdit_2.SetPlaceholderText(qtcore.QCoreApplication_Translate("MainWindow", "Write a message...", "dummy123", 0))
 	this.ToolButton_18.SetText(qtcore.QCoreApplication_Translate("MainWindow", "&Send", "dummy123", 0))
+	this.PushButton_5.SetText(qtcore.QCoreApplication_Translate("MainWindow", "Cancel", "dummy123", 0))
+	this.Label_19.SetText(qtcore.QCoreApplication_Translate("MainWindow", "Add Group", "dummy123", 0))
+	this.PushButton_6.SetText(qtcore.QCoreApplication_Translate("MainWindow", "Done", "dummy123", 0))
+	this.Label_20.SetText(qtcore.QCoreApplication_Translate("MainWindow", "Room Name:", "dummy123", 0))
+	this.RadioButton.SetText(qtcore.QCoreApplication_Translate("MainWindow", "&Text", "dummy123", 0))
+	this.RadioButton_2.SetText(qtcore.QCoreApplication_Translate("MainWindow", "&Audio", "dummy123", 0))
+	this.Label_21.SetText(qtcore.QCoreApplication_Translate("MainWindow", "Room Type:", "dummy123", 0))
+	this.ComboBox_4.SetItemText(0, qtcore.QCoreApplication_Translate("MainWindow", "Text", "dummy123", 0))
+	this.ComboBox_4.SetItemText(1, qtcore.QCoreApplication_Translate("MainWindow", "Audio", "dummy123", 0))
+	// noimpl:
+	this.PushButton_3.SetText(qtcore.QCoreApplication_Translate("MainWindow", "Cancel", "dummy123", 0))
+	this.Label_16.SetText(qtcore.QCoreApplication_Translate("MainWindow", "Add Friend", "dummy123", 0))
+	this.PushButton_4.SetText(qtcore.QCoreApplication_Translate("MainWindow", "Done", "dummy123", 0))
+	this.Label_17.SetText(qtcore.QCoreApplication_Translate("MainWindow", "Tox ID (either 76 hexadecimal characters or name@example.com )", "dummy123", 0))
+	this.Label_18.SetText(qtcore.QCoreApplication_Translate("MainWindow", "Message", "dummy123", 0))
+	this.PushButton.SetText(qtcore.QCoreApplication_Translate("MainWindow", "Cancel", "dummy123", 0))
+	this.Label_14.SetText(qtcore.QCoreApplication_Translate("MainWindow", "Inivte Friend", "dummy123", 0))
+	this.PushButton_2.SetText(qtcore.QCoreApplication_Translate("MainWindow", "Done", "dummy123", 0))
+	this.Label_15.SetText(qtcore.QCoreApplication_Translate("MainWindow", "Search", "dummy123", 0))
 	// noimpl: } // retranslateUi
 	// noimpl:
 	// noimpl: };

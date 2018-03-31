@@ -129,7 +129,7 @@ func (this *RoomListMan) Delete(item *RoomListItem) {
 }
 
 func (this *RoomListMan) onClicked(item *RoomListItem, pos *qtcore.QPoint) {
-	uictx.mw.switchUiStack(4)
+	uictx.mw.switchUiStack(UIST_MESSAGEUI)
 
 	uictx.msgwin.SetRoom(item)
 }

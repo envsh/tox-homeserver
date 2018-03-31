@@ -21,6 +21,9 @@
        <property name="text">
         <string>Tox ID (either 76 hexadecimal characters or name@example.com )</string>
        </property>
+       <property name="textInteractionFlags">
+        <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+       </property>
       </widget>
      </item>
      <item>

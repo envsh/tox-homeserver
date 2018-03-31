@@ -44,12 +44,13 @@ func (this *Ui_AddFriendDialog) SetupUi(AddFriendDialog *qtwidgets.QDialog) {
 		AddFriendDialog.SetObjectName("AddFriendDialog")
 	}
 	AddFriendDialog.Resize(606, 246)
-	this.VerticalLayout_2 = qtwidgets.NewQVBoxLayout_1(this.AddFriendDialog) // 111
-	this.VerticalLayout_2.SetObjectName("VerticalLayout_2")                  // 112
-	this.VerticalLayout = qtwidgets.NewQVBoxLayout()                         // 111
-	this.VerticalLayout.SetObjectName("VerticalLayout")                      // 112
-	this.Label = qtwidgets.NewQLabel(this.AddFriendDialog, 0)                // 111
-	this.Label.SetObjectName("Label")                                        // 112
+	this.VerticalLayout_2 = qtwidgets.NewQVBoxLayout_1(this.AddFriendDialog)                                 // 111
+	this.VerticalLayout_2.SetObjectName("VerticalLayout_2")                                                  // 112
+	this.VerticalLayout = qtwidgets.NewQVBoxLayout()                                                         // 111
+	this.VerticalLayout.SetObjectName("VerticalLayout")                                                      // 112
+	this.Label = qtwidgets.NewQLabel(this.AddFriendDialog, 0)                                                // 111
+	this.Label.SetObjectName("Label")                                                                        // 112
+	this.Label.SetTextInteractionFlags(qtcore.Qt__LinksAccessibleByMouse | qtcore.Qt__TextSelectableByMouse) // 114
 
 	this.VerticalLayout.Layout().AddWidget(this.Label) // 115
 

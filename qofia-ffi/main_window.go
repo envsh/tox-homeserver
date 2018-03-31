@@ -65,6 +65,9 @@ type MainWindow struct {
 	rcact1             *qtwidgets.QAction
 	rcact2             *qtwidgets.QAction
 	rcact3             *qtwidgets.QAction
+	rcactAddGroup      *qtwidgets.QAction
+	rcactAddFriend     *qtwidgets.QAction
+	rcactInviteFriend  *qtwidgets.QAction
 	rcact4             *qtwidgets.QAction
 	curRoomCtxMenuItem *RoomListItem
 
@@ -97,6 +100,9 @@ func (this *MainWindow) init() {
 	this.rcact1 = this.roomCtxMenu.AddAction("Leave Group")
 	this.rcact2 = this.roomCtxMenu.AddAction("Remove Friend")
 	this.rcact3 = this.roomCtxMenu.AddAction("View Info")
+	this.rcactAddGroup = this.roomCtxMenu.AddAction("Create Group")
+	this.rcactAddFriend = this.roomCtxMenu.AddAction("Add Friends")
+	this.rcactInviteFriend = this.roomCtxMenu.AddAction("Invite Friends")
 	this.rcact4 = this.roomCtxMenu.AddAction("PlaceHolder3")
 
 	qtrt.Connect(this.rcactOpen, "triggered(bool)", func(checked bool) {
@@ -261,7 +267,7 @@ func (this *MainWindow) connectSignals() {
 			}()
 		}
 	})
-	qtrt.Connect(uiw.ToolButton_7, "clicked(bool)", func(bool) { this.switchUiStack(2) })
+	qtrt.Connect(uiw.ToolButton_7, "clicked(bool)", func(bool) { this.switchUiStack(UIST_SETTINGS) })
 }
 
 var create_room_dlg *Ui_Dialog
@@ -275,6 +281,19 @@ func (this *MainWindow) initQml() {
 	proot := qw.RootObject()
 	gopp.NilPrint(proot, "qml root object nil")
 }
+
+const (
+	UIST_QMLMCTRL      = 0
+	UIST_QMLORIGIN     = 1
+	UIST_SETTINGS      = 2
+	UIST_MAINUI        = 3
+	UIST_MESSAGEUI     = 4
+	UIST_ADD_GROUp     = 5
+	UIST_ADD_FRIEND    = 6
+	UIST_INVITE_FRIEND = 7
+	UIST_TESTUI        = 8
+	UIST_LOGUI         = 9
+)
 
 func (this *MainWindow) switchUiStack(x int) {
 	uictx.uiw.ComboBox.SetCurrentIndex(x)
@@ -296,7 +315,7 @@ func (this *MainWindow) onRoomContextMenu(item *RoomListItem, w *qtwidgets.QWidg
 func (this *MainWindow) onRoomContextTriggered(item *RoomListItem, checked bool, act *qtwidgets.QAction) {
 	log.Println(item, checked, act.Text(), item.GetName(), item.GetId())
 	if act == this.rcactOpen {
-		uictx.mw.switchUiStack(4)
+		uictx.mw.switchUiStack(UIST_MESSAGEUI)
 		uictx.msgwin.SetRoom(item)
 	} else if act == this.rcact1 {
 		log.Println(item.grpInfo.GetGnum())
