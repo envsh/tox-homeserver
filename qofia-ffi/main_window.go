@@ -71,6 +71,8 @@ type MainWindow struct {
 	rcact4             *qtwidgets.QAction
 	curRoomCtxMenuItem *RoomListItem
 
+	RoomChatState
+
 	sticon *qtgui.QIcon
 }
 
@@ -84,12 +86,18 @@ func NewMainWindow() *MainWindow {
 	return this
 }
 
-func (this *MainWindow) initui() {
+func (this *MainWindow) init() {
+	this.initMainWin()
+	this.initRoomChat()
+	this.initInivteFriend()
+}
+
+func (this *MainWindow) initMainUi() {
 	this.setConnStatus(false)
 }
 
-func (this *MainWindow) init() {
-	this.initui()
+func (this *MainWindow) initMainWin() {
+	this.initMainUi()
 	this.initQml()
 	this.connectSignals()
 	this.switchUiStack(uictx.uiw.StackedWidget.CurrentIndex())

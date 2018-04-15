@@ -45,6 +45,23 @@
         </widget>
        </item>
        <item>
+        <widget class="QRadioButton" name="radioButton">
+         <property name="text">
+          <string>&amp;Text</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QRadioButton" name="radioButton_2">
+         <property name="text">
+          <string>&amp;Audio</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QComboBox" name="comboBox">
          <property name="frame">
           <bool>false</bool>

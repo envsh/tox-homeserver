@@ -101,6 +101,7 @@ type Ui_MainWindow struct {
 	ToolButton_16              *qtwidgets.QToolButton
 	ToolButton_13              *qtwidgets.QToolButton
 	ToolButton_14              *qtwidgets.QToolButton
+	ToolButton_22              *qtwidgets.QToolButton
 	HorizontalLayout_9         *qtwidgets.QHBoxLayout
 	LineHeadSepLeft            *qtwidgets.QFrame
 	LabelMsgCount2             *qtwidgets.QLabel
@@ -182,13 +183,14 @@ type Ui_MainWindow struct {
 	Icon10                     *qtgui.QIcon // 116
 	Icon11                     *qtgui.QIcon // 116
 	Icon12                     *qtgui.QIcon // 116
+	Icon13                     *qtgui.QIcon // 116
 	SizePolicy3                *qtwidgets.QSizePolicy
 	SizePolicy4                *qtwidgets.QSizePolicy
 	SizePolicy5                *qtwidgets.QSizePolicy
-	Icon13                     *qtgui.QIcon // 116
 	Icon14                     *qtgui.QIcon // 116
 	Icon15                     *qtgui.QIcon // 116
 	Icon16                     *qtgui.QIcon // 116
+	Icon17                     *qtgui.QIcon // 116
 }
 
 //  struct block end
@@ -705,6 +707,17 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 
 	this.HorizontalLayout_8.Layout().AddWidget(this.ToolButton_14) // 115
 
+	this.ToolButton_22 = qtwidgets.NewQToolButton(this.Widget_2) // 111
+	this.ToolButton_22.SetObjectName("ToolButton_22")            // 112
+	this.Icon13 = qtgui.NewQIcon()
+	this.Icon13.AddFile(":/icons/vertical-ellipsis_gray32.png", qtcore.NewQSize(), qtgui.QIcon__Normal, qtgui.QIcon__Off) // 115
+	this.ToolButton_22.SetIcon(this.Icon13)                                                                               // 114
+	this.ToolButton_22.SetIconSize(qtcore.NewQSize_1(32, 32))                                                             // 113
+	this.ToolButton_22.SetPopupMode(qtwidgets.QToolButton__InstantPopup)                                                  // 114
+	this.ToolButton_22.SetAutoRaise(true)                                                                                 // 114
+
+	this.HorizontalLayout_8.Layout().AddWidget(this.ToolButton_22) // 115
+
 	this.VerticalLayout_14.Layout().AddWidget(this.Widget_2) // 115
 
 	this.HorizontalLayout_9 = qtwidgets.NewQHBoxLayout()        // 111
@@ -780,9 +793,9 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.ToolButton_8 = qtwidgets.NewQToolButton(this.Page_2)   // 111
 	this.ToolButton_8.SetObjectName("ToolButton_8")             // 112
 	this.ToolButton_8.SetFocusPolicy(qtcore.Qt__NoFocus)        // 114
-	this.Icon13 = qtgui.NewQIcon()
-	this.Icon13.AddFile(":/icons/paper-clip-outline_gray64.png", qtcore.NewQSize(), qtgui.QIcon__Normal, qtgui.QIcon__Off) // 115
-	this.ToolButton_8.SetIcon(this.Icon13)                                                                                 // 114
+	this.Icon14 = qtgui.NewQIcon()
+	this.Icon14.AddFile(":/icons/paper-clip-outline_gray64.png", qtcore.NewQSize(), qtgui.QIcon__Normal, qtgui.QIcon__Off) // 115
+	this.ToolButton_8.SetIcon(this.Icon14)                                                                                 // 114
 	this.ToolButton_8.SetIconSize(qtcore.NewQSize_1(22, 22))                                                               // 113
 	this.ToolButton_8.SetAutoRaise(true)                                                                                   // 114
 
@@ -791,9 +804,9 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.ToolButton_9 = qtwidgets.NewQToolButton(this.Page_2) // 111
 	this.ToolButton_9.SetObjectName("ToolButton_9")           // 112
 	this.ToolButton_9.SetFocusPolicy(qtcore.Qt__NoFocus)      // 114
-	this.Icon14 = qtgui.NewQIcon()
-	this.Icon14.AddFile(":/icons/question-mark-gray64.png", qtcore.NewQSize(), qtgui.QIcon__Normal, qtgui.QIcon__Off) // 115
-	this.ToolButton_9.SetIcon(this.Icon14)                                                                            // 114
+	this.Icon15 = qtgui.NewQIcon()
+	this.Icon15.AddFile(":/icons/question-mark-gray64.png", qtcore.NewQSize(), qtgui.QIcon__Normal, qtgui.QIcon__Off) // 115
+	this.ToolButton_9.SetIcon(this.Icon15)                                                                            // 114
 	this.ToolButton_9.SetIconSize(qtcore.NewQSize_1(22, 22))                                                          // 113
 	this.ToolButton_9.SetAutoRaise(true)                                                                              // 114
 
@@ -802,9 +815,9 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.ToolButton_10 = qtwidgets.NewQToolButton(this.Page_2) // 111
 	this.ToolButton_10.SetObjectName("ToolButton_10")          // 112
 	this.ToolButton_10.SetFocusPolicy(qtcore.Qt__NoFocus)      // 114
-	this.Icon15 = qtgui.NewQIcon()
-	this.Icon15.AddFile(":/icons/smile_gray64.png", qtcore.NewQSize(), qtgui.QIcon__Normal, qtgui.QIcon__Off) // 115
-	this.ToolButton_10.SetIcon(this.Icon15)                                                                   // 114
+	this.Icon16 = qtgui.NewQIcon()
+	this.Icon16.AddFile(":/icons/smile_gray64.png", qtcore.NewQSize(), qtgui.QIcon__Normal, qtgui.QIcon__Off) // 115
+	this.ToolButton_10.SetIcon(this.Icon16)                                                                   // 114
 	this.ToolButton_10.SetIconSize(qtcore.NewQSize_1(22, 22))                                                 // 113
 	this.ToolButton_10.SetAutoRaise(true)                                                                     // 114
 
@@ -818,9 +831,9 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.ToolButton_18 = qtwidgets.NewQToolButton(this.Page_2) // 111
 	this.ToolButton_18.SetObjectName("ToolButton_18")          // 112
 	this.ToolButton_18.SetFocusPolicy(qtcore.Qt__NoFocus)      // 114
-	this.Icon16 = qtgui.NewQIcon()
-	this.Icon16.AddFile(":/icons/cursor_gray64.png", qtcore.NewQSize(), qtgui.QIcon__Normal, qtgui.QIcon__Off) // 115
-	this.ToolButton_18.SetIcon(this.Icon16)                                                                    // 114
+	this.Icon17 = qtgui.NewQIcon()
+	this.Icon17.AddFile(":/icons/cursor_gray64.png", qtcore.NewQSize(), qtgui.QIcon__Normal, qtgui.QIcon__Off) // 115
+	this.ToolButton_18.SetIcon(this.Icon17)                                                                    // 114
 	this.ToolButton_18.SetIconSize(qtcore.NewQSize_1(22, 22))                                                  // 113
 	this.ToolButton_18.SetToolButtonStyle(qtcore.Qt__ToolButtonTextBesideIcon)                                 // 114
 	this.ToolButton_18.SetAutoRaise(true)                                                                      // 114
@@ -1013,8 +1026,12 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 
 	this.VerticalLayout_18.Layout().AddWidget(this.ScrollArea_3) // 115
 
-	this.TableWidget = qtwidgets.NewQTableWidget(this.Page_invite_friend) // 111
-	this.TableWidget.SetObjectName("TableWidget")                         // 112
+	this.TableWidget = qtwidgets.NewQTableWidget(this.Page_invite_friend)          // 111
+	this.TableWidget.SetObjectName("TableWidget")                                  // 112
+	this.TableWidget.SetEditTriggers(qtwidgets.QAbstractItemView__NoEditTriggers)  // 114
+	this.TableWidget.SetProperty("showDropIndicator", qtcore.NewQVariant_9(false)) // 114
+	this.TableWidget.SetDragDropOverwriteMode(false)                               // 114
+	this.TableWidget.SetAlternatingRowColors(true)                                 // 114
 
 	this.VerticalLayout_18.Layout().AddWidget(this.TableWidget) // 115
 
@@ -1132,6 +1149,7 @@ func (this *Ui_MainWindow) RetranslateUi(MainWindow *qtwidgets.QMainWindow) {
 	this.ToolButton_16.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
 	this.ToolButton_13.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
 	this.ToolButton_14.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
+	this.ToolButton_22.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
 	this.LabelMsgCount2.SetText(qtcore.QCoreApplication_Translate("MainWindow", "000", "dummy123", 0))
 	this.ToolButton_8.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
 	this.ToolButton_9.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))

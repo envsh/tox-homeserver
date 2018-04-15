@@ -27,6 +27,8 @@ type Ui_Dialog struct {
 	LineEdit           *qtwidgets.QLineEdit
 	HorizontalLayout_2 *qtwidgets.QHBoxLayout
 	Label_2            *qtwidgets.QLabel
+	RadioButton        *qtwidgets.QRadioButton
+	RadioButton_2      *qtwidgets.QRadioButton
 	ComboBox           *qtwidgets.QComboBox
 	HorizontalLayout   *qtwidgets.QHBoxLayout
 	HorizontalSpacer   *qtwidgets.QSpacerItem
@@ -67,6 +69,17 @@ func (this *Ui_Dialog) SetupUi(Dialog *qtwidgets.QDialog) {
 	this.Label_2.SetObjectName("Label_2")                       // 112
 
 	this.HorizontalLayout_2.Layout().AddWidget(this.Label_2) // 115
+
+	this.RadioButton = qtwidgets.NewQRadioButton(this.Dialog) // 111
+	this.RadioButton.SetObjectName("RadioButton")             // 112
+	this.RadioButton.SetChecked(true)                         // 114
+
+	this.HorizontalLayout_2.Layout().AddWidget(this.RadioButton) // 115
+
+	this.RadioButton_2 = qtwidgets.NewQRadioButton(this.Dialog) // 111
+	this.RadioButton_2.SetObjectName("RadioButton_2")           // 112
+
+	this.HorizontalLayout_2.Layout().AddWidget(this.RadioButton_2) // 115
 
 	this.ComboBox = qtwidgets.NewQComboBox(this.Dialog)     // 111
 	this.ComboBox.AddItem("", qtcore.NewQVariant_12("wtf")) // 115
@@ -113,6 +126,8 @@ func (this *Ui_Dialog) RetranslateUi(Dialog *qtwidgets.QDialog) {
 	this.Dialog.SetWindowTitle(qtcore.QCoreApplication_Translate("Dialog", "Dialog", "dummy123", 0))
 	this.Label.SetText(qtcore.QCoreApplication_Translate("Dialog", "Room Name:", "dummy123", 0))
 	this.Label_2.SetText(qtcore.QCoreApplication_Translate("Dialog", "Room Type:", "dummy123", 0))
+	this.RadioButton.SetText(qtcore.QCoreApplication_Translate("Dialog", "&Text", "dummy123", 0))
+	this.RadioButton_2.SetText(qtcore.QCoreApplication_Translate("Dialog", "&Audio", "dummy123", 0))
 	this.ComboBox.SetItemText(0, qtcore.QCoreApplication_Translate("Dialog", "Text", "dummy123", 0))
 	this.ComboBox.SetItemText(1, qtcore.QCoreApplication_Translate("Dialog", "Audio", "dummy123", 0))
 	// noimpl:

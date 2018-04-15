@@ -612,6 +612,12 @@ func (this *LigTox) FriendAddNorequest(friendId string) (uint32, error) {
 }
 
 func (this *LigTox) FriendByPublicKey(pubkey string) (uint32, error) {
+	frnds := this.Binfo.GetFriends()
+	for frndnum, frndo := range frnds {
+		if frndo.Pubkey == pubkey {
+			return frndnum, nil
+		}
+	}
 	return uint32(0), nil
 }
 

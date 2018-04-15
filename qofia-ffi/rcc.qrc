@@ -1,5 +1,7 @@
 <RCC>
   <qresource>
+    <file>icons/vertical-ellipsis_gray32.png</file>
+    <file>icons/vertical-ellipsis_gray64.png</file>
     <file>theme/dark.css</file>
     <file>theme/material.css</file>
     <file>theme/system.css</file>

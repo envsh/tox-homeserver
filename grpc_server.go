@@ -183,6 +183,9 @@ func (this *GrpcService) RmtCall(ctx context.Context, req *thspbs.Event) (*thspb
 		groupId, _ := t.ConferenceGetIdentifier(gn)
 		out.Args = append(out.Args, groupId)
 
+		_, err = appctx.st.AddGroup(groupId, gn, rname)
+		gopp.ErrPrint(err, gn, rname, groupId)
+
 	case "ConferenceDelete": // "groupNumber"
 		gnum := gopp.MustUint32(req.Args[0])
 		err = t.ConferenceDelete(gnum)
@@ -217,8 +220,13 @@ func (this *GrpcService) RmtCall(ctx context.Context, req *thspbs.Event) (*thspb
 		gnum := gopp.MustUint32(req.Args[0])
 		pnum := gopp.MustUint32(req.Args[1])
 		pname, err := t.ConferencePeerGetName(gnum, pnum)
-		gopp.ErrPrint(err)
+		gopp.ErrPrint(err, req.Args)
 		out.Args = append(out.Args, pname)
+	case "ConferenceInvite": // groupNumber, friendNumber
+		gnum := gopp.MustUint32(req.Args[0])
+		fnum := gopp.MustUint32(req.Args[1])
+		err := t.ConferenceInvite(fnum, gnum)
+		gopp.ErrPrint(err, req.Args)
 		// TODO
 		// case "GetHistory":
 	default:

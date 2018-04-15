@@ -185,6 +185,21 @@ func (this *LigTox) ConferencePeerGetName(groupNumber uint32, peerNumber uint32)
 	return rsp.Args[0], nil
 }
 
+func (this *LigTox) ConferenceInvite(groupNumber uint32, peerNumber uint32) error {
+	fname := this.getMethodName()
+	args := thspbs.Event{}
+	args.Name = fname
+	args.Args = []string{fmt.Sprintf("%d", groupNumber), fmt.Sprintf("%d", peerNumber)}
+	cli := thspbs.NewToxhsClient(this.rpcli)
+	rsp, err := cli.RmtCall(context.Background(), &args)
+	gopp.ErrPrint(err, rsp)
+	log.Println(rsp)
+	if rsp.Ecode != 0 {
+		return errors.New(rsp.Emsg)
+	}
+	return nil
+}
+
 // utils
 /////
 func ConferenceCookieToIdentifier(cookie string) string {
