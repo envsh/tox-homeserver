@@ -13,8 +13,10 @@
 * grpc+custom
 * comet
 * websocket
+* grpc+emitter.io
+* nrpc=rpc based on nats
 
-参考：
+### 参考：
 pubsub库：https://github.com/lileio/pubsub
 goim库
 
