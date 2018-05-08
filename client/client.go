@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"gopp"
 	"log"
+	"net/url"
 	"runtime"
 	"strings"
 	"sync"
@@ -98,6 +99,8 @@ func NewLigTox() *LigTox {
 	gopp.ErrPrint(err, rpcli)
 	this.rpcli = rpcli
 
+	uo, err := url.Parse(thscom.GnatsAddr)
+	gopp.ErrPrint(err, uo)
 	ntscli, err := nats.Connect(thscom.GnatsAddr)
 	gopp.ErrPrint(err, thscom.GnatsAddr)
 	if err == nats.ErrNoServers {

@@ -12,7 +12,7 @@ democ: com
 	go build -v -o bin/democ ./examples/
 
 com:
-	protoc -I. ths.proto --go_out=plugins=grpc:./thspbs/
+	protoc -I./server ./server/ths.proto --go_out=plugins=grpc:./thspbs/
 	# cd ${HOME}/golib/src/github.com/go-xorm/cmd/xorm && xorm reverse -s sqlite3 "${CPWD}/data/toxhs.sqlite" templates/goxorm "${CPWD}/gofia/"
 	go install -v ./thspbs/ ./common/ ./client/ ./store/
 

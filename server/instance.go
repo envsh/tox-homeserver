@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
 	"encoding/json"
@@ -10,8 +10,8 @@ import (
 	"tox-homeserver/common"
 	"tox-homeserver/thspbs"
 
-	tox "github.com/kitech/go-toxcore"
-	"github.com/kitech/go-toxcore/xtox"
+	tox "github.com/TokTok/go-toxcore-c"
+	"github.com/envsh/go-toxcore/xtox"
 )
 
 type ToxVM struct {
@@ -144,7 +144,7 @@ func (this *ToxVM) setupCallbacks() {
 		evt.Margs = []string{fname, pubkey}
 
 		var gn uint32
-		switch int(itype) {
+		switch itype {
 		case tox.CONFERENCE_TYPE_TEXT:
 			gn, err = t.ConferenceJoin(friendNumber, cookie)
 			gopp.ErrPrint(err)
@@ -229,11 +229,10 @@ func (this *ToxVM) setupCallbacks() {
 		this.pubmsg(&evt)
 	}, nil)
 
-	t.CallbackConferenceNameListChangeAdd(func(_ *tox.Tox, groupNumber uint32, peerNumber uint32, change uint8, userData interface{}) {
+	t.CallbackConferencePeerNameAdd(func(_ *tox.Tox, groupNumber uint32, peerNumber uint32, name string, userData interface{}) {
 		evt := thspbs.Event{}
-		evt.Name = "ConferenceNameListChange"
-		evt.Args = []string{fmt.Sprintf("%d", groupNumber),
-			fmt.Sprintf("%d", peerNumber), fmt.Sprintf("%d", change)}
+		evt.Name = "ConferenceNamePeerName"
+		evt.Args = []string{fmt.Sprintf("%d", groupNumber), fmt.Sprintf("%d", peerNumber), name}
 
 		peerPubkey, err := t.ConferencePeerGetPublicKey(groupNumber, peerNumber)
 		gopp.ErrPrint(err)
@@ -254,6 +253,52 @@ func (this *ToxVM) setupCallbacks() {
 
 		this.pubmsg(&evt)
 	}, nil)
+	// TODO detect which peer added/deleted here and directly tell client, make client lighter.
+	t.CallbackConferencePeerListChangedAdd(func(_ *tox.Tox, groupNumber uint32, userData interface{}) {
+		evt := thspbs.Event{}
+		evt.Name = "ConferencePeerListChange"
+		evt.Args = []string{fmt.Sprintf("%d", groupNumber)}
+
+		title, err := t.ConferenceGetTitle(groupNumber)
+		gopp.ErrPrint(err)
+
+		groupId, _ := xtox.ConferenceGetIdentifier(t, groupNumber)
+		if xtox.ConferenceIdIsEmpty(groupId) {
+			groupId, _ = t.ConferenceGetIdentifier(groupNumber)
+		}
+
+		evt.Margs = []string{title, groupId}
+
+		this.pubmsg(&evt)
+	}, nil)
+
+	/*
+		t.CallbackConferenceNameListChangeAdd(func(_ *tox.Tox, groupNumber uint32, peerNumber uint32, change uint8, userData interface{}) {
+			evt := thspbs.Event{}
+			evt.Name = "ConferenceNameListChange"
+			evt.Args = []string{fmt.Sprintf("%d", groupNumber),
+				fmt.Sprintf("%d", peerNumber), fmt.Sprintf("%d", change)}
+
+			peerPubkey, err := t.ConferencePeerGetPublicKey(groupNumber, peerNumber)
+			gopp.ErrPrint(err)
+			peerName, err := t.ConferencePeerGetName(groupNumber, peerNumber)
+			gopp.ErrPrint(err)
+
+			title, err := t.ConferenceGetTitle(groupNumber)
+			gopp.ErrPrint(err)
+
+			groupId, _ := xtox.ConferenceGetIdentifier(t, groupNumber)
+			if xtox.ConferenceIdIsEmpty(groupId) {
+				groupId, _ = t.ConferenceGetIdentifier(groupNumber)
+			}
+
+			ctid, err := appctx.st.AddPeer(peerPubkey, groupNumber)
+			gopp.ErrPrint(err)
+			evt.Margs = []string{peerName, peerPubkey, title, groupId, fmt.Sprintf("%d", ctid)}
+
+			this.pubmsg(&evt)
+		}, nil)
+	*/
 
 	t.CallbackConferenceTitleAdd(func(_ *tox.Tox, groupNumber uint32, peerNumber uint32, title string, userData interface{}) {
 		evt := thspbs.Event{}

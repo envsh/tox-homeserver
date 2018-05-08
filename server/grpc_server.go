@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
 	"context"
@@ -7,8 +7,9 @@ import (
 	"log"
 	"net"
 
-	tox "github.com/kitech/go-toxcore"
-	"github.com/kitech/go-toxcore/xtox"
+	// tox "github.com/envsh/go-toxcore"
+	tox "github.com/TokTok/go-toxcore-c"
+	"github.com/envsh/go-toxcore/xtox"
 	"github.com/nats-io/nats"
 
 	"atapi/dorpc/dyngrpc"
@@ -178,7 +179,7 @@ func (this *GrpcService) RmtCall(ctx context.Context, req *thspbs.Event) (*thspb
 		gn, err := t.ConferenceNew()
 		gopp.ErrPrint(err, rname)
 		out.Mid = int64(gn)
-		err = t.ConferenceSetTitle(gn, rname)
+		_, err = t.ConferenceSetTitle(gn, rname)
 		gopp.ErrPrint(err, gn, rname)
 		groupId, _ := t.ConferenceGetIdentifier(gn)
 		out.Args = append(out.Args, groupId)
@@ -188,13 +189,13 @@ func (this *GrpcService) RmtCall(ctx context.Context, req *thspbs.Event) (*thspb
 
 	case "ConferenceDelete": // "groupNumber"
 		gnum := gopp.MustUint32(req.Args[0])
-		err = t.ConferenceDelete(gnum)
+		_, err = t.ConferenceDelete(gnum)
 		gopp.ErrPrint(err, req.Args)
 
 	case "ConferenceSendMessage": // "groupNumber","mtype","msg"
 		gnum := gopp.MustInt(req.Args[0])
 		mtype := gopp.MustInt(req.Args[1])
-		err = t.ConferenceSendMessage(uint32(gnum), mtype, req.Args[2])
+		_, err = t.ConferenceSendMessage(uint32(gnum), mtype, req.Args[2])
 		gopp.ErrPrint(err)
 		if err != nil {
 			out.Ecode = -1
@@ -225,7 +226,7 @@ func (this *GrpcService) RmtCall(ctx context.Context, req *thspbs.Event) (*thspb
 	case "ConferenceInvite": // groupNumber, friendNumber
 		gnum := gopp.MustUint32(req.Args[0])
 		fnum := gopp.MustUint32(req.Args[1])
-		err := t.ConferenceInvite(fnum, gnum)
+		_, err := t.ConferenceInvite(fnum, gnum)
 		gopp.ErrPrint(err, req.Args)
 		// TODO
 		// case "GetHistory":

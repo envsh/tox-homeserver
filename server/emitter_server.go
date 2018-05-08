@@ -1,3 +1,3 @@
-package main
+package server
 
 // emitter.io pubsub on mqtt

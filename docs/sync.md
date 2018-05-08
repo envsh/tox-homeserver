@@ -9,7 +9,7 @@
 
 ### 关于订阅的实现
 
-* grpc+nats
+* grpc+nats (现在的方式)
 * grpc+custom
 * comet
 * websocket
@@ -19,4 +19,8 @@
 ### 参考：
 pubsub库：https://github.com/lileio/pubsub
 goim库
+
+### FAQ
+
+Q: android 防屏幕关闭JNI或者go实现
 
