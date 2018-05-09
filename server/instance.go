@@ -346,5 +346,6 @@ func (this *ToxVM) pubmsg(evt *thspbs.Event) error {
 		// log.Println("pubmsg ok", len(bcc))
 	}
 	common.BytesSent(len(bcc))
+	appctx.wssrv.pushevt(evt)
 	return err
 }

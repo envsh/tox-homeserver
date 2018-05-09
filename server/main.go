@@ -26,9 +26,10 @@ func init() {
 }
 
 type appContext struct {
-	tvm  *ToxVM
-	rpcs *GrpcServer
-	st   *store.Storage
+	tvm   *ToxVM
+	rpcs  *GrpcServer
+	wssrv *WebsocketServer
+	st    *store.Storage
 }
 
 var appctx = &appContext{}
@@ -56,6 +57,11 @@ func Main() {
 	appctx.st = store.NewStorage()
 	common.SetLogMetrics()
 	go func() {
+		// 为简单debug,stats,socketio,websocket使用
+		sio := NewSocketioServer()
+		wso := NewWebsocketServer()
+		appctx.wssrv = wso
+		log.Println("Listen on http *:8089 ...", sio, wso)
 		err := http.ListenAndServe(":8089", nil)
 		gopp.ErrPrint(err)
 	}()
