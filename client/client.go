@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"gopp"
 	"log"
@@ -15,6 +16,7 @@ import (
 	thscom "tox-homeserver/common"
 
 	simplejson "github.com/bitly/go-simplejson"
+	"github.com/gorilla/websocket"
 	"github.com/nats-io/go-nats"
 	"google.golang.org/grpc"
 )
@@ -55,8 +57,11 @@ type LigTox struct {
 	bemsgsmu sync.RWMutex
 	OnNewMsg func()
 
-	rpcli  *grpc.ClientConn
-	ntscli *nats.Conn
+	rpcli    *grpc.ClientConn
+	ntscli   *nats.Conn
+	wsc4push *websocket.Conn
+	wsc4rpc  *websocket.Conn
+	usewstp  bool // use websocket transport for replace grpc+nats
 
 	// some callbacks, should be private. &fn => ud
 	cb_friend_requests           map[unsafe.Pointer]interface{}
@@ -109,7 +114,14 @@ func NewLigTox() *LigTox {
 	}
 	this.ntscli = ntscli
 	log.Println("gnats connected:", ntscli.IsConnected(), thscom.GnatsAddr)
-	ntscli.Subscribe(thscom.CBEventBusName, this.onBackendEvent)
+	ntscli.Subscribe(thscom.CBEventBusName, this.onBackendEventNats)
+
+	this.wsc4rpc, _, err = websocket.DefaultDialer.Dial(fmt.Sprintf("%s/toxhsrpc", thscom.WSAddr), nil)
+	gopp.ErrPrint(err, thscom.WSAddr)
+	this.wsc4push, _, err = websocket.DefaultDialer.Dial(fmt.Sprintf("%s/toxhspush", thscom.WSAddr), nil)
+	gopp.ErrPrint(err, thscom.WSAddr)
+	go this.serveBackendEventWS()
+	// TODO reconnect
 
 	return this
 }
@@ -142,14 +154,37 @@ func (this *LigTox) initCbmap() {
 
 }
 
-func (this *LigTox) onBackendEvent(msg *nats.Msg) {
+func (this *LigTox) onBackendEventNats(msg *nats.Msg) {
 	log.Println(msg.Subject, string(msg.Data))
 	jso, err := simplejson.NewJson(msg.Data)
 	gopp.ErrPrint(err)
 
+	this.onBackendEvent(jso, msg.Data)
+}
+
+// should block
+func (this *LigTox) serveBackendEventWS() {
+	for {
+		c := this.wsc4push
+		_, message, err := c.ReadMessage()
+		if err != nil {
+			log.Println("read:", err)
+			break
+		}
+		log.Printf("recv: %s\n", message)
+
+		jso, err := simplejson.NewJson(message)
+		gopp.ErrPrint(err)
+		this.onBackendEvent(jso, message)
+	}
+	log.Println("done")
+}
+
+func (this *LigTox) onBackendEvent(jso *simplejson.Json, data []byte) {
+
 	defer func() {
 		this.bemsgsmu.Lock()
-		this.bemsgs = append(this.bemsgs, msg.Data)
+		this.bemsgs = append(this.bemsgs, data)
 		if len(this.bemsgs) > 500 {
 			log.Println("queue too large.", len(this.bemsgs))
 			this.bemsgs = this.bemsgs[len(this.bemsgs)-500:]
@@ -195,12 +230,43 @@ func (this *LigTox) onBackendEvent(msg *nats.Msg) {
 	}
 }
 
+func (this *LigTox) rmtCall(args *thspbs.Event) (*thspbs.Event, error) {
+	if this.usewstp {
+		data, err := json.Marshal(args)
+		gopp.ErrPrint(err)
+		err = this.wsc4rpc.WriteMessage(websocket.TextMessage, data)
+		gopp.ErrPrint(err)
+		mt, rdata, err := this.wsc4rpc.ReadMessage()
+		gopp.ErrPrint(err, mt)
+		rsp := &thspbs.Event{}
+		err = json.Unmarshal(rdata, rsp)
+		gopp.ErrPrint(err)
+		return rsp, err
+	} else {
+		cli := thspbs.NewToxhsClient(this.rpcli)
+		rsp, err := cli.RmtCall(context.Background(), args)
+		return rsp, err
+	}
+}
+
 func (this *LigTox) GetBaseInfo() {
-	c := thspbs.NewToxhsClient(this.rpcli)
-	in := &thspbs.EmptyReq{}
-	bi, err := c.GetBaseInfo(context.Background(), in)
-	gopp.ErrPrint(err)
-	this.ParseBaseInfo(bi)
+	if this.usewstp {
+		in := &thspbs.Event{}
+		in.Name = "GetBaseInfo"
+		rsp, err := this.rmtCall(in)
+		gopp.ErrPrint(err)
+
+		binfo := &thspbs.BaseInfo{}
+		err = json.Unmarshal([]byte(rsp.Args[0]), binfo)
+		gopp.ErrPrint(err)
+		this.ParseBaseInfo(binfo)
+	} else {
+		cli := thspbs.NewToxhsClient(this.rpcli)
+		in := &thspbs.EmptyReq{}
+		bi, err := cli.GetBaseInfo(context.Background(), in)
+		gopp.ErrPrint(err)
+		this.ParseBaseInfo(bi)
+	}
 }
 
 func (this *LigTox) ParseBaseInfo(bi *thspbs.BaseInfo) {
@@ -653,8 +719,11 @@ func (this *LigTox) FriendSendMessage(friendNumber uint32, message string) (uint
 	args := thspbs.Event{}
 	args.Name = fname
 	args.Args = []string{fmt.Sprintf("%d", friendNumber), message}
-	cli := thspbs.NewToxhsClient(this.rpcli)
-	rsp, err := cli.RmtCall(context.Background(), &args)
+
+	// cli := thspbs.NewToxhsClient(this.rpcli)
+	// rsp, err := cli.RmtCall(context.Background(), &args)
+	rsp, err := this.rmtCall(&args)
+
 	gopp.ErrPrint(err, rsp)
 	log.Println(rsp)
 	wn := gopp.MustUint32(rsp.Args[0])

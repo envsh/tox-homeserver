@@ -60,7 +60,8 @@
     <script src="https://unpkg.com/element-ui/lib/index.js"></script>
 
     <script>
-     var wsc = null;
+     var wsc4rpc = null;
+     var wsc4push = null;
      var app0 = new Vue({
          el: '#app',
          data: function() {
@@ -74,40 +75,60 @@
              }
          },
          mounted:function(){
-             this.method1() //method1 will execute at pageload
+             this.method1(); //method1 will execute at pageload
+             this.method2();
          },
          methods:{
              method1:function(){
                  /* your logic */
-                 console.log("hhhhhhhhh"+wsc);
-                 wsc = new WebSocket('ws://wip.duckdns.org:8089/toxhs', 'toxhs');
+                 console.log("hhhhhhhhh"+wsc4push);
+                 wsc4push = new WebSocket('ws://wip.duckdns.org:8089/toxhspush', 'toxhs');
 
-                 wsc.addEventListener("open", function(event) {
-                     //  close.disabled = false;
-                     //  send.disabled = false;
-                     // status.textContent = "Connected";
+                 wsc4push.addEventListener("open", function(event) {
                      app0.ConnState = "None";
-                     console.log("Connected");
+                     console.log("Connected push");
                  });
 
                  // Display messages received from the server
-                 wsc.addEventListener("message", function(event) {
-                     // message.textContent = "Server Says: " + event.data;
+                 wsc4push.addEventListener("message", function(event) {
                      console.log("Server Says: " + event.data);
                      app0.EventLines += event.data+"\n";
                  });
 
                  // Display any errors that occur
-                 wsc.addEventListener("error", function(event) {
-                     //  message.textContent = "Error: " + event;
-                     console.log("Error: " + event.data);
+                 wsc4push.addEventListener("error", function(event) {
+                     console.log("Error push: " + event.data);
                  });
 
-                 wsc.addEventListener("close", function(event) {
-                     // open.disabled = false;
-                     // status.textContent = "Not Connected";
+                 wsc4push.addEventListener("close", function(event) {
                      app0.ConnState = "Gone";
-                     console.log("closed");
+                     console.log("closed push");
+                 });
+             },
+             method2:function(){
+                 /* your logic */
+                 console.log("hhhhhhhhh"+wsc4rpc);
+                 wsc4rpc = new WebSocket('ws://wip.duckdns.org:8089/toxhsrpc', 'toxhs');
+
+                 wsc4rpc.addEventListener("open", function(event) {
+                     app0.ConnState = "None";
+                     console.log("Connected rpc");
+                 });
+
+                 // Display messages received from the server
+                 wsc4rpc.addEventListener("message", function(event) {
+                     console.log("Server Says: " + event.data);
+                     app0.EventLines += event.data+"\n";
+                 });
+
+                 // Display any errors that occur
+                 wsc4rpc.addEventListener("error", function(event) {
+                     console.log("Error rpc: " + event.data);
+                 });
+
+                 wsc4rpc.addEventListener("close", function(event) {
+                     app0.ConnState = "Gone";
+                     console.log("closed rpc");
                  });
              },
          },

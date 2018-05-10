@@ -12,7 +12,7 @@
 * grpc+nats (现在的方式)
 * grpc+custom
 * comet
-* websocket
+* websocket*2 (1 for rpc, 1 for push)
 * grpc+emitter.io
 * nrpc=rpc based on nats
 

@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"gopp"
 	"log"
@@ -93,6 +94,12 @@ func RmtCallHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Event, erro
 	var err error
 	t := appctx.tvm.t
 	switch req.Name {
+	case "GetBaseInfo":
+		binfo, err := packBaseInfo(t)
+		gopp.ErrPrint(err)
+		bdata, err := json.Marshal(binfo)
+		gopp.ErrPrint(err)
+		out.Args = []string{string(bdata)}
 	case "FriendSendMessage": // "friendNumber", "msg"
 		fnum := gopp.MustInt(req.Args[0])
 		wn, err := t.FriendSendMessage(uint32(fnum), req.Args[1])

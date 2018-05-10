@@ -175,8 +175,11 @@ func (this *LigTox) ConferencePeerGetName(groupNumber uint32, peerNumber uint32)
 	args := thspbs.Event{}
 	args.Name = fname
 	args.Args = []string{fmt.Sprintf("%d", groupNumber), fmt.Sprintf("%d", peerNumber)}
-	cli := thspbs.NewToxhsClient(this.rpcli)
-	rsp, err := cli.RmtCall(context.Background(), &args)
+
+	// cli := thspbs.NewToxhsClient(this.rpcli)
+	// rsp, err := cli.RmtCall(context.Background(), &args)
+	rsp, err := this.rmtCall(&args)
+
 	gopp.ErrPrint(err, rsp)
 	log.Println(rsp)
 	if rsp.Ecode != 0 {
@@ -190,8 +193,11 @@ func (this *LigTox) ConferenceInvite(groupNumber uint32, peerNumber uint32) erro
 	args := thspbs.Event{}
 	args.Name = fname
 	args.Args = []string{fmt.Sprintf("%d", groupNumber), fmt.Sprintf("%d", peerNumber)}
-	cli := thspbs.NewToxhsClient(this.rpcli)
-	rsp, err := cli.RmtCall(context.Background(), &args)
+
+	// cli := thspbs.NewToxhsClient(this.rpcli)
+	// rsp, err := cli.RmtCall(context.Background(), &args)
+	rsp, err := this.rmtCall(&args)
+
 	gopp.ErrPrint(err, rsp)
 	log.Println(rsp)
 	if rsp.Ecode != 0 {

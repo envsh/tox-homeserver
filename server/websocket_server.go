@@ -33,13 +33,48 @@ func NewWebsocketServer() *WebsocketServer {
 }
 
 func (this *WebsocketServer) initHandler() {
-	http.HandleFunc("/toxhs", this.toxhs)
+	http.HandleFunc("/toxhsrpc", this.toxhsrpc)
+	http.HandleFunc("/toxhspush", this.toxhspush)
 	http.HandleFunc("/webdui/", this.webdui)
 	http.HandleFunc("/webdui", this.webdui)
 	http.HandleFunc("/echo", this.echo)
 }
 
-func (this *WebsocketServer) toxhs(w http.ResponseWriter, r *http.Request) {
+func (this *WebsocketServer) toxhsrpc(w http.ResponseWriter, r *http.Request) {
+	c, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Println("upgrade:", err, r.URL.String())
+		return
+	}
+	ctime := time.Now()
+	raddr := c.RemoteAddr().String()
+	defer func() {
+		c.Close()
+	}()
+
+	// TODO 保证Req/Resp的序列？
+	for {
+		mt, message, err := c.ReadMessage()
+		if err != nil {
+			log.Println("read:", err)
+			break
+		}
+		log.Printf("recv: %s of %d\n", message, mt)
+		req := &thspbs.Event{}
+		err = json.Unmarshal(message, req)
+		gopp.ErrPrint(err, string(message))
+
+		rsp, err := RmtCallHandler(context.Background(), req)
+		gopp.ErrPrint(err)
+		rspcc, err := json.Marshal(rsp)
+		gopp.ErrPrint(err)
+		err = c.WriteMessage(mt, rspcc)
+		gopp.ErrPrint(err)
+	}
+	log.Println("disconnected from:", raddr, time.Now().Sub(ctime))
+}
+
+func (this *WebsocketServer) toxhspush(w http.ResponseWriter, r *http.Request) {
 	c, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println("upgrade:", err, r.URL.String())
@@ -58,6 +93,7 @@ func (this *WebsocketServer) toxhs(w http.ResponseWriter, r *http.Request) {
 		this.connsmu.Unlock()
 	}()
 
+	// TODO 保证Req/Resp的序列？
 	for {
 		mt, message, err := c.ReadMessage()
 		if err != nil {
@@ -65,16 +101,6 @@ func (this *WebsocketServer) toxhs(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 		log.Printf("recv: %s of %d\n", message, mt)
-		req := &thspbs.Event{}
-		err = json.Unmarshal(message, req)
-		gopp.ErrPrint(err, string(message))
-
-		rsp, err := RmtCallHandler(context.Background(), req)
-		gopp.ErrPrint(err)
-		rspcc, err := json.Marshal(rsp)
-		gopp.ErrPrint(err)
-		err = c.WriteMessage(mt, rspcc)
-		gopp.ErrPrint(err)
 	}
 	log.Println("disconnected from:", raddr, time.Now().Sub(ctime))
 }
