@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"gopp"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"sync"
@@ -13,7 +14,10 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-var upgrader = websocket.Upgrader{} // use default options
+// use default options
+var upgrader = websocket.Upgrader{
+	CheckOrigin: func(r *http.Request) bool { return true },
+}
 
 type WebsocketServer struct {
 	conns   map[string]*websocket.Conn
@@ -30,13 +34,15 @@ func NewWebsocketServer() *WebsocketServer {
 
 func (this *WebsocketServer) initHandler() {
 	http.HandleFunc("/toxhs", this.toxhs)
+	http.HandleFunc("/webdui/", this.webdui)
+	http.HandleFunc("/webdui", this.webdui)
 	http.HandleFunc("/echo", this.echo)
 }
 
 func (this *WebsocketServer) toxhs(w http.ResponseWriter, r *http.Request) {
 	c, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Println("upgrade:", err)
+		log.Println("upgrade:", err, r.URL.String())
 		return
 	}
 	ctime := time.Now()
@@ -84,6 +90,13 @@ func (this *WebsocketServer) pushevt(evt *thspbs.Event) error {
 		gopp.ErrPrint(err)
 	}
 	return nil
+}
+
+func (this *WebsocketServer) webdui(w http.ResponseWriter, r *http.Request) {
+	log.Println(r.URL.String())
+	bcc, err := ioutil.ReadFile("./webdui/index.html")
+	gopp.ErrPrint(err)
+	w.Write(bcc)
 }
 
 func (this *WebsocketServer) echo(w http.ResponseWriter, r *http.Request) {
