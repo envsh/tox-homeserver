@@ -173,6 +173,7 @@ func (this *ToxVM) setupCallbacks() {
 		ctid, err := appctx.st.AddGroup(cookie2, gn, "")
 		gopp.ErrPrint(err)
 		evt.Margs = append(evt.Margs, fmt.Sprintf("%d", ctid))
+		// TODO if title not none, append to Margs
 
 		this.pubmsg(&evt)
 	}, nil)

@@ -11,7 +11,7 @@
             <el-row :gutter="20">
                 <el-col :span="1"><div class="grid-content bg-purple">&nbsp;</div></el-col>
                 <el-col :span="3"><div class="grid-content bg-purple">{{ UserName }}</div></el-col>
-                <el-col :span="8"><div class="grid-content bg-purple">{{ UserStatusMessage }}</div></el-col>
+                <el-col :span="8"><div class="grid-content bg-purple">{{ StatusMessage }}</div></el-col>
                 <el-col :span="3"><div class="grid-content bg-purple">{{ ToxhsHost }}</div></el-col>
                 <el-col :span="3"><div class="grid-content bg-purple">连接： {{ ConnState }}</div></el-col>
             </el-row>
@@ -24,9 +24,9 @@
                         <el-col :span="2"><div class="grid-content bg-purple">Contacts:</div></el-col>
                         <el-col :span="5"><div class="grid-content bg-purple">
                             <template>
-                        <el-select v-model="value" placeholder="请选择">
+                        <el-select v-model="CurrentContact" placeholder="请选择">
                             <el-option
-                                v-for="item in options"
+                                v-for="item in Contacts"
                                 :key="item.value"
                                 :label="item.label"
                                 :value="item.value">
@@ -34,8 +34,8 @@
                         </el-select>
                             </template>
                         </div></el-col>
-                        <el-col :span="3"><div class="grid-content bg-purple">
-                            <el-input v-model="input" placeholder=""></el-input></div></el-col>
+                        <el-col :span="12"><div class="grid-content bg-purple">
+                            <el-input v-model="CurrentContact" placeholder=""></el-input></div></el-col>
                     </el-row>
                 </el-footer>
             </el-container>
@@ -43,10 +43,10 @@
                 <el-footer>
                     <el-row :gutter="20">
                         <el-col :span="1"><div class="grid-content bg-purple">Input:</div></el-col>
-                        <el-col :span="12"><div class="grid-content bg-purple">
-                            <el-input v-model="input" placeholder="请输入内容"></el-input></div></el-col>
+                        <el-col :span="16"><div class="grid-content bg-purple">
+                            <el-input v-model="InputText" placeholder="请输入内容"></el-input></div></el-col>
                         <el-col :span="2"><div class="grid-content bg-purple">
-                            <el-button>发送消息</el-button>
+                            <el-button v-on:click="SendMessage">发送消息</el-button>
                         </div></el-col>
                     </el-row>
                 </el-footer>
@@ -62,16 +62,23 @@
     <script>
      var wsc4rpc = null;
      var wsc4push = null;
+     // TODO querystring as host: ?server=ip:port
+     var addrp = 'ws://127.0.0.1:8089'; // path: /toxhsrpc or /toxhspush
+     var addrp = 'ws://txhs.duckdns.org:8089'; // path: /toxhsrpc or /toxhspush
      var app0 = new Vue({
          el: '#app',
          data: function() {
              return {
                  visible: false,
                  UserName: "Tox User",
-                 UserStatusMessage: "-------",
+                 StatusMessage: "-------",
                  ToxhsHost: "127.0.0.1:8089",
                  EventLines: "",
                  ConnState: "Gone",
+                 CurrentContact: '',
+                 // {'value':'hehhe', 'label':'hehehhe', 'isgroup':false}
+                 Contacts: [],
+                 InputText: '',
              }
          },
          mounted:function(){
@@ -82,7 +89,7 @@
              method1:function(){
                  /* your logic */
                  console.log("hhhhhhhhh"+wsc4push);
-                 wsc4push = new WebSocket('ws://wip.duckdns.org:8089/toxhspush', 'toxhs');
+                 wsc4push = new WebSocket(addrp+'/toxhspush', 'toxhs');
 
                  wsc4push.addEventListener("open", function(event) {
                      app0.ConnState = "None";
@@ -91,8 +98,9 @@
 
                  // Display messages received from the server
                  wsc4push.addEventListener("message", function(event) {
-                     console.log("Server Says: " + event.data);
-                     app0.EventLines += event.data+"\n";
+                     // console.log("Server Says: " + event.data);
+                     // app0.EventLines += event.data+"\n";
+                     processRpcResponse(event.data);
                  });
 
                  // Display any errors that occur
@@ -108,17 +116,20 @@
              method2:function(){
                  /* your logic */
                  console.log("hhhhhhhhh"+wsc4rpc);
-                 wsc4rpc = new WebSocket('ws://wip.duckdns.org:8089/toxhsrpc', 'toxhs');
+                 wsc4rpc = new WebSocket(addrp+'/toxhsrpc', 'toxhs');
 
                  wsc4rpc.addEventListener("open", function(event) {
                      app0.ConnState = "None";
                      console.log("Connected rpc");
+                     req = {'Name': 'GetBaseInfo'};
+                     wsc4rpc.send(JSON.stringify(req));
                  });
 
                  // Display messages received from the server
                  wsc4rpc.addEventListener("message", function(event) {
-                     console.log("Server Says: " + event.data);
-                     app0.EventLines += event.data+"\n";
+                     // console.log("Server Says: " + event.data);
+                     // app0.EventLines += event.data+"\n";
+                     processRpcResponse(event.data);
                  });
 
                  // Display any errors that occur
@@ -131,7 +142,99 @@
                      console.log("closed rpc");
                  });
              },
+             SendMessage: function(){
+                 console.log(app0.CurrentContact);
+                 ct = findContact(app0.CurrentContact);
+                 console.log(ct);
+                 if (ct.isgroup) {
+                     req = {'name': 'ConferenceSendMessage', 'args': [ct.value, '0', app0.InputText, ct.label]}
+                     wsc4rpc.send(JSON.stringify(req));
+                 } else {
+                     req = {'name': 'FriendSendMessage', 'args': [ct.value, app0.InputText]}
+                     wsc4rpc.send(JSON.stringify(req));
+                 }
+                 line = app0.UserName + ' -> ' + ct.label + ': ' + app0.InputText;
+                 appendOutput(line);
+                 app0.InputText = '';
+             },
          },
      })
+
+     function appendOutput(line){
+         nowt = '';
+         nowt = new Date();
+         nowts = nowt.getHours() + ':' + nowt.getMinutes() + ':'+ nowt.getSeconds();
+         app0.EventLines += nowts + ' ' + line + "\n";
+     }
+     function findContact(id) {
+         for (i = 0; i < app0.Contacts.length; i++) {
+             item = app0.Contacts[i];
+             if (item.value == id) {
+                 return item;
+             }
+         }
+         return null;
+     }
+     function putContact(name, id, isgroup) {
+         found = findContact(id) != null;
+         console.log(name,id,isgroup,found);
+         if (!found) {
+             app0.Contacts.push({'value': id, 'label': name, 'isgroup': isgroup});
+         }
+         app0.CurrentContact = id;
+     }
+     function popContact(name, id){
+     }
+     function processRpcResponse(data) {
+         jso = JSON.parse(data);
+         if (jso.name == "GetBaseInfoResp") {
+             appendOutput('GetBaseInfo done');
+             binfo = JSON.parse(jso.args[0])
+             console.log(binfo);
+             app0.ConnState = binfo.connStatus > 0 ? 'OK':'None';
+             app0.UserName = binfo.name;
+             app0.StatusMessage = binfo.stmsg;
+             friends = binfo.friends;
+             keys = Object.keys(friends);
+             for (i = 0; i < keys.length; i ++) {
+                 friend = friends[keys[i]];
+                 putContact(friend.name, friend.pubkey, false);
+             }
+             groups = binfo.groups;
+             keys = Object.keys(groups);
+             for (i = 0; i < keys.length; i ++) {
+                 group = groups[keys[i]];
+                 putContact(group.title, group.groupId, true);
+             }
+         } else if (jso.name == "FriendSendMessageResp") {
+         } else if (jso.name == "ConferenceSendMessageResp") {
+         } else if (jso.name == "FriendMessage") {
+             var line = jso.margs[0]+": " + jso.args[1];
+             appendOutput(line);
+         } else if (jso.name == "ConferenceMessage") {
+             var line = jso.margs[2]+"'s "+jso.margs[0] + ": " + jso.args[3];
+             appendOutput(line);
+             putContact(jso.margs[2], jso.margs[3],  true);
+         } else if (jso.name == "ConferenceTitle") {
+             var line = jso.name + " change to " + jso.args[2] + " by " + jso.margs[1];
+             appendOutput(line);
+             putContact(jso.args[2], jso.margs[2],  true);
+         } else if (jso.name == "ConferenceNamePeerName") {
+             var line = jso.args[2] + " joined in " + jso.margs[2];
+             appendOutput(line);
+         } else if (jso.name == "SelfConnectionStatus") {
+             var line = jso.name + " " + jso.margs[0];
+             appendOutput(line);
+         } else if (jso.name == "FriendConnectionStatus") {
+             var line = jso.name + " " + jso.margs[0] + " " + jso.margs[2];
+             appendOutput(line);
+         } else if (jso.name == "ConferenceInvite") {
+             var line = jso.name + " to ??? " + " by " + jso.margs[0];
+             appendOutput(line);
+         } else if (jso.name == "ConferencePeerListChange") { // TODO leave???
+         } else {
+             appendOutput(data);
+         }
+     }
     </script>
 </html>

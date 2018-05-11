@@ -89,7 +89,7 @@ func packBaseInfo(t *tox.Tox) (*thspbs.BaseInfo, error) {
 // TODO 自己的消息做多终端同步转发
 func RmtCallHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Event, error) {
 	log.Println(req.Id, req.Name, req.Args, req.Margs)
-	out := &thspbs.Event{}
+	out := &thspbs.Event{Name: req.Name + "Resp"}
 
 	var err error
 	t := appctx.tvm.t
@@ -100,9 +100,12 @@ func RmtCallHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Event, erro
 		bdata, err := json.Marshal(binfo)
 		gopp.ErrPrint(err)
 		out.Args = []string{string(bdata)}
-	case "FriendSendMessage": // "friendNumber", "msg"
-		fnum := gopp.MustInt(req.Args[0])
-		wn, err := t.FriendSendMessage(uint32(fnum), req.Args[1])
+	case "FriendSendMessage": // args: "friendNumber" or "friendPubkey", "msg"
+		fnum := uint32(gopp.MustInt(req.Args[0]))
+		if len(req.Args[0]) >= 64 { // think as friendPubkey
+			fnum, _ = t.FriendByPublicKey(req.Args[0])
+		}
+		wn, err := t.FriendSendMessage(fnum, req.Args[1])
 		gopp.ErrPrint(err)
 		pubkey := t.SelfGetPublicKey()
 		msgid, err := appctx.st.AddFriendMessage(req.Args[1], pubkey)
@@ -129,10 +132,13 @@ func RmtCallHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Event, erro
 		_, err = t.ConferenceDelete(gnum)
 		gopp.ErrPrint(err, req.Args)
 
-	case "ConferenceSendMessage": // "groupNumber","mtype","msg"
-		gnum := gopp.MustInt(req.Args[0])
+	case "ConferenceSendMessage": // "groupNumber" or groupIdentity,"mtype","msg", optional4web("groupTitle")
+		gnum := uint32(gopp.MustInt(req.Args[0]))
 		mtype := gopp.MustInt(req.Args[1])
-		_, err = t.ConferenceSendMessage(uint32(gnum), mtype, req.Args[2])
+		if len(req.Args[0]) > 10 { // think as groupIdentity
+			gnum, _ = xtox.ConferenceGetByCookie(t, req.Args[0])
+		}
+		_, err = t.ConferenceSendMessage(gnum, mtype, req.Args[2])
 		gopp.ErrPrint(err)
 		if err != nil {
 			out.Ecode = -1

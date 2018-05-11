@@ -28,19 +28,22 @@ type Ui_MainWindow struct {
 	Label_2            *qtwidgets.QLabel
 	Label_3            *qtwidgets.QLabel
 	Label_4            *qtwidgets.QLabel
+	Label_7            *qtwidgets.QLabel
+	Label_8            *qtwidgets.QLabel
 	PlainTextEdit      *qtwidgets.QPlainTextEdit
 	HorizontalLayout_2 *qtwidgets.QHBoxLayout
 	Label_5            *qtwidgets.QLabel
 	ComboBox           *qtwidgets.QComboBox
 	LineEdit           *qtwidgets.QLineEdit
 	Label_6            *qtwidgets.QLabel
-	HorizontalSpacer   *qtwidgets.QSpacerItem
 	HorizontalLayout_3 *qtwidgets.QHBoxLayout
 	LineEdit_2         *qtwidgets.QLineEdit
 	PushButton         *qtwidgets.QPushButton
 	Menubar            *qtwidgets.QMenuBar
 	Statusbar          *qtwidgets.QStatusBar
 	MainWindow         *qtwidgets.QMainWindow
+	SizePolicy         *qtwidgets.QSizePolicy
+	SizePolicy1        *qtwidgets.QSizePolicy
 }
 
 //  struct block end
@@ -65,8 +68,9 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 
 	this.HorizontalLayout.Layout().AddWidget(this.Label) // 115
 
-	this.Label_2 = qtwidgets.NewQLabel(this.Centralwidget, 0) // 111
-	this.Label_2.SetObjectName("Label_2")                     // 112
+	this.Label_2 = qtwidgets.NewQLabel(this.Centralwidget, 0)                                                  // 111
+	this.Label_2.SetObjectName("Label_2")                                                                      // 112
+	this.Label_2.SetTextInteractionFlags(qtcore.Qt__LinksAccessibleByMouse | qtcore.Qt__TextSelectableByMouse) // 114
 
 	this.HorizontalLayout.Layout().AddWidget(this.Label_2) // 115
 
@@ -75,10 +79,22 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 
 	this.HorizontalLayout.Layout().AddWidget(this.Label_3) // 115
 
-	this.Label_4 = qtwidgets.NewQLabel(this.Centralwidget, 0) // 111
-	this.Label_4.SetObjectName("Label_4")                     // 112
+	this.Label_4 = qtwidgets.NewQLabel(this.Centralwidget, 0)                                                  // 111
+	this.Label_4.SetObjectName("Label_4")                                                                      // 112
+	this.Label_4.SetTextInteractionFlags(qtcore.Qt__LinksAccessibleByMouse | qtcore.Qt__TextSelectableByMouse) // 114
 
 	this.HorizontalLayout.Layout().AddWidget(this.Label_4) // 115
+
+	this.Label_7 = qtwidgets.NewQLabel(this.Centralwidget, 0)                                                  // 111
+	this.Label_7.SetObjectName("Label_7")                                                                      // 112
+	this.Label_7.SetTextInteractionFlags(qtcore.Qt__LinksAccessibleByMouse | qtcore.Qt__TextSelectableByMouse) // 114
+
+	this.HorizontalLayout.Layout().AddWidget(this.Label_7) // 115
+
+	this.Label_8 = qtwidgets.NewQLabel(this.Centralwidget, 0) // 111
+	this.Label_8.SetObjectName("Label_8")                     // 112
+
+	this.HorizontalLayout.Layout().AddWidget(this.Label_8) // 115
 
 	this.VerticalLayout.AddLayout(this.HorizontalLayout, 0) // 115
 
@@ -91,6 +107,11 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.HorizontalLayout_2.SetObjectName("HorizontalLayout_2") // 112
 	this.Label_5 = qtwidgets.NewQLabel(this.Centralwidget, 0)   // 111
 	this.Label_5.SetObjectName("Label_5")                       // 112
+	this.SizePolicy = qtwidgets.NewQSizePolicy_1(qtwidgets.QSizePolicy__Fixed, qtwidgets.QSizePolicy__Preferred, 1)
+	this.SizePolicy.SetHorizontalStretch(0)                                          // 114
+	this.SizePolicy.SetVerticalStretch(0)                                            // 114
+	this.SizePolicy.SetHeightForWidth(this.Label_5.SizePolicy().HasHeightForWidth()) // 114
+	this.Label_5.SetSizePolicy(this.SizePolicy)                                      // 114
 
 	this.HorizontalLayout_2.Layout().AddWidget(this.Label_5) // 115
 
@@ -101,6 +122,11 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 
 	this.LineEdit = qtwidgets.NewQLineEdit(this.Centralwidget) // 111
 	this.LineEdit.SetObjectName("LineEdit")                    // 112
+	this.SizePolicy1 = qtwidgets.NewQSizePolicy_1(qtwidgets.QSizePolicy__Preferred, qtwidgets.QSizePolicy__Fixed, 1)
+	this.SizePolicy1.SetHorizontalStretch(0)                                           // 114
+	this.SizePolicy1.SetVerticalStretch(0)                                             // 114
+	this.SizePolicy1.SetHeightForWidth(this.LineEdit.SizePolicy().HasHeightForWidth()) // 114
+	this.LineEdit.SetSizePolicy(this.SizePolicy1)                                      // 114
 
 	this.HorizontalLayout_2.Layout().AddWidget(this.LineEdit) // 115
 
@@ -108,10 +134,6 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.Label_6.SetObjectName("Label_6")                     // 112
 
 	this.HorizontalLayout_2.Layout().AddWidget(this.Label_6) // 115
-
-	this.HorizontalSpacer = qtwidgets.NewQSpacerItem(40, 20, qtwidgets.QSizePolicy__Expanding, qtwidgets.QSizePolicy__Minimum)
-
-	this.HorizontalLayout_2.AddItem(this.HorizontalSpacer) // 115
 
 	this.VerticalLayout.AddLayout(this.HorizontalLayout_2, 0) // 115
 
@@ -156,6 +178,8 @@ func (this *Ui_MainWindow) RetranslateUi(MainWindow *qtwidgets.QMainWindow) {
 	this.Label_2.SetText(qtcore.QCoreApplication_Translate("MainWindow", ",..", "dummy123", 0))
 	this.Label_3.SetText(qtcore.QCoreApplication_Translate("MainWindow", "status:", "dummy123", 0))
 	this.Label_4.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
+	this.Label_7.SetText(qtcore.QCoreApplication_Translate("MainWindow", "127.0.0.1:8089", "dummy123", 0))
+	this.Label_8.SetText(qtcore.QCoreApplication_Translate("MainWindow", "---", "dummy123", 0))
 	this.Label_5.SetText(qtcore.QCoreApplication_Translate("MainWindow", "Contact:", "dummy123", 0))
 	this.Label_6.SetText(qtcore.QCoreApplication_Translate("MainWindow", "select one usable contact for send message", "dummy123", 0))
 	this.PushButton.SetText(qtcore.QCoreApplication_Translate("MainWindow", "send", "dummy123", 0))

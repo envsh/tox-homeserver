@@ -58,6 +58,13 @@ message MemberInfo {
     string name = 3;
 }
 
+message ContactInfo {
+    uint32 pnum = 1;
+    string pubkey = 2;
+    string name = 3;
+    bool isgroup = 4;
+}
+
 message Message 
 {
     uint64 gid = 1;
