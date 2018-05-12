@@ -137,11 +137,13 @@ func wspushproc() {
 			_, message, err := c.ReadMessage()
 			if err != nil {
 				log.Println("read:", err)
-				return
+				break
 			}
 			log.Printf("recv: %s\n", message)
 			processResponse(string(message))
 		}
+		log.Println("done")
+		uitrunner.Run(func() { mw.Label_8.SetText("None") })
 	}()
 
 	ticker := time.NewTicker(time.Second)

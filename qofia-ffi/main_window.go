@@ -359,12 +359,7 @@ func (this *MainWindow) sendMessage() {
 			vtcli.FriendSendMessage(item.frndInfo.Fnum, itext)
 		}
 		uiw.LineEdit_2.Clear()
-		msgo := &Message{}
-		msgo.Msg = itext
-		msgo.Peer = vtcli.SelfGetName()
-		msgo.Time = time.Now()
-		msgo.Me = true
-		msgo.refmtmsg()
+		msgo := NewMessageForMe(itext)
 		log.Println(msgo)
 		item.AddMessage(msgo)
 	} else {
@@ -463,6 +458,7 @@ func tryReadContactEvent() {
 			// ctv.SetPressState(true)
 		}
 	}
+
 }
 
 func tryReadMessageEvent() {
@@ -631,6 +627,7 @@ func dispatchEvent(jso *simplejson.Json) {
 		peerName := jso.Get("margs").GetIndex(0).MustString()
 		groupTitle := jso.Get("margs").GetIndex(2).MustString()
 
+		// raw message show area
 		itext := fmt.Sprintf("%s@%s: %s", peerName, groupTitle, message)
 		uiw.ListWidget.AddItem(itext)
 		uiw.ListWidget.ScrollToBottom()
@@ -647,6 +644,38 @@ func dispatchEvent(jso *simplejson.Json) {
 			}
 		}
 
+	case "FriendSendMessage":
+		pubkey := jso.Get("args").GetIndex(0).MustString()
+		itext := jso.Get("args").GetIndex(1).MustString()
+
+		found := false
+		for _, room := range ctitmdl {
+			if room.GetId() == pubkey {
+				msgo := NewMessageForMe(itext)
+				room.AddMessage(msgo)
+				found = true
+				break
+			}
+		}
+		log.Println(found, pubkey, itext)
+
+	case "ConferenceSendMessage":
+		groupId := jso.Get("args").GetIndex(0).MustString()
+		itext := jso.Get("args").GetIndex(2).MustString()
+		groupTitle := jso.Get("args").GetIndex(3).MustString()
+
+		found := false
+		for _, room := range ctitmdl {
+			if room.GetId() == groupId && room.GetName() == groupTitle {
+				msgo := NewMessageForMe(itext)
+				room.AddMessage(msgo)
+				found = true
+				break
+			}
+		}
+		log.Println(found, groupId, itext)
+
 	default:
+		log.Println(jso)
 	}
 }

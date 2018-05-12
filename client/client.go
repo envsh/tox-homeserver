@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"crypto/md5"
 	"encoding/json"
 	"fmt"
 	"gopp"
@@ -10,6 +11,7 @@ import (
 	"runtime"
 	"strings"
 	"sync"
+	"time"
 	"tox-homeserver/thspbs"
 	"unsafe"
 
@@ -155,13 +157,14 @@ func (this *LigTox) initCbmap() {
 }
 
 func (this *LigTox) onBackendEventNats(msg *nats.Msg) {
-	log.Println(msg.Subject, string(msg.Data))
+	log.Println("nats:", msg.Subject, string(msg.Data))
 	jso, err := simplejson.NewJson(msg.Data)
 	gopp.ErrPrint(err)
 
-	this.onBackendEvent(jso, msg.Data)
+	this.onBackendEventDeduped(jso, msg.Data)
 }
 
+// TODO 两个同时接收导致重复消息
 // should block
 func (this *LigTox) serveBackendEventWS() {
 	for {
@@ -171,13 +174,41 @@ func (this *LigTox) serveBackendEventWS() {
 			log.Println("read:", err)
 			break
 		}
-		log.Printf("recv: %s\n", message)
+		log.Printf("wsrecv: %s\n", message)
 
 		jso, err := simplejson.NewJson(message)
 		gopp.ErrPrint(err)
-		this.onBackendEvent(jso, message)
+		this.onBackendEventDeduped(jso, message)
 	}
 	log.Println("done")
+}
+
+var evtmd5smu sync.Mutex
+var evtmd5s = make(map[string]time.Time)
+
+func (this *LigTox) onBackendEventDeduped(jso *simplejson.Json, data []byte) {
+	data, err := jso.Encode()
+	gopp.ErrPrint(err)
+	md5b := md5.New().Sum(data)
+	isdup := false
+	evtmd5smu.Lock()
+	if tm, ok := evtmd5s[string(md5b)]; ok {
+		if time.Now().Sub(tm).Seconds() < 10 {
+			// ok dup message
+			isdup = true
+		}
+	} else {
+		evtmd5s[string(md5b)] = time.Now()
+	}
+	for s, tm := range evtmd5s {
+		if time.Now().Sub(tm).Seconds() > 30 {
+			delete(evtmd5s, s)
+		}
+	}
+	evtmd5smu.Unlock()
+	if !isdup {
+		this.onBackendEvent(jso, data)
+	}
 }
 
 func (this *LigTox) onBackendEvent(jso *simplejson.Json, data []byte) {

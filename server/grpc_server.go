@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"encoding/json"
 	"gopp"
 	"log"
 	"net"
@@ -84,7 +85,7 @@ func (this *GrpcService) GetBaseInfo(ctx context.Context, req *thspbs.EmptyReq) 
 
 // TODO 自己的消息做多终端同步转发
 func (this *GrpcService) RmtCall(ctx context.Context, req *thspbs.Event) (*thspbs.Event, error) {
-	return RmtCallHandler(ctx, req)
+	return RmtCallHandlers(ctx, req)
 }
 
 func (this *GrpcService) Ping(ctx context.Context, req *thspbs.EmptyReq) (*thspbs.EmptyReq, error) {
@@ -103,3 +104,33 @@ func demofn1() {
 }
 
 ///
+func pubmsgall(evt *thspbs.Event) error {
+	var err error
+	err = pubmsg2nats(evt)
+	if err == nil {
+		err = pubmsg2ws(evt)
+	}
+	return err
+}
+
+func pubmsg2nats(evt *thspbs.Event) error {
+	bcc, err := json.Marshal(evt)
+	gopp.ErrPrint(err)
+	err = appctx.rpcs.nc.Publish(common.CBEventBusName, bcc)
+	gopp.ErrPrint(err)
+	// reconnect
+	if err != nil {
+		appctx.rpcs.checkOrReconnNats(err)
+		err = appctx.rpcs.nc.Publish(common.CBEventBusName, bcc)
+		gopp.ErrPrint(err)
+	}
+	if err == nil {
+		// log.Println("pubmsg ok", len(bcc))
+	}
+	common.BytesSent(len(bcc))
+	return err
+}
+
+func pubmsg2ws(evt *thspbs.Event) error {
+	return appctx.wssrv.pushevt(evt)
+}

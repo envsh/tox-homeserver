@@ -67,6 +67,16 @@ func NewMessageForFriend(jso *simplejson.Json) *Message {
 	return this
 }
 
+func NewMessageForMe(itext string) *Message {
+	msgo := &Message{}
+	msgo.Msg = itext
+	msgo.Peer = vtcli.SelfGetName()
+	msgo.Time = time.Now()
+	msgo.Me = true
+	msgo.refmtmsg()
+	return msgo
+}
+
 func (this *Message) refmtmsg() {
 	this.LastMsgUi = this.Msg
 

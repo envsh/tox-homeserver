@@ -64,16 +64,13 @@ func (this *WebsocketServer) toxhsrpc(w http.ResponseWriter, r *http.Request) {
 		err = json.Unmarshal(message, req)
 		gopp.ErrPrint(err, string(message))
 
-		rsp, err := RmtCallHandler(context.Background(), req)
+		rsp, err := RmtCallHandlers(context.Background(), req)
 		gopp.ErrPrint(err)
 		rspcc, err := json.Marshal(rsp)
 		gopp.ErrPrint(err)
 		err = c.WriteMessage(mt, rspcc)
 		gopp.ErrPrint(err)
 
-		if out, err := RmtCallResyncHandler(context.Background(), req); err == nil {
-			this.pushevt(out)
-		}
 	}
 	log.Println("disconnected from:", raddr, time.Now().Sub(ctime))
 }

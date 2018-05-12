@@ -1,13 +1,11 @@
 package server
 
 import (
-	"encoding/json"
 	"fmt"
 	"gopp"
 	"log"
 	"math"
 	"time"
-	"tox-homeserver/common"
 	"tox-homeserver/thspbs"
 
 	tox "github.com/TokTok/go-toxcore-c"
@@ -332,21 +330,4 @@ func (this *ToxVM) setupCallbacks() {
 	*/
 }
 
-func (this *ToxVM) pubmsg(evt *thspbs.Event) error {
-	bcc, err := json.Marshal(evt)
-	gopp.ErrPrint(err)
-	err = appctx.rpcs.nc.Publish(common.CBEventBusName, bcc)
-	gopp.ErrPrint(err)
-	// reconnect
-	if err != nil {
-		appctx.rpcs.checkOrReconnNats(err)
-		err = appctx.rpcs.nc.Publish(common.CBEventBusName, bcc)
-		gopp.ErrPrint(err)
-	}
-	if err == nil {
-		// log.Println("pubmsg ok", len(bcc))
-	}
-	common.BytesSent(len(bcc))
-	appctx.wssrv.pushevt(evt)
-	return err
-}
+func (this *ToxVM) pubmsg(evt *thspbs.Event) error { return pubmsgall(evt) }

@@ -88,8 +88,21 @@ func packBaseInfo(t *tox.Tox) (*thspbs.BaseInfo, error) {
 }
 
 // TODO 自己的消息做多终端同步转发
-func RmtCallHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Event, error) {
+func RmtCallHandlers(ctx context.Context, req *thspbs.Event) (*thspbs.Event, error) {
 	log.Println(req.Id, req.Name, req.Args, req.Margs)
+
+	// 先把消息同步到不同协议的不同终端上
+	out, err := RmtCallResyncHandler(context.Background(), req)
+	gopp.ErrPrint(err)
+	if err == nil {
+		pubmsgall(out)
+	}
+
+	return RmtCallExecuteHandler(ctx, req)
+}
+
+// 直接执行请求
+func RmtCallExecuteHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Event, error) {
 	out := &thspbs.Event{Name: req.Name + "Resp"}
 
 	var err error
@@ -205,6 +218,7 @@ func RmtCallResyncHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Event
 		if len(req.Args[0]) >= 64 { // think as friendPubkey
 			fnum, _ = t.FriendByPublicKey(req.Args[0])
 			log.Println(fnum, " <- ", req.Args[0])
+		} else {
 		}
 		fname, err := t.FriendGetName(fnum)
 		gopp.ErrPrint(err)
@@ -214,6 +228,7 @@ func RmtCallResyncHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Event
 		if len(req.Args[0]) > 10 { // think as groupIdentity
 			gnum, _ = xtox.ConferenceGetByIdentifier(t, req.Args[0])
 			log.Println(gnum, " <- ", req.Args[0])
+		} else {
 		}
 		title, err := t.ConferenceGetTitle(gnum)
 		gopp.ErrPrint(err)
