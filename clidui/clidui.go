@@ -72,7 +72,7 @@ var rpcoutch = make(chan string, 128)
 
 func main() {
 	flag.Parse()
-	log.SetFlags(0)
+	log.SetFlags(log.Flags() | log.Lshortfile)
 
 	app := qtwidgets.NewQApplication(len(os.Args), os.Args, 0)
 
@@ -95,7 +95,7 @@ func main() {
 			if ct.Isgroup {
 				req := &thspbs.Event{}
 				req.Name = "ConferenceSendMessage"
-				req.Args = []string{ct.Pubkey, "0", msg, ct.Name}
+				req.Args = []string{ct.Pubkey, "0", msg}
 				rpcCallObj(req)
 			} else {
 				req := &thspbs.Event{}
@@ -103,8 +103,10 @@ func main() {
 				req.Args = []string{ct.Pubkey, msg}
 				rpcCallObj(req)
 			}
-			var line = fmt.Sprintf("%s -> %s: %s", gbinfo.Name, ct.Name, msg)
-			appendOutput(line)
+			var line = fmt.Sprintf("me -> %s: %s", ct.Name, msg)
+			if false {
+				appendOutput(line)
+			}
 			mw.LineEdit_2.Clear()
 		}
 	})
@@ -268,7 +270,13 @@ func processResponse(data string) {
 	} else if jso.Name == "ConferenceMessage" {
 		var line = jso.Margs[2] + "'s " + jso.Margs[0] + ": " + jso.Args[3]
 		appendOutput(line)
-		putContact(jso.Margs[2], jso.Margs[3], true)
+		uitrunner.Run(func() {
+			found := findContact(jso.Margs[3]) != nil
+			if !found {
+				putContact(jso.Margs[2], jso.Margs[3], true)
+				mw.ComboBox.AddItem__(jso.Margs[2])
+			}
+		})
 	} else if jso.Name == "ConferenceTitle" {
 		var line = jso.Name + " change to " + jso.Args[2] + " by " + jso.Margs[1]
 		appendOutput(line)
@@ -286,6 +294,12 @@ func processResponse(data string) {
 		var line = jso.Name + " to ??? " + " by " + jso.Margs[0]
 		appendOutput(line)
 	} else if jso.Name == "ConferencePeerListChange" { // TODO leave???
+	} else if jso.Name == "FriendSendMessage" {
+		var line = "me -> " + jso.Args[2] + ": " + jso.Args[1]
+		appendOutput(line)
+	} else if jso.Name == "ConferenceSendMessage" {
+		var line = "me -> " + jso.Args[3] + ": " + jso.Args[2]
+		appendOutput(line)
 	} else {
 		appendOutput(data)
 	}

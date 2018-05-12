@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"gopp"
 	"log"
@@ -104,6 +105,7 @@ func RmtCallHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Event, erro
 		fnum := uint32(gopp.MustInt(req.Args[0]))
 		if len(req.Args[0]) >= 64 { // think as friendPubkey
 			fnum, _ = t.FriendByPublicKey(req.Args[0])
+			log.Println(fnum, " <- ", req.Args[0])
 		}
 		wn, err := t.FriendSendMessage(fnum, req.Args[1])
 		gopp.ErrPrint(err)
@@ -136,7 +138,8 @@ func RmtCallHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Event, erro
 		gnum := uint32(gopp.MustInt(req.Args[0]))
 		mtype := gopp.MustInt(req.Args[1])
 		if len(req.Args[0]) > 10 { // think as groupIdentity
-			gnum, _ = xtox.ConferenceGetByCookie(t, req.Args[0])
+			gnum, _ = xtox.ConferenceGetByIdentifier(t, req.Args[0])
+			log.Println(gnum, " <- ", req.Args[0])
 		}
 		_, err = t.ConferenceSendMessage(gnum, mtype, req.Args[2])
 		gopp.ErrPrint(err)
@@ -181,5 +184,43 @@ func RmtCallHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Event, erro
 
 	common.BytesRecved(len(req.String()))
 	common.BytesSent(len(out.String()))
+	return out, nil
+}
+
+// TODO 自己的消息做多终端同步转发
+// 把其中一个端发送的消息再同步到其他端上
+// 需要记录一个终端的id
+func RmtCallResyncHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Event, error) {
+	log.Println(req.Id, req.Name, req.Args, req.Margs)
+	out := &thspbs.Event{}
+
+	var err error
+	t := appctx.tvm.t
+	err = gopp.DeepCopy(req, out)
+	gopp.ErrPrint(err)
+
+	switch req.Name {
+	case "FriendSendMessage": // args: "friendNumber" or "friendPubkey", "msg"
+		fnum := uint32(gopp.MustInt(req.Args[0]))
+		if len(req.Args[0]) >= 64 { // think as friendPubkey
+			fnum, _ = t.FriendByPublicKey(req.Args[0])
+			log.Println(fnum, " <- ", req.Args[0])
+		}
+		fname, err := t.FriendGetName(fnum)
+		gopp.ErrPrint(err)
+		out.Args = append(out.Args, fname)
+	case "ConferenceSendMessage": // "groupNumber" or groupIdentity,"mtype","msg"
+		gnum := uint32(gopp.MustInt(req.Args[0]))
+		if len(req.Args[0]) > 10 { // think as groupIdentity
+			gnum, _ = xtox.ConferenceGetByIdentifier(t, req.Args[0])
+			log.Println(gnum, " <- ", req.Args[0])
+		}
+		title, err := t.ConferenceGetTitle(gnum)
+		gopp.ErrPrint(err)
+		out.Args = append(out.Args, title)
+	default:
+		return nil, errors.New("not need")
+	}
+
 	return out, nil
 }

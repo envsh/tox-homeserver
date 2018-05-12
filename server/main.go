@@ -7,11 +7,7 @@ import (
 	"log"
 	"net/http"
 	_ "net/http/pprof"
-	"os"
-	"os/signal"
-	"runtime/trace"
 	"strings"
-	"syscall"
 	"time"
 	"tox-homeserver/common"
 	"tox-homeserver/store"
@@ -35,19 +31,6 @@ type appContext struct {
 var appctx = &appContext{}
 
 func Main() {
-	if false {
-		f, err := os.Create("trace.out")
-		gopp.ErrPrint(err)
-		trace.Start(f)
-		sigs := make(chan os.Signal, 1)
-		signal.Notify(sigs, syscall.SIGINT)
-		go func() {
-			sig := <-sigs
-			log.Println(sig)
-			trace.Stop()
-			os.Exit(0)
-		}()
-	}
 	printBuildInfo(true)
 	flag.Parse()
 	if err := agent.Listen(agent.Options{}); err != nil {

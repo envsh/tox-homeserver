@@ -63,8 +63,7 @@
      var wsc4rpc = null;
      var wsc4push = null;
      // TODO querystring as host: ?server=ip:port
-     var addrp = 'ws://127.0.0.1:8089'; // path: /toxhsrpc or /toxhspush
-     var addrp = 'ws://txhs.duckdns.org:8089'; // path: /toxhsrpc or /toxhspush
+     var addrp = "ws://" + window.location.hostname + ":8089"; // path: /toxhsrpc or /toxhspush
      var app0 = new Vue({
          el: '#app',
          data: function() {
@@ -147,14 +146,14 @@
                  ct = findContact(app0.CurrentContact);
                  console.log(ct);
                  if (ct.isgroup) {
-                     req = {'name': 'ConferenceSendMessage', 'args': [ct.value, '0', app0.InputText, ct.label]}
+                     req = {'name': 'ConferenceSendMessage', 'args': [ct.value, '0', app0.InputText]}
                      wsc4rpc.send(JSON.stringify(req));
                  } else {
                      req = {'name': 'FriendSendMessage', 'args': [ct.value, app0.InputText]}
                      wsc4rpc.send(JSON.stringify(req));
                  }
-                 line = app0.UserName + ' -> ' + ct.label + ': ' + app0.InputText;
-                 appendOutput(line);
+                 var line = 'me -> ' + ct.label + ': ' + app0.InputText;
+                 // appendOutput(line);
                  app0.InputText = '';
              },
          },
@@ -167,7 +166,7 @@
          app0.EventLines += nowts + ' ' + line + "\n";
      }
      function findContact(id) {
-         for (i = 0; i < app0.Contacts.length; i++) {
+         for (var i = 0; i < app0.Contacts.length; i++) {
              item = app0.Contacts[i];
              if (item.value == id) {
                  return item;
@@ -196,13 +195,15 @@
              app0.StatusMessage = binfo.stmsg;
              friends = binfo.friends;
              keys = Object.keys(friends);
-             for (i = 0; i < keys.length; i ++) {
+             for (var i = 0; i < keys.length; i ++) {
                  friend = friends[keys[i]];
                  putContact(friend.name, friend.pubkey, false);
              }
              groups = binfo.groups;
              keys = Object.keys(groups);
-             for (i = 0; i < keys.length; i ++) {
+             for (var i = 0; i < keys.length; i +=1) {
+             }
+             for (var i = 0; i < keys.length; i +=1) {
                  group = groups[keys[i]];
                  putContact(group.title, group.groupId, true);
              }
@@ -232,6 +233,12 @@
              var line = jso.name + " to ??? " + " by " + jso.margs[0];
              appendOutput(line);
          } else if (jso.name == "ConferencePeerListChange") { // TODO leave???
+         } else if (jso.name == "FriendSendMessage") {
+             var line = "me -> " + jso.args[2] + ": " + jso.args[1];
+             appendOutput(line);
+         } else if (jso.name == "ConferenceSendMessage") {
+             var line = "me -> " + jso.args[3] + ": " + jso.args[2];
+             appendOutput(line);
          } else {
              appendOutput(data);
          }

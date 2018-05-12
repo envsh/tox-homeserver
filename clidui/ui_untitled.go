@@ -91,8 +91,9 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 
 	this.HorizontalLayout.Layout().AddWidget(this.Label_7) // 115
 
-	this.Label_8 = qtwidgets.NewQLabel(this.Centralwidget, 0) // 111
-	this.Label_8.SetObjectName("Label_8")                     // 112
+	this.Label_8 = qtwidgets.NewQLabel(this.Centralwidget, 0)                                                  // 111
+	this.Label_8.SetObjectName("Label_8")                                                                      // 112
+	this.Label_8.SetTextInteractionFlags(qtcore.Qt__LinksAccessibleByMouse | qtcore.Qt__TextSelectableByMouse) // 114
 
 	this.HorizontalLayout.Layout().AddWidget(this.Label_8) // 115
 

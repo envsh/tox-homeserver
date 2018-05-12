@@ -70,6 +70,10 @@ func (this *WebsocketServer) toxhsrpc(w http.ResponseWriter, r *http.Request) {
 		gopp.ErrPrint(err)
 		err = c.WriteMessage(mt, rspcc)
 		gopp.ErrPrint(err)
+
+		if out, err := RmtCallResyncHandler(context.Background(), req); err == nil {
+			this.pushevt(out)
+		}
 	}
 	log.Println("disconnected from:", raddr, time.Now().Sub(ctime))
 }
