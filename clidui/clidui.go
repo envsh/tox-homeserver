@@ -92,15 +92,15 @@ func main() {
 		gopp.NilPrint(ct, currtext)
 		if ct != nil {
 			msg := mw.LineEdit_2.Text()
-			if ct.Isgroup {
+			if ct.IsGroup() {
 				req := &thspbs.Event{}
 				req.Name = "ConferenceSendMessage"
-				req.Args = []string{ct.Pubkey, "0", msg}
+				req.Args = []string{gopp.ToStr(ct.Pnum), "0", msg, ct.Pubkey}
 				rpcCallObj(req)
 			} else {
 				req := &thspbs.Event{}
 				req.Name = "FriendSendMessage"
-				req.Args = []string{ct.Pubkey, msg}
+				req.Args = []string{gopp.ToStr(ct.Pnum), msg, ct.Pubkey}
 				rpcCallObj(req)
 			}
 			var line = fmt.Sprintf("me -> %s: %s", ct.Name, msg)
@@ -108,6 +108,16 @@ func main() {
 				appendOutput(line)
 			}
 			mw.LineEdit_2.Clear()
+		}
+	})
+	// todo not supported string param
+	// qtrt.Connect(mw.ComboBox, "currentTextChanged(const QString &)", func() {})
+	qtrt.Connect(mw.ComboBox, "currentIndexChanged(int)", func(idx int) {
+		log.Println(idx)
+		text := mw.ComboBox.CurrentText()
+		cti := findContactByName(text)
+		if cti != nil {
+			mw.LineEdit.SetText(fmt.Sprintf("%s:%d", cti.Pubkey, cti.Pnum))
 		}
 	})
 
@@ -251,14 +261,14 @@ func processResponse(data string) {
 			for _, friendo := range binfo.Friends {
 				found := findContact(friendo.Pubkey) != nil
 				if !found {
-					putContact(friendo.Name, friendo.Pubkey, false)
+					putContact(friendo.Name, friendo.Pubkey, friendo.Fnum, thspbs.MemberInfo_FRIEND)
 					mw.ComboBox.AddItem__(friendo.Name)
 				}
 			}
 			for _, groupo := range binfo.Groups {
 				found := findContact(groupo.GroupId) != nil
 				if !found {
-					putContact(groupo.Title, groupo.GroupId, true)
+					putContact(groupo.Title, groupo.GroupId, groupo.Gnum, thspbs.MemberInfo_GROUP)
 					mw.ComboBox.AddItem__(groupo.Title)
 				}
 			}
@@ -275,14 +285,14 @@ func processResponse(data string) {
 		uitrunner.Run(func() {
 			found := findContact(jso.Margs[3]) != nil
 			if !found {
-				putContact(jso.Margs[2], jso.Margs[3], true)
+				putContact(jso.Margs[2], jso.Margs[3], uint32(gopp.MustInt(jso.Args[0])), thspbs.MemberInfo_GROUP)
 				mw.ComboBox.AddItem__(jso.Margs[2])
 			}
 		})
 	} else if jso.Name == "ConferenceTitle" {
 		var line = jso.Name + " change to " + jso.Args[2] + " by " + jso.Margs[1]
 		appendOutput(line)
-		putContact(jso.Args[2], jso.Margs[2], true)
+		putContact(jso.Args[2], jso.Margs[2], uint32(gopp.MustInt(jso.Args[0])), thspbs.MemberInfo_GROUP)
 	} else if jso.Name == "ConferenceNamePeerName" {
 		var line = jso.Args[2] + " joined in " + jso.Margs[2]
 		appendOutput(line)
@@ -297,10 +307,10 @@ func processResponse(data string) {
 		appendOutput(line)
 	} else if jso.Name == "ConferencePeerListChange" { // TODO leave???
 	} else if jso.Name == "FriendSendMessage" {
-		var line = "me -> " + jso.Args[2] + ": " + jso.Args[1]
+		var line = "me -> " + jso.Margs[0] + ": " + jso.Args[1]
 		appendOutput(line)
 	} else if jso.Name == "ConferenceSendMessage" {
-		var line = "me -> " + jso.Args[3] + ": " + jso.Args[2]
+		var line = "me -> " + jso.Margs[0] + ": " + jso.Args[2]
 		appendOutput(line)
 	} else {
 		appendOutput(data)
@@ -333,10 +343,11 @@ func findContactByName(name string) *thspbs.ContactInfo {
 	}
 	return nil
 }
-func putContact(name, id string, isgroup bool) {
+func putContact(name, id string, pnum uint32, mtype thspbs.MemberInfo_MemType) {
 	ctinfo := &thspbs.ContactInfo{}
 	ctinfo.Name = name
 	ctinfo.Pubkey = id
-	ctinfo.Isgroup = isgroup
+	ctinfo.Pnum = pnum
+	ctinfo.Mtype = mtype
 	contacts[id] = ctinfo
 }

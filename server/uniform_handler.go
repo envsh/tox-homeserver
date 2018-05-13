@@ -115,11 +115,15 @@ func RmtCallExecuteHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Even
 		gopp.ErrPrint(err)
 		out.Args = []string{string(bdata)}
 	case "FriendSendMessage": // args: "friendNumber" or "friendPubkey", "msg"
+		if len(req.Args) < 2 {
+			log.Println("paramter error")
+		}
 		fnum := uint32(gopp.MustInt(req.Args[0]))
 		if len(req.Args[0]) >= 64 { // think as friendPubkey
 			fnum, _ = t.FriendByPublicKey(req.Args[0])
 			log.Println(fnum, " <- ", req.Args[0])
 		}
+		log.Println("fnum:", fnum, req.Args)
 		wn, err := t.FriendSendMessage(fnum, req.Args[1])
 		gopp.ErrPrint(err)
 		pubkey := t.SelfGetPublicKey()
@@ -222,7 +226,10 @@ func RmtCallResyncHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Event
 		}
 		fname, err := t.FriendGetName(fnum)
 		gopp.ErrPrint(err)
-		out.Args = append(out.Args, fname)
+		pubkey, err := t.FriendGetPublicKey(fnum)
+		gopp.ErrPrint(err)
+		out.Margs = []string{fname, pubkey, "msgid"}
+
 	case "ConferenceSendMessage": // "groupNumber" or groupIdentity,"mtype","msg"
 		gnum := uint32(gopp.MustInt(req.Args[0]))
 		if len(req.Args[0]) > 10 { // think as groupIdentity
@@ -232,7 +239,11 @@ func RmtCallResyncHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Event
 		}
 		title, err := t.ConferenceGetTitle(gnum)
 		gopp.ErrPrint(err)
-		out.Args = append(out.Args, title)
+
+		groupId, _ := xtox.ConferenceGetIdentifier(t, gnum)
+		peerPubkey := t.SelfGetPublicKey()
+		peerName := t.SelfGetName()
+		out.Margs = []string{peerName, peerPubkey, title, groupId, "msgid"}
 	default:
 		return nil, errors.New("not need")
 	}

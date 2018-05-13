@@ -30,6 +30,7 @@ type Ui_MainWindow struct {
 	Label_4            *qtwidgets.QLabel
 	Label_7            *qtwidgets.QLabel
 	Label_8            *qtwidgets.QLabel
+	ToolButton         *qtwidgets.QToolButton
 	PlainTextEdit      *qtwidgets.QPlainTextEdit
 	HorizontalLayout_2 *qtwidgets.QHBoxLayout
 	Label_5            *qtwidgets.QLabel
@@ -96,6 +97,12 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.Label_8.SetTextInteractionFlags(qtcore.Qt__LinksAccessibleByMouse | qtcore.Qt__TextSelectableByMouse) // 114
 
 	this.HorizontalLayout.Layout().AddWidget(this.Label_8) // 115
+
+	this.ToolButton = qtwidgets.NewQToolButton(this.Centralwidget) // 111
+	this.ToolButton.SetObjectName("ToolButton")                    // 112
+	this.ToolButton.SetFocusPolicy(qtcore.Qt__NoFocus)             // 114
+
+	this.HorizontalLayout.Layout().AddWidget(this.ToolButton) // 115
 
 	this.VerticalLayout.AddLayout(this.HorizontalLayout, 0) // 115
 
@@ -181,8 +188,12 @@ func (this *Ui_MainWindow) RetranslateUi(MainWindow *qtwidgets.QMainWindow) {
 	this.Label_4.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
 	this.Label_7.SetText(qtcore.QCoreApplication_Translate("MainWindow", "127.0.0.1:8089", "dummy123", 0))
 	this.Label_8.SetText(qtcore.QCoreApplication_Translate("MainWindow", "---", "dummy123", 0))
+	// noimpl: #ifndef QT_NO_STATUSTIP
+	this.ToolButton.SetStatusTip(qtcore.QCoreApplication_Translate("MainWindow", "\351\207\215\350\277\236", "dummy123", 0))
+	// noimpl: #endif // QT_NO_STATUSTIP
+	this.ToolButton.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
 	this.Label_5.SetText(qtcore.QCoreApplication_Translate("MainWindow", "Contact:", "dummy123", 0))
-	this.Label_6.SetText(qtcore.QCoreApplication_Translate("MainWindow", "select one usable contact for send message", "dummy123", 0))
+	this.Label_6.SetText(qtcore.QCoreApplication_Translate("MainWindow", "select one for send message", "dummy123", 0))
 	this.PushButton.SetText(qtcore.QCoreApplication_Translate("MainWindow", "send", "dummy123", 0))
 	// noimpl: } // retranslateUi
 	// noimpl:

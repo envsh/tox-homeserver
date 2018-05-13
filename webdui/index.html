@@ -75,7 +75,7 @@
                  EventLines: "",
                  ConnState: "Gone",
                  CurrentContact: '',
-                 // {'value':'hehhe', 'label':'hehehhe', 'isgroup':false}
+                 // {'value':'hehhe', 'label':'hehehhe','pnum':5, 'isgroup':false}
                  Contacts: [],
                  InputText: '',
              }
@@ -146,10 +146,10 @@
                  ct = findContact(app0.CurrentContact);
                  console.log(ct);
                  if (ct.isgroup) {
-                     req = {'name': 'ConferenceSendMessage', 'args': [ct.value, '0', app0.InputText]}
+                     req = {'name': 'ConferenceSendMessage', 'args': [''+ct.pnum, '0', app0.InputText, ct.value]}
                      wsc4rpc.send(JSON.stringify(req));
                  } else {
-                     req = {'name': 'FriendSendMessage', 'args': [ct.value, app0.InputText]}
+                     req = {'name': 'FriendSendMessage', 'args': [''+ct.pnum, app0.InputText, ct.value]}
                      wsc4rpc.send(JSON.stringify(req));
                  }
                  var line = 'me -> ' + ct.label + ': ' + app0.InputText;
@@ -174,11 +174,11 @@
          }
          return null;
      }
-     function putContact(name, id, isgroup) {
+     function putContact(name, id, peernum, isgroup) {
          found = findContact(id) != null;
          console.log(name,id,isgroup,found);
          if (!found) {
-             app0.Contacts.push({'value': id, 'label': name, 'isgroup': isgroup});
+             app0.Contacts.push({'value': id, 'label': name, 'pnum': peernum, 'isgroup': isgroup});
          }
          app0.CurrentContact = id;
      }
@@ -197,7 +197,7 @@
              keys = Object.keys(friends);
              for (var i = 0; i < keys.length; i ++) {
                  friend = friends[keys[i]];
-                 putContact(friend.name, friend.pubkey, false);
+                 putContact(friend.name, friend.pubkey, friend.fnum, false);
              }
              groups = binfo.groups;
              keys = Object.keys(groups);
@@ -205,7 +205,7 @@
              }
              for (var i = 0; i < keys.length; i +=1) {
                  group = groups[keys[i]];
-                 putContact(group.title, group.groupId, true);
+                 putContact(group.title, group.groupId, group.gnum, true);
              }
          } else if (jso.name == "FriendSendMessageResp") {
          } else if (jso.name == "ConferenceSendMessageResp") {
@@ -215,11 +215,11 @@
          } else if (jso.name == "ConferenceMessage") {
              var line = jso.margs[2]+"'s "+jso.margs[0] + ": " + jso.args[3];
              appendOutput(line);
-             putContact(jso.margs[2], jso.margs[3],  true);
+             putContact(jso.margs[2], jso.margs[3], jso.args[0], true);
          } else if (jso.name == "ConferenceTitle") {
              var line = jso.name + " change to " + jso.args[2] + " by " + jso.margs[1];
              appendOutput(line);
-             putContact(jso.args[2], jso.margs[2],  true);
+             putContact(jso.args[2], jso.margs[2], jso.args[0], true);
          } else if (jso.name == "ConferenceNamePeerName") {
              var line = jso.args[2] + " joined in " + jso.margs[2];
              appendOutput(line);
@@ -234,10 +234,10 @@
              appendOutput(line);
          } else if (jso.name == "ConferencePeerListChange") { // TODO leave???
          } else if (jso.name == "FriendSendMessage") {
-             var line = "me -> " + jso.args[2] + ": " + jso.args[1];
+             var line = "me -> " + jso.margs[0] + ": " + jso.args[1];
              appendOutput(line);
          } else if (jso.name == "ConferenceSendMessage") {
-             var line = "me -> " + jso.args[3] + ": " + jso.args[2];
+             var line = "me -> " + jso.margs[0] + ": " + jso.args[2];
              appendOutput(line);
          } else {
              appendOutput(data);

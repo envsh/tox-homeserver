@@ -52,17 +52,14 @@ message GroupInfo {
     map<uint32, MemberInfo> members = 7;
 }
 
+// = ContactInfo
+// 可用于friend,group,peer
 message MemberInfo {
     uint32 pnum = 1;
     string pubkey = 2;
     string name = 3;
-}
-
-message ContactInfo {
-    uint32 pnum = 1;
-    string pubkey = 2;
-    string name = 3;
-    bool isgroup = 4;
+    enum MemType { UNKNOWN = 0; FRIEND = 1; GROUP = 2; PEER = 3;}
+    MemType mtype = 4; // member type, friend, group, peer
 }
 
 message Message 

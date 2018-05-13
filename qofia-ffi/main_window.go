@@ -645,7 +645,7 @@ func dispatchEvent(jso *simplejson.Json) {
 		}
 
 	case "FriendSendMessage":
-		pubkey := jso.Get("args").GetIndex(0).MustString()
+		pubkey := jso.Get("args").GetIndex(2).MustString()
 		itext := jso.Get("args").GetIndex(1).MustString()
 
 		found := false
@@ -660,7 +660,7 @@ func dispatchEvent(jso *simplejson.Json) {
 		log.Println(found, pubkey, itext)
 
 	case "ConferenceSendMessage":
-		groupId := jso.Get("args").GetIndex(0).MustString()
+		groupId := jso.Get("args").GetIndex(3).MustString()
 		itext := jso.Get("args").GetIndex(2).MustString()
 		groupTitle := jso.Get("args").GetIndex(3).MustString()
 

@@ -7,6 +7,7 @@ all: bd
 
 bd: com
 	go build -v -o bin/toxhs -ldflags "${GOVVV}" .
+	tar zcvf bin/toxhs.tar.gz bin/toxhs
 
 democ: com
 	go build -v -o bin/democ ./examples/
@@ -39,9 +40,10 @@ tofiab: # build
 	cd tofia && ./gradlew build  --console plain --build-cache --warn build
 	find ./tofia -name "*.apk"|xargs ls -lh
 tofiai: # install
-	adb install -r ./tofia/app/build/outputs/apk/debug/app-debug.apk
+	adb install -r ./tofia/app/build/build/outputs/apk/debug/app-debug.apk
 tofiac: # clean
-	rm -vf ./tofia/app/build/outputs/apk/*/*.apk
+	rm -vf ./tofia/app/build/build/outputs/apk/*/*.apk
+	rm -vf ./tofia/app/build/build/outputs/apk/*/*.apk.tar.gz
 
 emu:
 	go build -v -buildmode=c-shared -o bin/libtoxcore.so ./toxemu/

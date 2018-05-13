@@ -71,6 +71,19 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QToolButton" name="toolButton">
+        <property name="focusPolicy">
+         <enum>Qt::NoFocus</enum>
+        </property>
+        <property name="statusTip">
+         <string>重连</string>
+        </property>
+        <property name="text">
+         <string>...</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </item>
     <item>
@@ -107,7 +120,7 @@
       <item>
        <widget class="QLabel" name="label_6">
         <property name="text">
-         <string>select one usable contact for send message</string>
+         <string>select one for send message</string>
         </property>
        </widget>
       </item>
