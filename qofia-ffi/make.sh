@@ -17,6 +17,6 @@ time go build -p 1 -v  -pkgdir ~/oss/pkg/android_arm -buildmode=c-shared -o libm
 chmod +x libmain.so
 
 mv andwrapmain.c.nogo andwrapmain.c
-$CC andwrapmain.c -shared   -o libgo.so -lmain -L. -Wl,-soname,libgo.so
+$CC andwrapmain.c -shared   -o libgolem.so -lmain -L. -Wl,-soname,libgolem.so
 mv andwrapmain.c andwrapmain.c.nogo
 
