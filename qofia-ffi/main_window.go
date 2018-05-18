@@ -181,6 +181,10 @@ func setAppStyleSheetTheme(index int) {
 func (this *MainWindow) connectSignals() {
 	uiw := uictx.uiw
 
+	qtrt.Connect(uiw.ToolButton_20, "clicked(bool)", func(checked bool) {
+		log.Println(checked)
+		testRunOnAndroidThread()
+	})
 	qtrt.Connect(uiw.ToolButton_21, "clicked(bool)", func(checked bool) {
 		log.Println(checked)
 		setAppStyleSheet()

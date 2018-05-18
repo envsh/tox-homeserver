@@ -25,19 +25,29 @@ func NewStorage() *Storage {
 	if runtime.GOOS == "android" {
 		dsn = fmt.Sprintf("file:///data/data/io.dnesth.tofia/toxhs.sqlite")
 	} else {
-		dsn = fmt.Sprintf("toxhs.sqlite")
+		dsn = fmt.Sprintf("toxhs.sqlite?cache=shared&mode=rwc")
 	}
 	dbh, err := xorm.NewEngine("sqlite3", dsn)
 	gopp.ErrPrint(err)
 	err = dbh.Ping()
 	gopp.ErrPrint(err, dsn)
+	this.dbh = dbh
+	this.SetWAL(true)
 
 	logger := xorm.NewSimpleLogger2(os.Stdout, common.LogPrefix, 0)
 	dbh.SetLogger(logger)
-	this.dbh = dbh
 	dbh.ShowSQL(true)
 	this.initTables()
 	return this
+}
+
+// -wal when can delete this file? if lost, does it broken database?
+// -shm when can delete this file? if lost, does it broken database?
+func (this *Storage) SetWAL(enable bool) {
+	_, err := this.dbh.Exec("PRAGMA journal_mode=WAL;")
+	gopp.ErrPrint(err)
+	_, err = this.dbh.Exec("PRAGMA locking_mode=EXCLUSIVE;")
+	gopp.ErrPrint(err)
 }
 
 func (this *Storage) initTables() {

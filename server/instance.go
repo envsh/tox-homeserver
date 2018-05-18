@@ -22,7 +22,7 @@ var tvmCtx = xtox.NewToxContext("toxhs.tsbin", "toxhs0", "i'm toxhs0")
 func newToxVM() *ToxVM {
 	this := &ToxVM{}
 	this.t = xtox.New(tvmCtx)
-	log.Println(this.t == nil)
+	log.Println("tox is nil:", this.t == nil)
 	this.abft = xtox.FOTA_ADD_NET_HELP_BOTS | xtox.FOTA_REMOVE_ONLY_ME_ALL |
 		xtox.FOTA_ACCEPT_FRIEND_REQUEST | xtox.FOTA_ACCEPT_GROUP_INVITE
 	xtox.SetAutoBotFeatures(this.t, this.abft)

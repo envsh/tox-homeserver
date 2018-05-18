@@ -5,6 +5,7 @@ import (
 	"gopp"
 	"log"
 	"os"
+	"runtime"
 	"strings"
 	"time"
 
@@ -79,6 +80,7 @@ func NewMessageForMe(itext string) *Message {
 
 func (this *Message) refmtmsg() {
 	this.LastMsgUi = this.Msg
+	this.resetTimezone()
 
 	refmtmsgfns := []func(){this.refmtmsgRUser, this.refmtmsgLink}
 	for _, fn := range refmtmsgfns {
@@ -102,6 +104,11 @@ func (this *Message) refmtmsgLink() {
 		s = strings.Replace(s, u, fmt.Sprintf(`<a href="%s">%s</a>`, u, u), -1)
 	}
 	this.MsgUi = s
+}
+func (this *Message) resetTimezone() {
+	if runtime.GOOS == "android" {
+		this.Time = this.Time.Add(8 * time.Hour)
+	}
 }
 
 ////////////////
