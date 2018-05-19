@@ -184,6 +184,7 @@ func (this *MainWindow) connectSignals() {
 	qtrt.Connect(uiw.ToolButton_20, "clicked(bool)", func(checked bool) {
 		log.Println(checked)
 		testRunOnAndroidThread()
+		KeepScreenOn(true)
 	})
 	qtrt.Connect(uiw.ToolButton_21, "clicked(bool)", func(checked bool) {
 		log.Println(checked)
@@ -380,10 +381,10 @@ func (this *MainWindow) initAppBackend() {
 	vtcli.OnNewMsg = func() { mech.Trigger() }
 
 	for {
-		time.Sleep(500 * time.Millisecond)
 		if vtcli.SelfGetAddress() != "" {
 			break
 		}
+		time.Sleep(50 * time.Millisecond)
 	}
 	log.Println(vtcli.SelfGetAddress())
 

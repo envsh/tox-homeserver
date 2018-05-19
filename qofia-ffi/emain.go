@@ -14,13 +14,15 @@ import (
 )
 
 func main() {
-	qtrt.SetFinalizerObjectFilter(finalizerFilter)
 
 	// Create application
 	if runtime.GOOS == "android" {
 		os.Setenv("QT_AUTO_SCREEN_SCALE_FACTOR ", "1.5")
 		qtcore.QCoreApplication_SetAttribute(qtcore.Qt__AA_EnableHighDpiScaling, true)
+	} else {
+		qtrt.SetFinalizerObjectFilter(finalizerFilter)
 	}
+	// qtrt.SetDebugFFICall(true)
 	app := qtwidgets.NewQApplication(len(os.Args), os.Args, 0)
 	if false {
 		app.SetAttribute(qtcore.Qt__AA_EnableHighDpiScaling, true) // for android

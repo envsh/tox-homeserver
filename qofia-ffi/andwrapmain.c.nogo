@@ -1,6 +1,8 @@
 extern void go_wrapper_main();
 
+double keepThismainInMainThread;
 int main(int argc, char**argv) {
+    keepThismainInMainThread = 123.456;
     go_wrapper_main();
     return 0;
 }
