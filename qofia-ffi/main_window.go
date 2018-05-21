@@ -183,8 +183,10 @@ func (this *MainWindow) connectSignals() {
 
 	qtrt.Connect(uiw.ToolButton_20, "clicked(bool)", func(checked bool) {
 		log.Println(checked)
-		testRunOnAndroidThread()
-		KeepScreenOn(true)
+		go func() {
+			// testRunOnAndroidThread()
+			KeepScreenOn(true)
+		}()
 	})
 	qtrt.Connect(uiw.ToolButton_21, "clicked(bool)", func(checked bool) {
 		log.Println(checked)

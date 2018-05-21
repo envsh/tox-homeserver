@@ -3,6 +3,7 @@ mkdir -p ./build/libs/armeabi-v7a
 cp -v libgolem.so ./build/
 cp -v libgolem.so ./build/libs/armeabi-v7a/
 
+
 mkdir -p ./build/java ./build/src/debug/java
 MYQTDIR=/home/me/Qt5.10.1/5.10.1/
 QTSRCDIR=$MYQTDIR/Src
@@ -11,7 +12,7 @@ cp -va $QTSRCDIR/qtandroidextras/src/jar/src/* ./build/src/
 cp -va $QTSRCDIR/qtconnectivity/src/android/bluetooth/src/* ./build/src/
 cp -va $QTSRCDIR/qtconnectivity/src/android/nfc/src/* ./build/src/
 cp -va $QTSRCDIR/qtwebview/src/jar/src/* ./build/src/
-cp -va $QTSRCDIR/qtpurchasing/src/jar/src/* ./build/src/
+cp -va $QTSRCDIR/qtpurchasing/src/android/src/* ./build/src/ || exit 1
 
 time $MYQTDIR/android_armv7/bin/androiddeployqt --output ./build/ --verbose --gradle --deployment bundled --android-platform android-26
 

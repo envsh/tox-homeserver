@@ -21,7 +21,9 @@ func testRunOnAndroidThread() {
 func KeepScreenOn(on bool) {
 	// maybe hang here
 	// qtandroidextras.RunOnAndroidThread(func() { _KeepScreenOn(on) })
-	qtandroidextras.RunOnAndroidThread(func() { _KeepScreenOn2(on) })
+	// 好像是qtandroidextras.RunOnAndroidThread再调回来的问题，假设不调回来可能行
+	// qtandroidextras.RunOnAndroidThread(func() { _KeepScreenOn2(on) })
+	_KeepScreenOn2(true)
 }
 
 func _KeepScreenOn(on bool) {
