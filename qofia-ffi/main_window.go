@@ -181,12 +181,14 @@ func setAppStyleSheetTheme(index int) {
 func (this *MainWindow) connectSignals() {
 	uiw := uictx.uiw
 
+	qtrt.Connect(uiw.ToolButton_19, "clicked(bool)", func(checked bool) {
+		log.Println(checked)
+		ShowToast("hehehh哈哈eehhe", 1)
+	})
 	qtrt.Connect(uiw.ToolButton_20, "clicked(bool)", func(checked bool) {
 		log.Println(checked)
-		go func() {
-			// testRunOnAndroidThread()
-			KeepScreenOn(true)
-		}()
+		// testRunOnAndroidThread()
+		KeepScreenOn(true)
 	})
 	qtrt.Connect(uiw.ToolButton_21, "clicked(bool)", func(checked bool) {
 		log.Println(checked)

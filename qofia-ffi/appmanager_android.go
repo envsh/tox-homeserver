@@ -18,12 +18,17 @@ func testRunOnAndroidThread() {
 	qtandroidextras.RunOnAndroidThread(func() { _ExceptionCheckAndClear() })
 }
 
+func ShowToast(message string, duration uint64) {
+	qtandroidextras.ShowToast(message, duration)
+}
+
 func KeepScreenOn(on bool) {
 	// maybe hang here
 	// qtandroidextras.RunOnAndroidThread(func() { _KeepScreenOn(on) })
 	// 好像是qtandroidextras.RunOnAndroidThread再调回来的问题，假设不调回来可能行
 	// qtandroidextras.RunOnAndroidThread(func() { _KeepScreenOn2(on) })
-	_KeepScreenOn2(true)
+	// _KeepScreenOn2(true)
+	qtandroidextras.KeepScreenOn(on)
 }
 
 func _KeepScreenOn(on bool) {
