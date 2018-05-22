@@ -85,10 +85,10 @@ func (this *ToxVM) setupCallbacks() {
 		fname, err := t.FriendGetName(friendNumber)
 		gopp.ErrPrint(err)
 
-		msgid, err := appctx.st.AddFriendMessage(message, pubkey)
+		msgo, err := appctx.st.AddFriendMessage(message, pubkey)
 		gopp.ErrPrint(err)
 
-		evt.Margs = []string{fname, pubkey, fmt.Sprintf("%d", msgid)}
+		evt.Margs = []string{fname, pubkey, fmt.Sprintf("%d", msgo.EventId)}
 		this.pubmsg(&evt)
 	}, nil)
 
@@ -195,10 +195,10 @@ func (this *ToxVM) setupCallbacks() {
 			groupId, _ = t.ConferenceGetIdentifier(groupNumber)
 		}
 
-		msgid, err := appctx.st.AddGroupMessage(message, "0", groupId, peerPubkey)
+		msgo, err := appctx.st.AddGroupMessage(message, "0", groupId, peerPubkey)
 		gopp.ErrPrint(err)
 
-		evt.Margs = []string{peerName, peerPubkey, title, groupId, fmt.Sprintf("%d", msgid)}
+		evt.Margs = []string{peerName, peerPubkey, title, groupId, fmt.Sprintf("%d", msgo.EventId)}
 		if t.SelfGetPublicKey() == peerPubkey {
 		} else {
 			this.pubmsg(&evt)
@@ -312,9 +312,16 @@ func (this *ToxVM) setupCallbacks() {
 		peerPubkey, _ := xtox.ConferencePeerGetPubkey(t, groupNumber, peerNumber)
 		peerName, _ := xtox.ConferencePeerGetName(t, groupNumber, peerNumber)
 		if peerName == "" || peerPubkey == "" {
-			log.Println("not found:", peerName, peerPubkey)
+			log.Println("peer not found:", peerName, peerPubkey)
 		}
 		evt.Margs = []string{groupId, peerName, peerPubkey}
+
+		ctid, err := appctx.st.AddGroup(groupId, groupNumber, title)
+		gopp.ErrPrint(err, ctid)
+		if err != nil {
+			_, err := appctx.st.UpdateGroup(groupId, groupNumber, title)
+			gopp.ErrPrint(err)
+		}
 
 		this.pubmsg(&evt)
 	}, nil)

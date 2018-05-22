@@ -136,9 +136,9 @@ func RmtCallExecuteHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Even
 		wn, err := t.FriendSendMessage(fnum, req.Args[1])
 		gopp.ErrPrint(err)
 		pubkey := t.SelfGetPublicKey()
-		msgid, err := appctx.st.AddFriendMessage(req.Args[1], pubkey)
-		gopp.ErrPrint(err, msgid)
-		out.Mid = msgid
+		msgo, err := appctx.st.AddFriendMessage(req.Args[1], pubkey)
+		gopp.ErrPrint(err)
+		out.Mid = msgo.EventId
 		out.Args = append(out.Args, fmt.Sprintf("%d", wn))
 
 		// groups
@@ -175,9 +175,9 @@ func RmtCallExecuteHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Even
 		}
 		cookie, _ := xtox.ConferenceGetCookie(t, uint32(gnum))
 		pubkey := t.SelfGetPublicKey()
-		msgid, err := appctx.st.AddGroupMessage(req.Args[2], "0", cookie, pubkey)
-		gopp.ErrPrint(err, msgid)
-		out.Mid = msgid
+		msgo, err := appctx.st.AddGroupMessage(req.Args[2], "0", cookie, pubkey)
+		gopp.ErrPrint(err)
+		out.Mid = msgo.EventId
 	case "ConferenceJoin": // friendNumber, cookie
 		fnum := gopp.MustUint32(req.Args[0])
 		cookie := req.Args[1]

@@ -6,7 +6,6 @@ import (
 	"log"
 	"os"
 	"runtime"
-	"time"
 	"tox-homeserver/common"
 
 	"github.com/go-xorm/xorm"
@@ -24,6 +23,8 @@ func NewStorage() *Storage {
 	var dsn string
 	if runtime.GOOS == "android" {
 		dsn = fmt.Sprintf("file:///data/data/io.dnesth.tofia/toxhs.sqlite")
+		dsn = fmt.Sprintf("file://%s/toxhs.sqlite", common.AndroidGetDataDir())
+		log.Println(dsn)
 	} else {
 		dsn = fmt.Sprintf("toxhs.sqlite?cache=shared&mode=rwc")
 	}
@@ -96,6 +97,15 @@ func (this *Storage) AddGroup(identify string, num uint32, title string) (int64,
 	return this.AddContact(c)
 }
 
+func (this *Storage) UpdateGroup(identify string, num uint32, title string) (int64, error) {
+	c := &Contact{}
+	c.IsGroup = 1
+	c.Pubkey = identify
+	c.RtId = int(num)
+	c.Name = title
+	return this.UpdateContactByPubkey(c)
+}
+
 func (this *Storage) AddPeer(peerPubkey string, num uint32) (int64, error) {
 	c := &Contact{}
 	c.IsPeer = 1
@@ -105,44 +115,54 @@ func (this *Storage) AddPeer(peerPubkey string, num uint32) (int64, error) {
 }
 
 func (this *Storage) AddContact(c *Contact) (int64, error) {
-	nowt := time.Now().String()
-	c.Created = nowt
-	c.Updated = nowt
+	c.Created = common.NowTimeStr()
+	c.Updated = c.Created
 
 	id, err := this.dbh.InsertOne(c)
 	gopp.ErrPrint(err, id)
 	return id, err
 }
 
-func (this *Storage) AddFriendMessage(msg string, pubkey string) (int64, error) {
+func (this *Storage) UpdateContactByPubkey(c *Contact) (int64, error) {
+	c.Updated = common.NowTimeStr()
+
+	id, err := this.dbh.Where("pubkey = ?", c.Pubkey).Update(c)
+	gopp.ErrPrint(err, id)
+	return id, err
+}
+
+// eventId 参数可选，为0表示服务器使用，自动生成
+func (this *Storage) AddFriendMessage(msg string, pubkey string, eventId int64) (*Message, error) {
 	c := &Contact{}
 	c.Pubkey = pubkey
 	exist, err := this.dbh.Get(c)
 	gopp.ErrPrint(err, exist, pubkey)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 	if !exist {
-		return 0, xorm.ErrNotExist
+		return nil, xorm.ErrNotExist
 	}
 
 	m := &Message{}
 	m.Content = msg
 	m.ContactId = c.Id
 	m.RoomId = c.Id // for friend, room id is contact id. contact is a room
+	m.EventId = eventId
 	return this.AddMessage(m)
 }
 
-func (this *Storage) AddGroupMessage(msg string, mtype string, identify string, peerPubkey string) (int64, error) {
+// eventId 参数可选，为0表示服务器使用，自动生成
+func (this *Storage) AddGroupMessage(msg string, mtype string, identify string, peerPubkey string, eventId int64) (*Message, error) {
 	c0 := &Contact{}
 	c0.Pubkey = identify
 	exist, err := this.dbh.Get(c0)
 	gopp.ErrPrint(err, exist, identify)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 	if !exist {
-		return 0, xorm.ErrNotExist
+		return nil, xorm.ErrNotExist
 	}
 
 	c1 := &Contact{}
@@ -150,31 +170,32 @@ func (this *Storage) AddGroupMessage(msg string, mtype string, identify string, 
 	exist, err = this.dbh.Get(c1)
 	gopp.ErrPrint(err, exist, identify)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 	if !exist {
-		return 0, xorm.ErrNotExist
+		return nil, xorm.ErrNotExist
 	}
 
 	m := &Message{}
 	m.Content = msg
 	m.ContactId = c1.Id
 	m.RoomId = c0.Id
+	m.EventId = eventId
 	return this.AddMessage(m)
 }
 
-func (this *Storage) AddMessage(m *Message) (int64, error) {
-	nowt := time.Now().String()
-	m.Updated = nowt
+//
+func (this *Storage) AddMessage(m *Message) (*Message, error) {
+	m.Updated = common.NowTimeStr()
 	// m.EventId <=0认为是server端，否则客户端
 	if m.EventId <= 0 {
-		m.Created = nowt
+		m.Created = m.Updated
 		m.EventId = this.NextId()
 	}
 
 	id, err := this.dbh.InsertOne(m)
 	gopp.ErrPrint(err, id)
-	return id, err
+	return m, err
 }
 
 func (this *Storage) MaxEventId() (int64, error) {
@@ -208,8 +229,8 @@ func (this *Storage) AddDevice() error {
 func (this *Storage) AddDevice2(name string) error {
 	dv := Device{}
 	dv.Uuid = name
-	dv.Created = time.Now().String()
-	dv.Updated = time.Now().String()
+	dv.Created = common.NowTimeStr()
+	dv.Updated = dv.Created
 
 	id, err := this.dbh.InsertOne(&dv)
 	gopp.ErrPrint(err, id)
@@ -246,7 +267,7 @@ func (this *Storage) AddSyncInfo(ct_id int, next_batch int, prev_batch int) erro
 	dv.CtId = ct_id
 	dv.NextBatch = next_batch
 	dv.PrevBatch = prev_batch
-	dv.Updated = time.Now().String()
+	dv.Updated = common.NowTimeStr()
 
 	id, err := this.dbh.InsertOne(&dv)
 	gopp.ErrPrint(err, id)
@@ -269,7 +290,7 @@ func (this *Storage) UpdateSyncInfo(ct_id int, next_batch int, prev_batch int) e
 	c.CtId = ct_id
 	c.NextBatch = next_batch
 	c.PrevBatch = prev_batch
-	c.Updated = time.Now().String()
+	c.Updated = common.NowTimeStr()
 
 	_, err := this.dbh.Where("ct_id = ?", ct_id).Update(c)
 	gopp.ErrPrint(err, ct_id)

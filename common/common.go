@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"runtime"
+	"time"
 )
 
 const CBEventBusName = "cbevt"
@@ -45,3 +46,7 @@ func init() {
 }
 
 func init() { log.SetPrefix(LogPrefix) }
+
+const DefaultTimeLayout = "2006-01-02 15:04:05.999999999 -0700 MST"
+
+func NowTimeStr() string { return time.Now().String()[:len(DefaultTimeLayout)] }

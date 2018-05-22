@@ -133,7 +133,7 @@ func (this *AppContext) dispatchEvent(jso *simplejson.Json) {
 
 	case "FriendMessage":
 		// jso.Get("args").GetIndex(0).MustString()
-		// msg := jso.Get("args").GetIndex(1).MustString()
+		msg := jso.Get("args").GetIndex(1).MustString()
 		fname := jso.Get("margs").GetIndex(0).MustString()
 		pubkey := jso.Get("margs").GetIndex(1).MustString()
 
@@ -158,8 +158,9 @@ func (this *AppContext) dispatchEvent(jso *simplejson.Json) {
 		}
 
 		///
-		// _, err := appctx.store.AddFriendMessage(msg, pubkey)
-		// gopp.ErrPrint(err)
+		eventId := int64(gopp.MustInt(jso.Get("margs").GetIndex(2).MustString()))
+		_, err := appctx.store.AddFriendMessage(msg, pubkey, eventId)
+		gopp.ErrPrint(err)
 
 	case "FriendConnectionStatus":
 		fname := jso.Get("margs").GetIndex(0).MustString()
@@ -290,7 +291,8 @@ func (this *AppContext) dispatchEvent(jso *simplejson.Json) {
 
 		//
 		peerPubkey := jso.Get("margs").GetIndex(1).MustString()
-		_, err := appctx.store.AddGroupMessage(message, "0", groupId, peerPubkey)
+		eventId := int64(gopp.MustInt(jso.Get("margs").GetIndex(4).MustString()))
+		_, err := appctx.store.AddGroupMessage(message, "0", groupId, peerPubkey, eventId)
 		gopp.ErrPrint(err)
 
 	default:

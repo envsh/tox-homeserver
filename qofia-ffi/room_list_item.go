@@ -36,6 +36,7 @@ type Message struct {
 func NewMessageForGroup(jso *simplejson.Json) *Message {
 	groupId := jso.Get("margs").GetIndex(3).MustString()
 	log.Println(groupId)
+	// log.Println(jso)
 	if thscli.ConferenceIdIsEmpty(groupId) {
 		// break
 	}
@@ -44,11 +45,13 @@ func NewMessageForGroup(jso *simplejson.Json) *Message {
 	peerName := jso.Get("margs").GetIndex(0).MustString()
 	groupTitle := jso.Get("margs").GetIndex(2).MustString()
 	_ = groupTitle
+	eventId := gopp.MustInt(jso.Get("margs").GetIndex(4).MustString())
 
 	this := &Message{}
 	this.Msg = message
 	this.Peer = peerName
 	this.Time = time.Now()
+	this.EventId = int64(eventId)
 
 	this.refmtmsg()
 	return this
@@ -59,11 +62,13 @@ func NewMessageForFriend(jso *simplejson.Json) *Message {
 	fname := jso.Get("margs").GetIndex(0).MustString()
 	pubkey := jso.Get("margs").GetIndex(1).MustString()
 	_, _, _ = msg, fname, pubkey
+	eventId := gopp.MustInt(jso.Get("margs").GetIndex(2).MustString())
 
 	this := &Message{}
 	this.Msg = msg
 	this.Peer = fname
 	this.Time = time.Now()
+	this.EventId = int64(eventId)
 
 	this.refmtmsg()
 	return this
@@ -337,7 +342,7 @@ func (this *RoomListItem) AddMessage(msgo *Message, prev bool) {
 	// check in list
 	for _, msgoe := range this.msgos {
 		if msgoe.EventId == msgo.EventId {
-			log.Println("msg already in list:", msgo.EventId)
+			log.Printf("msg already in list: %d, %+v\n", msgo.EventId, msgo)
 			return
 		}
 	}
