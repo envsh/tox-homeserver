@@ -12,6 +12,7 @@ import (
 	"tox-homeserver/thspbs"
 
 	simplejson "github.com/bitly/go-simplejson"
+	"github.com/go-xorm/xorm"
 	"github.com/kitech/godsts/maps/hashmap"
 	"github.com/nats-io/nats"
 	"google.golang.org/grpc"
@@ -256,7 +257,7 @@ func (this *AppContext) dispatchEvent(jso *simplejson.Json) {
 
 		///
 		peerPubkey := jso.Get("margs").GetIndex(1).MustString()
-		_, err := appctx.store.AddPeer(peerPubkey, 0)
+		_, err := appctx.store.AddPeer(peerPubkey, 0, "")
 		gopp.ErrPrint(err)
 
 	case "ConferenceMessage":
@@ -290,9 +291,15 @@ func (this *AppContext) dispatchEvent(jso *simplejson.Json) {
 		}
 
 		//
+		peerName := jso.Get("margs").GetIndex(0).MustString()
 		peerPubkey := jso.Get("margs").GetIndex(1).MustString()
+		_, err := appctx.store.GetContactByPubkey(peerPubkey)
+		if err == xorm.ErrNotExist {
+			peerNum := gopp.MustUint32(jso.Get("args").GetIndex(1).MustString())
+			appctx.store.AddPeer(peerPubkey, peerNum, peerName)
+		}
 		eventId := int64(gopp.MustInt(jso.Get("margs").GetIndex(4).MustString()))
-		_, err := appctx.store.AddGroupMessage(message, "0", groupId, peerPubkey, eventId)
+		_, err = appctx.store.AddGroupMessage(message, "0", groupId, peerPubkey, eventId)
 		gopp.ErrPrint(err)
 
 	default:
@@ -314,6 +321,20 @@ func (this *AppContext) getBaseInfo() {
 
 	this.vtcli.ParseBaseInfo(info)
 	log.Println("herehehe")
+}
+
+func (this *AppContext) persistBaseInfo(bi *thspbs.BaseInfo) {
+	for _, frndo := range bi.Friends {
+		appctx.store.AddFriend(frndo.Pubkey, frndo.Fnum, frndo.Name, frndo.Stmsg)
+	}
+	for _, grpo := range bi.Groups {
+		for _, peero := range grpo.GetMembers() {
+			appctx.store.AddPeer(peero.Pubkey, peero.Pnum, peero.Name)
+		}
+	}
+	for _, grpo := range bi.Groups {
+		appctx.store.AddGroup(grpo.GroupId, grpo.Gnum, grpo.Title)
+	}
 }
 
 func (this *AppContext) doCall() {

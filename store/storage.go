@@ -33,7 +33,7 @@ func NewStorage() *Storage {
 	err = dbh.Ping()
 	gopp.ErrPrint(err, dsn)
 	this.dbh = dbh
-	// this.SetWAL(true)
+	this.SetWAL(true)
 
 	logger := xorm.NewSimpleLogger2(os.Stdout, common.LogPrefix, 0)
 	dbh.SetLogger(logger)
@@ -47,6 +47,9 @@ func NewStorage() *Storage {
 func (this *Storage) SetWAL(enable bool) {
 	_, err := this.dbh.Exec("PRAGMA journal_mode=WAL;")
 	gopp.ErrPrint(err)
+	if true {
+		return
+	}
 	_, err = this.dbh.Exec("PRAGMA locking_mode=EXCLUSIVE;")
 	gopp.ErrPrint(err)
 }
@@ -106,11 +109,12 @@ func (this *Storage) UpdateGroup(identify string, num uint32, title string) (int
 	return this.UpdateContactByPubkey(c)
 }
 
-func (this *Storage) AddPeer(peerPubkey string, num uint32) (int64, error) {
+func (this *Storage) AddPeer(peerPubkey string, num uint32, name string) (int64, error) {
 	c := &Contact{}
 	c.IsPeer = 1
 	c.Pubkey = peerPubkey
 	c.RtId = int(num)
+	c.Name = name
 	return this.AddContact(c)
 }
 
@@ -211,13 +215,16 @@ func (this *Storage) MaxEventId() (int64, error) {
 }
 
 func (this *Storage) FindEventsByContactId(pubkey string, prev_batch int64) ([]Message, error) {
-	c := this.GetContactByPubkey(pubkey)
+	c, err := this.GetContactByPubkey(pubkey)
+	if err != nil {
+		return nil, err
+	}
 	if c == nil {
 		return nil, xorm.ErrNotExist
 	}
 
 	r := []Message{}
-	err := this.dbh.Where("room_id = ? and event_id <= ?", c.Id, prev_batch).Desc("event_id").Limit(20).Find(&r)
+	err = this.dbh.Where("room_id = ? and event_id <= ?", c.Id, prev_batch).Desc("event_id").Limit(20).Find(&r)
 	gopp.ErrPrint(err)
 	return r, err
 }

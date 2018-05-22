@@ -302,6 +302,7 @@ func (this *LigTox) GetBaseInfo() {
 
 func (this *LigTox) ParseBaseInfo(bi *thspbs.BaseInfo) {
 	this.Binfo = bi
+	appctx.persistBaseInfo(bi)
 	this.callbackBaseInfo(bi)
 }
 

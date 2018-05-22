@@ -147,11 +147,15 @@ func (this *MainWindow) initMainWin() {
 	})
 
 	//
+	log.Println("Has scroller:", qtwidgets.QScroller_HasScroller(uictx.uiw.ScrollArea),
+		qtwidgets.QScroller_HasScroller(uictx.uiw.ScrollArea_2))
 	uictx.uiw.ScrollArea.GrabGesture(qtcore.Qt__SwipeGesture, 0)
 	uictx.uiw.ScrollArea.GrabGesture(qtcore.Qt__PanGesture, 0)
 	uictx.uiw.ScrollArea.GrabGesture(qtcore.Qt__PinchGesture, 0)
 	qtwidgets.QScroller_GrabGesture(uictx.uiw.ScrollArea, qtwidgets.QScroller__LeftMouseButtonGesture)
 	qtwidgets.QScroller_GrabGesture(uictx.uiw.ScrollArea_2, qtwidgets.QScroller__LeftMouseButtonGesture)
+	log.Println("Has scroller:", qtwidgets.QScroller_HasScroller(uictx.uiw.ScrollArea),
+		qtwidgets.QScroller_HasScroller(uictx.uiw.ScrollArea_2))
 
 	/*
 		uictx.uiw.ScrollArea.InheritEvent(func(event *qtcore.QEvent) bool {

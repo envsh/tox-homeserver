@@ -5,12 +5,12 @@ import (
 	"strconv"
 )
 
-func (this *Storage) GetContactByPubkey(pubkey string) *Contact {
+func (this *Storage) GetContactByPubkey(pubkey string) (*Contact, error) {
 	ct := &Contact{}
 	ct.Pubkey = pubkey
 	_, err := this.dbh.Get(ct)
 	gopp.ErrPrint(err)
-	return ct
+	return ct, err
 }
 
 func (this *Storage) GetContactById(ct_id int) *Contact {
@@ -35,7 +35,7 @@ func (this *Storage) GetAllContacts() []*Contact {
 
 func (this *Storage) GetLatestMessages(pubkey string) []Message {
 	msgs := []Message{}
-	ct := this.GetContactByPubkey(pubkey)
+	ct, _ := this.GetContactByPubkey(pubkey)
 	err := this.dbh.Where("contact_id=?", ct.Id).Limit(10).Desc("id").Find(&msgs)
 	gopp.ErrPrint(err, pubkey)
 	return msgs
@@ -46,7 +46,7 @@ func (this *Storage) GetMessagesFrom(pubkey string, sfrom string) []Message {
 	from, err := strconv.ParseInt(sfrom, 10, 64)
 	gopp.ErrPrint(err, sfrom, from)
 
-	ct := this.GetContactByPubkey(pubkey)
+	ct, _ := this.GetContactByPubkey(pubkey)
 	err = this.dbh.Where("contact_id=? AND id<?", ct.Id, from).Limit(13).Desc("id").Find(&msgs)
 	gopp.ErrPrint(err, ct)
 	return msgs
@@ -54,7 +54,7 @@ func (this *Storage) GetMessagesFrom(pubkey string, sfrom string) []Message {
 
 func (this *Storage) GetLastMessage(pubkey string, msg string) *Message {
 	msgr := Message{}
-	ct := this.GetContactByPubkey(pubkey)
+	ct, _ := this.GetContactByPubkey(pubkey)
 	_, err := this.dbh.Where("contact_id=? AND content=?", ct.Id, msg).Limit(1).Desc("id").Get(&msgr)
 	gopp.ErrPrint(err, pubkey, msg)
 	return &msgr
