@@ -13,6 +13,14 @@ func (this *Storage) GetContactByPubkey(pubkey string) *Contact {
 	return ct
 }
 
+func (this *Storage) GetContactById(ct_id int) *Contact {
+	ct := &Contact{}
+	ct.Id = ct_id
+	_, err := this.dbh.Get(ct)
+	gopp.ErrPrint(err)
+	return ct
+}
+
 func (this *Storage) GetAllContacts() []*Contact {
 	var contacts []Contact
 	err := this.dbh.Find(&contacts)

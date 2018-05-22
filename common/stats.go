@@ -31,6 +31,9 @@ func logMetFancy() {
 	recvMeter := metrics.GetOrRegisterMeter(ByteRecv+msuf, MetReg)
 	sentMeter := metrics.GetOrRegisterMeter(ByteSent+msuf, MetReg)
 	tplstr := "meter: %s, count: %d, 1-min rate: %s, 5-min rate: %s, 15-min rate: %s, mean rate: %s\n"
+	if true {
+		return
+	}
 	log.Printf(tplstr, ByteRecv+msuf, recvMeter.Count(),
 		ffn(recvMeter.Rate1()), ffn(recvMeter.Rate5()),
 		ffn(recvMeter.Rate15()), ffn(recvMeter.RateMean()))

@@ -105,6 +105,7 @@ type Ui_MainWindow struct {
 	HorizontalLayout_9         *qtwidgets.QHBoxLayout
 	LineHeadSepLeft            *qtwidgets.QFrame
 	LabelMsgCount2             *qtwidgets.QLabel
+	ToolButton_23              *qtwidgets.QToolButton
 	LineHeadSepRight           *qtwidgets.QFrame
 	ScrollArea_2               *qtwidgets.QScrollArea
 	ScrollAreaWidgetContents_2 *qtwidgets.QWidget
@@ -745,6 +746,12 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 
 	this.HorizontalLayout_9.Layout().AddWidget(this.LabelMsgCount2) // 115
 
+	this.ToolButton_23 = qtwidgets.NewQToolButton(this.Page_2) // 111
+	this.ToolButton_23.SetObjectName("ToolButton_23")          // 112
+	this.ToolButton_23.SetAutoRaise(true)                      // 114
+
+	this.HorizontalLayout_9.Layout().AddWidget(this.ToolButton_23) // 115
+
 	this.LineHeadSepRight = qtwidgets.NewQFrame(this.Page_2, 0) // 111
 	this.LineHeadSepRight.SetObjectName("LineHeadSepRight")     // 112
 	this.SizePolicy5 = qtwidgets.NewQSizePolicy_1(qtwidgets.QSizePolicy__Fixed, qtwidgets.QSizePolicy__Fixed, 1)
@@ -769,7 +776,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.ScrollArea_2.SetWidgetResizable(true)                                             // 114
 	this.ScrollAreaWidgetContents_2 = qtwidgets.NewQWidget(nil, 0)                         // 111
 	this.ScrollAreaWidgetContents_2.SetObjectName("ScrollAreaWidgetContents_2")            // 112
-	this.ScrollAreaWidgetContents_2.SetGeometry(0, 0, 366, 424)                            // 114
+	this.ScrollAreaWidgetContents_2.SetGeometry(0, 0, 366, 408)                            // 114
 	this.VerticalLayout_3 = qtwidgets.NewQVBoxLayout_1(this.ScrollAreaWidgetContents_2)    // 111
 	this.VerticalLayout_3.SetSpacing(0)                                                    // 114
 	this.VerticalLayout_3.SetObjectName("VerticalLayout_3")                                // 112
@@ -1015,7 +1022,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.ScrollArea_3.SetWidgetResizable(true)                                           // 114
 	this.ScrollAreaWidgetContents_3 = qtwidgets.NewQWidget(nil, 0)                       // 111
 	this.ScrollAreaWidgetContents_3.SetObjectName("ScrollAreaWidgetContents_3")          // 112
-	this.ScrollAreaWidgetContents_3.SetGeometry(0, 0, 366, 231)                          // 114
+	this.ScrollAreaWidgetContents_3.SetGeometry(0, 0, 96, 26)                            // 114
 	this.VerticalLayout_17 = qtwidgets.NewQVBoxLayout_1(this.ScrollAreaWidgetContents_3) // 111
 	this.VerticalLayout_17.SetObjectName("VerticalLayout_17")                            // 112
 	this.VerticalSpacer_4 = qtwidgets.NewQSpacerItem(20, 216, qtwidgets.QSizePolicy__Minimum, qtwidgets.QSizePolicy__Expanding)
@@ -1151,6 +1158,7 @@ func (this *Ui_MainWindow) RetranslateUi(MainWindow *qtwidgets.QMainWindow) {
 	this.ToolButton_14.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
 	this.ToolButton_22.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
 	this.LabelMsgCount2.SetText(qtcore.QCoreApplication_Translate("MainWindow", "000", "dummy123", 0))
+	this.ToolButton_23.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
 	this.ToolButton_8.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
 	this.ToolButton_9.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
 	this.ToolButton_10.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))

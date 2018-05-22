@@ -14,6 +14,7 @@ type Contact struct {
 	RtId       int    `xorm:"INTEGER"`
 	IsPeer     int    `xorm:"index INTEGER"`
 	ChatType   int    `xorm:"INTEGER"`
+	IsFriend   int    `xorm:"index INTEGER"`
 }
 
 type Message struct {
@@ -37,4 +38,12 @@ type Device struct {
 
 type Idgen struct {
 	Id int64 `xorm:"pk autoincr INTEGER"`
+}
+
+type SyncInfo struct {
+	Id        int    `xorm:"pk autoincr INTEGER"`
+	CtId      int    `xorm:"unique INTEGER"`
+	NextBatch int    `xorm:"INTEGER"`
+	PrevBatch int    `xorm:"INTEGER"`
+	Updated   string `xorm:"TEXT"`
 }

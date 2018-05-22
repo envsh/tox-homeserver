@@ -1,7 +1,7 @@
 ### 消息同步
 
 * 自己随便造的方式
-* matrix协议的方式
+* matrix协议的方式 https://matrix.org/docs/spec/client_server/r0.3.0.html#syncing
 * ActiveSync方式
 
 参考：z-push, matrix, 微信，

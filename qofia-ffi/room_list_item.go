@@ -21,9 +21,10 @@ import (
 )
 
 type Message struct {
-	Msg  string
-	Peer string
-	Time time.Time
+	Msg     string
+	Peer    string
+	Time    time.Time
+	EventId int64
 
 	Me        bool
 	MsgUi     string
@@ -177,6 +178,8 @@ type RoomListItem struct {
 	unreadedCount int
 	totalCount    int
 	peerCount     int
+	nextBatch     int64
+	prevBatch     int64
 }
 
 func NewRoomListItem() *RoomListItem {
@@ -330,10 +333,29 @@ func (this *RoomListItem) SetContactInfo(info interface{}) {
 	this.ToolButton_2.SetToolTip(this.GetName() + "." + gopp.SubStr(this.GetId(), 7))
 }
 
-func (this *RoomListItem) AddMessage(msgo *Message) {
-	this.msgos = append(this.msgos, msgo)
-	msgiw := NewUi_MessageItemView2()
-	this.msgitmdl = append(this.msgitmdl, msgiw)
+func (this *RoomListItem) AddMessage(msgo *Message, prev bool) {
+	// check in list
+	for _, msgoe := range this.msgos {
+		if msgoe.EventId == msgo.EventId {
+			log.Println("msg already in list:", msgo.EventId)
+			return
+		}
+	}
+
+	if prev {
+		this.msgos = append([]*Message{msgo}, this.msgos...)
+		msgiw := NewUi_MessageItemView2()
+		this.msgitmdl = append([]*Ui_MessageItemView{msgiw}, this.msgitmdl...)
+		this.AddMessageImpl(msgo, msgiw)
+	} else {
+		this.msgos = append(this.msgos, msgo)
+		msgiw := NewUi_MessageItemView2()
+		this.msgitmdl = append(this.msgitmdl, msgiw)
+		this.AddMessageImpl(msgo, msgiw)
+	}
+}
+
+func (this *RoomListItem) AddMessageImpl(msgo *Message, msgiw *Ui_MessageItemView) {
 
 	lastSame := func(peerUi string) bool {
 		if len(this.msgos) >= 2 {

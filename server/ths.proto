@@ -25,10 +25,11 @@ message BaseInfo {
     string id = 1;
     string name = 2;
     string stmsg = 3;
-    uint32 status = 4;
+    uint32 status = 4; // statusText
     map<uint32,FriendInfo> friends = 5;
     map<uint32,GroupInfo> groups = 6;
     int32 connStatus = 7;
+    int64 nextBatch = 8;
 }
 
 message FriendInfo {

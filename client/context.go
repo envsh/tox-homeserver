@@ -90,7 +90,8 @@ func AppOnCreate() {
 	})
 }
 
-func (this *AppContext) GetLigTox() *LigTox { return this.vtcli }
+func (this *AppContext) GetLigTox() *LigTox         { return this.vtcli }
+func (this *AppContext) GetStorage() *store.Storage { return this.store }
 
 func (this *AppContext) pollNats() {
 

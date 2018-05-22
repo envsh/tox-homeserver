@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"gopp"
 	"log"
+	"strconv"
 	"tox-homeserver/common"
 	"tox-homeserver/thspbs"
 
@@ -84,6 +85,10 @@ func packBaseInfo(t *tox.Tox) (*thspbs.BaseInfo, error) {
 		out.Groups[gn] = gi
 	}
 
+	id, err := appctx.st.MaxEventId()
+	gopp.ErrPrint(err)
+	out.NextBatch = id + 1
+
 	return out, nil
 }
 
@@ -92,10 +97,14 @@ func RmtCallHandlers(ctx context.Context, req *thspbs.Event) (*thspbs.Event, err
 	log.Println(req.Id, req.Name, req.Args, req.Margs)
 
 	// 先把消息同步到不同协议的不同终端上
-	out, err := RmtCallResyncHandler(context.Background(), req)
-	gopp.ErrPrint(err)
-	if err == nil {
-		pubmsgall(out)
+	switch req.Name {
+	case "LoadEventsByContactId":
+	default:
+		out, err := RmtCallResyncHandler(context.Background(), req)
+		gopp.ErrPrint(err)
+		if err == nil {
+			pubmsgall(out)
+		}
 	}
 
 	return RmtCallExecuteHandler(ctx, req)
@@ -191,8 +200,20 @@ func RmtCallExecuteHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Even
 		fnum := gopp.MustUint32(req.Args[1])
 		_, err := t.ConferenceInvite(fnum, gnum)
 		gopp.ErrPrint(err, req.Args)
-		// TODO
-		// case "GetHistory":
+	// TODO
+	// case "GetHistory":
+	case "LoadEventsByContactId":
+		prev_batch, err := strconv.Atoi(req.Args[1])
+		gopp.ErrPrint(err, req.Args)
+		if err == nil {
+			msgos, err := appctx.st.FindEventsByContactId(req.Args[0], int64(prev_batch))
+			gopp.ErrPrint(err)
+			if err == nil {
+				data, err := json.Marshal(msgos)
+				gopp.ErrPrint(err)
+				out.Args = []string{string(data)}
+			}
+		}
 	default:
 		log.Println("unimpled:", req.Name, req.Args)
 		out.Ecode = -1

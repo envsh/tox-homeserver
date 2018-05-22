@@ -5,6 +5,7 @@ import (
 	"gopp"
 	"io/ioutil"
 	"log"
+	"runtime"
 	"time"
 
 	"github.com/kitech/qt.go/qtcore"
@@ -113,6 +114,19 @@ func (this *MainWindow) initMainWin() {
 	this.rcactInviteFriend = this.roomCtxMenu.AddAction("Invite Friends")
 	this.rcact4 = this.roomCtxMenu.AddAction("PlaceHolder3")
 
+	if runtime.GOOS == "android" {
+		sz := qtcore.NewQSize_1(32, 32)
+		this.ToolButton_11.SetIconSize(sz)
+		this.ToolButton_12.SetIconSize(sz)
+		this.ToolButton_19.SetIconSize(sz)
+		this.ToolButton_20.SetIconSize(sz)
+		this.ToolButton_21.SetIconSize(sz)
+		this.ToolButton_4.SetIconSize(sz)
+		this.ToolButton_5.SetIconSize(sz)
+		this.ToolButton_6.SetIconSize(sz)
+		this.ToolButton_7.SetIconSize(sz)
+	}
+
 	qtrt.Connect(this.rcactOpen, "triggered(bool)", func(checked bool) {
 		this.onRoomContextTriggered(this.curRoomCtxMenuItem, checked, this.rcactOpen)
 	})
@@ -194,6 +208,16 @@ func (this *MainWindow) connectSignals() {
 		log.Println(checked)
 		setAppStyleSheet()
 	})
+
+	qtrt.Connect(uiw.ToolButton_23, "clicked(bool)", func(checked bool) {
+		log.Println(checked, uictx.msgwin.item == nil)
+		if uictx.msgwin.item != nil {
+			go func() {
+				hisfet.LoadPrevHistory(uictx.msgwin.item)
+			}()
+		}
+	})
+
 	stkw := uiw.StackedWidget
 	qtrt.Connect(uiw.ToolButton_11, "clicked(bool)", func(checked bool) {
 		cidx := stkw.CurrentIndex()
@@ -370,7 +394,7 @@ func (this *MainWindow) sendMessage() {
 		uiw.LineEdit_2.Clear()
 		msgo := NewMessageForMe(itext)
 		log.Println(msgo)
-		item.AddMessage(msgo)
+		item.AddMessage(msgo, false)
 	} else {
 		log.Println("not send:", len(itext), item)
 	}
@@ -427,6 +451,8 @@ var baseInfoGot bool = false
 var contactQueue = make(chan interface{}, 1234)
 var uifnQueue = make(chan func(), 1234)
 
+func runOnUiThread(fn func()) { uifnQueue <- fn }
+
 func tryReadEvent() {
 
 	if !baseInfoGot {
@@ -459,6 +485,8 @@ func tryReadContactEvent() {
 		ctv.OnConextMenu = func(w *qtwidgets.QWidget, pos *qtcore.QPoint) {
 			uictx.mw.onRoomContextMenu(ctv, w, pos)
 		}
+		ctv.nextBatch = appctx.GetLigTox().Binfo.NextBatch
+		ctv.prevBatch = appctx.GetLigTox().Binfo.NextBatch - 1
 
 		uictx.iteman.addRoomItem(ctv)
 		ctv.SetContactInfo(contactx)
@@ -517,7 +545,7 @@ func dispatchEvent(jso *simplejson.Json) {
 			log.Println("wtf", fname, pubkey, msg)
 		} else {
 			msgo := NewMessageForFriend(jso)
-			item.AddMessage(msgo)
+			item.AddMessage(msgo, false)
 		}
 
 		///
@@ -648,7 +676,7 @@ func dispatchEvent(jso *simplejson.Json) {
 		for _, room := range ctitmdl {
 			log.Println(room.GetName(), ",", groupTitle, ",", room.GetId(), ",", groupId)
 			if room.GetId() == groupId && room.GetName() == groupTitle {
-				room.AddMessage(NewMessageForGroup(jso))
+				room.AddMessage(NewMessageForGroup(jso), false)
 				break
 			}
 		}
@@ -661,7 +689,7 @@ func dispatchEvent(jso *simplejson.Json) {
 		for _, room := range ctitmdl {
 			if room.GetId() == pubkey {
 				msgo := NewMessageForMe(itext)
-				room.AddMessage(msgo)
+				room.AddMessage(msgo, false)
 				found = true
 				break
 			}
@@ -677,7 +705,7 @@ func dispatchEvent(jso *simplejson.Json) {
 		for _, room := range ctitmdl {
 			if room.GetId() == groupId && room.GetName() == groupTitle {
 				msgo := NewMessageForMe(itext)
-				room.AddMessage(msgo)
+				room.AddMessage(msgo, false)
 				found = true
 				break
 			}

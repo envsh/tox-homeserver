@@ -12,10 +12,10 @@ import (
 	"strings"
 	"sync"
 	"time"
-	"tox-homeserver/thspbs"
 	"unsafe"
 
 	thscom "tox-homeserver/common"
+	"tox-homeserver/thspbs"
 
 	simplejson "github.com/bitly/go-simplejson"
 	"github.com/gorilla/websocket"

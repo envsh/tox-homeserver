@@ -56,6 +56,10 @@ func NewMessageFromStoreRecord(m *store.Message) *Message {
 	this.EventId = m.EventId
 	this.Msg = m.Content
 	this.Peer = "unknown" // ??? TODO
+	cto := appctx.GetStorage().GetContactById(m.ContactId)
+	if cto != nil {
+		this.Peer = cto.Name
+	}
 
 	defaultTimeStringLayout := "2006-01-02 15:04:05.999999999 -0700 MST"
 	tim, err := time.Parse(defaultTimeStringLayout, m.Updated[:len(defaultTimeStringLayout)])

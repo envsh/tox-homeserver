@@ -7,7 +7,7 @@ all: bd
 
 bd: com
 	PKG_CONFIG_PATH=/opt/toxcore-static2/lib64/pkgconfig/ CGO_LDFLAGS="-lopus -lsodium" \
-		go build -v -o bin/toxhs -ldflags "${GOVVV}" .
+		go build -i -v -o bin/toxhs -ldflags "${GOVVV}" .
 	tar zcvf bin/toxhs.tar.gz bin/toxhs
 
 democ: com
