@@ -42,8 +42,8 @@ type Idgen struct {
 
 type SyncInfo struct {
 	Id        int    `xorm:"pk autoincr INTEGER"`
-	CtId      int    `xorm:"unique INTEGER"`
-	NextBatch int    `xorm:"INTEGER"`
-	PrevBatch int    `xorm:"INTEGER"`
+	CtId      int    `xorm:"unique(siu) INTEGER"`
+	NextBatch int64  `xorm:"unique(siu) INTEGER"`
+	PrevBatch int64  `xorm:"unique(siu) INTEGER"`
 	Updated   string `xorm:"TEXT"`
 }

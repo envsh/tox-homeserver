@@ -85,7 +85,7 @@ func (this *ToxVM) setupCallbacks() {
 		fname, err := t.FriendGetName(friendNumber)
 		gopp.ErrPrint(err)
 
-		msgo, err := appctx.st.AddFriendMessage(message, pubkey)
+		msgo, err := appctx.st.AddFriendMessage(message, pubkey, 0)
 		gopp.ErrPrint(err)
 
 		evt.Margs = []string{fname, pubkey, fmt.Sprintf("%d", msgo.EventId)}
@@ -195,7 +195,7 @@ func (this *ToxVM) setupCallbacks() {
 			groupId, _ = t.ConferenceGetIdentifier(groupNumber)
 		}
 
-		msgo, err := appctx.st.AddGroupMessage(message, "0", groupId, peerPubkey)
+		msgo, err := appctx.st.AddGroupMessage(message, "0", groupId, peerPubkey, 0)
 		gopp.ErrPrint(err)
 
 		evt.Margs = []string{peerName, peerPubkey, title, groupId, fmt.Sprintf("%d", msgo.EventId)}
@@ -230,7 +230,7 @@ func (this *ToxVM) setupCallbacks() {
 
 	t.CallbackConferencePeerNameAdd(func(_ *tox.Tox, groupNumber uint32, peerNumber uint32, name string, userData interface{}) {
 		evt := thspbs.Event{}
-		evt.Name = "ConferenceNamePeerName"
+		evt.Name = "ConferencePeerName"
 		evt.Args = []string{fmt.Sprintf("%d", groupNumber), fmt.Sprintf("%d", peerNumber), name}
 
 		peerPubkey, err := t.ConferencePeerGetPublicKey(groupNumber, peerNumber)
@@ -246,7 +246,7 @@ func (this *ToxVM) setupCallbacks() {
 			groupId, _ = t.ConferenceGetIdentifier(groupNumber)
 		}
 
-		ctid, err := appctx.st.AddPeer(peerPubkey, groupNumber)
+		ctid, err := appctx.st.AddPeer(peerPubkey, groupNumber, peerName)
 		gopp.ErrPrint(err)
 		evt.Margs = []string{peerName, peerPubkey, title, groupId, fmt.Sprintf("%d", ctid)}
 

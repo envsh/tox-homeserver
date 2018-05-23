@@ -220,7 +220,7 @@
              var line = jso.name + " change to " + jso.args[2] + " by " + jso.margs[1];
              appendOutput(line);
              putContact(jso.args[2], jso.margs[2], jso.args[0], true);
-         } else if (jso.name == "ConferenceNamePeerName") {
+         } else if (jso.name == "ConferencePeerName") {
              var line = jso.args[2] + " joined in " + jso.margs[2];
              appendOutput(line);
          } else if (jso.name == "SelfConnectionStatus") {

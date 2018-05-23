@@ -217,7 +217,7 @@ func (this *MainWindow) connectSignals() {
 		log.Println(checked, uictx.msgwin.item == nil)
 		if uictx.msgwin.item != nil {
 			go func() {
-				hisfet.LoadPrevHistory(uictx.msgwin.item)
+				hisfet.PullPrevHistoryByRoom(uictx.msgwin.item)
 			}()
 		}
 	})
@@ -404,6 +404,7 @@ func (this *MainWindow) sendMessage() {
 	}
 }
 
+// should block
 func (this *MainWindow) initAppBackend() {
 	mech, uiw := uictx.mech, uictx.uiw
 
@@ -448,6 +449,16 @@ func (this *MainWindow) initAppBackend() {
 
 	mech.Trigger()
 
+	// 加载每个房间的最新消息, force schedue, or contact maybe not show in ui
+	go func() {
+		btime := time.Now()
+		log.Println("Waiting contacts show on UI...") // about 31ms with 7 contacts
+		for len(contactQueue) > 0 {
+			time.Sleep(10 * time.Millisecond)
+		}
+		log.Println("Show base contacts on UI done.", time.Since(btime))
+		pullAllRoomsLatestMessages()
+	}()
 	select {}
 }
 
@@ -489,8 +500,7 @@ func tryReadContactEvent() {
 		ctv.OnConextMenu = func(w *qtwidgets.QWidget, pos *qtcore.QPoint) {
 			uictx.mw.onRoomContextMenu(ctv, w, pos)
 		}
-		ctv.nextBatch = appctx.GetLigTox().Binfo.NextBatch
-		ctv.prevBatch = appctx.GetLigTox().Binfo.NextBatch - 1
+		ctv.timeline = thscli.TimeLine{NextBatch: vtcli.Binfo.NextBatch, PrevBatch: vtcli.Binfo.NextBatch - 1}
 
 		uictx.iteman.addRoomItem(ctv)
 		ctv.SetContactInfo(contactx)
@@ -582,6 +592,7 @@ func dispatchEvent(jso *simplejson.Json) {
 			item.OnConextMenu = func(w *qtwidgets.QWidget, pos *qtcore.QPoint) {
 				uictx.mw.onRoomContextMenu(item, w, pos)
 			}
+			item.timeline = thscli.TimeLine{NextBatch: vtcli.Binfo.NextBatch, PrevBatch: vtcli.Binfo.NextBatch - 1}
 			uictx.iteman.addRoomItem(item)
 			grpInfo := &thspbs.GroupInfo{}
 			grpInfo.GroupId = groupId
@@ -614,6 +625,7 @@ func dispatchEvent(jso *simplejson.Json) {
 			item.OnConextMenu = func(w *qtwidgets.QWidget, pos *qtcore.QPoint) {
 				uictx.mw.onRoomContextMenu(item, w, pos)
 			}
+			item.timeline = thscli.TimeLine{NextBatch: vtcli.Binfo.NextBatch, PrevBatch: vtcli.Binfo.NextBatch - 1}
 			uictx.iteman.addRoomItem(item)
 			grpInfo := &thspbs.GroupInfo{}
 			grpInfo.GroupId = groupId
@@ -622,7 +634,10 @@ func dispatchEvent(jso *simplejson.Json) {
 			item.SetContactInfo(grpInfo)
 			log.Println("new group contact:", groupNumber, groupId, groupTitle)
 		}
-
+	case "ConferencePeerName":
+		log.Println("TODO", jso)
+	case "ConferencePeerListChange":
+		log.Println("TODO", jso)
 	case "ConferenceNameListChange":
 		groupTitle := jso.Get("margs").GetIndex(2).MustString()
 		groupId := jso.Get("margs").GetIndex(3).MustString()
@@ -672,13 +687,13 @@ func dispatchEvent(jso *simplejson.Json) {
 		itext := fmt.Sprintf("%s@%s: %s", peerName, groupTitle, message)
 		uiw.ListWidget.AddItem(itext)
 		uiw.ListWidget.ScrollToBottom()
-		log.Println("item:", itext)
+		// log.Println("item:", itext)
 
 		ccstate.curpos = uiw.ScrollArea_2.VerticalScrollBar().Value()
 		ccstate.maxpos = uiw.ScrollArea_2.VerticalScrollBar().Maximum()
 
 		for _, room := range ctitmdl {
-			log.Println(room.GetName(), ",", groupTitle, ",", room.GetId(), ",", groupId)
+			// log.Println(room.GetName(), ",", groupTitle, ",", room.GetId(), ",", groupId)
 			if room.GetId() == groupId && room.GetName() == groupTitle {
 				room.AddMessage(NewMessageForGroup(jso), false)
 				break

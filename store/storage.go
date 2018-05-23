@@ -47,6 +47,9 @@ func NewStorage() *Storage {
 func (this *Storage) SetWAL(enable bool) {
 	_, err := this.dbh.Exec("PRAGMA journal_mode=WAL;")
 	gopp.ErrPrint(err)
+	_, err = this.dbh.Exec(fmt.Sprintf("PRAGMA journal_size_limit=%d;", 3*1000*1000)) // 3MB
+	gopp.ErrPrint(err)
+	// others: wal_checkpoint, wal_autocheckpoint, synchronous, cache_size
 	if true {
 		return
 	}
@@ -214,7 +217,7 @@ func (this *Storage) MaxEventId() (int64, error) {
 	return int64(r.EventId), nil
 }
 
-func (this *Storage) FindEventsByContactId(pubkey string, prev_batch int64) ([]Message, error) {
+func (this *Storage) FindEventsByContactId(pubkey string, prev_batch int64, page_size int) ([]Message, error) {
 	c, err := this.GetContactByPubkey(pubkey)
 	if err != nil {
 		return nil, err
@@ -224,7 +227,8 @@ func (this *Storage) FindEventsByContactId(pubkey string, prev_batch int64) ([]M
 	}
 
 	r := []Message{}
-	err = this.dbh.Where("room_id = ? and event_id <= ?", c.Id, prev_batch).Desc("event_id").Limit(20).Find(&r)
+	err = this.dbh.Where("room_id = ? and event_id <= ?", c.Id, prev_batch).
+		Desc("event_id").Limit(page_size).Find(&r)
 	gopp.ErrPrint(err)
 	return r, err
 }
@@ -269,7 +273,7 @@ func (this *Storage) NextId() int64 {
 	return idv.Id
 }
 
-func (this *Storage) AddSyncInfo(ct_id int, next_batch int, prev_batch int) error {
+func (this *Storage) AddSyncInfo(ct_id int, next_batch int64, prev_batch int64) error {
 	dv := SyncInfo{}
 	dv.CtId = ct_id
 	dv.NextBatch = next_batch
@@ -292,7 +296,7 @@ func (this *Storage) FindSyncInfoByCtId(ct_id int) ([]SyncInfo, error) {
 	return c, nil
 }
 
-func (this *Storage) UpdateSyncInfo(ct_id int, next_batch int, prev_batch int) error {
+func (this *Storage) UpdateSyncInfo(ct_id int, next_batch int64, prev_batch int64) error {
 	c := &SyncInfo{}
 	c.CtId = ct_id
 	c.NextBatch = next_batch
@@ -309,6 +313,14 @@ func (this *Storage) DeleteSyncInfoByCtId(ct_id int) error {
 	c.CtId = ct_id
 	_, err := this.dbh.Delete(c)
 	gopp.ErrPrint(err, ct_id)
+	return err
+}
+
+func (this *Storage) DeleteSyncInfoById(id int) error {
+	c := &SyncInfo{}
+	c.Id = id
+	_, err := this.dbh.Delete(c)
+	gopp.ErrPrint(err, id)
 	return err
 }
 

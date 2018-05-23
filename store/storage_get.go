@@ -59,3 +59,27 @@ func (this *Storage) GetLastMessage(pubkey string, msg string) *Message {
 	gopp.ErrPrint(err, pubkey, msg)
 	return &msgr
 }
+
+func (this *Storage) GetTimeLinesByPubkey(pubkey string) (rets []SyncInfo, err error) {
+	c, err := this.GetContactByPubkey(pubkey)
+	gopp.ErrPrint(err, pubkey)
+	if err != nil {
+		return
+	}
+
+	err = this.dbh.Where("ct_id = ?", c.Id).Desc("next_batch").Find(&rets)
+	gopp.ErrPrint(err, pubkey, c)
+	return
+}
+
+func (this *Storage) DeleteTimeLinesByPubkey(pubkey string) (err error) {
+	c, err := this.GetContactByPubkey(pubkey)
+	gopp.ErrPrint(err, pubkey)
+	if err != nil {
+		return
+	}
+
+	n, err := this.dbh.Where("ct_id = ?", c.Id).Delete(&SyncInfo{})
+	gopp.ErrPrint(err, n, pubkey, c)
+	return
+}

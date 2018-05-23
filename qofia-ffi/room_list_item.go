@@ -183,8 +183,8 @@ type RoomListItem struct {
 	unreadedCount int
 	totalCount    int
 	peerCount     int
-	nextBatch     int64
-	prevBatch     int64
+	timeline      thscli.TimeLine
+	SyncInfoCount int
 }
 
 func NewRoomListItem() *RoomListItem {
@@ -357,6 +357,15 @@ func (this *RoomListItem) AddMessage(msgo *Message, prev bool) {
 		msgiw := NewUi_MessageItemView2()
 		this.msgitmdl = append(this.msgitmdl, msgiw)
 		this.AddMessageImpl(msgo, msgiw)
+		// test and update storage's sync info
+		if msgo.EventId >= this.timeline.NextBatch {
+			this.timeline.NextBatch = msgo.EventId + 1
+			this.SyncInfoCount += 1
+			if this.SyncInfoCount >= 1 /*common.PullPageSize*/ {
+				this.SyncInfoCount = 0
+				go hisfet.RefreshPrevStorageTimeLine(&this.timeline, this.GetId(), this.GetName())
+			}
+		}
 	}
 }
 

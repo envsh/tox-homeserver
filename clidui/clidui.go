@@ -293,7 +293,7 @@ func processResponse(data string) {
 		var line = jso.Name + " change to " + jso.Args[2] + " by " + jso.Margs[1]
 		appendOutput(line)
 		putContact(jso.Args[2], jso.Margs[2], uint32(gopp.MustInt(jso.Args[0])), thspbs.MemberInfo_GROUP)
-	} else if jso.Name == "ConferenceNamePeerName" {
+	} else if jso.Name == "ConferencePeerName" {
 		var line = jso.Args[2] + " joined in " + jso.Margs[2]
 		appendOutput(line)
 	} else if jso.Name == "SelfConnectionStatus" {

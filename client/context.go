@@ -300,7 +300,7 @@ func (this *AppContext) dispatchEvent(jso *simplejson.Json) {
 		}
 		eventId := int64(gopp.MustInt(jso.Get("margs").GetIndex(4).MustString()))
 		_, err = appctx.store.AddGroupMessage(message, "0", groupId, peerPubkey, eventId)
-		gopp.ErrPrint(err)
+		gopp.ErrPrint(err, jso)
 
 	default:
 	}

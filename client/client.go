@@ -178,7 +178,14 @@ func (this *LigTox) serveBackendEventWS() {
 
 		jso, err := simplejson.NewJson(message)
 		gopp.ErrPrint(err)
-		this.onBackendEventDeduped(jso, message)
+		if rdatao, ok := jso.CheckGet("data"); ok {
+			rmessage, _ := rdatao.Encode()
+			this.onBackendEventDeduped(rdatao, rmessage)
+		} else if _, ok := jso.CheckGet("name"); ok {
+			this.onBackendEventDeduped(jso, message)
+		} else {
+			log.Println("Unknown packet:", string(message))
+		}
 	}
 	log.Println("done")
 }

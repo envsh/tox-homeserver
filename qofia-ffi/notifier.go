@@ -30,7 +30,6 @@ func NewNotifier(f func()) *Notifier {
 
 func (this *Notifier) setup() {
 	qtrt.Connect(this.rb, "readyRead()", func() {
-		log.Println("hehehehhee")
 		this.rbmu.Lock()
 		this.rb.ReadAll()
 		this.rbmu.Unlock()

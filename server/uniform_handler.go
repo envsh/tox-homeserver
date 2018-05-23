@@ -136,7 +136,7 @@ func RmtCallExecuteHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Even
 		wn, err := t.FriendSendMessage(fnum, req.Args[1])
 		gopp.ErrPrint(err)
 		pubkey := t.SelfGetPublicKey()
-		msgo, err := appctx.st.AddFriendMessage(req.Args[1], pubkey)
+		msgo, err := appctx.st.AddFriendMessage(req.Args[1], pubkey, 0)
 		gopp.ErrPrint(err)
 		out.Mid = msgo.EventId
 		out.Args = append(out.Args, fmt.Sprintf("%d", wn))
@@ -175,7 +175,7 @@ func RmtCallExecuteHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Even
 		}
 		cookie, _ := xtox.ConferenceGetCookie(t, uint32(gnum))
 		pubkey := t.SelfGetPublicKey()
-		msgo, err := appctx.st.AddGroupMessage(req.Args[2], "0", cookie, pubkey)
+		msgo, err := appctx.st.AddGroupMessage(req.Args[2], "0", cookie, pubkey, 0)
 		gopp.ErrPrint(err)
 		out.Mid = msgo.EventId
 	case "ConferenceJoin": // friendNumber, cookie
@@ -202,11 +202,11 @@ func RmtCallExecuteHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Even
 		gopp.ErrPrint(err, req.Args)
 	// TODO
 	// case "GetHistory":
-	case "LoadEventsByContactId":
+	case "PullEventsByContactId":
 		prev_batch, err := strconv.Atoi(req.Args[1])
 		gopp.ErrPrint(err, req.Args)
 		if err == nil {
-			msgos, err := appctx.st.FindEventsByContactId(req.Args[0], int64(prev_batch))
+			msgos, err := appctx.st.FindEventsByContactId(req.Args[0], int64(prev_batch), common.PullPageSize)
 			gopp.ErrPrint(err)
 			if err == nil {
 				data, err := json.Marshal(msgos)
