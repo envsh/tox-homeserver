@@ -131,7 +131,7 @@ func (this *RoomListMan) Get(id string) *RoomListItem {
 }
 func (this *RoomListMan) addRoomItem(item *RoomListItem) {
 	uictx.ctitmdl = append(uictx.ctitmdl, item)
-	uictx.uiw.VerticalLayout_10.InsertWidget(0, item.QWidget_PTR(), 0, 0)
+	uictx.uiw.VerticalLayout_9.InsertWidget(0, item.QWidget_PTR(), 0, 0)
 }
 
 func (this *RoomListMan) Delete(item *RoomListItem) {
@@ -146,7 +146,7 @@ func (this *RoomListMan) Delete(item *RoomListItem) {
 		}
 	}
 
-	uictx.uiw.VerticalLayout_10.RemoveWidget(item.QWidget_PTR())
+	uictx.uiw.VerticalLayout_9.RemoveWidget(item.QWidget_PTR())
 	item.QWidget_PTR().SetVisible(false)
 	// TODO really destroy
 }
@@ -385,8 +385,8 @@ func (this *RoomListItem) AddMessageImpl(msgo *Message, msgiw *Ui_MessageItemVie
 	msgiw.ToolButton.SetVisible(false)
 
 	if uictx.msgwin.item == this {
-		vlo8 := uictx.uiw.VerticalLayout_8
-		vlo8.Layout().AddWidget(msgiw.QWidget_PTR())
+		vlo3 := uictx.uiw.VerticalLayout_3
+		vlo3.Layout().AddWidget(msgiw.QWidget_PTR())
 	}
 	this.SetLastMsg(fmt.Sprintf("%s: %s", gopp.StrSuf4ui(msgo.PeerUi, 8, 1), msgo.LastMsgUi))
 
@@ -485,7 +485,7 @@ func (this *RoomListItem) SetBgColor(p string) {
 	default:
 		log.Println("wtf", p)
 	}
-	log.Println("set color:", p, css)
+	// log.Println("set color:", p, css)
 	po := qtcore.NewQVariant_15(p)
 	this.ContactItemView.SetProperty("istate", po)
 	syl := this.ContactItemView.Style()

@@ -45,12 +45,12 @@ func (this *MessageListWin) ReloadMessages(oldItem *RoomListItem) {
 	item := this.item
 
 	btime := time.Now()
-	vlo8 := uictx.uiw.VerticalLayout_8
+	vlo8 := uictx.uiw.VerticalLayout_3
 	log.Println("clean msg list win:", vlo8.Count())
 	if oldItem != nil {
 		log.Println("clean msg list win:", vlo8.Count(), len(oldItem.msgitmdl))
-		// i > 0 leave the QSpacerItem there
-		for i := vlo8.Count() - 1; i > 0; i-- {
+		// i > 0 leave the QSpacerItem there // not need QSpacerItem anymore
+		for i := vlo8.Count() - 1; i >= 0; i-- {
 			itemv := vlo8.TakeAt(i)
 			itemv.Widget().SetVisible(false)
 		}

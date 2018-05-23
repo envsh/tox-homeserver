@@ -77,8 +77,6 @@ type Ui_MainWindow struct {
 	ScrollArea                 *qtwidgets.QScrollArea
 	ScrollAreaWidgetContents   *qtwidgets.QWidget
 	VerticalLayout_9           *qtwidgets.QVBoxLayout
-	VerticalLayout_10          *qtwidgets.QVBoxLayout
-	VerticalSpacer_2           *qtwidgets.QSpacerItem
 	HorizontalLayout_3         *qtwidgets.QHBoxLayout
 	ToolButton_4               *qtwidgets.QToolButton
 	ToolButton_5               *qtwidgets.QToolButton
@@ -110,8 +108,6 @@ type Ui_MainWindow struct {
 	ScrollArea_2               *qtwidgets.QScrollArea
 	ScrollAreaWidgetContents_2 *qtwidgets.QWidget
 	VerticalLayout_3           *qtwidgets.QVBoxLayout
-	VerticalLayout_8           *qtwidgets.QVBoxLayout
-	VerticalSpacer             *qtwidgets.QSpacerItem
 	HorizontalLayout_6         *qtwidgets.QHBoxLayout
 	ToolButton_8               *qtwidgets.QToolButton
 	ToolButton_9               *qtwidgets.QToolButton
@@ -156,7 +152,6 @@ type Ui_MainWindow struct {
 	ScrollArea_3               *qtwidgets.QScrollArea
 	ScrollAreaWidgetContents_3 *qtwidgets.QWidget
 	VerticalLayout_17          *qtwidgets.QVBoxLayout
-	VerticalSpacer_4           *qtwidgets.QSpacerItem
 	TableWidget                *qtwidgets.QTableWidget
 	Page_6                     *qtwidgets.QWidget
 	VerticalLayout_5           *qtwidgets.QVBoxLayout
@@ -188,6 +183,7 @@ type Ui_MainWindow struct {
 	SizePolicy3                *qtwidgets.QSizePolicy
 	SizePolicy4                *qtwidgets.QSizePolicy
 	SizePolicy5                *qtwidgets.QSizePolicy
+	SizePolicy6                *qtwidgets.QSizePolicy
 	Icon14                     *qtgui.QIcon // 116
 	Icon15                     *qtgui.QIcon // 116
 	Icon16                     *qtgui.QIcon // 116
@@ -522,30 +518,24 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.ScrollArea = qtwidgets.NewQScrollArea(this.Page) // 111
 	this.ScrollArea.SetObjectName("ScrollArea")           // 112
 	this.SizePolicy2 = qtwidgets.NewQSizePolicy_1(qtwidgets.QSizePolicy__Preferred, qtwidgets.QSizePolicy__Expanding, 1)
-	this.SizePolicy2.SetHorizontalStretch(0)                                             // 114
-	this.SizePolicy2.SetVerticalStretch(0)                                               // 114
-	this.SizePolicy2.SetHeightForWidth(this.ScrollArea.SizePolicy().HasHeightForWidth()) // 114
-	this.ScrollArea.SetSizePolicy(this.SizePolicy2)                                      // 114
-	this.ScrollArea.SetFocusPolicy(qtcore.Qt__NoFocus)                                   // 114
-	this.ScrollArea.SetHorizontalScrollBarPolicy(qtcore.Qt__ScrollBarAlwaysOff)          // 114
-	this.ScrollArea.SetWidgetResizable(true)                                             // 114
-	this.ScrollAreaWidgetContents = qtwidgets.NewQWidget(nil, 0)                         // 111
-	this.ScrollAreaWidgetContents.SetObjectName("ScrollAreaWidgetContents")              // 112
-	this.ScrollAreaWidgetContents.SetGeometry(0, 0, 378, 437)                            // 114
-	this.VerticalLayout_9 = qtwidgets.NewQVBoxLayout_1(this.ScrollAreaWidgetContents)    // 111
-	this.VerticalLayout_9.SetSpacing(0)                                                  // 114
-	this.VerticalLayout_9.SetObjectName("VerticalLayout_9")                              // 112
-	this.VerticalLayout_9.SetContentsMargins(0, 0, 0, 0)                                 // 114
-	this.VerticalLayout_10 = qtwidgets.NewQVBoxLayout()                                  // 111
-	this.VerticalLayout_10.SetSpacing(0)                                                 // 114
-	this.VerticalLayout_10.SetObjectName("VerticalLayout_10")                            // 112
-	this.VerticalSpacer_2 = qtwidgets.NewQSpacerItem(20, 0, qtwidgets.QSizePolicy__Minimum, qtwidgets.QSizePolicy__Expanding)
-
-	this.VerticalLayout_10.AddItem(this.VerticalSpacer_2) // 115
-
-	this.VerticalLayout_9.AddLayout(this.VerticalLayout_10, 0) // 115
-
-	this.ScrollArea.SetWidget(this.ScrollAreaWidgetContents) // 114
+	this.SizePolicy2.SetHorizontalStretch(0)                                                           // 114
+	this.SizePolicy2.SetVerticalStretch(0)                                                             // 114
+	this.SizePolicy2.SetHeightForWidth(this.ScrollArea.SizePolicy().HasHeightForWidth())               // 114
+	this.ScrollArea.SetSizePolicy(this.SizePolicy2)                                                    // 114
+	this.ScrollArea.SetFocusPolicy(qtcore.Qt__NoFocus)                                                 // 114
+	this.ScrollArea.SetHorizontalScrollBarPolicy(qtcore.Qt__ScrollBarAlwaysOff)                        // 114
+	this.ScrollArea.SetWidgetResizable(true)                                                           // 114
+	this.ScrollArea.SetAlignment(qtcore.Qt__AlignLeading | qtcore.Qt__AlignLeft | qtcore.Qt__AlignTop) // 114
+	this.ScrollAreaWidgetContents = qtwidgets.NewQWidget(nil, 0)                                       // 111
+	this.ScrollAreaWidgetContents.SetObjectName("ScrollAreaWidgetContents")                            // 112
+	this.ScrollAreaWidgetContents.SetGeometry(0, 0, 378, 16)                                           // 114
+	this.SizePolicy.SetHeightForWidth(this.ScrollAreaWidgetContents.SizePolicy().HasHeightForWidth())  // 114
+	this.ScrollAreaWidgetContents.SetSizePolicy(this.SizePolicy)                                       // 114
+	this.VerticalLayout_9 = qtwidgets.NewQVBoxLayout_1(this.ScrollAreaWidgetContents)                  // 111
+	this.VerticalLayout_9.SetSpacing(0)                                                                // 114
+	this.VerticalLayout_9.SetObjectName("VerticalLayout_9")                                            // 112
+	this.VerticalLayout_9.SetContentsMargins(0, 0, 0, 0)                                               // 114
+	this.ScrollArea.SetWidget(this.ScrollAreaWidgetContents)                                           // 114
 
 	this.VerticalLayout_2.Layout().AddWidget(this.ScrollArea) // 115
 
@@ -767,30 +757,27 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 
 	this.VerticalLayout_14.AddLayout(this.HorizontalLayout_9, 0) // 115
 
-	this.ScrollArea_2 = qtwidgets.NewQScrollArea(this.Page_2)                              // 111
-	this.ScrollArea_2.SetObjectName("ScrollArea_2")                                        // 112
-	this.SizePolicy2.SetHeightForWidth(this.ScrollArea_2.SizePolicy().HasHeightForWidth()) // 114
-	this.ScrollArea_2.SetSizePolicy(this.SizePolicy2)                                      // 114
-	this.ScrollArea_2.SetFocusPolicy(qtcore.Qt__NoFocus)                                   // 114
-	this.ScrollArea_2.SetHorizontalScrollBarPolicy(qtcore.Qt__ScrollBarAlwaysOff)          // 114
-	this.ScrollArea_2.SetWidgetResizable(true)                                             // 114
-	this.ScrollAreaWidgetContents_2 = qtwidgets.NewQWidget(nil, 0)                         // 111
-	this.ScrollAreaWidgetContents_2.SetObjectName("ScrollAreaWidgetContents_2")            // 112
-	this.ScrollAreaWidgetContents_2.SetGeometry(0, 0, 366, 408)                            // 114
-	this.VerticalLayout_3 = qtwidgets.NewQVBoxLayout_1(this.ScrollAreaWidgetContents_2)    // 111
-	this.VerticalLayout_3.SetSpacing(0)                                                    // 114
-	this.VerticalLayout_3.SetObjectName("VerticalLayout_3")                                // 112
-	this.VerticalLayout_3.SetContentsMargins(0, 0, 0, 0)                                   // 114
-	this.VerticalLayout_8 = qtwidgets.NewQVBoxLayout()                                     // 111
-	this.VerticalLayout_8.SetSpacing(5)                                                    // 114
-	this.VerticalLayout_8.SetObjectName("VerticalLayout_8")                                // 112
-	this.VerticalSpacer = qtwidgets.NewQSpacerItem(20, 0, qtwidgets.QSizePolicy__Minimum, qtwidgets.QSizePolicy__Expanding)
-
-	this.VerticalLayout_8.AddItem(this.VerticalSpacer) // 115
-
-	this.VerticalLayout_3.AddLayout(this.VerticalLayout_8, 0) // 115
-
-	this.ScrollArea_2.SetWidget(this.ScrollAreaWidgetContents_2) // 114
+	this.ScrollArea_2 = qtwidgets.NewQScrollArea(this.Page_2)                                               // 111
+	this.ScrollArea_2.SetObjectName("ScrollArea_2")                                                         // 112
+	this.SizePolicy2.SetHeightForWidth(this.ScrollArea_2.SizePolicy().HasHeightForWidth())                  // 114
+	this.ScrollArea_2.SetSizePolicy(this.SizePolicy2)                                                       // 114
+	this.ScrollArea_2.SetFocusPolicy(qtcore.Qt__NoFocus)                                                    // 114
+	this.ScrollArea_2.SetHorizontalScrollBarPolicy(qtcore.Qt__ScrollBarAlwaysOff)                           // 114
+	this.ScrollArea_2.SetWidgetResizable(true)                                                              // 114
+	this.ScrollArea_2.SetAlignment(qtcore.Qt__AlignBottom | qtcore.Qt__AlignLeading | qtcore.Qt__AlignLeft) // 114
+	this.ScrollAreaWidgetContents_2 = qtwidgets.NewQWidget(nil, 0)                                          // 111
+	this.ScrollAreaWidgetContents_2.SetObjectName("ScrollAreaWidgetContents_2")                             // 112
+	this.ScrollAreaWidgetContents_2.SetGeometry(0, 396, 366, 16)                                            // 114
+	this.SizePolicy6 = qtwidgets.NewQSizePolicy_1(qtwidgets.QSizePolicy__Preferred, qtwidgets.QSizePolicy__Maximum, 1)
+	this.SizePolicy6.SetHorizontalStretch(0)                                                             // 114
+	this.SizePolicy6.SetVerticalStretch(0)                                                               // 114
+	this.SizePolicy6.SetHeightForWidth(this.ScrollAreaWidgetContents_2.SizePolicy().HasHeightForWidth()) // 114
+	this.ScrollAreaWidgetContents_2.SetSizePolicy(this.SizePolicy6)                                      // 114
+	this.VerticalLayout_3 = qtwidgets.NewQVBoxLayout_1(this.ScrollAreaWidgetContents_2)                  // 111
+	this.VerticalLayout_3.SetSpacing(0)                                                                  // 114
+	this.VerticalLayout_3.SetObjectName("VerticalLayout_3")                                              // 112
+	this.VerticalLayout_3.SetContentsMargins(0, 0, 0, 0)                                                 // 114
+	this.ScrollArea_2.SetWidget(this.ScrollAreaWidgetContents_2)                                         // 114
 
 	this.VerticalLayout_14.Layout().AddWidget(this.ScrollArea_2) // 115
 
@@ -1017,19 +1004,18 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 
 	this.VerticalLayout_18.AddLayout(this.HorizontalLayout_11, 0) // 115
 
-	this.ScrollArea_3 = qtwidgets.NewQScrollArea(this.Page_invite_friend)                // 111
-	this.ScrollArea_3.SetObjectName("ScrollArea_3")                                      // 112
-	this.ScrollArea_3.SetWidgetResizable(true)                                           // 114
-	this.ScrollAreaWidgetContents_3 = qtwidgets.NewQWidget(nil, 0)                       // 111
-	this.ScrollAreaWidgetContents_3.SetObjectName("ScrollAreaWidgetContents_3")          // 112
-	this.ScrollAreaWidgetContents_3.SetGeometry(0, 0, 96, 26)                            // 114
-	this.VerticalLayout_17 = qtwidgets.NewQVBoxLayout_1(this.ScrollAreaWidgetContents_3) // 111
-	this.VerticalLayout_17.SetObjectName("VerticalLayout_17")                            // 112
-	this.VerticalSpacer_4 = qtwidgets.NewQSpacerItem(20, 216, qtwidgets.QSizePolicy__Minimum, qtwidgets.QSizePolicy__Expanding)
-
-	this.VerticalLayout_17.AddItem(this.VerticalSpacer_4) // 115
-
-	this.ScrollArea_3.SetWidget(this.ScrollAreaWidgetContents_3) // 114
+	this.ScrollArea_3 = qtwidgets.NewQScrollArea(this.Page_invite_friend)                                // 111
+	this.ScrollArea_3.SetObjectName("ScrollArea_3")                                                      // 112
+	this.ScrollArea_3.SetWidgetResizable(true)                                                           // 114
+	this.ScrollArea_3.SetAlignment(qtcore.Qt__AlignLeading | qtcore.Qt__AlignLeft | qtcore.Qt__AlignTop) // 114
+	this.ScrollAreaWidgetContents_3 = qtwidgets.NewQWidget(nil, 0)                                       // 111
+	this.ScrollAreaWidgetContents_3.SetObjectName("ScrollAreaWidgetContents_3")                          // 112
+	this.ScrollAreaWidgetContents_3.SetGeometry(0, 0, 366, 16)                                           // 114
+	this.SizePolicy.SetHeightForWidth(this.ScrollAreaWidgetContents_3.SizePolicy().HasHeightForWidth())  // 114
+	this.ScrollAreaWidgetContents_3.SetSizePolicy(this.SizePolicy)                                       // 114
+	this.VerticalLayout_17 = qtwidgets.NewQVBoxLayout_1(this.ScrollAreaWidgetContents_3)                 // 111
+	this.VerticalLayout_17.SetObjectName("VerticalLayout_17")                                            // 112
+	this.ScrollArea_3.SetWidget(this.ScrollAreaWidgetContents_3)                                         // 114
 
 	this.VerticalLayout_18.Layout().AddWidget(this.ScrollArea_3) // 115
 
