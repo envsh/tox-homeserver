@@ -45,7 +45,10 @@ QScrollBar::handle {
 QScrollBar::add-line,QScrollBar::sub-line{
     height: 0px;    width: 0px;
 }
-
+#ScrollAreaWidgetContents > *,#ScrollAreaWidgetContents_2 > *, #ScrollAreaWidgetContents_3 > *  {
+    background: palette(window);
+    color: palette(text);
+}
 
 QComboBox QAbstractItemView {
     background: palette(window);

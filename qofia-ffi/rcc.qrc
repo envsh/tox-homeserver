@@ -5,10 +5,10 @@
     <file>theme/dark.css</file>
     <file>theme/material.css</file>
     <file>theme/system.css</file>
+    <file>theme/apptst.css</file>
     <file>qmlapp/area.qml</file>
     <file>icons/barbuttonicon_forward_gray64.png</file>
     <file>icons/barbuttonicon_back_gray64.png</file>
-    <file>app.css</file>
     <file>icons/add-square-button_gray64.png</file>
     <file>icons/remove-symbol_gray64.png</file>
     <file>icons/add-square-button-gray.png</file>

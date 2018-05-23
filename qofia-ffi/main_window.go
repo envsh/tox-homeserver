@@ -172,13 +172,13 @@ func (this *MainWindow) initMainWin() {
 func setAppStyleSheet() {
 	bcc, err := []byte{}, error(nil)
 	if gopp.IsAndroid() { // simple test
-		bcc, err = ioutil.ReadFile("/sdcard/app.css")
+		bcc, err = ioutil.ReadFile("/sdcard/apptst.css")
 	} else {
-		bcc, err = ioutil.ReadFile("./app.css")
+		bcc, err = ioutil.ReadFile("./theme/apptst.css")
 	}
 	gopp.ErrPrint(err)
 	if err != nil {
-		fp := qtcore.NewQFile_1(":/app.css")
+		fp := qtcore.NewQFile_1(":/theme/apptst.css")
 		fp.Open(qtcore.QIODevice__ReadOnly)
 		bcc = []byte(qtcore.NewQIODeviceFromPointer(fp.GetCthis()).ReadAll().Data())
 		qtcore.NewQIODeviceFromPointer(fp.GetCthis()).Close()
