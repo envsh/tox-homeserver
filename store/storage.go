@@ -103,13 +103,23 @@ func (this *Storage) AddGroup(identify string, num uint32, title string) (int64,
 	return this.AddContact(c)
 }
 
-func (this *Storage) UpdateGroup(identify string, num uint32, title string) (int64, error) {
+func (this *Storage) UpdateGroup(identifier string, num uint32, title string) (int64, error) {
 	c := &Contact{}
 	c.IsGroup = 1
-	c.Pubkey = identify
+	c.Pubkey = identifier
 	c.RtId = int(num)
 	c.Name = title
 	return this.UpdateContactByPubkey(c)
+}
+
+func (this *Storage) SetGroup(identifier string, num uint32, title string) (ret int64, err error) {
+	ret, err = this.AddGroup(identifier, num, title)
+	gopp.ErrPrint(err, title)
+	if IsUniqueConstraintErr(err) {
+		ret, err = this.UpdateGroup(identifier, num, title)
+		gopp.ErrPrint(err, title)
+	}
+	return
 }
 
 func (this *Storage) AddPeer(peerPubkey string, num uint32, name string) (int64, error) {
@@ -273,7 +283,7 @@ func (this *Storage) NextId() int64 {
 	return idv.Id
 }
 
-func (this *Storage) AddSyncInfo(ct_id int, next_batch int64, prev_batch int64) error {
+func (this *Storage) AddSyncInfo(ct_id int64, next_batch int64, prev_batch int64) error {
 	dv := SyncInfo{}
 	dv.CtId = ct_id
 	dv.NextBatch = next_batch
@@ -285,7 +295,7 @@ func (this *Storage) AddSyncInfo(ct_id int, next_batch int64, prev_batch int64) 
 	return err
 }
 
-func (this *Storage) FindSyncInfoByCtId(ct_id int) ([]SyncInfo, error) {
+func (this *Storage) FindSyncInfoByCtId(ct_id int64) ([]SyncInfo, error) {
 	c := []SyncInfo{}
 	err := this.dbh.Where("ct_id = ?", ct_id).Desc("next_batch").Find(c)
 	gopp.ErrPrint(err, ct_id)
@@ -296,7 +306,7 @@ func (this *Storage) FindSyncInfoByCtId(ct_id int) ([]SyncInfo, error) {
 	return c, nil
 }
 
-func (this *Storage) UpdateSyncInfo(ct_id int, next_batch int64, prev_batch int64) error {
+func (this *Storage) UpdateSyncInfo(ct_id int64, next_batch int64, prev_batch int64) error {
 	c := &SyncInfo{}
 	c.CtId = ct_id
 	c.NextBatch = next_batch
@@ -308,7 +318,7 @@ func (this *Storage) UpdateSyncInfo(ct_id int, next_batch int64, prev_batch int6
 	return err
 }
 
-func (this *Storage) DeleteSyncInfoByCtId(ct_id int) error {
+func (this *Storage) DeleteSyncInfoByCtId(ct_id int64) error {
 	c := &SyncInfo{}
 	c.CtId = ct_id
 	_, err := this.dbh.Delete(c)
@@ -316,7 +326,7 @@ func (this *Storage) DeleteSyncInfoByCtId(ct_id int) error {
 	return err
 }
 
-func (this *Storage) DeleteSyncInfoById(id int) error {
+func (this *Storage) DeleteSyncInfoById(id int64) error {
 	c := &SyncInfo{}
 	c.Id = id
 	_, err := this.dbh.Delete(c)

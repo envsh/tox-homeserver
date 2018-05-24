@@ -13,7 +13,7 @@ func (this *Storage) GetContactByPubkey(pubkey string) (*Contact, error) {
 	return ct, err
 }
 
-func (this *Storage) GetContactById(ct_id int) *Contact {
+func (this *Storage) GetContactById(ct_id int64) *Contact {
 	ct := &Contact{}
 	ct.Id = ct_id
 	_, err := this.dbh.Get(ct)

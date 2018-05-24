@@ -84,6 +84,23 @@ func MergeTimeLines(tls ...*TimeLine) (mrgtm *TimeLine, can bool) {
 	return
 }
 
+// merge as many as possible, return merged timeline, and mrgcnt
+// no touch of params
+func MergeTimeLinesCount(btl *TimeLine, tls []*TimeLine) (mrgtl *TimeLine, mrgcnt int) {
+	mrgtl = btl
+	for _, tl := range tls {
+		newtl, can := mrgtl.Merge(tl)
+
+		if can {
+			mrgtl = newtl
+			mrgcnt += 1
+		} else {
+			break
+		}
+	}
+	return
+}
+
 func SyncInfo2TimeLine(si *store.SyncInfo) *TimeLine {
 	if si == nil {
 		return nil

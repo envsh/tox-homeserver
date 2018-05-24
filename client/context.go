@@ -229,6 +229,13 @@ func (this *AppContext) dispatchEvent(jso *simplejson.Json) {
 			//		InterBackRelay.Signal()
 			//	}
 		}
+		_, err := appctx.store.SetGroup(groupId, 0, groupTitle)
+		gopp.ErrPrint(err, groupTitle)
+
+	case "ConferencePeerName":
+		// TODO
+	case "ConferencePeerListChange":
+		// TODO
 	case "ConferenceNameListChange":
 		groupTitle := jso.Get("margs").GetIndex(2).MustString()
 		groupId := jso.Get("margs").GetIndex(3).MustString()

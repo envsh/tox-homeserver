@@ -1,7 +1,7 @@
 package store
 
 type Contact struct {
-	Id         int    `xorm:"pk autoincr INTEGER"`
+	Id         int64  `xorm:"pk autoincr INTEGER"`
 	Pubkey     string `xorm:"not null unique TEXT"`
 	Name       string `xorm:"index TEXT"`
 	Stmsg      string `xorm:"TEXT"`
@@ -18,19 +18,19 @@ type Contact struct {
 }
 
 type Message struct {
-	Id        int    `xorm:"pk autoincr INTEGER"`
+	Id        int64  `xorm:"pk autoincr INTEGER"`
 	Updated   string `xorm:"TEXT"`
 	Created   string `xorm:"TEXT"`
 	Content   string `xorm:"TEXT"`
 	Mtype     int    `xorm:"INTEGER"`
-	ContactId int    `xorm:"index INTEGER"`
-	RoomId    int    `xorm:"index INTEGER"`
+	ContactId int64  `xorm:"index INTEGER"`
+	RoomId    int64  `xorm:"index INTEGER"` // it's really another ContactId
 	EventId   int64  `xorm:"unique INTEGER"`
 }
 
 type Device struct {
-	Id        int    `xorm:"pk autoincr INTEGER"`
-	ContactId int    `xorm:"index INTEGER"`
+	Id        int64  `xorm:"pk autoincr INTEGER"`
+	ContactId int64  `xorm:"index INTEGER"`
 	Uuid      string `xorm:"unique TEXT"`
 	Created   string `xorm:"TEXT"`
 	Updated   string `xorm:"TEXT"`
@@ -41,8 +41,8 @@ type Idgen struct {
 }
 
 type SyncInfo struct {
-	Id        int    `xorm:"pk autoincr INTEGER"`
-	CtId      int    `xorm:"unique(siu) INTEGER"`
+	Id        int64  `xorm:"pk autoincr INTEGER"`
+	CtId      int64  `xorm:"unique(siu) INTEGER"`
 	NextBatch int64  `xorm:"unique(siu) INTEGER"`
 	PrevBatch int64  `xorm:"unique(siu) INTEGER"`
 	Updated   string `xorm:"TEXT"`

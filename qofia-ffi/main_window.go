@@ -217,9 +217,34 @@ func (this *MainWindow) connectSignals() {
 		log.Println(checked, uictx.msgwin.item == nil)
 		if uictx.msgwin.item != nil {
 			go func() {
-				hisfet.PullPrevHistoryByRoom(uictx.msgwin.item)
+				hisfet.PullPrevHistoryByRoomItem(uictx.msgwin.item)
 			}()
 		}
+	})
+
+	qtrt.Connect(uiw.ToolButton_24, "clicked(bool)", func(checked bool) {
+		log.Println(checked)
+		uiw.ScrollAreaWidgetContents_2.SetSizePolicy_1(qtwidgets.QSizePolicy__Fixed, qtwidgets.QSizePolicy__Fixed)
+	})
+	qtrt.Connect(uiw.ToolButton_25, "clicked(bool)", func(checked bool) {
+		log.Println(checked)
+		uiw.ScrollAreaWidgetContents_2.SetSizePolicy_1(qtwidgets.QSizePolicy__Maximum, qtwidgets.QSizePolicy__Fixed)
+	})
+	qtrt.Connect(uiw.ToolButton_26, "clicked(bool)", func(checked bool) {
+		log.Println(checked)
+		uiw.ScrollAreaWidgetContents_2.SetSizePolicy_1(qtwidgets.QSizePolicy__Minimum, qtwidgets.QSizePolicy__Fixed)
+	})
+	qtrt.Connect(uiw.ToolButton_27, "clicked(bool)", func(checked bool) {
+		log.Println(checked)
+		uiw.ScrollAreaWidgetContents_2.SetSizePolicy_1(qtwidgets.QSizePolicy__Preferred, qtwidgets.QSizePolicy__Fixed)
+	})
+	qtrt.Connect(uiw.ToolButton_28, "clicked(bool)", func(checked bool) {
+		log.Println(checked)
+		uiw.ScrollAreaWidgetContents_2.SetSizePolicy_1(qtwidgets.QSizePolicy__Expanding, qtwidgets.QSizePolicy__Fixed)
+	})
+	qtrt.Connect(uiw.ToolButton_29, "clicked(bool)", func(checked bool) {
+		log.Println(checked)
+		uiw.ScrollAreaWidgetContents_2.SetSizePolicy_1(qtwidgets.QSizePolicy__MinimumExpanding, qtwidgets.QSizePolicy__Fixed)
 	})
 
 	stkw := uiw.StackedWidget

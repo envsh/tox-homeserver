@@ -31,15 +31,14 @@ func (this *Fetcher) pullByContactId(ct_id uint32) ([]*store.Message, error) {
 // 写入库
 // 更新该好友的同步状态信息
 // 更新当前contact item的实时同步状态信息
-func (this *Fetcher) PullPrevHistoryByRoom(item *RoomListItem) {
+func (this *Fetcher) PullPrevHistoryByRoomItem(item *RoomListItem) {
 	this.PullPrevHistoryById(item.GetId(), item.timeline.PrevBatch)
 }
 
 func (this *Fetcher) PullPrevHistoryById(pubkey string, prev_batch int64) {
 	msgos, err := appctx.GetLigTox().PullEventsByContactId(pubkey, prev_batch)
-	log.Println(msgos)
 	gopp.ErrPrint(err)
-	log.Println(len(msgos))
+	log.Println(len(msgos), msgos)
 
 	item := uictx.iteman.Get(pubkey)
 	if item == nil {
@@ -87,35 +86,22 @@ func (this *Fetcher) RefreshPrevStorageTimeLine(itemtl *thscli.TimeLine, pubkey 
 	gopp.ErrPrint(err, sis)
 	tls := thscli.SyncInfos2TimeLines(sis)
 
-	mrgcnt := 0
 	rtl := &thscli.TimeLine{NextBatch: itemtl.NextBatch, PrevBatch: itemtl.PrevBatch}
-	for _, tl := range tls {
-		ntl, can := rtl.Merge(tl)
-		log.Println("mrgres:", rtl, tl, can)
-		if can {
-			rtl = ntl
-			mrgcnt += 1
-		} else {
-			break
-		}
-	}
+	rtl, mrgcnt := thscli.MergeTimeLinesCount(rtl, tls)
 
 	// TODO 删除与添加事务起来
-	c, err := st.GetContactByPubkey(pubkey)
-	gopp.ErrPrint(err)
-	// err = st.DeleteTimeLinesByPubkey(pubkey)
-	// gopp.ErrPrint(err, pubkey)
+	// 删除合并掉的
 	if mrgcnt > 0 {
 		log.Println("mrgsome:", mrgcnt, rtl, tls[mrgcnt:])
-		// 删除合并掉的
 		for i := 0; i < mrgcnt; i++ {
 			err := st.DeleteSyncInfoById(sis[i].Id)
 			gopp.ErrPrint(err, sis[i])
 		}
-	} else {
-		// save one
 	}
+
 	// 写入新的部分
+	c, err := st.GetContactByPubkey(pubkey)
+	gopp.ErrPrint(err)
 	err = st.AddSyncInfo(c.Id, rtl.NextBatch, rtl.PrevBatch)
 	gopp.ErrPrint(err, c)
 	log.Println("rt vs. st timeline:", itemtl, rtl, mrgcnt, itemName)
@@ -131,10 +117,10 @@ func NewMessageFromStoreRecord(m *store.Message) *Message {
 		this.Peer = cto.Name
 	}
 
-	defaultTimeStringLayout := "2006-01-02 15:04:05.999999999 -0700 MST"
-	tim, err := time.Parse(defaultTimeStringLayout, m.Updated[:len(defaultTimeStringLayout)])
+	defaultTimeStringLayout := common.DefaultTimeLayout
+	tm, err := time.Parse(defaultTimeStringLayout, m.Updated[:len(defaultTimeStringLayout)])
 	gopp.ErrPrint(err)
-	this.Time = tim
+	this.Time = tm
 
 	this.refmtmsg()
 	return this
