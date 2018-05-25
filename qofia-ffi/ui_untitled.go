@@ -260,6 +260,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.ToolButton_20 = qtwidgets.NewQToolButton(this.Centralwidget) // 111
 	this.ToolButton_20.SetObjectName("ToolButton_20")                 // 112
 	this.ToolButton_20.SetFocusPolicy(qtcore.Qt__NoFocus)             // 114
+	this.ToolButton_20.SetCheckable(true)                             // 114
 	this.ToolButton_20.SetAutoRaise(true)                             // 114
 
 	this.HorizontalLayout_7.Layout().AddWidget(this.ToolButton_20) // 115
@@ -1064,6 +1065,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 
 	this.TextEdit = qtwidgets.NewQTextEdit(this.Page_add_friend) // 111
 	this.TextEdit.SetObjectName("TextEdit")                      // 112
+	this.TextEdit.SetAcceptRichText(false)                       // 114
 
 	this.VerticalLayout_19.Layout().AddWidget(this.TextEdit) // 115
 
@@ -1120,7 +1122,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.ScrollArea_3.SetAlignment(qtcore.Qt__AlignLeading | qtcore.Qt__AlignLeft | qtcore.Qt__AlignTop) // 114
 	this.ScrollAreaWidgetContents_3 = qtwidgets.NewQWidget(nil, 0)                                       // 111
 	this.ScrollAreaWidgetContents_3.SetObjectName("ScrollAreaWidgetContents_3")                          // 112
-	this.ScrollAreaWidgetContents_3.SetGeometry(0, 0, 366, 16)                                           // 114
+	this.ScrollAreaWidgetContents_3.SetGeometry(0, 0, 96, 16)                                            // 114
 	this.SizePolicy.SetHeightForWidth(this.ScrollAreaWidgetContents_3.SizePolicy().HasHeightForWidth())  // 114
 	this.ScrollAreaWidgetContents_3.SetSizePolicy(this.SizePolicy)                                       // 114
 	this.VerticalLayout_17 = qtwidgets.NewQVBoxLayout_1(this.ScrollAreaWidgetContents_3)                 // 111
@@ -1207,6 +1209,9 @@ func (this *Ui_MainWindow) RetranslateUi(MainWindow *qtwidgets.QMainWindow) {
 	this.Action_About.SetText(qtcore.QCoreApplication_Translate("MainWindow", "&About", "dummy123", 0))
 	this.ToolButton_11.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
 	this.ToolButton_19.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
+	// noimpl: #ifndef QT_NO_TOOLTIP
+	this.ToolButton_20.SetToolTip(qtcore.QCoreApplication_Translate("MainWindow", "keep screen on(only android)", "dummy123", 0))
+	// noimpl: #endif // QT_NO_TOOLTIP
 	this.ToolButton_20.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
 	// noimpl: #ifndef QT_NO_TOOLTIP
 	this.ToolButton_21.SetToolTip(qtcore.QCoreApplication_Translate("MainWindow", "Load css for test", "dummy123", 0))
@@ -1322,6 +1327,7 @@ func (this *Ui_MainWindow) RetranslateUi(MainWindow *qtwidgets.QMainWindow) {
 	this.PushButton_4.SetText(qtcore.QCoreApplication_Translate("MainWindow", "Done", "dummy123", 0))
 	this.Label_17.SetText(qtcore.QCoreApplication_Translate("MainWindow", "Tox ID (either 76 hexadecimal characters or name@example.com )", "dummy123", 0))
 	this.Label_18.SetText(qtcore.QCoreApplication_Translate("MainWindow", "Message", "dummy123", 0))
+	this.TextEdit.SetPlaceholderText(qtcore.QCoreApplication_Translate("MainWindow", "I am %1 ! Let's chat with Tox?", "dummy123", 0))
 	this.PushButton.SetText(qtcore.QCoreApplication_Translate("MainWindow", "Cancel", "dummy123", 0))
 	this.Label_14.SetText(qtcore.QCoreApplication_Translate("MainWindow", "Inivte Friend", "dummy123", 0))
 	this.PushButton_2.SetText(qtcore.QCoreApplication_Translate("MainWindow", "Done", "dummy123", 0))

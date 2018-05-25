@@ -66,6 +66,7 @@ func (this *Ui_AddFriendDialog) SetupUi(AddFriendDialog *qtwidgets.QDialog) {
 
 	this.TextEdit = qtwidgets.NewQTextEdit(this.AddFriendDialog) // 111
 	this.TextEdit.SetObjectName("TextEdit")                      // 112
+	this.TextEdit.SetAcceptRichText(false)                       // 114
 
 	this.VerticalLayout.Layout().AddWidget(this.TextEdit) // 115
 
@@ -104,6 +105,7 @@ func (this *Ui_AddFriendDialog) RetranslateUi(AddFriendDialog *qtwidgets.QDialog
 	this.AddFriendDialog.SetWindowTitle(qtcore.QCoreApplication_Translate("AddFriendDialog", "Dialog", "dummy123", 0))
 	this.Label.SetText(qtcore.QCoreApplication_Translate("AddFriendDialog", "Tox ID (either 76 hexadecimal characters or name@example.com )", "dummy123", 0))
 	this.Label_2.SetText(qtcore.QCoreApplication_Translate("AddFriendDialog", "Message", "dummy123", 0))
+	this.TextEdit.SetPlaceholderText(qtcore.QCoreApplication_Translate("AddFriendDialog", "I am %1 ! Let's chat with Tox?", "dummy123", 0))
 	// noimpl: } // retranslateUi
 	// noimpl:
 	// noimpl: };

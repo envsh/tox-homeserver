@@ -131,3 +131,44 @@ func (this *MainWindow) getCurrentRoom() uint32 {
 	item := uictx.msgwin.item
 	return item.grpInfo.GetGnum()
 }
+
+//
+func (this *MainWindow) initAddFriend() {
+	this.initAddFriendUi()
+	this.initAddFriendSignals()
+}
+
+func (this *MainWindow) initAddFriendUi() {
+
+}
+
+func (this *MainWindow) initAddFriendSignals() {
+	qtrt.Connect(this.PushButton_3, "clicked(bool)", func(bool) {
+		this.switchUiStack(UIST_MAINUI)
+	})
+
+	qtrt.Connect(this.PushButton_4, "clicked(bool)", func(bool) {
+		toxid := this.LineEdit_4.Text()
+		addmsg := this.TextEdit.ToPlainText()
+		phmsg := this.TextEdit.PlaceholderText()
+		err := this.addFriendByToxId(toxid, addmsg, phmsg)
+		gopp.ErrPrint(err, toxid, addmsg)
+		if err != nil {
+			log.Println("faild")
+		} else {
+			this.switchUiStack(UIST_MAINUI)
+		}
+	})
+}
+
+func (this *MainWindow) addFriendByToxId(toxid, addmsg string, phmsg string) error {
+	if true {
+		t := appctx.GetLigTox()
+		if addmsg == phmsg {
+			addmsg = qtcore.NewQString_5(phmsg).Arg_11_(t.SelfGetName())
+		}
+		_, err := t.FriendAdd(toxid, phmsg)
+		return err
+	}
+	return nil
+}

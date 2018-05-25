@@ -86,8 +86,14 @@
         <property name="focusPolicy">
          <enum>Qt::NoFocus</enum>
         </property>
+        <property name="toolTip">
+         <string>keep screen on(only android)</string>
+        </property>
         <property name="text">
          <string>...</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
         </property>
         <property name="autoRaise">
          <bool>true</bool>
@@ -1654,7 +1660,14 @@
            </widget>
           </item>
           <item>
-           <widget class="QTextEdit" name="textEdit"/>
+           <widget class="QTextEdit" name="textEdit">
+            <property name="acceptRichText">
+             <bool>false</bool>
+            </property>
+            <property name="placeholderText">
+             <string>I am %1 ! Let's chat with Tox?</string>
+            </property>
+           </widget>
           </item>
          </layout>
         </item>
@@ -1736,7 +1749,7 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>366</width>
+             <width>96</width>
              <height>16</height>
             </rect>
            </property>

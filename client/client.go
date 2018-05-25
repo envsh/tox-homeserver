@@ -696,53 +696,88 @@ func (this *LigTox) GetSavedata() []byte {
  * @param pubkey hex 64B length
  */
 func (this *LigTox) Bootstrap(addr string, port uint16, pubkey string) (bool, error) {
-	return true, nil
+	fname := this.getMethodName()
+	args := thspbs.Event{}
+	args.Name = fname
+	args.Args = []string{addr, gopp.ToStr(port), pubkey}
+
+	rsp, err := this.rmtCall(&args)
+	gopp.ErrPrint(err, rsp)
+	log.Println(rsp)
+	return true, err
 }
 
-func (this *LigTox) SelfGetAddress() string {
-	return this.Binfo.GetId()
-}
+func (this *LigTox) SelfGetAddress() string       { return this.Binfo.GetId() }
+func (this *LigTox) SelfGetConnectionStatus() int { return int(this.Binfo.GetConnStatus()) }
 
-func (this *LigTox) SelfGetConnectionStatus() int {
-	return int(this.Binfo.GetConnStatus())
-}
 func (this *LigTox) SelfSetName(name string) error {
-	return nil
+	fname := this.getMethodName()
+	args := thspbs.Event{}
+	args.Name = fname
+	args.Args = []string{name}
+
+	rsp, err := this.rmtCall(&args)
+	gopp.ErrPrint(err, rsp)
+	log.Println(rsp)
+	return err
 }
 
-func (this *LigTox) SelfGetName() string {
-	return this.Binfo.GetName()
-}
+func (this *LigTox) SelfGetName() string  { return this.Binfo.GetName() }
+func (this *LigTox) SelfGetNameSize() int { return len(this.Binfo.GetName()) }
 
-func (this *LigTox) SelfGetNameSize() int {
-	return len(this.Binfo.GetName())
-}
+func (this *LigTox) SelfSetStatusMessage(statusText string) (bool, error) {
+	fname := this.getMethodName()
+	args := thspbs.Event{}
+	args.Name = fname
+	args.Args = []string{statusText}
 
-func (this *LigTox) SelfSetStatusMessage(status string) (bool, error) {
-	return true, nil
+	rsp, err := this.rmtCall(&args)
+	gopp.ErrPrint(err, rsp)
+	log.Println(rsp)
+	return true, err
 }
 
 func (this *LigTox) SelfSetStatus(status uint8) {
+	fname := this.getMethodName()
+	args := thspbs.Event{}
+	args.Name = fname
+	args.Args = []string{gopp.ToStr(status)}
+
+	rsp, err := this.rmtCall(&args)
+	gopp.ErrPrint(err, rsp)
+	log.Println(rsp)
 }
 
-func (this *LigTox) SelfGetStatusMessageSize() int {
-	return len(this.Binfo.GetStmsg())
-}
-
-func (this *LigTox) SelfGetStatusMessage() (string, error) {
-	return this.Binfo.GetStmsg(), nil
-}
-
-func (this *LigTox) SelfGetStatus() int {
-	return int(this.Binfo.GetStatus())
-}
+func (this *LigTox) SelfGetStatusMessageSize() int         { return len(this.Binfo.GetStmsg()) }
+func (this *LigTox) SelfGetStatusMessage() (string, error) { return this.Binfo.GetStmsg(), nil }
+func (this *LigTox) SelfGetStatus() int                    { return int(this.Binfo.GetStatus()) }
 
 func (this *LigTox) FriendAdd(friendId string, message string) (uint32, error) {
-	return uint32(0), nil
+	fname := this.getMethodName()
+	args := thspbs.Event{}
+	args.Name = fname
+	args.Args = []string{friendId, message}
+
+	rsp, err := this.rmtCall(&args)
+	gopp.ErrPrint(err, rsp)
+	log.Println(rsp)
+
+	wn := gopp.MustUint32(rsp.Args[0])
+	return wn, nil
 }
 
 func (this *LigTox) FriendAddNorequest(friendId string) (uint32, error) {
-	return uint32(0), nil
+	fname := this.getMethodName()
+	args := thspbs.Event{}
+	args.Name = fname
+	args.Args = []string{friendId}
+
+	rsp, err := this.rmtCall(&args)
+	gopp.ErrPrint(err, rsp)
+	log.Println(rsp)
+
+	wn := gopp.MustUint32(rsp.Args[0])
+	return wn, nil
 }
 
 func (this *LigTox) FriendByPublicKey(pubkey string) (uint32, error) {
@@ -796,7 +831,19 @@ func (this *LigTox) FriendSendMessage(friendNumber uint32, message string) (uint
 }
 
 func (this *LigTox) FriendSendAction(friendNumber uint32, action string) (uint32, error) {
-	return uint32(0), nil
+	fname := this.getMethodName()
+	args := thspbs.Event{}
+	args.Name = fname
+	args.Args = []string{fmt.Sprintf("%d", friendNumber), action}
+
+	// cli := thspbs.NewToxhsClient(this.rpcli)
+	// rsp, err := cli.RmtCall(context.Background(), &args)
+	rsp, err := this.rmtCall(&args)
+
+	gopp.ErrPrint(err, rsp)
+	log.Println(rsp)
+	wn := gopp.MustUint32(rsp.Args[0])
+	return wn, nil
 }
 
 func (this *LigTox) FriendGetName(friendNumber uint32) (string, error) {
@@ -844,16 +891,30 @@ func (this *LigTox) FriendGetLastOnline(friendNumber uint32) (uint64, error) {
 }
 
 func (this *LigTox) SelfSetTyping(friendNumber uint32, typing bool) (bool, error) {
-	return true, nil
+	fname := this.getMethodName()
+	args := thspbs.Event{}
+	args.Name = fname
+	args.Args = []string{gopp.ToStr(friendNumber), gopp.ToStr(typing)}
+
+	rsp, err := this.rmtCall(&args)
+	gopp.ErrPrint(err, rsp)
+	log.Println(rsp)
+	return true, err
 }
 
 func (this *LigTox) FriendGetTyping(friendNumber uint32) (bool, error) {
-	return true, nil
+	fname := this.getMethodName()
+	args := thspbs.Event{}
+	args.Name = fname
+	args.Args = []string{gopp.ToStr(friendNumber)}
+
+	rsp, err := this.rmtCall(&args)
+	gopp.ErrPrint(err, rsp)
+	log.Println(rsp)
+	return false, err
 }
 
-func (this *LigTox) SelfGetFriendListSize() uint32 {
-	return uint32(len(this.Binfo.GetFriends()))
-}
+func (this *LigTox) SelfGetFriendListSize() uint32 { return uint32(len(this.Binfo.GetFriends())) }
 
 func (this *LigTox) SelfGetFriendList() []uint32 {
 	fns := []uint32{}
@@ -866,10 +927,26 @@ func (this *LigTox) SelfGetFriendList() []uint32 {
 // tox_callback_***
 
 func (this *LigTox) SelfGetNospam() uint32 {
-	return uint32(0)
+	fname := this.getMethodName()
+	args := thspbs.Event{}
+	args.Name = fname
+	args.Args = []string{}
+
+	rsp, err := this.rmtCall(&args)
+	gopp.ErrPrint(err, rsp)
+	log.Println(rsp)
+	return gopp.MustUint32(rsp.Args[0])
 }
 
 func (this *LigTox) SelfSetNospam(nospam uint32) {
+	fname := this.getMethodName()
+	args := thspbs.Event{}
+	args.Name = fname
+	args.Args = []string{gopp.ToStr(nospam)}
+
+	rsp, err := this.rmtCall(&args)
+	gopp.ErrPrint(err, rsp)
+	log.Println(rsp)
 }
 
 func (this *LigTox) SelfGetPublicKey() string {
