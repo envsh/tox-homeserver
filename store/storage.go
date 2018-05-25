@@ -61,7 +61,7 @@ func (this *Storage) initTables() {
 	tbls, err := this.dbh.DBMetas()
 	gopp.ErrPrint(err, len(tbls))
 
-	dmrecs := []interface{}{&Contact{}, &Message{}, &Device{}, &Idgen{}, &SyncInfo{}}
+	dmrecs := []interface{}{&Contact{}, &Message{}, &Device{}, &Idgen{}, &SyncInfo{}, &Setting{}}
 	for _, dmrec := range dmrecs {
 		recval := fmt.Sprintf("%+v", dmrec)
 		if ok, err := this.dbh.IsTableExist(dmrec); !ok && err == nil {

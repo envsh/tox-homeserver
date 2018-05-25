@@ -136,7 +136,7 @@ func RmtCallExecuteHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Even
 		wn, err := t.FriendSendMessage(fnum, req.Args[1])
 		gopp.ErrPrint(err)
 		pubkey := t.SelfGetPublicKey()
-		msgo, err := appctx.st.AddFriendMessage(req.Args[1], pubkey, 0)
+		msgo, err := appctx.st.AddFriendMessage(req.Args[1], pubkey, req.Mid)
 		gopp.ErrPrint(err)
 		out.Mid = msgo.EventId
 		out.Args = append(out.Args, fmt.Sprintf("%d", wn))
@@ -173,9 +173,9 @@ func RmtCallExecuteHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Even
 			out.Ecode = -1
 			out.Emsg = err.Error()
 		}
-		cookie, _ := xtox.ConferenceGetCookie(t, uint32(gnum))
+		identifier, _ := xtox.ConferenceGetIdentifier(t, uint32(gnum))
 		pubkey := t.SelfGetPublicKey()
-		msgo, err := appctx.st.AddGroupMessage(req.Args[2], "0", cookie, pubkey, 0)
+		msgo, err := appctx.st.AddGroupMessage(req.Args[2], "0", identifier, pubkey, req.Mid)
 		gopp.ErrPrint(err)
 		out.Mid = msgo.EventId
 	case "ConferenceJoin": // friendNumber, cookie
@@ -234,6 +234,7 @@ func RmtCallResyncHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Event
 
 	var err error
 	t := appctx.tvm.t
+	st := appctx.st
 	err = gopp.DeepCopy(req, out)
 	gopp.ErrPrint(err)
 
@@ -249,7 +250,9 @@ func RmtCallResyncHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Event
 		gopp.ErrPrint(err)
 		pubkey, err := t.FriendGetPublicKey(fnum)
 		gopp.ErrPrint(err)
-		out.Margs = []string{fname, pubkey, "msgid"}
+		eventId := st.NextId()
+		req.Mid = eventId
+		out.Margs = []string{fname, pubkey, gopp.ToStr(eventId)}
 
 	case "ConferenceSendMessage": // "groupNumber" or groupIdentity,"mtype","msg"
 		gnum := uint32(gopp.MustInt(req.Args[0]))
@@ -264,7 +267,9 @@ func RmtCallResyncHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Event
 		groupId, _ := xtox.ConferenceGetIdentifier(t, gnum)
 		peerPubkey := t.SelfGetPublicKey()
 		peerName := t.SelfGetName()
-		out.Margs = []string{peerName, peerPubkey, title, groupId, "msgid"}
+		eventId := st.NextId()
+		req.Mid = eventId
+		out.Margs = []string{peerName, peerPubkey, title, groupId, gopp.ToStr(eventId)}
 	default:
 		return nil, errors.New("not need")
 	}

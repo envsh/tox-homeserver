@@ -70,6 +70,7 @@ type Ui_MainWindow struct {
 	Label_23                   *qtwidgets.QLabel
 	ComboBox_6                 *qtwidgets.QComboBox
 	PushButton_7               *qtwidgets.QPushButton
+	Label_24                   *qtwidgets.QLabel
 	VerticalSpacer_2           *qtwidgets.QSpacerItem
 	Page                       *qtwidgets.QWidget
 	VerticalLayout_2           *qtwidgets.QVBoxLayout
@@ -448,14 +449,15 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.VerticalLayout_8 = qtwidgets.NewQVBoxLayout_1(this.Page_8) // 111
 	this.VerticalLayout_8.SetSpacing(22)                            // 114
 	this.VerticalLayout_8.SetObjectName("VerticalLayout_8")         // 112
-	this.VerticalSpacer = qtwidgets.NewQSpacerItem(20, 188, qtwidgets.QSizePolicy__Minimum, qtwidgets.QSizePolicy__Expanding)
+	this.VerticalSpacer = qtwidgets.NewQSpacerItem(20, 168, qtwidgets.QSizePolicy__Minimum, qtwidgets.QSizePolicy__Expanding)
 
 	this.VerticalLayout_8.AddItem(this.VerticalSpacer) // 115
 
-	this.HorizontalLayout_15 = qtwidgets.NewQHBoxLayout()         // 111
-	this.HorizontalLayout_15.SetObjectName("HorizontalLayout_15") // 112
-	this.Label_22 = qtwidgets.NewQLabel(this.Page_8, 0)           // 111
-	this.Label_22.SetObjectName("Label_22")                       // 112
+	this.HorizontalLayout_15 = qtwidgets.NewQHBoxLayout()                                                       // 111
+	this.HorizontalLayout_15.SetObjectName("HorizontalLayout_15")                                               // 112
+	this.Label_22 = qtwidgets.NewQLabel(this.Page_8, 0)                                                         // 111
+	this.Label_22.SetObjectName("Label_22")                                                                     // 112
+	this.Label_22.SetTextInteractionFlags(qtcore.Qt__LinksAccessibleByMouse | qtcore.Qt__TextSelectableByMouse) // 114
 
 	this.HorizontalLayout_15.Layout().AddWidget(this.Label_22) // 115
 
@@ -485,7 +487,14 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 
 	this.VerticalLayout_8.Layout().AddWidget(this.PushButton_7) // 115
 
-	this.VerticalSpacer_2 = qtwidgets.NewQSpacerItem(20, 187, qtwidgets.QSizePolicy__Minimum, qtwidgets.QSizePolicy__Expanding)
+	this.Label_24 = qtwidgets.NewQLabel(this.Page_8, 0)                                                         // 111
+	this.Label_24.SetObjectName("Label_24")                                                                     // 112
+	this.Label_24.SetWordWrap(true)                                                                             // 114
+	this.Label_24.SetTextInteractionFlags(qtcore.Qt__LinksAccessibleByMouse | qtcore.Qt__TextSelectableByMouse) // 114
+
+	this.VerticalLayout_8.Layout().AddWidget(this.Label_24) // 115
+
+	this.VerticalSpacer_2 = qtwidgets.NewQSpacerItem(20, 167, qtwidgets.QSizePolicy__Minimum, qtwidgets.QSizePolicy__Expanding)
 
 	this.VerticalLayout_8.AddItem(this.VerticalSpacer_2) // 115
 
@@ -1178,7 +1187,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 
 	this.RetranslateUi(MainWindow)
 
-	this.StackedWidget.SetCurrentIndex(4) // 114
+	this.StackedWidget.SetCurrentIndex(3) // 114
 	this.ComboBox_6.SetCurrentIndex(0)    // 114
 
 	qtcore.QMetaObject_ConnectSlotsByName(MainWindow) // 100111
@@ -1242,6 +1251,7 @@ func (this *Ui_MainWindow) RetranslateUi(MainWindow *qtwidgets.QMainWindow) {
 	this.ComboBox_6.SetItemText(0, qtcore.QCoreApplication_Translate("MainWindow", "txhs.duckdns.org:2080", "dummy123", 0))
 	// noimpl:
 	this.PushButton_7.SetText(qtcore.QCoreApplication_Translate("MainWindow", "Sign in", "dummy123", 0))
+	this.Label_24.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
 	this.ToolButton_17.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
 	this.Label_2.SetText(qtcore.QCoreApplication_Translate("MainWindow", "Loading ...", "dummy123", 0))
 	this.Label_3.SetText(qtcore.QCoreApplication_Translate("MainWindow", "Loading ...", "dummy123", 0))

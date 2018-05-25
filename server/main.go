@@ -9,7 +9,7 @@ import (
 	_ "net/http/pprof"
 	"strings"
 	"time"
-	"tox-homeserver/common"
+	thscom "tox-homeserver/common"
 	"tox-homeserver/store"
 
 	"github.com/envsh/go-toxcore/xtox"
@@ -38,14 +38,14 @@ func Main() {
 	}
 
 	appctx.st = store.NewStorage()
-	common.SetLogMetrics()
+	thscom.SetLogMetrics()
 	go func() {
 		// 为简单debug,stats,socketio,websocket使用
 		sio := NewSocketioServer()
 		wso := NewWebsocketServer()
 		appctx.wssrv = wso
-		log.Println("Listen on http *:8089 ...", sio, wso)
-		err := http.ListenAndServe(":8089", nil)
+		log.Printf("Listen on WS: *:%d ..., %s, %s\n", thscom.WSPort, sio, wso)
+		err := http.ListenAndServe(fmt.Sprintf(":%d", thscom.WSPort), nil)
 		gopp.ErrPrint(err)
 	}()
 

@@ -59,6 +59,7 @@ type LigTox struct {
 	bemsgsmu sync.RWMutex
 	OnNewMsg func()
 
+	srvurl   string
 	rpcli    *grpc.ClientConn
 	ntscli   *nats.Conn
 	wsc4push *websocket.Conn
@@ -95,37 +96,62 @@ type LigTox struct {
 	cb_conference_message_setted bool
 }
 
-func NewLigTox() *LigTox {
+func NewLigTox(srvurl string) *LigTox {
 	this := &LigTox{}
+	this.srvurl = srvurl
 	this.bemsgs = make([][]byte, 0)
 	this.initCbmap()
 
-	// this.initConnections()
-	log.Println("connecting grpc:", thscom.GrpcAddr)
-	rpcli, err := grpc.Dial(thscom.GrpcAddr, grpc.WithInsecure())
+	return this
+}
+
+func (this *LigTox) Connect() error {
+	srvurl := this.srvurl
+	log.Println("connecting grpc:", srvurl)
+	rpcli, err := grpc.Dial(srvurl, grpc.WithInsecure())
 	gopp.ErrPrint(err, rpcli)
+	if err != nil {
+		return err
+	}
+
+	// ping test, seems grpc is lazy connect
+	cc := rpcli
+	thsc := thspbs.NewToxhsClient(cc)
+	in := &thspbs.EmptyReq{}
+	_, err = thsc.Ping(context.Background(), in)
+	gopp.ErrPrint(err)
+	if err != nil {
+		return err
+	}
 	this.rpcli = rpcli
 
-	uo, err := url.Parse(thscom.GnatsAddr)
+	natsurl := fmt.Sprintf("nats://%s:%d", strings.Split(srvurl, ":")[0], thscom.GnatsPort)
+	uo, err := url.Parse(natsurl)
 	gopp.ErrPrint(err, uo)
-	ntscli, err := nats.Connect(thscom.GnatsAddr)
-	gopp.ErrPrint(err, thscom.GnatsAddr)
-	if err == nats.ErrNoServers {
-		// try local
-		ntscli, err = nats.Connect(thscom.GnatsAddrlo)
+	ntscli, err := nats.Connect(natsurl)
+	gopp.ErrPrint(err, natsurl)
+	if err != nil {
+		return err
 	}
 	this.ntscli = ntscli
-	log.Println("gnats connected:", ntscli.IsConnected(), thscom.GnatsAddr)
-	ntscli.Subscribe(thscom.CBEventBusName, this.onBackendEventNats)
+	log.Println("gnats connected:", ntscli.IsConnected(), natsurl)
 
-	this.wsc4rpc, _, err = websocket.DefaultDialer.Dial(fmt.Sprintf("%s/toxhsrpc", thscom.WSAddr), nil)
-	gopp.ErrPrint(err, thscom.WSAddr)
-	this.wsc4push, _, err = websocket.DefaultDialer.Dial(fmt.Sprintf("%s/toxhspush", thscom.WSAddr), nil)
-	gopp.ErrPrint(err, thscom.WSAddr)
+	wsurl := fmt.Sprintf("ws://%s:%d", strings.Split(srvurl, ":")[0], thscom.WSPort)
+	this.wsc4rpc, _, err = websocket.DefaultDialer.Dial(fmt.Sprintf("%s/toxhsrpc", wsurl), nil)
+	gopp.ErrPrint(err, wsurl)
+	this.wsc4push, _, err = websocket.DefaultDialer.Dial(fmt.Sprintf("%s/toxhspush", wsurl), nil)
+	gopp.ErrPrint(err, wsurl)
+
+	return nil
+}
+
+func (this *LigTox) start() {
+
+	// this.initConnections()
+	this.ntscli.Subscribe(thscom.CBEventBusName, this.onBackendEventNats)
+
 	go this.serveBackendEventWS()
 	// TODO reconnect
-
-	return this
 }
 
 func (this *LigTox) initCbmap() {

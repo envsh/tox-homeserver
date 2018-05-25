@@ -84,6 +84,12 @@ func NewMessageForMe(itext string) *Message {
 	return msgo
 }
 
+func NewMessageForMeFromJson(itext string, eventId int64) *Message {
+	msgo := NewMessageForMe(itext)
+	msgo.EventId = eventId
+	return msgo
+}
+
 func (this *Message) refmtmsg() {
 	this.LastMsgUi = this.Msg
 	this.resetTimezone()
@@ -113,7 +119,7 @@ func (this *Message) refmtmsgLink() {
 }
 func (this *Message) resetTimezone() {
 	if runtime.GOOS == "android" {
-		this.Time = this.Time.Add(8 * time.Hour)
+		// this.Time = this.Time.Add(8 * time.Hour)
 	}
 }
 
@@ -185,6 +191,7 @@ type RoomListItem struct {
 	peerCount     int
 	timeline      thscli.TimeLine
 	SyncInfoCount int
+	LastMsgTime   time.Time
 }
 
 func NewRoomListItem() *RoomListItem {
@@ -370,7 +377,7 @@ func (this *RoomListItem) AddMessage(msgo *Message, prev bool) {
 }
 
 func (this *RoomListItem) AddMessageImpl(msgo *Message, msgiw *Ui_MessageItemView) {
-
+	// 计算是否省略掉显示与上一条相同的用户名
 	lastSame := func(peerUi string) bool {
 		if len(this.msgos) >= 2 {
 			if this.msgos[len(this.msgos)-2].PeerUi == peerUi {
@@ -397,7 +404,7 @@ func (this *RoomListItem) AddMessageImpl(msgo *Message, msgiw *Ui_MessageItemVie
 		vlo3 := uictx.uiw.VerticalLayout_3
 		vlo3.Layout().AddWidget(msgiw.QWidget_PTR())
 	}
-	this.SetLastMsg(fmt.Sprintf("%s: %s", gopp.StrSuf4ui(msgo.PeerUi, 8, 1), msgo.LastMsgUi))
+	this.SetLastMsg(fmt.Sprintf("%s: %s", gopp.StrSuf4ui(msgo.PeerUi, 9, 1), msgo.LastMsgUi), msgo.Time)
 
 	this.totalCount += 1
 	if uictx.msgwin.item == this {
@@ -445,11 +452,25 @@ func (this *RoomListItem) UpdateReaded() {
 	}
 }
 
-func (this *RoomListItem) SetLastMsg(msg string) {
+// TODO how custom setting this
+func init() {
+	if runtime.GOOS == "android" {
+		secondsEastOfUTC := int((8 * time.Hour).Seconds())
+		cqzone := time.FixedZone("Chongqing", secondsEastOfUTC)
+		time.Local = cqzone
+	}
+}
+
+// 两类时间，server time, client time
+func (this *RoomListItem) SetLastMsg(msg string, tm time.Time) {
+	if !tm.After(this.LastMsgTime) {
+		return
+	}
+
+	this.LastMsgTime = tm
 	cmsg := msg
 	this.Label_3.SetText(gopp.StrSuf4ui(cmsg, 36))
 	this.Label_3.SetToolTip(cmsg)
-	tm := time.Now()
 	this.LabelLastMsgTime.SetText(Time2TodayMinute(tm))
 	this.LabelLastMsgTime.SetToolTip(gopp.TimeToFmt1(tm))
 }

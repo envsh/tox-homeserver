@@ -247,9 +247,9 @@ func (this *ToxVM) setupCallbacks() {
 		}
 
 		ctid, err := appctx.st.AddPeer(peerPubkey, groupNumber, peerName)
-		gopp.ErrPrint(err)
-		evt.Margs = []string{peerName, peerPubkey, title, groupId, fmt.Sprintf("%d", ctid)}
+		gopp.ErrPrint(err, peerNumber, name, peerPubkey)
 
+		evt.Margs = []string{peerName, peerPubkey, title, groupId, fmt.Sprintf("%d", ctid)}
 		this.pubmsg(&evt)
 	}, nil)
 	// TODO detect which peer added/deleted here and directly tell client, make client lighter.
@@ -267,7 +267,6 @@ func (this *ToxVM) setupCallbacks() {
 		}
 
 		evt.Margs = []string{title, groupId}
-
 		this.pubmsg(&evt)
 	}, nil)
 
@@ -312,9 +311,8 @@ func (this *ToxVM) setupCallbacks() {
 		peerPubkey, _ := xtox.ConferencePeerGetPubkey(t, groupNumber, peerNumber)
 		peerName, _ := xtox.ConferencePeerGetName(t, groupNumber, peerNumber)
 		if peerName == "" || peerPubkey == "" {
-			log.Println("peer not found:", peerName, peerPubkey)
+			log.Println("peer not found:", peerNumber, peerName, peerPubkey)
 		}
-		evt.Margs = []string{groupId, peerName, peerPubkey}
 
 		ctid, err := appctx.st.AddGroup(groupId, groupNumber, title)
 		gopp.ErrPrint(err, ctid)
@@ -323,6 +321,7 @@ func (this *ToxVM) setupCallbacks() {
 			gopp.ErrPrint(err)
 		}
 
+		evt.Margs = []string{groupId, peerName, peerPubkey}
 		this.pubmsg(&evt)
 	}, nil)
 

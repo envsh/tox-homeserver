@@ -63,7 +63,7 @@
      var wsc4rpc = null;
      var wsc4push = null;
      // TODO querystring as host: ?server=ip:port
-     var addrp = "ws://" + window.location.hostname + ":8089"; // path: /toxhsrpc or /toxhspush
+     var addrp = "ws://" + window.location.host; // path: /toxhsrpc or /toxhspush
      var app0 = new Vue({
          el: '#app',
          data: function() {
@@ -71,7 +71,7 @@
                  visible: false,
                  UserName: "Tox User",
                  StatusMessage: "-------",
-                 ToxhsHost: "127.0.0.1:8089",
+                 ToxhsHost: window.location.host, // "127.0.0.1:8099",
                  EventLines: "",
                  ConnState: "Gone",
                  CurrentContact: '',

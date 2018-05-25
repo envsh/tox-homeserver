@@ -16,6 +16,7 @@ import (
 	simplejson "github.com/bitly/go-simplejson"
 
 	thscli "tox-homeserver/client"
+	"tox-homeserver/store"
 	"tox-homeserver/thspbs"
 )
 
@@ -165,8 +166,8 @@ func (this *MainWindow) initMainWin() {
 		})
 	*/
 
-	go this.initAppBackend()
-
+	this.loadStorage()
+	// go this.initAppBackend()
 }
 
 func setAppStyleSheet() {
@@ -338,6 +339,10 @@ func (this *MainWindow) connectSignals() {
 		}
 	})
 	qtrt.Connect(uiw.ToolButton_7, "clicked(bool)", func(bool) { this.switchUiStack(UIST_SETTINGS) })
+	qtrt.Connect(uiw.PushButton_7, "clicked(bool)", func(bool) {
+		this.Label_24.Clear()
+		go this.initAppBackend()
+	})
 }
 
 var create_room_dlg *Ui_Dialog
@@ -431,22 +436,35 @@ func (this *MainWindow) sendMessage() {
 	}
 }
 
+func (this *MainWindow) loadStorage() {
+	appctx = thscli.NewAppContext()
+	appctx.OpenStrorage()
+	st := appctx.GetStorage()
+	setting, err := st.GetSetting(store.SK_HOMESERVER_URL)
+	gopp.ErrPrint(err)
+	if setting != nil {
+		this.ComboBox_6.SetCurrentText(setting.Value)
+	}
+	log.Println("loadStorage done", err)
+}
+
 // should block
 func (this *MainWindow) initAppBackend() {
 	mech, uiw := uictx.mech, uictx.uiw
 
-	thscli.AppOnCreate()
-	appctx = thscli.GetAppCtx()
+	srvurl := uiw.ComboBox_6.CurrentText()
+	err := thscli.AppConnect(srvurl)
+	gopp.ErrPrint(err, srvurl)
+	if err != nil {
+		runOnUiThread(func() { this.Label_24.SetText("connect error:" + err.Error()) })
+		return
+	}
 	vtcli = appctx.GetLigTox()
 	vtcli.OnNewMsg = func() { mech.Trigger() }
 
-	for {
-		if vtcli.SelfGetAddress() != "" {
-			break
-		}
-		time.Sleep(50 * time.Millisecond)
-	}
+	condWait(50, func() bool { return vtcli.SelfGetAddress() != "" })
 	log.Println(vtcli.SelfGetAddress())
+	runOnUiThread(func() { this.switchUiStack(UIST_MAINUI) })
 
 	uiw.Label_2.SetText(vtcli.SelfGetName())
 	stmsg, _ := vtcli.SelfGetStatusMessage()
@@ -480,9 +498,7 @@ func (this *MainWindow) initAppBackend() {
 	go func() {
 		btime := time.Now()
 		log.Println("Waiting contacts show on UI...") // about 31ms with 7 contacts
-		for len(contactQueue) > 0 {
-			time.Sleep(10 * time.Millisecond)
-		}
+		condWait(10, func() bool { return len(contactQueue) > 0 })
 		log.Println("Show base contacts on UI done.", time.Since(btime))
 		pullAllRoomsLatestMessages()
 	}()
@@ -493,9 +509,13 @@ var baseInfoGot bool = false
 var contactQueue = make(chan interface{}, 1234)
 var uifnQueue = make(chan func(), 1234)
 
-func runOnUiThread(fn func()) { uifnQueue <- fn }
+func runOnUiThread(fn func()) {
+	uifnQueue <- fn
+	uictx.mech.Trigger()
+}
 
 func tryReadEvent() {
+	tryReadUifnEvent()
 
 	if !baseInfoGot {
 		log.Println("wtf")
@@ -507,7 +527,6 @@ func tryReadEvent() {
 		// return
 	}
 
-	tryReadUifnEvent()
 	tryReadContactEvent()
 	tryReadMessageEvent()
 }
@@ -728,13 +747,14 @@ func dispatchEvent(jso *simplejson.Json) {
 		}
 
 	case "FriendSendMessage":
-		pubkey := jso.Get("args").GetIndex(2).MustString()
 		itext := jso.Get("args").GetIndex(1).MustString()
+		pubkey := jso.Get("margs").GetIndex(1).MustString()
+		eventId := gopp.MustInt64(jso.Get("margs").GetIndex(2).MustString())
 
 		found := false
 		for _, room := range ctitmdl {
 			if room.GetId() == pubkey {
-				msgo := NewMessageForMe(itext)
+				msgo := NewMessageForMeFromJson(itext, eventId)
 				room.AddMessage(msgo, false)
 				found = true
 				break
@@ -743,14 +763,15 @@ func dispatchEvent(jso *simplejson.Json) {
 		log.Println(found, pubkey, itext)
 
 	case "ConferenceSendMessage":
-		groupId := jso.Get("args").GetIndex(3).MustString()
 		itext := jso.Get("args").GetIndex(2).MustString()
-		groupTitle := jso.Get("args").GetIndex(3).MustString()
+		groupTitle := jso.Get("margs").GetIndex(2).MustString()
+		groupId := jso.Get("margs").GetIndex(3).MustString()
+		eventId := gopp.MustInt64(jso.Get("margs").GetIndex(4).MustString())
 
 		found := false
 		for _, room := range ctitmdl {
 			if room.GetId() == groupId && room.GetName() == groupTitle {
-				msgo := NewMessageForMe(itext)
+				msgo := NewMessageForMeFromJson(itext, eventId)
 				room.AddMessage(msgo, false)
 				found = true
 				break

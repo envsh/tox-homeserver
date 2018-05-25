@@ -15,7 +15,12 @@ rm -vf libmain.so
 time go build -p 1 -v -i -pkgdir ~/oss/pkg/android_arm -buildmode=c-shared -o libmain.so .
 chmod +x libmain.so
 
-mv andwrapmain.c.nogo andwrapmain.c
-$CC andwrapmain.c -shared   -o libgolem.so -lmain -L. -Wl,-soname,libgolem.so
-mv andwrapmain.c andwrapmain.c.nogo
+$CC -xc andwrapmain.c.nogo -shared   -o libgolem.so -lmain -L. -Wl,-soname,libgolem.so
+ccret=$?
+
+if [ x"$1" == x"2" ] && [ x"$ccret" == x"0" ]; then
+    sleep 2;
+    sh make2.sh
+fi
+
 

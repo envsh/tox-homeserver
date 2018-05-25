@@ -14,7 +14,7 @@ import (
 	simplejson "github.com/bitly/go-simplejson"
 	"github.com/go-xorm/xorm"
 	"github.com/kitech/godsts/maps/hashmap"
-	"github.com/nats-io/nats"
+	"github.com/nats-io/go-nats"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/connectivity"
 )
@@ -36,64 +36,73 @@ type AppContext struct {
 var appctx *AppContext
 var appctxOnce sync.Once
 
-func GetAppCtx() *AppContext { return appctx }
+func NewAppContext() *AppContext {
+	appctx = &AppContext{}
+	appctx.contactStates = hashmap.New()
+	appctx.chatFormStates = hashmap.New()
 
-func AppOnCreate() {
+	_AppOnCreate()
+	return appctx
+}
+
+func (this *AppContext) OpenStrorage() {
+	appctx.store = store.NewStorage()
+	if appctx.store.DeviceEmpty() {
+		err := appctx.store.AddDevice()
+		gopp.ErrPrint(err)
+	}
+}
+
+// func GetAppCtx() *AppContext { return appctx }
+
+func AppConnect(srvurl string) error {
+	// 初始化顺序: server => memory => disk => network
+	// appctx.logState = newLogState()
+	var err error
+	vtcli := NewLigTox(srvurl)
+	err = vtcli.Connect()
+	gopp.ErrPrint(err, srvurl)
+	if err != nil {
+		return err
+	}
+	vtcli.start()
+	appctx.vtcli = vtcli
+
+	dv := appctx.store.GetDevice()
+	if dv != nil {
+		log.Println("my device:", dv.Uuid)
+	} else {
+		log.Println("my device not exist: wtf")
+	}
+
+	appctx.nc = appctx.vtcli.ntscli
+	appctx.rpcli = appctx.vtcli.rpcli
+
+	go appctx.keepConn()
+	time.Sleep(1 * time.Millisecond)
+
+	go func() {
+
+		appctx.getBaseInfo()
+		go appctx.pollGrpc()
+		go appctx.pollNats()
+	}()
+
+	return nil
+}
+
+func _AppOnCreate() {
 	appctxOnce.Do(func() {
 		// printBuildInfo(true)
 		log.Println("Start pprof server: *:8089")
 		go func() { gopp.ErrPrint(http.ListenAndServe(":8089", nil)) }()
-
-		// 初始化顺序: server => memory => disk => network
-		appctx = &AppContext{}
-		// appctx.logState = newLogState()
-		appctx.vtcli = NewLigTox()
-		appctx.contactStates = hashmap.New()
-		appctx.chatFormStates = hashmap.New()
-
-		appctx.store = store.NewStorage()
-		if appctx.store.DeviceEmpty() {
-			err := appctx.store.AddDevice()
-			gopp.ErrPrint(err)
-		}
-		dv := appctx.store.GetDevice()
-		if dv != nil {
-			log.Println("my device:", dv.Uuid)
-		} else {
-			log.Println("my device not exist: wtf")
-		}
-
-		log.Println("connecting gnats:", thscom.GnatsAddr)
-		nc, err := nats.Connect(thscom.GnatsAddr)
-		gopp.ErrPrint(err)
-		appctx.nc = nc
-
-		log.Println("connecting grpc:", thscom.GrpcAddr)
-		rpcli, err := grpc.Dial(thscom.GrpcAddr, grpc.WithInsecure())
-		gopp.ErrPrint(err, rpcli)
-		appctx.rpcli = rpcli
-		go appctx.keepConn()
-		time.Sleep(1 * time.Millisecond)
-
-		//ping
-		cc := appctx.rpcli
-		thsc := thspbs.NewToxhsClient(cc)
-		in := &thspbs.EmptyReq{}
-		_, err = thsc.Ping(context.Background(), in)
-		gopp.ErrPrint(err)
-
-		go func() {
-
-			appctx.getBaseInfo()
-			go appctx.pollGrpc()
-			go appctx.pollNats()
-		}()
 	})
 }
 
 func (this *AppContext) GetLigTox() *LigTox         { return this.vtcli }
 func (this *AppContext) GetStorage() *store.Storage { return this.store }
 
+// 只用做消息存储
 func (this *AppContext) pollNats() {
 
 	for {

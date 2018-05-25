@@ -117,7 +117,7 @@ func NewMessageFromStoreRecord(m *store.Message) *Message {
 	}
 
 	defaultTimeStringLayout := common.DefaultTimeLayout
-	tm, err := time.Parse(defaultTimeStringLayout, m.Updated[:len(defaultTimeStringLayout)])
+	tm, err := time.Parse(defaultTimeStringLayout, m.Updated)
 	gopp.ErrPrint(err)
 	this.Time = tm
 
@@ -126,7 +126,7 @@ func NewMessageFromStoreRecord(m *store.Message) *Message {
 }
 
 func (this *Fetcher) NotifyUiPrevHistory(item *RoomListItem, msgos []store.Message) {
-	for i := len(msgos) - 1; i >= 0; i-- {
+	for i := 0; i < len(msgos); i++ {
 		msgoe := msgos[i]
 		msgou := NewMessageFromStoreRecord(&msgoe)
 		runOnUiThread(func() {
@@ -139,7 +139,7 @@ func (this *Fetcher) NotifyUiPrevHistory(item *RoomListItem, msgos []store.Messa
 }
 
 func (this *Fetcher) SavePrevHistory(msgos []store.Message) {
-	for i := len(msgos) - 1; i >= 0; i-- {
+	for i := 0; i < len(msgos); i++ {
 		msgoe := msgos[i]
 		_ = msgoe
 		_, err := appctx.GetStorage().AddMessage(&msgoe)

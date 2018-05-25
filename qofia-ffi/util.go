@@ -42,3 +42,12 @@ func Time2Today(t time.Time) string {
 func Time2TodayMinute(t time.Time) string {
 	return t.Format("15:04")
 }
+
+func condWait(timeoutms int, f func() bool) {
+	for {
+		time.Sleep(time.Duration(timeoutms) * time.Millisecond)
+		if f() {
+			break
+		}
+	}
+}

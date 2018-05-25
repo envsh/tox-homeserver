@@ -9,7 +9,7 @@ import (
 
 	// tox "github.com/envsh/go-toxcore"
 
-	"github.com/nats-io/nats"
+	"github.com/nats-io/go-nats"
 
 	"atapi/dorpc/dyngrpc"
 
