@@ -38,7 +38,6 @@ func (this *Fetcher) PullPrevHistoryByRoomItem(item *RoomListItem) {
 func (this *Fetcher) PullPrevHistoryById(pubkey string, prev_batch int64) {
 	msgos, err := appctx.GetLigTox().PullEventsByContactId(pubkey, prev_batch)
 	gopp.ErrPrint(err)
-	log.Println(len(msgos), msgos)
 
 	item := uictx.iteman.Get(pubkey)
 	if item == nil {
@@ -144,7 +143,7 @@ func (this *Fetcher) SavePrevHistory(msgos []store.Message) {
 		msgoe := msgos[i]
 		_ = msgoe
 		_, err := appctx.GetStorage().AddMessage(&msgoe)
-		gopp.ErrPrint(err, i)
+		gopp.FalsePrint(store.IsUniqueConstraintErr(err), err, i)
 	}
 }
 

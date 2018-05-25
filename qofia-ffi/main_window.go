@@ -356,13 +356,15 @@ const (
 	UIST_QMLMCTRL      = 0
 	UIST_QMLORIGIN     = 1
 	UIST_SETTINGS      = 2
-	UIST_MAINUI        = 3
-	UIST_MESSAGEUI     = 4
-	UIST_ADD_GROUp     = 5
-	UIST_ADD_FRIEND    = 6
-	UIST_INVITE_FRIEND = 7
-	UIST_TESTUI        = 8
-	UIST_LOGUI         = 9
+	UIST_LOGINUI       = 3
+	UIST_MAINUI        = 4
+	UIST_MESSAGEUI     = 5
+	UIST_ADD_GROUp     = 6
+	UIST_ADD_FRIEND    = 7
+	UIST_INVITE_FRIEND = 8
+	UIST_MEMBERS       = 9
+	UIST_TESTUI        = 10
+	UIST_LOGUI         = 11
 )
 
 func (this *MainWindow) switchUiStack(x int) {

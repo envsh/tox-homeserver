@@ -22,7 +22,7 @@ func (this *LigTox) PullEventsByContactId(pubkey string, prev_batch int64) ([]st
 	if err != nil {
 		return nil, err
 	}
-	log.Println(rsp.Args)
+
 	rets := []store.Message{}
 	err = json.Unmarshal([]byte(rsp.Args[0]), &rets)
 	gopp.ErrPrint(err)

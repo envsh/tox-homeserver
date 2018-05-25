@@ -28,6 +28,7 @@ type Message struct {
 	EventId   int64  `xorm:"unique INTEGER"`
 }
 
+// for server
 type Device struct {
 	Id        int64  `xorm:"pk autoincr INTEGER"`
 	ContactId int64  `xorm:"index INTEGER"`
@@ -40,10 +41,31 @@ type Idgen struct {
 	Id int64 `xorm:"pk autoincr INTEGER"`
 }
 
+// for client
 type SyncInfo struct {
 	Id        int64  `xorm:"pk autoincr INTEGER"`
 	CtId      int64  `xorm:"unique(siu) INTEGER"`
 	NextBatch int64  `xorm:"unique(siu) INTEGER"`
 	PrevBatch int64  `xorm:"unique(siu) INTEGER"`
 	Updated   string `xorm:"TEXT"`
+}
+
+const (
+	SK_DEVICE_NAME    = "device_name"
+	SK_HOMESERVER_URL = "homeserver_url" // it's really last
+	SK_SHOW_SQL_INLOG = "show_sql_inlog"
+	SK_DEBUG_LEVEL    = "debug_level"
+)
+
+var SettingKeys = []string{"device_name", "homeserver_url", "show_sql", "debug_level"}
+
+// for client
+type Setting struct {
+	Id int64 `xorm:"pk autoincr INTEGER"`
+	// case for multiple accounts
+	// ContactId int64  `xorm:"index ITNEGER"`
+	Name    string `xorm:"unique TEXT"`
+	Value   string `xorm:"TEXT"`
+	Created string `xorm:"TEXT"`
+	Updated string `xorm:"TEXT"`
 }

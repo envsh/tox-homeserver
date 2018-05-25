@@ -37,7 +37,7 @@ func NewStorage() *Storage {
 
 	logger := xorm.NewSimpleLogger2(os.Stdout, common.LogPrefix, 0)
 	dbh.SetLogger(logger)
-	dbh.ShowSQL(true)
+	dbh.ShowSQL(false)
 	this.initTables()
 	return this
 }
@@ -74,11 +74,10 @@ func (this *Storage) initTables() {
 
 		if true {
 			err = this.dbh.CreateUniques(dmrec)
-			gopp.ErrPrint(err, recval)
+			gopp.FalsePrint(IsIndexExistErr(err), err)
 
 			err = this.dbh.CreateIndexes(dmrec)
-			gopp.ErrPrint(err, recval)
-
+			gopp.FalsePrint(IsIndexExistErr(err), err)
 		}
 	}
 }
@@ -136,7 +135,6 @@ func (this *Storage) AddContact(c *Contact) (int64, error) {
 	c.Updated = c.Created
 
 	id, err := this.dbh.InsertOne(c)
-	gopp.ErrPrint(err, id)
 	return id, err
 }
 
@@ -211,7 +209,7 @@ func (this *Storage) AddMessage(m *Message) (*Message, error) {
 	}
 
 	id, err := this.dbh.InsertOne(m)
-	gopp.ErrPrint(err, id)
+	_ = id
 	return m, err
 }
 
@@ -332,6 +330,44 @@ func (this *Storage) DeleteSyncInfoById(id int64) error {
 	_, err := this.dbh.Delete(c)
 	gopp.ErrPrint(err, id)
 	return err
+}
+
+func (this *Storage) SetSetting(name, value string) (int64, error) {
+	c := &Setting{}
+
+	exist, err := this.dbh.Where("name = ?", name).Get(c)
+	if err != nil {
+		return 0, err
+	}
+
+	c = &Setting{}
+	c.Name = name
+	c.Value = value
+	c.Updated = common.NowTimeStr()
+
+	if exist {
+		return this.dbh.Where("name = ?", name).Update(c)
+	} else {
+		c.Created = c.Updated
+		return this.dbh.InsertOne(c)
+	}
+}
+
+func (this *Storage) GetSetting(name string) (setting *Setting, err error) {
+	c := &Setting{}
+	exist, err := this.dbh.Where("name = ?", name).Get(c)
+	if err != nil {
+		return nil, err
+	}
+	if !exist {
+		return nil, xorm.ErrNotExist
+	}
+	return c, nil
+}
+
+func (this *Storage) GetSettings() (settings []Setting, err error) {
+	err = this.dbh.Where("1==1").Find(&settings)
+	return
 }
 
 func init() {
