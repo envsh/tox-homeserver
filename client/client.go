@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"gopp"
 	"log"
+	"math"
 	"net/url"
 	"runtime"
 	"strings"
@@ -762,8 +763,11 @@ func (this *LigTox) FriendAdd(friendId string, message string) (uint32, error) {
 	gopp.ErrPrint(err, rsp)
 	log.Println(rsp)
 
-	wn := gopp.MustUint32(rsp.Args[0])
-	return wn, nil
+	if err == nil {
+		wn := gopp.MustUint32(rsp.Args[0])
+		return wn, nil
+	}
+	return math.MaxUint32, err
 }
 
 func (this *LigTox) FriendAddNorequest(friendId string) (uint32, error) {
@@ -799,7 +803,15 @@ func (this *LigTox) FriendGetPublicKey(friendNumber uint32) (string, error) {
 }
 
 func (this *LigTox) FriendDelete(friendNumber uint32) (bool, error) {
-	return true, nil
+	fname := this.getMethodName()
+	args := thspbs.Event{}
+	args.Name = fname
+	args.Args = []string{gopp.ToStr(friendNumber)}
+
+	rsp, err := this.rmtCall(&args)
+	gopp.ErrPrint(err, rsp)
+	log.Println(rsp)
+	return true, err
 }
 
 func (this *LigTox) FriendGetConnectionStatus(friendNumber uint32) (int, error) {
@@ -851,7 +863,16 @@ func (this *LigTox) FriendGetName(friendNumber uint32) (string, error) {
 	if frndo, ok := frnds[friendNumber]; ok {
 		return frndo.Name, nil
 	}
-	return string(""), nil
+
+	fname := this.getMethodName()
+	req := this.newRequest(fname, friendNumber)
+	rsp, err := this.rmtCall(req)
+	gopp.ErrPrint(err, rsp)
+	log.Println(rsp)
+	if err == nil {
+		return rsp.Args[0], nil
+	}
+	return string(""), err
 }
 
 func (this *LigTox) FriendGetNameSize(friendNumber uint32) (int, error) {
@@ -1009,4 +1030,15 @@ func (this *LigTox) getMethodName() string {
 	parts := strings.Split(fno.Name(), ".")
 	fname := parts[2]
 	return fname
+}
+
+func (this *LigTox) newRequest(fname string, args ...interface{}) *thspbs.Event {
+	// fname := this.getMethodName()
+	req := &thspbs.Event{}
+	req.Name = fname
+	req.Args = []string{}
+	for _, arg := range args {
+		req.Args = append(req.Args, gopp.ToStr(arg))
+	}
+	return req
 }

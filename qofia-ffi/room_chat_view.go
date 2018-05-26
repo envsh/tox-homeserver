@@ -3,6 +3,8 @@ package main
 import (
 	"gopp"
 	"log"
+	"math"
+	"tox-homeserver/thspbs"
 
 	"github.com/kitech/qt.go/qtcore"
 	"github.com/kitech/qt.go/qtrt"
@@ -151,24 +153,30 @@ func (this *MainWindow) initAddFriendSignals() {
 		toxid := this.LineEdit_4.Text()
 		addmsg := this.TextEdit.ToPlainText()
 		phmsg := this.TextEdit.PlaceholderText()
-		err := this.addFriendByToxId(toxid, addmsg, phmsg)
+		frndno, err := this.addFriendByToxId(toxid, addmsg, phmsg)
 		gopp.ErrPrint(err, toxid, addmsg)
 		if err != nil {
 			log.Println("faild")
 		} else {
+			frndo := &thspbs.FriendInfo{}
+			frndo.Fnum = frndno
+			frndo.Pubkey = toxid[:64]
+			frndo.Name = toxid
+			contactQueue <- frndo
+			uictx.mech.Trigger()
 			this.switchUiStack(UIST_MAINUI)
 		}
 	})
 }
 
-func (this *MainWindow) addFriendByToxId(toxid, addmsg string, phmsg string) error {
+func (this *MainWindow) addFriendByToxId(toxid, addmsg string, phmsg string) (uint32, error) {
 	if true {
 		t := appctx.GetLigTox()
 		if addmsg == phmsg {
 			addmsg = qtcore.NewQString_5(phmsg).Arg_11_(t.SelfGetName())
 		}
-		_, err := t.FriendAdd(toxid, phmsg)
-		return err
+		frndno, err := t.FriendAdd(toxid, phmsg)
+		return frndno, err
 	}
-	return nil
+	return math.MaxUint32, nil
 }

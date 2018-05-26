@@ -430,13 +430,30 @@ func (this *RoomListItem) UpdateName(name string) {
 	if this.isgroup {
 		if this.grpInfo.Title != name {
 			this.grpInfo.Title = name
-			this.Label_2.SetText(gopp.StrSuf4ui(name, 26))
-			this.Label_2.SetToolTip(name)
-			this.ToolButton_2.SetToolTip(name + "." + this.GetId()[:7])
+			this.SetContactInfo(this.grpInfo)
+			// this.Label_2.SetText(gopp.StrSuf4ui(name, 26))
+			// this.Label_2.SetToolTip(name)
+			// this.ToolButton_2.SetToolTip(name + "." + this.GetId()[:7])
 		}
 	} else {
+		if this.frndInfo.Name != name {
+			this.frndInfo.Name = name
+			this.SetContactInfo(this.frndInfo)
+			// this.Label_2.SetText(gopp.StrSuf4ui(name, 26))
+			// this.Label_2.SetToolTip(name)
+			// this.ToolButton_2.SetToolTip(name + "." + this.GetId()[:7])
+		}
 	}
 }
+func (this *RoomListItem) UpdateStatusMessage(statusText string) {
+	if !this.isgroup {
+		if this.frndInfo.Stmsg != statusText {
+			this.frndInfo.Stmsg = statusText
+			this.SetContactInfo(this.frndInfo)
+		}
+	}
+}
+
 func (this *RoomListItem) UpdateReaded() {
 	mw := uictx.mw
 	curval := mw.ScrollArea_2.VerticalScrollBar().Value()
@@ -534,6 +551,9 @@ func (this *RoomListItem) SetBgColor(p string) {
 }
 
 func (this *RoomListItem) setConnStatus(st int32) {
+	if !this.isgroup {
+		this.frndInfo.ConnStatus = st
+	}
 	if st > 0 {
 		this.sticon = qtgui.NewQIcon_2(":/icons/online_30.png")
 		this.ToolButton.SetIcon(this.sticon)

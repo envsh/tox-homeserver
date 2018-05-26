@@ -37,3 +37,5 @@ run:
 clean:
 	rm -vf ui_*.h ui_*_c.h ui_*.go ui_*.cpp
 	rm -vf rcc.cpp *_rc.go
+
+

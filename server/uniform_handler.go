@@ -200,7 +200,34 @@ func RmtCallExecuteHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Even
 		fnum := gopp.MustUint32(req.Args[1])
 		_, err := t.ConferenceInvite(fnum, gnum)
 		gopp.ErrPrint(err, req.Args)
-	// TODO
+	case "FriendAdd": // toxid, addmsg
+		toxid := req.Args[0]
+		addmsg := req.Args[1]
+		frndno, err := t.FriendAdd(toxid, addmsg)
+		gopp.ErrPrint(err, toxid, addmsg)
+		if err != nil {
+			out.Ecode = -1
+			out.Emsg = err.Error()
+		} else {
+			out.Args = []string{gopp.ToStr(frndno)}
+		}
+	case "FriendAddNorequest": // toxid
+		toxid := req.Args[0]
+		frndno, err := t.FriendAddNorequest(toxid)
+		gopp.ErrPrint(err, toxid)
+		if err != nil {
+			out.Ecode = -1
+			out.Emsg = err.Error()
+		} else {
+			out.Args = []string{gopp.ToStr(frndno)}
+		}
+	case "FriendDelete": // frndno
+		frndno := gopp.MustUint32(req.Args[0])
+		_, err := t.FriendDelete(frndno)
+		gopp.ErrPrint(err, frndno)
+		if err != nil {
+			out.Ecode, out.Emsg = -1, err.Error()
+		}
 	// case "GetHistory":
 	case "PullEventsByContactId":
 		prev_batch, err := strconv.Atoi(req.Args[1])
@@ -271,7 +298,7 @@ func RmtCallResyncHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Event
 		req.Mid = eventId
 		out.Margs = []string{peerName, peerPubkey, title, groupId, gopp.ToStr(eventId)}
 	default:
-		return nil, errors.New("not need")
+		return nil, errors.New("not need/impl resync " + req.Name)
 	}
 
 	return out, nil

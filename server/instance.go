@@ -93,7 +93,7 @@ func (this *ToxVM) setupCallbacks() {
 	}, nil)
 
 	t.CallbackFriendConnectionStatusAdd(func(_ *tox.Tox, friendNumber uint32, status int, userData interface{}) {
-		evt := thspbs.Event{}
+		evt := &thspbs.Event{}
 		evt.Name = "FriendConnectionStatus"
 		evt.Args = []string{fmt.Sprintf("%d", friendNumber), fmt.Sprintf("%d", status)}
 		pubkey, err := t.FriendGetPublicKey(friendNumber)
@@ -101,8 +101,31 @@ func (this *ToxVM) setupCallbacks() {
 		fname, err := t.FriendGetName(friendNumber)
 		gopp.ErrPrint(err)
 		evt.Margs = []string{fname, pubkey, tox.ConnStatusString(status)}
-		this.pubmsg(&evt)
+		this.pubmsg(evt)
 	}, nil)
+
+	t.CallbackFriendNameAdd(func(_ *tox.Tox, friendNumber uint32, fname string, userData interface{}) {
+		evt := &thspbs.Event{}
+		evt.Name = "FriendName"
+		evt.Args = gopp.ToStrs(friendNumber, fname)
+		pubkey, err := t.FriendGetPublicKey(friendNumber)
+		gopp.ErrPrint(err)
+		evt.Margs = []string{pubkey}
+		this.pubmsg(evt)
+	}, nil)
+
+	t.CallbackFriendStatusMessageAdd(func(_ *tox.Tox, friendNumber uint32, statusText string, userData interface{}) {
+		evt := &thspbs.Event{}
+		evt.Name = "FriendStatusMessage"
+		evt.Args = gopp.ToStrs(friendNumber, statusText)
+		pubkey, err := t.FriendGetPublicKey(friendNumber)
+		gopp.ErrPrint(err)
+		fname, err := t.FriendGetName(friendNumber)
+		gopp.ErrPrint(err)
+		evt.Margs = []string{fname, pubkey}
+		this.pubmsg(evt)
+	}, nil)
+
 	/*
 	   type cb_friend_request_ftype func(this *Tox, pubkey string, message string, userData interface{})
 	   type cb_friend_message_ftype func(this *Tox, friendNumber uint32, message string, userData interface{})

@@ -54,6 +54,9 @@ emu:
 emuc:
 	go build -v -o /tmp/toxemu.out ./toxemu/
 
+wc:
+	ls *.go server/*.go client/*.go common/*.go qofia-ffi/*.go | grep -v ui_ | grep -v rcc_rc.go | xargs wc -l
+
 lint:
 
 pprof:

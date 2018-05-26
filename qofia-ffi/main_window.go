@@ -92,6 +92,7 @@ func (this *MainWindow) init() {
 	this.initMainWin()
 	this.initRoomChat()
 	this.initInivteFriend()
+	this.initAddFriend()
 }
 
 func (this *MainWindow) initMainUi() {
@@ -291,21 +292,33 @@ func (this *MainWindow) connectSignals() {
 
 	//
 	qtrt.Connect(uiw.ToolButton_4, "clicked(bool)", func(bool) {
-		if add_friend_dlg == nil {
-			add_friend_dlg = NewUi_AddFriendDialog2()
-			qtrt.ConnectSlot(add_friend_dlg.ButtonBox, "accepted()", add_friend_dlg.AddFriendDialog, "accept()")
-			qtrt.ConnectSlot(add_friend_dlg.ButtonBox, "rejected()", add_friend_dlg.AddFriendDialog, "reject()")
-			setAppStyleSheet()
-		} else {
-			add_friend_dlg.LineEdit.Clear()
+		this.switchUiStack(UIST_ADD_FRIEND)
+		cb := uictx.qtapp.Clipboard()
+		log.Println(cb.Text__())
+		toxid := cb.Text__()
+		if toxid != "" {
+			this.LineEdit_4.SetText(toxid)
 		}
+		addmsg := qtcore.NewQString_5(this.TextEdit.PlaceholderText()).Arg_11_(appctx.GetLigTox().SelfGetName())
+		this.TextEdit.SetPlainText(addmsg)
 
-		log.Println(add_friend_dlg.ButtonBox.GetCthis(), add_friend_dlg.AddFriendDialog.GetCthis())
-		r := add_friend_dlg.AddFriendDialog.Exec()
-		log.Println(r, qtwidgets.QDialog__Accepted, qtwidgets.QDialog__Rejected)
-		if r == qtwidgets.QDialog__Accepted {
-			log.Println(add_friend_dlg.LineEdit.Text())
-		}
+		/*
+			if add_friend_dlg == nil {
+				add_friend_dlg = NewUi_AddFriendDialog2()
+				qtrt.ConnectSlot(add_friend_dlg.ButtonBox, "accepted()", add_friend_dlg.AddFriendDialog, "accept()")
+				qtrt.ConnectSlot(add_friend_dlg.ButtonBox, "rejected()", add_friend_dlg.AddFriendDialog, "reject()")
+				setAppStyleSheet()
+			} else {
+				add_friend_dlg.LineEdit.Clear()
+			}
+
+			log.Println(add_friend_dlg.ButtonBox.GetCthis(), add_friend_dlg.AddFriendDialog.GetCthis())
+			r := add_friend_dlg.AddFriendDialog.Exec()
+			log.Println(r, qtwidgets.QDialog__Accepted, qtwidgets.QDialog__Rejected)
+			if r == qtwidgets.QDialog__Accepted {
+				log.Println(add_friend_dlg.LineEdit.Text())
+			}
+		*/
 	})
 	qtrt.Connect(uiw.ToolButton_5, "clicked(bool)", func(bool) {
 		if create_room_dlg == nil {
@@ -399,7 +412,11 @@ func (this *MainWindow) onRoomContextTriggered(item *RoomListItem, checked bool,
 		vtcli.ConferenceDelete(item.grpInfo.GetGnum())
 		uictx.iteman.Delete(item)
 	} else if act == this.rcact2 {
-
+		_, err := vtcli.FriendDelete(item.frndInfo.GetFnum())
+		gopp.ErrPrint(err, item.frndInfo.GetFnum())
+		if err == nil {
+			uictx.iteman.Delete(item)
+		}
 	} else if act == this.rcact3 {
 
 	}
@@ -621,6 +638,32 @@ func dispatchEvent(jso *simplejson.Json) {
 		item := uictx.iteman.Get(pubkey)
 		if item != nil {
 			item.setConnStatus(int32(st))
+			if item.GetName() != fname && fname != "" {
+				item.UpdateName(fname)
+			}
+		} else {
+			log.Println("item not found:", fname, pubkey)
+		}
+
+	case "FriendName":
+		fname := jso.Get("args").GetIndex(1).MustString()
+		pubkey := jso.Get("margs").GetIndex(0).MustString()
+		_, _ = fname, pubkey
+		item := uictx.iteman.Get(pubkey)
+		if item != nil {
+			item.UpdateName(fname)
+		} else {
+			log.Println("item not found:", fname, pubkey)
+		}
+
+	case "FriendStatusMessage":
+		statusText := jso.Get("args").GetIndex(1).MustString()
+		fname := jso.Get("margs").GetIndex(0).MustString()
+		pubkey := jso.Get("margs").GetIndex(1).MustString()
+		_, _ = fname, pubkey
+		item := uictx.iteman.Get(pubkey)
+		if item != nil {
+			item.UpdateStatusMessage(statusText)
 		} else {
 			log.Println("item not found:", fname, pubkey)
 		}
