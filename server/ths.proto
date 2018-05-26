@@ -3,7 +3,7 @@ package thspbs;
 
 
 service Toxhs {
-    rpc PollCallback(EmptyReq) returns(stream EmptyReq);
+    rpc PollCallback(EmptyReq) returns(stream Event);
     rpc GetBaseInfo(EmptyReq) returns(BaseInfo);
     rpc RmtCall(Event) returns(Event);
     rpc Ping(EmptyReq) returns(EmptyReq);

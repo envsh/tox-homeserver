@@ -137,13 +137,22 @@ func (this *LigTox) Connect() error {
 	this.ntscli = ntscli
 	log.Println("gnats connected:", ntscli.IsConnected(), natsurl)
 
+	if err := this.connectWS(); err != nil {
+		gopp.ErrPrint(err, srvurl)
+		return err
+	}
+
+	return nil
+}
+
+func (this *LigTox) connectWS() (err error) {
+	srvurl := this.srvurl
 	wsurl := fmt.Sprintf("ws://%s:%d", strings.Split(srvurl, ":")[0], thscom.WSPort)
 	this.wsc4rpc, _, err = websocket.DefaultDialer.Dial(fmt.Sprintf("%s/toxhsrpc", wsurl), nil)
 	gopp.ErrPrint(err, wsurl)
 	this.wsc4push, _, err = websocket.DefaultDialer.Dial(fmt.Sprintf("%s/toxhspush", wsurl), nil)
 	gopp.ErrPrint(err, wsurl)
-
-	return nil
+	return
 }
 
 func (this *LigTox) start() {
@@ -152,6 +161,8 @@ func (this *LigTox) start() {
 	this.ntscli.Subscribe(thscom.CBEventBusName, this.onBackendEventNats)
 
 	go this.serveBackendEventWS()
+
+	go this.serveBackendEventGrpc()
 	// TODO reconnect
 }
 
@@ -194,11 +205,35 @@ func (this *LigTox) onBackendEventNats(msg *nats.Msg) {
 // TODO 两个同时接收导致重复消息
 // should block
 func (this *LigTox) serveBackendEventWS() {
+	var err error
+	for {
+		err = this.serveBackendEventWSImpl()
+		for retry := 1; ; retry++ {
+			log.Println("Websocket maybe disconnect, retry 3 secs...")
+			time.Sleep(time.Duration(retry+retry) * time.Second)
+			err = this.connectWS()
+			gopp.ErrPrint(err, "ws reconnect error")
+			if err == nil {
+				log.Println("Websocket reconnect success.")
+				break
+			}
+			if err != nil && retry > 10000 {
+				goto funcend
+			}
+
+		}
+	}
+funcend:
+	log.Println("Websocket given up!!!")
+}
+func (this *LigTox) serveBackendEventWSImpl() error {
+	var errtop error
 	for {
 		c := this.wsc4push
 		_, message, err := c.ReadMessage()
 		if err != nil {
 			log.Println("read:", err)
+			errtop = err
 			break
 		}
 		log.Printf("wsrecv: %s\n", message)
@@ -214,7 +249,44 @@ func (this *LigTox) serveBackendEventWS() {
 			log.Println("Unknown packet:", string(message))
 		}
 	}
-	log.Println("done")
+	log.Println("Websocket poll done")
+	return errtop
+}
+
+// should block
+func (this *LigTox) serveBackendEventGrpc() {
+
+	for {
+		this.serveBackendEventGrpcImpl()
+		log.Println("Grpc maybe disconnect, retry 3 secs...")
+		time.Sleep(3 * time.Second)
+	}
+}
+
+func (this *LigTox) serveBackendEventGrpcImpl() {
+	clio := thspbs.NewToxhsClient(this.rpcli)
+	stmc, err := clio.PollCallback(context.Background(), &thspbs.EmptyReq{})
+	gopp.ErrPrint(err)
+	if err != nil {
+		return
+	}
+	cnter := uint64(0)
+	for {
+		evt, err := stmc.Recv()
+		gopp.ErrPrint(err)
+		if err != nil {
+			break
+		}
+		cnter++
+
+		jcc, err := json.Marshal(evt)
+		gopp.ErrPrint(err)
+		log.Println("grpcrecv:", string(jcc))
+		jso, err := simplejson.NewJson(jcc)
+		gopp.ErrPrint(err)
+		this.onBackendEventDeduped(jso, jcc)
+	}
+	log.Println("Grpc poll got events:", cnter)
 }
 
 var evtmd5smu sync.Mutex
