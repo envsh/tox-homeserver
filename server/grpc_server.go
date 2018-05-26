@@ -83,7 +83,7 @@ func (this *GrpcService) GetBaseInfo(ctx context.Context, req *thspbs.EmptyReq) 
 	return out, nil
 }
 
-// TODO 自己的消息做多终端同步转发
+// 自己的消息做多终端同步转发
 func (this *GrpcService) RmtCall(ctx context.Context, req *thspbs.Event) (*thspbs.Event, error) {
 	return RmtCallHandlers(ctx, req)
 }
@@ -104,16 +104,16 @@ func demofn1() {
 }
 
 ///
-func pubmsgall(evt *thspbs.Event) error {
+func pubmsgall(ctx context.Context, evt *thspbs.Event) error {
 	var err error
-	err = pubmsg2nats(evt)
+	err = pubmsg2nats(ctx, evt)
 	if err == nil {
-		err = pubmsg2ws(evt)
+		err = pubmsg2ws(ctx, evt)
 	}
 	return err
 }
 
-func pubmsg2nats(evt *thspbs.Event) error {
+func pubmsg2nats(ctx context.Context, evt *thspbs.Event) error {
 	bcc, err := json.Marshal(evt)
 	gopp.ErrPrint(err)
 	err = appctx.rpcs.nc.Publish(common.CBEventBusName, bcc)
@@ -131,6 +131,6 @@ func pubmsg2nats(evt *thspbs.Event) error {
 	return err
 }
 
-func pubmsg2ws(evt *thspbs.Event) error {
+func pubmsg2ws(ctx context.Context, evt *thspbs.Event) error {
 	return appctx.wssrv.pushevt(evt)
 }

@@ -123,6 +123,10 @@ func (this *WebsocketServer) webdui(w http.ResponseWriter, r *http.Request) {
 	log.Println(r.URL.String())
 	bcc, err := ioutil.ReadFile("./webdui/index.html")
 	gopp.ErrPrint(err)
+	if err != nil {
+		bcc, err = Asset("webdui/index.html")
+		gopp.ErrPrint(err)
+	}
 	w.Write(bcc)
 }
 

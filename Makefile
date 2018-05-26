@@ -6,6 +6,7 @@ CPWD=$(shell pwd)
 all: bd
 
 bd: com
+	go-bindata -nocompress -pkg server -o server/webdui_bindata.go webdui/
 	PKG_CONFIG_PATH=/opt/toxcore-static2/lib64/pkgconfig/ CGO_LDFLAGS="-lopus -lsodium" \
 		go build -i -v -o bin/toxhs -ldflags "${GOVVV}" .
 	tar zcvf bin/toxhs.tar.gz bin/toxhs

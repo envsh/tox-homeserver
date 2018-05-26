@@ -92,7 +92,8 @@ func packBaseInfo(t *tox.Tox) (*thspbs.BaseInfo, error) {
 	return out, nil
 }
 
-// TODO 自己的消息做多终端同步转发
+// 自己的消息做多终端同步转发
+// conn caller connection
 func RmtCallHandlers(ctx context.Context, req *thspbs.Event) (*thspbs.Event, error) {
 	log.Println(req.Id, req.Name, req.Args, req.Margs)
 
@@ -106,7 +107,7 @@ func RmtCallHandlers(ctx context.Context, req *thspbs.Event) (*thspbs.Event, err
 		out, err := RmtCallResyncHandler(context.Background(), req)
 		gopp.ErrPrint(err)
 		if err == nil {
-			pubmsgall(out)
+			pubmsgall(ctx, out)
 		}
 	}
 
@@ -118,8 +119,12 @@ func RmtCallHandlers(ctx context.Context, req *thspbs.Event) (*thspbs.Event, err
 	case "FriendAddNorequest":
 		fallthrough
 	case "FriendDelete": //
+		fallthrough
+	case "ConferenceNew":
+		fallthrough
+	case "ConferenceDelete":
 		rsp.Margs = append(rsp.Margs, req.Args...)
-		pubmsgall(rsp)
+		pubmsgall(ctx, rsp)
 	}
 
 	return rsp, err
@@ -165,15 +170,23 @@ func RmtCallExecuteHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Even
 		_, err = t.ConferenceSetTitle(gn, rname)
 		gopp.ErrPrint(err, gn, rname)
 		groupId, _ := t.ConferenceGetIdentifier(gn)
-		out.Args = append(out.Args, groupId)
+		gopp.CondWait(10, func() bool {
+			t.Iterate2(nil)
+			groupId, _ = t.ConferenceGetIdentifier(gn)
+			log.Println(gn, groupId)
+			return !xtox.ConferenceIdIsEmpty(groupId)
+		})
+		out.Args = append(out.Args, groupId, gopp.ToStr(gn))
 
 		_, err = appctx.st.AddGroup(groupId, gn, rname)
 		gopp.ErrPrint(err, gn, rname, groupId)
 
 	case "ConferenceDelete": // "groupNumber"
 		gnum := gopp.MustUint32(req.Args[0])
+		groupId, _ := t.ConferenceGetIdentifier(gnum)
 		_, err = t.ConferenceDelete(gnum)
 		gopp.ErrPrint(err, req.Args)
+		out.Args = append(out.Args, groupId)
 
 	case "ConferenceSendMessage": // "groupNumber" or groupIdentity,"mtype","msg", optional4web("groupTitle")
 		gnum := uint32(gopp.MustInt(req.Args[0]))
@@ -269,7 +282,7 @@ func RmtCallExecuteHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Even
 	return out, nil
 }
 
-// TODO 自己的消息做多终端同步转发
+// 自己的消息做多终端同步转发
 // 把其中一个端发送的消息再同步到其他端上
 // 需要记录一个终端的id
 func RmtCallResyncHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Event, error) {

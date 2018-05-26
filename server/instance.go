@@ -359,4 +359,4 @@ func (this *ToxVM) setupCallbacks() {
 	*/
 }
 
-func (this *ToxVM) pubmsg(evt *thspbs.Event) error { return pubmsgall(evt) }
+func (this *ToxVM) pubmsg(evt *thspbs.Event) error { return pubmsgall(nil, evt) }

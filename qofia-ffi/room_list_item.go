@@ -421,7 +421,7 @@ func (this *RoomListItem) GetName() string {
 
 func (this *RoomListItem) GetId() string {
 	if this.isgroup {
-		log.Println(this.grpInfo.GetGroupId(), this.grpInfo.Title)
+		// log.Println(this.grpInfo.GetGroupId(), this.grpInfo.Title)
 	}
 	return gopp.IfElseStr(this.isgroup, this.grpInfo.GetGroupId(), this.frndInfo.GetPubkey())
 }

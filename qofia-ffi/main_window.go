@@ -345,6 +345,7 @@ func (this *MainWindow) connectSignals() {
 				gn, id, err := vtcli.ConferenceNew(name)
 				gopp.ErrPrint(err, name)
 				log.Println("Group created:", gn, name)
+
 				grp := &thspbs.GroupInfo{}
 				grp.Gnum = gn
 				grp.Mtype = 0
@@ -352,6 +353,7 @@ func (this *MainWindow) connectSignals() {
 				grp.GroupId = id
 				contactQueue <- grp
 				uictx.mech.Trigger()
+
 			}()
 		}
 	})
@@ -568,9 +570,13 @@ func tryReadContactEvent() {
 			uictx.mw.onRoomContextMenu(ctv, w, pos)
 		}
 		ctv.timeline = thscli.TimeLine{NextBatch: vtcli.Binfo.NextBatch, PrevBatch: vtcli.Binfo.NextBatch - 1}
+		ctv.SetContactInfo(contactx)
+		if uictx.iteman.Get(ctv.GetId()) != nil {
+			log.Println("Already in list:", ctv.GetName(), ctv.GetId())
+			continue
+		}
 
 		uictx.iteman.addRoomItem(ctv)
-		ctv.SetContactInfo(contactx)
 		log.Println("add contact...", len(uictx.ctitmdl))
 		if len(uictx.ctitmdl) == 1 {
 			// ctv.SetPressState(true)
@@ -871,7 +877,25 @@ func dispatchEventResp(jso *simplejson.Json) {
 		if item != nil {
 			uictx.iteman.Delete(item)
 		}
-
+	case "ConferenceNewResp":
+		pubkey := jso.Get("args").GetIndex(0).MustString()
+		title := jso.Get("margs").GetIndex(0).MustString()
+		gnum := gopp.MustUint32(jso.Get("args").GetIndex(1).MustString())
+		item := uictx.iteman.Get(pubkey)
+		if item == nil {
+			grpo := &thspbs.GroupInfo{}
+			grpo.Gnum = gnum
+			grpo.GroupId = pubkey
+			grpo.Title = title
+			contactQueue <- grpo
+			uictx.mech.Trigger()
+		}
+	case "ConferenceDeleteResp":
+		pubkey := jso.Get("args").GetIndex(0).MustString()
+		item := uictx.iteman.Get(pubkey)
+		if item != nil {
+			uictx.iteman.Delete(item)
+		}
 	default:
 		log.Println(jso)
 	}
