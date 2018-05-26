@@ -289,6 +289,10 @@ func (this *MainWindow) connectSignals() {
 	qtrt.Connect(uiw.ComboBox_2, "currentIndexChanged(int)", func(index int) {
 		setAppStyleSheetTheme(index)
 	})
+	// switch ui
+	qtrt.Connect(uiw.ComboBox, "currentTextChanged(const QString&)", func(text string) {
+		log.Println(text)
+	})
 
 	//
 	qtrt.Connect(uiw.ToolButton_4, "clicked(bool)", func(bool) {
@@ -585,6 +589,7 @@ func tryReadMessageEvent() {
 			gopp.ErrPrint(err, jso)
 			if err == nil {
 				dispatchEvent(jso)
+				dispatchEventResp(jso)
 			}
 		}
 	}
@@ -821,6 +826,51 @@ func dispatchEvent(jso *simplejson.Json) {
 			}
 		}
 		log.Println(found, groupId, itext)
+
+	default:
+		log.Println(jso)
+	}
+}
+
+func dispatchEventResp(jso *simplejson.Json) {
+	// uiw, ctitmdl := uictx.uiw, uictx.ctitmdl
+	// listwp1 := Ui_MainWindow_Get_listWidget(uiw)
+	// listw1 := widgets.NewQListWidgetFromPointer(listwp1)
+
+	evtName := jso.Get("name").MustString()
+	switch evtName {
+	case "FriendAddResp":
+		fnum := gopp.MustUint32(jso.Get("args").GetIndex(0).MustString())
+		toxid := jso.Get("margs").GetIndex(0).MustString()
+		pubkey := toxid[:64]
+		item := uictx.iteman.Get(pubkey)
+		if item == nil {
+			frndo := &thspbs.FriendInfo{}
+			frndo.Fnum = fnum
+			frndo.Pubkey = pubkey
+			frndo.Name = pubkey
+			contactQueue <- frndo
+			uictx.mech.Trigger()
+		}
+	case "FriendAddNorequestResp":
+		fnum := gopp.MustUint32(jso.Get("args").GetIndex(0).MustString())
+		toxid := jso.Get("margs").GetIndex(0).MustString()
+		pubkey := toxid[:64]
+		item := uictx.iteman.Get(pubkey)
+		if item == nil {
+			frndo := &thspbs.FriendInfo{}
+			frndo.Fnum = fnum
+			frndo.Pubkey = pubkey
+			frndo.Name = pubkey
+			contactQueue <- frndo
+			uictx.mech.Trigger()
+		}
+	case "FriendDeleteResp":
+		pubkey := jso.Get("margs").GetIndex(0).MustString()
+		item := uictx.iteman.Get(pubkey)
+		if item != nil {
+			uictx.iteman.Delete(item)
+		}
 
 	default:
 		log.Println(jso)

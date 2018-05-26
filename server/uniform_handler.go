@@ -100,6 +100,9 @@ func RmtCallHandlers(ctx context.Context, req *thspbs.Event) (*thspbs.Event, err
 	switch req.Name {
 	case "LoadEventsByContactId":
 	default:
+	case "FriendSendMessage":
+		fallthrough
+	case "ConferenceSendMessage":
 		out, err := RmtCallResyncHandler(context.Background(), req)
 		gopp.ErrPrint(err)
 		if err == nil {
@@ -107,7 +110,19 @@ func RmtCallHandlers(ctx context.Context, req *thspbs.Event) (*thspbs.Event, err
 		}
 	}
 
-	return RmtCallExecuteHandler(ctx, req)
+	rsp, err := RmtCallExecuteHandler(ctx, req)
+
+	switch req.Name {
+	case "FriendAdd": //
+		fallthrough
+	case "FriendAddNorequest":
+		fallthrough
+	case "FriendDelete": //
+		rsp.Margs = append(rsp.Margs, req.Args...)
+		pubmsgall(rsp)
+	}
+
+	return rsp, err
 }
 
 // 直接执行请求
@@ -223,6 +238,8 @@ func RmtCallExecuteHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Even
 		}
 	case "FriendDelete": // frndno
 		frndno := gopp.MustUint32(req.Args[0])
+		pubkey, _ := t.FriendGetPublicKey(frndno)
+		out.Margs = []string{pubkey}
 		_, err := t.FriendDelete(frndno)
 		gopp.ErrPrint(err, frndno)
 		if err != nil {
@@ -280,6 +297,10 @@ func RmtCallResyncHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Event
 		eventId := st.NextId()
 		req.Mid = eventId
 		out.Margs = []string{fname, pubkey, gopp.ToStr(eventId)}
+
+	//  依赖执行结果，不能转。而在处理的时候获取Resp
+	// case "FriendAdd": // args: toxid, addmsg
+	// case "FriendAddNorequest": // args: toxid
 
 	case "ConferenceSendMessage": // "groupNumber" or groupIdentity,"mtype","msg"
 		gnum := uint32(gopp.MustInt(req.Args[0]))
