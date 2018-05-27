@@ -8,7 +8,6 @@ import (
 	"gopp"
 	"log"
 	"math"
-	"net/url"
 	"runtime"
 	"strings"
 	"sync"
@@ -20,7 +19,6 @@ import (
 
 	simplejson "github.com/bitly/go-simplejson"
 	"github.com/gorilla/websocket"
-	"github.com/nats-io/go-nats"
 	"google.golang.org/grpc"
 )
 
@@ -62,10 +60,9 @@ type LigTox struct {
 
 	srvurl   string
 	rpcli    *grpc.ClientConn
-	ntscli   *nats.Conn
 	wsc4push *websocket.Conn
 	wsc4rpc  *websocket.Conn
-	usewstp  bool // use websocket transport for replace grpc+nats
+	usewstp  bool // use websocket transport for replace grpc
 
 	// some callbacks, should be private. &fn => ud
 	cb_friend_requests           map[unsafe.Pointer]interface{}
@@ -126,17 +123,6 @@ func (this *LigTox) Connect() error {
 	}
 	this.rpcli = rpcli
 
-	natsurl := fmt.Sprintf("nats://%s:%d", strings.Split(srvurl, ":")[0], thscom.GnatsPort)
-	uo, err := url.Parse(natsurl)
-	gopp.ErrPrint(err, uo)
-	ntscli, err := nats.Connect(natsurl)
-	gopp.ErrPrint(err, natsurl)
-	if err != nil {
-		return err
-	}
-	this.ntscli = ntscli
-	log.Println("gnats connected:", ntscli.IsConnected(), natsurl)
-
 	if err := this.connectWS(); err != nil {
 		gopp.ErrPrint(err, srvurl)
 		return err
@@ -158,7 +144,6 @@ func (this *LigTox) connectWS() (err error) {
 func (this *LigTox) start() {
 
 	// this.initConnections()
-	this.ntscli.Subscribe(thscom.CBEventBusName, this.onBackendEventNats)
 
 	go this.serveBackendEventWS()
 
@@ -192,14 +177,6 @@ func (this *LigTox) initCbmap() {
 
 	this.cb_baseinfos = make(map[unsafe.Pointer]interface{})
 
-}
-
-func (this *LigTox) onBackendEventNats(msg *nats.Msg) {
-	log.Println("nats:", msg.Subject, string(msg.Data))
-	jso, err := simplejson.NewJson(msg.Data)
-	gopp.ErrPrint(err)
-
-	this.onBackendEventDeduped(jso, msg.Data)
 }
 
 // TODO 两个同时接收导致重复消息

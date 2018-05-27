@@ -264,7 +264,6 @@ func (this *MainWindow) connectSignals() {
 	})
 
 	qtrt.Connect(uiw.ScrollArea_2.VerticalScrollBar(), "rangeChanged(int,int)", func(min int, max int) {
-		log.Println(min, max)
 		curpos := uiw.ScrollArea_2.VerticalScrollBar().Value()
 		if ccstate.isBottom && curpos < max {
 			uiw.ScrollArea_2.VerticalScrollBar().SetValue(max)
@@ -291,7 +290,6 @@ func (this *MainWindow) connectSignals() {
 	})
 	// switch ui
 	qtrt.Connect(uiw.ComboBox, "currentTextChanged(const QString&)", func(text string) {
-		log.Println(text)
 	})
 
 	//

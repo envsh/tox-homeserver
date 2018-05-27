@@ -65,7 +65,7 @@ func (this *Fetcher) RefreshPrevRealtime(item *RoomListItem, msgos []store.Messa
 			min = msgo.EventId - 1
 		}
 	}
-	log.Println(min, item.timeline.PrevBatch)
+
 	if min < item.timeline.PrevBatch {
 		log.Printf("%s's prev_batch switch from %d to %d\n", item.GetName(), item.timeline.PrevBatch, min)
 		item.timeline.PrevBatch = min
@@ -103,7 +103,7 @@ func (this *Fetcher) RefreshPrevStorageTimeLine(itemtl *thscli.TimeLine, pubkey 
 	gopp.ErrPrint(err)
 	err = st.AddSyncInfo(c.Id, rtl.NextBatch, rtl.PrevBatch)
 	gopp.ErrPrint(err, c)
-	log.Println("rt vs. st timeline:", itemtl, rtl, mrgcnt, itemName)
+	log.Println("runtime/storage timeline:", itemtl, rtl, mrgcnt, itemName)
 }
 
 func NewMessageFromStoreRecord(m *store.Message) *Message {

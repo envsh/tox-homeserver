@@ -62,30 +62,6 @@
   revision = "59954f2a9d67847c68659c36d884c4ae9aba9726"
 
 [[projects]]
-  name = "github.com/nats-io/gnatsd"
-  packages = ["conf","logger","server","server/pse","util"]
-  revision = "12a5ced612f30aa511906c0de12a124233752f70"
-  version = "v1.0.4"
-
-[[projects]]
-  name = "github.com/nats-io/go-nats"
-  packages = ["encoders/builtin","util"]
-  revision = "d66cb54e6b7bdd93f0b28afc8450d84c780dfb68"
-  version = "v1.4.0"
-
-[[projects]]
-  name = "github.com/nats-io/nats"
-  packages = ["."]
-  revision = "d66cb54e6b7bdd93f0b28afc8450d84c780dfb68"
-  version = "v1.4.0"
-
-[[projects]]
-  name = "github.com/nats-io/nuid"
-  packages = ["."]
-  revision = "289cccf02c178dc782430d534e3c1f5b72af807f"
-  version = "v1.0.0"
-
-[[projects]]
   name = "github.com/sasha-s/go-deadlock"
   packages = ["."]
   revision = "09aefc0ac06ad74d91ca31acdb11fc981c159149"

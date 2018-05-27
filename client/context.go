@@ -7,20 +7,17 @@ import (
 	"net/http"
 	"sync"
 	"time"
-	thscom "tox-homeserver/common"
 	"tox-homeserver/store"
 	"tox-homeserver/thspbs"
 
 	simplejson "github.com/bitly/go-simplejson"
 	"github.com/go-xorm/xorm"
 	"github.com/kitech/godsts/maps/hashmap"
-	"github.com/nats-io/go-nats"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/connectivity"
 )
 
 type AppContext struct {
-	nc    *nats.Conn
 	rpcli *grpc.ClientConn
 	vtcli *LigTox
 	logFn func(s string)
@@ -75,7 +72,6 @@ func AppConnect(srvurl string) error {
 		log.Println("my device not exist: wtf")
 	}
 
-	appctx.nc = appctx.vtcli.ntscli
 	appctx.rpcli = appctx.vtcli.rpcli
 
 	go appctx.keepConn()
@@ -85,7 +81,6 @@ func AppConnect(srvurl string) error {
 
 		appctx.getBaseInfo()
 		go appctx.pollGrpc()
-		go appctx.pollNats()
 	}()
 
 	return nil
@@ -103,34 +98,6 @@ func (this *AppContext) GetLigTox() *LigTox         { return this.vtcli }
 func (this *AppContext) GetStorage() *store.Storage { return this.store }
 
 // 只用做消息存储
-func (this *AppContext) pollNats() {
-
-	for {
-		stopC := make(chan struct{}, 0)
-		ch := make(chan *nats.Msg, 16)
-		subh, err := this.nc.ChanSubscribe(thscom.CBEventBusName, ch)
-		gopp.ErrPrint(err, subh)
-		for {
-			select {
-			case m, ok := <-ch:
-				if !ok {
-					log.Println("msg chan err, conn lost?")
-				} else {
-					log.Println(string(m.Data))
-					jso, err := simplejson.NewJson(m.Data)
-					gopp.ErrPrint(err, jso)
-					if this.logFn != nil {
-						this.logFn(string(m.Data))
-					}
-					this.dispatchEvent(jso)
-				}
-			case <-stopC:
-				return
-			}
-		}
-	}
-}
-
 func (this *AppContext) dispatchEvent(jso *simplejson.Json) {
 	evtName := jso.Get("name").MustString()
 	switch evtName {
@@ -322,7 +289,7 @@ func (this *AppContext) dispatchEvent(jso *simplejson.Json) {
 	}
 }
 
-///
+/// TODO use this replace pollGnats
 func (this *AppContext) pollGrpc() {
 
 }

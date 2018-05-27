@@ -2,15 +2,12 @@ package server
 
 import (
 	"context"
-	"encoding/json"
 	"gopp"
 	"log"
 	"net"
 	"sync"
 
 	// tox "github.com/envsh/go-toxcore"
-
-	"github.com/nats-io/go-nats"
 
 	"atapi/dorpc/dyngrpc"
 
@@ -23,7 +20,6 @@ import (
 type GrpcServer struct {
 	srv   *grpc.Server
 	lsner net.Listener
-	nc    *nats.Conn
 	svc   *GrpcService
 
 	connsmu   sync.Mutex
@@ -49,12 +45,6 @@ func (this *GrpcServer) run() {
 	this.lsner = lsner
 	log.Println("listen on:", lsner.Addr())
 
-	// TODO tls支持
-	log.Println("Connecting gnatsd:", common.GnatsAddrlo)
-	nc, err := nats.Connect(common.GnatsAddrlo)
-	gopp.ErrPrint(err)
-	this.nc = nc
-
 	this.register()
 	err = this.srv.Serve(this.lsner)
 	gopp.ErrPrint(err)
@@ -62,17 +52,6 @@ func (this *GrpcServer) run() {
 
 func (this *GrpcServer) register() {
 	dyngrpc.RegisterService(demofn1, "thsdemo", "pasv")
-}
-
-func (this *GrpcServer) checkOrReconnNats(err error) {
-	if err == nats.ErrConnectionClosed {
-		log.Println("Reconnecting...")
-		nc, err2 := nats.Connect(common.GnatsAddr)
-		gopp.ErrPrint(err2)
-		if err2 == nil {
-			this.nc = nc
-		}
-	}
 }
 
 // TODO
@@ -129,32 +108,11 @@ func demofn1() {
 ///
 func pubmsgall(ctx context.Context, evt *thspbs.Event) error {
 	var err error
-	err = pubmsg2nats(ctx, evt)
-	if err == nil {
-		err = pubmsg2ws(ctx, evt)
-	}
+	err = pubmsg2ws(ctx, evt)
 	{
 		err := pubmsg2grpc(ctx, evt)
 		gopp.ErrPrint(err, ctx)
 	}
-	return err
-}
-
-func pubmsg2nats(ctx context.Context, evt *thspbs.Event) error {
-	bcc, err := json.Marshal(evt)
-	gopp.ErrPrint(err)
-	err = appctx.rpcs.nc.Publish(common.CBEventBusName, bcc)
-	gopp.ErrPrint(err)
-	// reconnect
-	if err != nil {
-		appctx.rpcs.checkOrReconnNats(err)
-		err = appctx.rpcs.nc.Publish(common.CBEventBusName, bcc)
-		gopp.ErrPrint(err)
-	}
-	if err == nil {
-		// log.Println("pubmsg ok", len(bcc))
-	}
-	common.BytesSent(len(bcc))
 	return err
 }
 

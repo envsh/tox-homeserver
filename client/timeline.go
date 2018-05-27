@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"gopp"
-	"log"
 	"sort"
 	"tox-homeserver/store"
 	"tox-homeserver/thspbs"
@@ -50,7 +49,6 @@ func (this *TimeLine) Merge(that *TimeLine) (mrgtm *TimeLine, can bool) {
 
 	points := []int64{this.NextBatch, this.PrevBatch, that.NextBatch, that.PrevBatch}
 	sort.SliceStable(points, func(i int, j int) bool { return points[i] > points[j] })
-	log.Println(points)
 
 	if points[0] == this.NextBatch && points[1] == this.PrevBatch {
 		if points[1] == points[2] {

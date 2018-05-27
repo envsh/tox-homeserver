@@ -20,14 +20,6 @@
   name = "github.com/kitech/godsts"
 
 [[constraint]]
-  name = "github.com/nats-io/gnatsd"
-  version = "1.0.4"
-
-[[constraint]]
-  name = "github.com/nats-io/nats"
-  version = "1.4.0"
-
-[[constraint]]
   branch = "master"
   name = "golang.org/x/image"
 
