@@ -56,6 +56,7 @@ func NewUiContext() *UiContext {
 func (this *UiContext) init() *UiContext {
 	this.gtreco.OnClick = this.iteman.onClicked
 	this.gtreco.OnLongTouch = this.iteman.onLongTouched
+	this.msgwin.InitMessageListGesture()
 	return this
 }
 
@@ -189,7 +190,6 @@ func setAppStyleSheet() {
 }
 
 func setAppStyleSheetTheme(index int) {
-
 	fp := qtcore.NewQFile_1(fmt.Sprintf(":/theme/%s.css", styleSheets[index]))
 	fp.Open(qtcore.QIODevice__ReadOnly)
 	bcc := []byte(qtcore.NewQIODeviceFromPointer(fp.GetCthis()).ReadAll().Data())

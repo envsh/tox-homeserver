@@ -9,7 +9,7 @@
     "ndk-host":"linux-x86_64",
     "target-architecture": "armeabi-v7a",
 
-    "android-extra-libs":"./libmain.so,./libs/libffi.so,./libs/arm7/libQt5Inline.so,./libs/arm7/libQt5Widgets.so,./libs/arm7/libQt5Network.so,./libs/arm7/libQt5Qml.so,./libs/arm7/libQt5Quick.so,./libs/arm7/libQt5QuickTemplates2.so,./libs/arm7/libQt5QuickControls2.so,./libs/arm7/libQt5QuickWidgets.so,./libs/arm7/libQt5AndroidExtras.so",
+    "android-extra-libs":"./libmain.so,./libs/libffi.so,./libs/arm7/libQt5Inline.so,./libs/arm7/libQt5Widgets.so,./libs/arm7/libQt5Network.so,./libs/arm7/libQt5Qml.so,./libs/arm7/libQt5Quick.so,./libs/arm7/libQt5QuickTemplates2.so,./libs/arm7/libQt5QuickControls2.so,./libs/arm7/libQt5QuickWidgets.so,./libs/arm7/libQt5AndroidExtras.so,./libs/arm7/libplugins_styles_libqandroidstyle.so",
     "android-package-source-directory": "andemudir",
 
     "qml-import-paths":"/usr/lib/qt/qml",

@@ -45,9 +45,9 @@
 
             <!-- Background running -->
             <!-- Warning: changing this value to true may cause unexpected crashes if the
-                          application still try to draw after
-                          "applicationStateChanged(Qt::ApplicationSuspended)"
-                          signal is sent! -->
+                 application still try to draw after
+                 "applicationStateChanged(Qt::ApplicationSuspended)"
+                 signal is sent! -->
             <meta-data android:name="android.app.background_running" android:value="false"/>
             <!-- Background running -->
 
@@ -57,10 +57,10 @@
 
             <!-- extract android style -->
             <!-- available android:values :
-                * full - useful QWidget & Quick Controls 1 apps
-                * minimal - useful for Quick Controls 2 apps, it is much faster than "full"
-                * none - useful for apps that don't use any of the above Qt modules
-                -->
+                 * full - useful QWidget & Quick Controls 1 apps
+                 * minimal - useful for Quick Controls 2 apps, it is much faster than "full"
+                 * none - useful for apps that don't use any of the above Qt modules
+            -->
             <meta-data android:name="android.app.extract_android_style" android:value="full"/>
             <!-- extract android style -->
     </activity>
