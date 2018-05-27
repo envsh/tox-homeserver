@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
-        <title>toxhs - golang</title>
+        <title>toxhs - go</title>
         <!-- import CSS -->
         <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
     </head>
@@ -13,7 +13,7 @@
                 <el-col :span="3"><div class="grid-content bg-purple">{{ UserName }}</div></el-col>
                 <el-col :span="8"><div class="grid-content bg-purple">{{ StatusMessage }}</div></el-col>
                 <el-col :span="3"><div class="grid-content bg-purple">{{ ToxhsHost }}</div></el-col>
-                <el-col :span="3"><div class="grid-content bg-purple">连接： {{ ConnState }}</div></el-col>
+                <el-col :span="3"><div class="grid-content bg-purple">Network： {{ ConnState }}</div></el-col>
             </el-row>
 
             <el-container>
@@ -24,7 +24,7 @@
                         <el-col :span="2"><div class="grid-content bg-purple">Contacts:</div></el-col>
                         <el-col :span="5"><div class="grid-content bg-purple">
                             <template>
-                        <el-select v-model="CurrentContact" placeholder="请选择">
+                        <el-select v-model="CurrentContact" placeholder="Choose">
                             <el-option
                                 v-for="item in Contacts"
                                 :key="item.value"
@@ -44,9 +44,9 @@
                     <el-row :gutter="20">
                         <el-col :span="1"><div class="grid-content bg-purple">Input:</div></el-col>
                         <el-col :span="16"><div class="grid-content bg-purple">
-                            <el-input v-model="InputText" placeholder="请输入内容"></el-input></div></el-col>
+                            <el-input v-model="InputText" placeholder="Input Text..."></el-input></div></el-col>
                         <el-col :span="2"><div class="grid-content bg-purple">
-                            <el-button v-on:click="SendMessage">发送消息</el-button>
+                            <el-button v-on:click="SendMessage">Send Message</el-button>
                         </div></el-col>
                     </el-row>
                 </el-footer>
