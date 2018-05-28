@@ -1,89 +1,97 @@
-服务端提供的API接口
 
-## 版本计划：6个月
+Server's API (WIP)
 
-### v0.9
-实现目标：图片文字消息混排功能。
+## Basic concepts
 
-### v0.8
-实现目标：音频视频功能。
+The server convert tox callback to json format and forward to transport.
+The server receive clients's RPC request of json format, execute it on tox instance and response clients.
 
-### v0.7
-实现目标：实现文件传输
+The server support 2 transport type, Grpc and Websocket. 
+They are standalone transport without depend on another one.
 
-### v0.6
-实现目标：发送离线消息，对方离线。
+The server do more work other than just forward messages/events. It should make client simple.
 
-### v0.5 
-实现目标：完整历史拉取客户端。
+## Transports
 
-### v0.4
-实现目标：改造设计，以便适用于UI客户端拉取历史消息。客户端实现兼容v0.3功能，但保存的消息已经包括了消息全局序号。
+### Grpc
 
-### v0.3
-实现目标：UI客户端保存记录，可加载本客户端已经记录的聊天记录。服务器端一同记录。
+For RPC call, the result will response synchronizely.
 
-### v0.2
-实现目标：实现从UI来的主动好友管理功能，基本信人信息设置功能。
+For events push, server use Grpc's stream reponse model to do this work.
 
-### v0.1 
+For this transport, client only need 1 connection.
 
-实现目标：收发消息，不做从UI来的主动好友管理和个人信息设置功能。
+### Websocket
 
-好友的消息在一个窗口内混合显示，不分多窗口。
+For this transport, client need 2 connections.
 
+One connection for RPC call. One connectoin for push events.
 
-## 客户端api接口说明
+Client should not send any data to server over push connection.
 
-注意，要server端处理更多的工作，客户端重展示。
-即客户端向server端发送少量信息，而server尽量获取到一些用于展示的信息一同发送到客户端。
+Client should do exactly Request/Response pair on RPC connection. Client should handle MethodName*Resp* on this connection.
 
-### api总体设计与通信设计
-通信采用手写原始websocket协议，没有使用框架。
-采用的机制为一个websocket端口，两条不同path的连接，分别用于rpc和push。
+The 2 connections has different path.
 
-rpc连接上，客户端主动发送请求，并立即接收响应，1请求1响应模式。服务器不会主动在这个连接上发送数据包。
-push连接上不允许客户端发送消息到服务器端，如果错误的发送消息则会忽略。
+### Comunicate flow
 
-数据包格式为json，对应定义好的结构体 Event。
+1. Client connect to RPC channel.
+2. Call GetBaseInfo, get recently self info, friend list and group list.
+3. Then client pull latest 20 history messages that just before GetBaseInfo call.
+4. Client connect to pusher channel for wait later events.
+5. When client running, send RPC calls over RPC api.
 
+## Websocket API
 
-### rpc请求接口
+### RPC requests
 
-* path: /toxhsrpc
+* connect path: /toxhsrpc
 
-请求消息格式：
-* Name: 方法名称
-* Args: 调用参数数组，均为字符串
+request format:
+* Name: MethodName
+* Args: array
 
-响应格式：
-* Name: 方法名称
-* Args: 返回值数组，均为字符串
+response format:
+* Name: MethodName
+* Args: array
 
-### push通道
-事件类型，事件参数
+### pusher 
 
-事件push接口： 
-* path: /toxhspush
+* connection path: /toxhspush
 
-消息格式：
-* Name: 事件名称
-* Args: 调用参数数组，均为字符串
+event format:
+* Name: MethodName
+* Args: array
 
-### 拉取初始包
-在启动后执行，获取账号的当前状态
+All tox's callback will give a camel style of their original name, such as:
 
+* tox\_callback\_friend\_message => FriendMessage
+* tox\_callback\_conference\_message => ConferenceMessage
 
-### 修改设置
+### GetBaseInfo
+Call after connected to RPC, it's the first call to server.
 
-包括修改昵称，网络状态。
+request name: GetBaseInfo
+arguments: ()
 
-可以分类为类型和参数的统一设置模式。
-
-### 拉取历史消息
+response format: https://github.com/envsh/tox-homeserver/blob/master/server/ths.proto#L24
 
 
+### client pull history messages
 
-## 第三方接收/发送接口
-http+json协议
+request name: PullEventsByContactId
+arguments: (prev_batch int)
+
+response: array of Message struct https://github.com/envsh/tox-homeserver/blob/master/store/struct.go#L20
+
+prev_batch: server will select early than prev\_batch. SQL: select ... where eventid <= prev\_batch order by eventid desc limit 20;
+
+The first prev\_batch is returned by GetBaseInfo call.
+
+this is for the features: loop get older messages
+
+### Profile settings
+
+coming soon...
+
 

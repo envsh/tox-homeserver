@@ -32,6 +32,8 @@
 * grpc+emitter.io
 * nrpc=rpc based on nats
 
+最终决定只使用两个transport：grpc和websocket。两者均完全实现了pull/push。
+
 ### 参考：
 pubsub库：https://github.com/lileio/pubsub
 goim库
