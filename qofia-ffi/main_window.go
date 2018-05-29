@@ -357,7 +357,7 @@ func (this *MainWindow) connectSignals() {
 	})
 	qtrt.Connect(uiw.ToolButton_7, "clicked(bool)", func(bool) { this.switchUiStack(UIST_SETTINGS) })
 	qtrt.Connect(uiw.PushButton_7, "clicked(bool)", func(bool) {
-		this.Label_24.Clear()
+		this.Label_24.SetText("...")
 		go this.initAppBackend()
 	})
 }

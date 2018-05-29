@@ -177,6 +177,8 @@ type RoomListItem struct {
 	subws  []qtwidgets.QWidget_ITF
 	menu   *qtwidgets.QMenu
 
+	floatUnreadCountLabel *qtwidgets.QLabel
+
 	msgitmdl []*Ui_MessageItemView
 	msgos    []*Message
 
@@ -190,8 +192,9 @@ type RoomListItem struct {
 	totalCount    int
 	peerCount     int
 	timeline      thscli.TimeLine
-	SyncInfoCount int
-	LastMsgTime   time.Time
+
+	WaitSyncStoreTimeLineCount int
+	LastMsgEventId             int64
 }
 
 func NewRoomListItem() *RoomListItem {
@@ -218,7 +221,18 @@ func NewRoomListItem3(info *thspbs.GroupInfo) *RoomListItem {
 }
 
 func (this *RoomListItem) init() {
+	this.initUis()
+	this.initEvents()
+}
 
+func (this *RoomListItem) initUis() {
+	if !gopp.IsAndroid() {
+		this.ToolButton.SetIconSize(qtcore.NewQSize_1(12, 12))
+	}
+	this.floatUnreadCountLabel = this.floatTextOverWidget(this.ToolButton)
+}
+
+func (this *RoomListItem) initEvents() {
 	labs := []*qtwidgets.QLabel{this.Label_2, this.Label_3, this.Label_4, this.Label_5, this.LabelLastMsgTime}
 	for _, lab := range labs {
 		lab.SetText("")
@@ -367,9 +381,9 @@ func (this *RoomListItem) AddMessage(msgo *Message, prev bool) {
 		// test and update storage's sync info
 		if msgo.EventId >= this.timeline.NextBatch {
 			this.timeline.NextBatch = msgo.EventId + 1
-			this.SyncInfoCount += 1
-			if this.SyncInfoCount >= 1 /*common.PullPageSize*/ {
-				this.SyncInfoCount = 0
+			this.WaitSyncStoreTimeLineCount += 1
+			if this.WaitSyncStoreTimeLineCount >= 1 /*common.PullPageSize*/ {
+				this.WaitSyncStoreTimeLineCount = 0
 				go hisfet.RefreshPrevStorageTimeLine(&this.timeline, this.GetId(), this.GetName())
 			}
 		}
@@ -404,7 +418,8 @@ func (this *RoomListItem) AddMessageImpl(msgo *Message, msgiw *Ui_MessageItemVie
 		vlo3 := uictx.uiw.VerticalLayout_3
 		vlo3.Layout().AddWidget(msgiw.QWidget_PTR())
 	}
-	this.SetLastMsg(fmt.Sprintf("%s: %s", gopp.StrSuf4ui(msgo.PeerUi, 9, 1), msgo.LastMsgUi), msgo.Time)
+	this.SetLastMsg(fmt.Sprintf("%s: %s", gopp.StrSuf4ui(msgo.PeerUi, 9, 1), msgo.LastMsgUi),
+		msgo.Time, msgo.EventId)
 
 	this.totalCount += 1
 	if uictx.msgwin.item == this {
@@ -413,6 +428,7 @@ func (this *RoomListItem) AddMessageImpl(msgo *Message, msgiw *Ui_MessageItemVie
 	}
 	this.unreadedCount += 1
 	this.ToolButton.SetText(fmt.Sprintf("%d", this.unreadedCount))
+	// this.floatUnreadCountLabel.SetText(fmt.Sprintf("%d", this.unreadedCount))
 }
 
 func (this *RoomListItem) GetName() string {
@@ -479,12 +495,12 @@ func init() {
 }
 
 // 两类时间，server time, client time
-func (this *RoomListItem) SetLastMsg(msg string, tm time.Time) {
-	if !tm.After(this.LastMsgTime) {
+func (this *RoomListItem) SetLastMsg(msg string, tm time.Time, eventId int64) {
+	if this.LastMsgEventId > eventId {
 		return
 	}
 
-	this.LastMsgTime = tm
+	this.LastMsgEventId = eventId
 	cmsg := msg
 	this.Label_3.SetText(gopp.StrSuf4ui(cmsg, 36))
 	this.Label_3.SetToolTip(cmsg)
@@ -561,4 +577,13 @@ func (this *RoomListItem) setConnStatus(st int32) {
 		this.sticon = qtgui.NewQIcon_2(":/icons/offline_30.png")
 		this.ToolButton.SetIcon(this.sticon)
 	}
+}
+
+func (this *RoomListItem) floatTextOverWidget(w qtwidgets.QWidget_ITF) *qtwidgets.QLabel {
+	lo := qtwidgets.NewQVBoxLayout_1(w)
+	lo.SetContentsMargins(0, 0, 0, 0)
+	lo.AddStretch__()
+	lab := qtwidgets.NewQLabel__()
+	lo.AddWidget(lab, 0, qtcore.Qt__AlignCenter)
+	return lab
 }

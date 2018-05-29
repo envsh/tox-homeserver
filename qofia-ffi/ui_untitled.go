@@ -495,7 +495,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 
 	this.VerticalLayout_8.Layout().AddWidget(this.Label_24) // 115
 
-	this.VerticalSpacer_2 = qtwidgets.NewQSpacerItem(20, 167, qtwidgets.QSizePolicy__Minimum, qtwidgets.QSizePolicy__Expanding)
+	this.VerticalSpacer_2 = qtwidgets.NewQSpacerItem(20, 238, qtwidgets.QSizePolicy__Minimum, qtwidgets.QSizePolicy__Expanding)
 
 	this.VerticalLayout_8.AddItem(this.VerticalSpacer_2) // 115
 
@@ -520,6 +520,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.Icon2.AddFile(":/icons/icon_avatar_40.png", qtcore.NewQSize(), qtgui.QIcon__Normal, qtgui.QIcon__Off) // 115
 	this.ToolButton_17.SetIcon(this.Icon2)                                                                     // 114
 	this.ToolButton_17.SetIconSize(qtcore.NewQSize_1(32, 32))                                                  // 113
+	this.ToolButton_17.SetAutoRaise(true)                                                                      // 114
 
 	this.HorizontalLayout.Layout().AddWidget(this.ToolButton_17) // 115
 
@@ -606,7 +607,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.ScrollArea.SetAlignment(qtcore.Qt__AlignLeading | qtcore.Qt__AlignLeft | qtcore.Qt__AlignTop) // 114
 	this.ScrollAreaWidgetContents = qtwidgets.NewQWidget(nil, 0)                                       // 111
 	this.ScrollAreaWidgetContents.SetObjectName("ScrollAreaWidgetContents")                            // 112
-	this.ScrollAreaWidgetContents.SetGeometry(0, 0, 378, 16)                                           // 114
+	this.ScrollAreaWidgetContents.SetGeometry(0, 0, 380, 16)                                           // 114
 	this.SizePolicy.SetHeightForWidth(this.ScrollAreaWidgetContents.SizePolicy().HasHeightForWidth())  // 114
 	this.ScrollAreaWidgetContents.SetSizePolicy(this.SizePolicy)                                       // 114
 	this.VerticalLayout_9 = qtwidgets.NewQVBoxLayout_1(this.ScrollAreaWidgetContents)                  // 111
@@ -881,7 +882,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.ScrollArea_2.SetAlignment(qtcore.Qt__AlignBottom | qtcore.Qt__AlignLeading | qtcore.Qt__AlignLeft) // 114
 	this.ScrollAreaWidgetContents_2 = qtwidgets.NewQWidget(nil, 0)                                          // 111
 	this.ScrollAreaWidgetContents_2.SetObjectName("ScrollAreaWidgetContents_2")                             // 112
-	this.ScrollAreaWidgetContents_2.SetGeometry(0, 396, 366, 16)                                            // 114
+	this.ScrollAreaWidgetContents_2.SetGeometry(0, 12, 98, 16)                                              // 114
 	this.SizePolicy.SetHeightForWidth(this.ScrollAreaWidgetContents_2.SizePolicy().HasHeightForWidth())     // 114
 	this.ScrollAreaWidgetContents_2.SetSizePolicy(this.SizePolicy)                                          // 114
 	this.VerticalLayout_3 = qtwidgets.NewQVBoxLayout_1(this.ScrollAreaWidgetContents_2)                     // 111
@@ -1122,7 +1123,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.ScrollArea_3.SetAlignment(qtcore.Qt__AlignLeading | qtcore.Qt__AlignLeft | qtcore.Qt__AlignTop) // 114
 	this.ScrollAreaWidgetContents_3 = qtwidgets.NewQWidget(nil, 0)                                       // 111
 	this.ScrollAreaWidgetContents_3.SetObjectName("ScrollAreaWidgetContents_3")                          // 112
-	this.ScrollAreaWidgetContents_3.SetGeometry(0, 0, 96, 16)                                            // 114
+	this.ScrollAreaWidgetContents_3.SetGeometry(0, 0, 98, 18)                                            // 114
 	this.SizePolicy.SetHeightForWidth(this.ScrollAreaWidgetContents_3.SizePolicy().HasHeightForWidth())  // 114
 	this.ScrollAreaWidgetContents_3.SetSizePolicy(this.SizePolicy)                                       // 114
 	this.VerticalLayout_17 = qtwidgets.NewQVBoxLayout_1(this.ScrollAreaWidgetContents_3)                 // 111
