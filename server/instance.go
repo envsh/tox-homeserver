@@ -125,7 +125,17 @@ func (this *ToxVM) setupCallbacks() {
 		evt.Margs = []string{fname, pubkey}
 		this.pubmsg(evt)
 	}, nil)
-
+	t.CallbackFriendStatusAdd(func(_ *tox.Tox, friendNumber uint32, status int, ud interface{}) {
+		evt := &thspbs.Event{}
+		evt.Name = "FriendStatus"
+		evt.Args = gopp.ToStrs(friendNumber, status)
+		pubkey, err := t.FriendGetPublicKey(friendNumber)
+		gopp.ErrPrint(err)
+		fname, err := t.FriendGetName(friendNumber)
+		gopp.ErrPrint(err)
+		evt.Margs = []string{fname, pubkey}
+		this.pubmsg(evt)
+	}, nil)
 	/*
 	   type cb_friend_request_ftype func(this *Tox, pubkey string, message string, userData interface{})
 	   type cb_friend_message_ftype func(this *Tox, friendNumber uint32, message string, userData interface{})

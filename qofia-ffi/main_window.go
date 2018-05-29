@@ -677,6 +677,18 @@ func dispatchEvent(jso *simplejson.Json) {
 			log.Println("item not found:", fname, pubkey)
 		}
 
+	case "FriendStatus":
+		status := gopp.MustInt(jso.Get("args").GetIndex(1).MustString())
+		fname := jso.Get("margs").GetIndex(0).MustString()
+		pubkey := jso.Get("margs").GetIndex(1).MustString()
+		_, _ = fname, pubkey
+		item := uictx.iteman.Get(pubkey)
+		if item != nil {
+			item.setUserStatus(status)
+		} else {
+			log.Println("item not found:", fname, pubkey)
+		}
+
 	case "ConferenceInvite":
 		groupNumber := jso.Get("margs").GetIndex(2).MustString()
 		cookie := jso.Get("args").GetIndex(2).MustString()

@@ -200,29 +200,27 @@ type RoomListItem struct {
 func NewRoomListItem() *RoomListItem {
 	this := &RoomListItem{}
 	this.Ui_ContactItemView = NewUi_ContactItemView2()
-	this.init()
+	this.initUis()
+	this.initEvents()
 	return this
 }
 
 func NewRoomListItem2(info *thspbs.FriendInfo) *RoomListItem {
 	this := &RoomListItem{}
 	this.Ui_ContactItemView = NewUi_ContactItemView2()
+	this.initUis()
 	this.SetContactInfo(info)
-	this.init()
+	this.initEvents()
 	return this
 }
 
 func NewRoomListItem3(info *thspbs.GroupInfo) *RoomListItem {
 	this := &RoomListItem{}
 	this.Ui_ContactItemView = NewUi_ContactItemView2()
-	this.SetContactInfo(info)
-	this.init()
-	return this
-}
-
-func (this *RoomListItem) init() {
 	this.initUis()
+	this.SetContactInfo(info)
 	this.initEvents()
+	return this
 }
 
 func (this *RoomListItem) initUis() {
@@ -340,11 +338,9 @@ func (this *RoomListItem) SetContactInfo(info interface{}) {
 			this.ToolButton.SetIcon(this.sticon)
 		}
 	case *thspbs.GroupInfo:
-		log.Println(ct.GetTitle(), ct.Title, trtxt(ct.GetTitle(), 26))
 		this.grpInfo = ct
 		this.isgroup = true
 		this.Label_2.SetText(trtxt(ct.GetTitle(), 26))
-		log.Println(this.Label_2.Text())
 		this.Label_2.SetToolTip(ct.GetTitle())
 		this.Label_4.SetHidden(true)
 		this.QWidget_PTR().SetFixedHeight(this.QWidget_PTR().Height() - 20)
@@ -353,6 +349,7 @@ func (this *RoomListItem) SetContactInfo(info interface{}) {
 		this.peerCount = len(ct.Members)
 		if this.peerCount > 0 {
 		}
+		this.setConnStatus(int32(thscli.CONN_STATUS_UDP))
 	default:
 		log.Fatalln("wtf")
 	}
@@ -570,11 +567,41 @@ func (this *RoomListItem) setConnStatus(st int32) {
 	if !this.isgroup {
 		this.frndInfo.ConnStatus = st
 	}
-	if st > 0 {
-		this.sticon = qtgui.NewQIcon_2(":/icons/online_30.png")
-		this.ToolButton.SetIcon(this.sticon)
+	iconNames := map[string]map[int]string{
+		"friend": {thscli.CONN_STATUS_NONE: ":/icons/offline_30.png",
+			thscli.CONN_STATUS_TCP: ":/icons/online_30.png",
+			thscli.CONN_STATUS_UDP: ":/icons/online_30.png"},
+		"group": {0: ":/icons/dot_groupchat.png"},
+		// "group": {0: ":/icons/online_30.png"},
+	}
+	if this.isgroup {
+		if false {
+			// android not run svg well now???
+			pxm := qtgui.NewQPixmap_3_(iconNames["group"][0]).Scaled__(9, 9)
+			this.sticon = qtgui.NewQIcon_1(pxm)
+		} else { // backup method
+			this.sticon = qtgui.NewQIcon_2(iconNames["group"][0])
+		}
 	} else {
-		this.sticon = qtgui.NewQIcon_2(":/icons/offline_30.png")
+		this.sticon = qtgui.NewQIcon_2(iconNames["friend"][int(st)])
+	}
+	this.ToolButton.SetIcon(this.sticon)
+}
+
+func (this *RoomListItem) setUserStatus(st int) {
+	clricon := qtgui.NewQIcon_2(":/icons/offline_30.png")
+	switch st {
+	case thscli.USER_STATUS_NONE:
+		if !this.isgroup {
+			this.setConnStatus(this.frndInfo.ConnStatus)
+		}
+	case thscli.USER_STATUS_AWAY:
+		this.sticon = qtgui.NewQIcon_2(":/icons/dot_away.png")
+		this.ToolButton.SetIcon(clricon)
+		this.ToolButton.SetIcon(this.sticon)
+	case thscli.USER_STATUS_BUSY:
+		this.sticon = qtgui.NewQIcon_2(":/icons/dot_busy.png")
+		this.ToolButton.SetIcon(clricon)
 		this.ToolButton.SetIcon(this.sticon)
 	}
 }

@@ -1,5 +1,8 @@
 <RCC>
   <qresource>
+    <file>icons/dot_away.png</file>
+    <file>icons/dot_busy.png</file>
+    <file>icons/dot_groupchat.png</file>
     <file>icons/vertical-ellipsis_gray32.png</file>
     <file>icons/vertical-ellipsis_gray64.png</file>
     <file>theme/dark.css</file>
