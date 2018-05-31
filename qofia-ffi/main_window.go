@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"runtime"
+	"strings"
 	"time"
 
 	"github.com/kitech/qt.go/qtcore"
@@ -98,6 +99,8 @@ func (this *MainWindow) init() {
 
 func (this *MainWindow) initMainUi() {
 	this.setConnStatus(false)
+	this.LineEdit_5.SetVisible(false)
+	this.LineEdit_6.SetVisible(false)
 }
 
 func (this *MainWindow) initMainWin() {
@@ -360,6 +363,44 @@ func (this *MainWindow) connectSignals() {
 		this.Label_24.SetText("...")
 		go this.initAppBackend()
 	})
+
+	uiw.Label_2.InheritMousePressEvent(func(ev *qtgui.QMouseEvent) {
+		uiw.Label_2.SetVisible(false)
+		uiw.LineEdit_5.SetText(uiw.Label_2.Text())
+		uiw.LineEdit_5.SetVisible(true)
+	})
+	uiw.Label_3.InheritMousePressEvent(func(ev *qtgui.QMouseEvent) {
+		uiw.Label_3.SetVisible(false)
+		uiw.LineEdit_6.SetText(uiw.Label_3.Text())
+		uiw.LineEdit_6.SetVisible(true)
+	})
+	qtrt.Connect(uiw.LineEdit_5, "editingFinished()", func() {
+		if !uiw.LineEdit_5.IsVisible() {
+			return // it's lost focus event
+		}
+		txt := uiw.LineEdit_5.Text()
+		uiw.LineEdit_5.SetVisible(false)
+		txt = strings.TrimSpace(txt)
+		if txt != "" && txt != uiw.Label_3.Text() {
+			uiw.Label_2.SetText(txt)
+			vtcli.SelfSetName(txt)
+		}
+		uiw.Label_2.SetVisible(true)
+	})
+	qtrt.Connect(uiw.LineEdit_6, "editingFinished()", func() {
+		if !uiw.LineEdit_6.IsVisible() {
+			return // it's lost focus event
+		}
+		txt := uiw.LineEdit_6.Text()
+		uiw.LineEdit_6.SetVisible(false)
+		txt = strings.TrimSpace(txt)
+		if txt != "" && txt != uiw.Label_3.Text() {
+			uiw.Label_3.SetText(txt)
+			vtcli.SelfSetStatusMessage(txt)
+		}
+		uiw.Label_3.SetVisible(true)
+	})
+
 }
 
 var create_room_dlg *Ui_Dialog
@@ -906,6 +947,12 @@ func dispatchEventResp(jso *simplejson.Json) {
 		if item != nil {
 			uictx.iteman.Delete(item)
 		}
+	case "SelfSetNameResp":
+		name := jso.Get("args").GetIndex(0).MustString()
+		uictx.uiw.Label_2.SetText(name)
+	case "SelfSetStatusMessageResp":
+		stmsg := jso.Get("args").GetIndex(0).MustString()
+		uictx.uiw.Label_3.SetText(stmsg)
 	default:
 		log.Println(jso)
 	}

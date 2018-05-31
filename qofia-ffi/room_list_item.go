@@ -228,6 +228,7 @@ func (this *RoomListItem) initUis() {
 		this.ToolButton.SetIconSize(qtcore.NewQSize_1(12, 12))
 	}
 	this.floatUnreadCountLabel = this.floatTextOverWidget(this.ToolButton)
+	// this.Ui_ContactItemView.ContactItemView.SetMinimumHeight(20 * 2)
 }
 
 func (this *RoomListItem) initEvents() {
@@ -343,7 +344,8 @@ func (this *RoomListItem) SetContactInfo(info interface{}) {
 		this.Label_2.SetText(trtxt(ct.GetTitle(), 26))
 		this.Label_2.SetToolTip(ct.GetTitle())
 		this.Label_4.SetHidden(true)
-		this.QWidget_PTR().SetFixedHeight(this.QWidget_PTR().Height() - 20)
+		// this maybe call multiple times, so -20 -20 then, the item is 0 height.
+		// this.QWidget_PTR().SetFixedHeight(this.QWidget_PTR().Height() - 20)
 		this.cticon = qtgui.NewQIcon_2(":/icons/groupgray.png")
 		this.ToolButton_2.SetIcon(this.cticon)
 		this.peerCount = len(ct.Members)
@@ -498,9 +500,13 @@ func (this *RoomListItem) SetLastMsg(msg string, tm time.Time, eventId int64) {
 	}
 
 	this.LastMsgEventId = eventId
-	cmsg := msg
-	this.Label_3.SetText(gopp.StrSuf4ui(cmsg, 36))
-	this.Label_3.SetToolTip(cmsg)
+	refmter := func(s string) string {
+		s = gopp.StrSuf4ui(s, 36)
+		return strings.Replace(s, "\n", " ", -1)
+	}
+	cmsg := refmter(msg)
+	this.Label_3.SetText(cmsg)
+	this.Label_3.SetToolTip(msg)
 	this.LabelLastMsgTime.SetText(Time2TodayMinute(tm))
 	this.LabelLastMsgTime.SetToolTip(gopp.TimeToFmt1(tm))
 }

@@ -68,12 +68,13 @@ func (this *Ui_ContactItemView) SetupUi(ContactItemView *qtwidgets.QWidget) {
 	this.ContactItemView.SetFocusPolicy(qtcore.Qt__ClickFocus)                               // 114
 	this.ContactItemView.SetContextMenuPolicy(qtcore.Qt__DefaultContextMenu)                 // 114
 	this.HorizontalLayout_3 = qtwidgets.NewQHBoxLayout_1(this.ContactItemView)               // 111
-	this.HorizontalLayout_3.SetSpacing(0)                                                    // 114
+	this.HorizontalLayout_3.SetSpacing(1)                                                    // 114
 	this.HorizontalLayout_3.SetObjectName("HorizontalLayout_3")                              // 112
-	this.HorizontalLayout_3.SetContentsMargins(0, 0, 0, 0)                                   // 114
+	this.HorizontalLayout_3.SetContentsMargins(0, 1, 0, 0)                                   // 114
 	this.VerticalLayout_3 = qtwidgets.NewQVBoxLayout()                                       // 111
 	this.VerticalLayout_3.SetSpacing(0)                                                      // 114
 	this.VerticalLayout_3.SetObjectName("VerticalLayout_3")                                  // 112
+	this.VerticalLayout_3.SetContentsMargins(-1, 0, -1, 0)                                   // 114
 	this.VerticalSpacer_3 = qtwidgets.NewQSpacerItem(20, 3, qtwidgets.QSizePolicy__Minimum, qtwidgets.QSizePolicy__Expanding)
 
 	this.VerticalLayout_3.AddItem(this.VerticalSpacer_3) // 115

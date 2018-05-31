@@ -97,10 +97,12 @@ func packBaseInfo(t *tox.Tox) (*thspbs.BaseInfo, error) {
 func RmtCallHandlers(ctx context.Context, req *thspbs.Event) (*thspbs.Event, error) {
 	log.Println(req.Id, req.Name, req.Args, req.Margs)
 
-	// 先把消息同步到不同协议的不同终端上
+	// 先把消息同步到不同协议的不同终端上, not need execute result
 	switch req.Name {
 	case "LoadEventsByContactId":
 	default:
+	case "SelfSetName", "SelfSetStatusMessage":
+		fallthrough
 	case "FriendSendMessage":
 		fallthrough
 	case "ConferenceSendMessage":
@@ -113,6 +115,7 @@ func RmtCallHandlers(ctx context.Context, req *thspbs.Event) (*thspbs.Event, err
 
 	rsp, err := RmtCallExecuteHandler(ctx, req)
 
+	// re sync to client, need execute result
 	switch req.Name {
 	case "FriendAdd": //
 		fallthrough
@@ -258,6 +261,14 @@ func RmtCallExecuteHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Even
 		if err != nil {
 			out.Ecode, out.Emsg = -1, err.Error()
 		}
+	case "SelfSetName":
+		name := req.Args[0]
+		err := t.SelfSetName(name)
+		gopp.ErrPrint(err, name)
+	case "SelfSetStatusMessage":
+		stmsg := req.Args[0]
+		_, err := t.SelfSetStatusMessage(stmsg)
+		gopp.ErrPrint(err, stmsg)
 	// case "GetHistory":
 	case "PullEventsByContactId":
 		prev_batch, err := strconv.Atoi(req.Args[1])

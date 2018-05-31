@@ -75,11 +75,15 @@ type Ui_MainWindow struct {
 	Page                       *qtwidgets.QWidget
 	VerticalLayout_2           *qtwidgets.QVBoxLayout
 	Widget                     *qtwidgets.QWidget
-	HorizontalLayout           *qtwidgets.QHBoxLayout
+	HorizontalLayout_17        *qtwidgets.QHBoxLayout
 	ToolButton_17              *qtwidgets.QToolButton
 	VerticalLayout             *qtwidgets.QVBoxLayout
+	HorizontalLayout           *qtwidgets.QHBoxLayout
 	Label_2                    *qtwidgets.QLabel
+	LineEdit_5                 *qtwidgets.QLineEdit
+	HorizontalLayout_16        *qtwidgets.QHBoxLayout
 	Label_3                    *qtwidgets.QLabel
+	LineEdit_6                 *qtwidgets.QLineEdit
 	ToolButton                 *qtwidgets.QToolButton
 	HorizontalLayout_2         *qtwidgets.QHBoxLayout
 	LineEdit                   *qtwidgets.QLineEdit
@@ -185,8 +189,8 @@ type Ui_MainWindow struct {
 	SizePolicy                 *qtwidgets.QSizePolicy
 	Icon1                      *qtgui.QIcon // 116
 	Icon2                      *qtgui.QIcon // 116
-	Font                       *qtgui.QFont // 116
 	SizePolicy1                *qtwidgets.QSizePolicy
+	Font                       *qtgui.QFont // 116
 	Icon3                      *qtgui.QIcon // 116
 	Icon4                      *qtgui.QIcon // 116
 	SizePolicy2                *qtwidgets.QSizePolicy
@@ -499,58 +503,79 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 
 	this.VerticalLayout_8.AddItem(this.VerticalSpacer_2) // 115
 
-	this.StackedWidget.AddWidget(this.Page_8)                       // 115
-	this.Page = qtwidgets.NewQWidget(nil, 0)                        // 111
-	this.Page.SetObjectName("Page")                                 // 112
-	this.VerticalLayout_2 = qtwidgets.NewQVBoxLayout_1(this.Page)   // 111
-	this.VerticalLayout_2.SetSpacing(0)                             // 114
-	this.VerticalLayout_2.SetObjectName("VerticalLayout_2")         // 112
-	this.VerticalLayout_2.SetContentsMargins(0, 0, 0, 0)            // 114
-	this.Widget = qtwidgets.NewQWidget(this.Page, 0)                // 111
-	this.Widget.SetObjectName("Widget")                             // 112
-	this.HorizontalLayout = qtwidgets.NewQHBoxLayout_1(this.Widget) // 111
-	this.HorizontalLayout.SetSpacing(0)                             // 114
-	this.HorizontalLayout.SetObjectName("HorizontalLayout")         // 112
-	this.HorizontalLayout.SetContentsMargins(6, 6, 6, 6)            // 114
-	this.ToolButton_17 = qtwidgets.NewQToolButton(this.Widget)      // 111
-	this.ToolButton_17.SetObjectName("ToolButton_17")               // 112
-	this.ToolButton_17.SetMaximumSize_1(32, 32)                     // 113
-	this.ToolButton_17.SetFocusPolicy(qtcore.Qt__NoFocus)           // 114
+	this.StackedWidget.AddWidget(this.Page_8)                          // 115
+	this.Page = qtwidgets.NewQWidget(nil, 0)                           // 111
+	this.Page.SetObjectName("Page")                                    // 112
+	this.VerticalLayout_2 = qtwidgets.NewQVBoxLayout_1(this.Page)      // 111
+	this.VerticalLayout_2.SetSpacing(0)                                // 114
+	this.VerticalLayout_2.SetObjectName("VerticalLayout_2")            // 112
+	this.VerticalLayout_2.SetContentsMargins(0, 0, 0, 0)               // 114
+	this.Widget = qtwidgets.NewQWidget(this.Page, 0)                   // 111
+	this.Widget.SetObjectName("Widget")                                // 112
+	this.HorizontalLayout_17 = qtwidgets.NewQHBoxLayout_1(this.Widget) // 111
+	this.HorizontalLayout_17.SetSpacing(3)                             // 114
+	this.HorizontalLayout_17.SetObjectName("HorizontalLayout_17")      // 112
+	this.HorizontalLayout_17.SetContentsMargins(0, 3, 0, 3)            // 114
+	this.ToolButton_17 = qtwidgets.NewQToolButton(this.Widget)         // 111
+	this.ToolButton_17.SetObjectName("ToolButton_17")                  // 112
+	this.ToolButton_17.SetMaximumSize_1(32, 32)                        // 113
+	this.ToolButton_17.SetFocusPolicy(qtcore.Qt__NoFocus)              // 114
 	this.Icon2 = qtgui.NewQIcon()
 	this.Icon2.AddFile(":/icons/icon_avatar_40.png", qtcore.NewQSize(), qtgui.QIcon__Normal, qtgui.QIcon__Off) // 115
 	this.ToolButton_17.SetIcon(this.Icon2)                                                                     // 114
 	this.ToolButton_17.SetIconSize(qtcore.NewQSize_1(32, 32))                                                  // 113
 	this.ToolButton_17.SetAutoRaise(true)                                                                      // 114
 
-	this.HorizontalLayout.Layout().AddWidget(this.ToolButton_17) // 115
+	this.HorizontalLayout_17.Layout().AddWidget(this.ToolButton_17) // 115
 
-	this.VerticalLayout = qtwidgets.NewQVBoxLayout()     // 111
-	this.VerticalLayout.SetSpacing(3)                    // 114
-	this.VerticalLayout.SetObjectName("VerticalLayout")  // 112
-	this.VerticalLayout.SetContentsMargins(3, -1, 3, -1) // 114
-	this.Label_2 = qtwidgets.NewQLabel(this.Widget, 0)   // 111
-	this.Label_2.SetObjectName("Label_2")                // 112
-	this.Font = qtgui.NewQFont()
-	this.Font.SetPointSize(12)                                                                       // 114
-	this.Font.SetBold(true)                                                                          // 114
-	this.Font.SetWeight(75)                                                                          // 114
-	this.Label_2.SetFont(this.Font)                                                                  // 114
-	this.Label_2.SetTextInteractionFlags(qtcore.Qt__TextEditable | qtcore.Qt__TextSelectableByMouse) // 114
-
-	this.VerticalLayout.Layout().AddWidget(this.Label_2) // 115
-
-	this.Label_3 = qtwidgets.NewQLabel(this.Widget, 0) // 111
-	this.Label_3.SetObjectName("Label_3")              // 112
+	this.VerticalLayout = qtwidgets.NewQVBoxLayout()        // 111
+	this.VerticalLayout.SetSpacing(0)                       // 114
+	this.VerticalLayout.SetObjectName("VerticalLayout")     // 112
+	this.HorizontalLayout = qtwidgets.NewQHBoxLayout()      // 111
+	this.HorizontalLayout.SetSpacing(0)                     // 114
+	this.HorizontalLayout.SetObjectName("HorizontalLayout") // 112
+	this.Label_2 = qtwidgets.NewQLabel(this.Widget, 0)      // 111
+	this.Label_2.SetObjectName("Label_2")                   // 112
 	this.SizePolicy1 = qtwidgets.NewQSizePolicy_1(qtwidgets.QSizePolicy__Expanding, qtwidgets.QSizePolicy__Preferred, 1)
-	this.SizePolicy1.SetHorizontalStretch(0)                                                         // 114
-	this.SizePolicy1.SetVerticalStretch(0)                                                           // 114
-	this.SizePolicy1.SetHeightForWidth(this.Label_3.SizePolicy().HasHeightForWidth())                // 114
-	this.Label_3.SetSizePolicy(this.SizePolicy1)                                                     // 114
-	this.Label_3.SetTextInteractionFlags(qtcore.Qt__TextEditable | qtcore.Qt__TextSelectableByMouse) // 114
+	this.SizePolicy1.SetHorizontalStretch(0)                                          // 114
+	this.SizePolicy1.SetVerticalStretch(0)                                            // 114
+	this.SizePolicy1.SetHeightForWidth(this.Label_2.SizePolicy().HasHeightForWidth()) // 114
+	this.Label_2.SetSizePolicy(this.SizePolicy1)                                      // 114
+	this.Font = qtgui.NewQFont()
+	this.Font.SetPointSize(12)                                             // 114
+	this.Font.SetBold(true)                                                // 114
+	this.Font.SetWeight(75)                                                // 114
+	this.Label_2.SetFont(this.Font)                                        // 114
+	this.Label_2.SetTextInteractionFlags(qtcore.Qt__TextSelectableByMouse) // 114
 
-	this.VerticalLayout.Layout().AddWidget(this.Label_3) // 115
+	this.HorizontalLayout.Layout().AddWidget(this.Label_2) // 115
 
-	this.HorizontalLayout.AddLayout(this.VerticalLayout, 0) // 115
+	this.LineEdit_5 = qtwidgets.NewQLineEdit(this.Widget) // 111
+	this.LineEdit_5.SetObjectName("LineEdit_5")           // 112
+
+	this.HorizontalLayout.Layout().AddWidget(this.LineEdit_5) // 115
+
+	this.VerticalLayout.AddLayout(this.HorizontalLayout, 0) // 115
+
+	this.HorizontalLayout_16 = qtwidgets.NewQHBoxLayout()                             // 111
+	this.HorizontalLayout_16.SetSpacing(0)                                            // 114
+	this.HorizontalLayout_16.SetObjectName("HorizontalLayout_16")                     // 112
+	this.Label_3 = qtwidgets.NewQLabel(this.Widget, 0)                                // 111
+	this.Label_3.SetObjectName("Label_3")                                             // 112
+	this.SizePolicy1.SetHeightForWidth(this.Label_3.SizePolicy().HasHeightForWidth()) // 114
+	this.Label_3.SetSizePolicy(this.SizePolicy1)                                      // 114
+	this.Label_3.SetTextInteractionFlags(qtcore.Qt__TextSelectableByMouse)            // 114
+
+	this.HorizontalLayout_16.Layout().AddWidget(this.Label_3) // 115
+
+	this.LineEdit_6 = qtwidgets.NewQLineEdit(this.Widget) // 111
+	this.LineEdit_6.SetObjectName("LineEdit_6")           // 112
+
+	this.HorizontalLayout_16.Layout().AddWidget(this.LineEdit_6) // 115
+
+	this.VerticalLayout.AddLayout(this.HorizontalLayout_16, 0) // 115
+
+	this.HorizontalLayout_17.AddLayout(this.VerticalLayout, 0) // 115
 
 	this.ToolButton = qtwidgets.NewQToolButton(this.Widget) // 111
 	this.ToolButton.SetObjectName("ToolButton")             // 112
@@ -561,7 +586,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.ToolButton.SetToolButtonStyle(qtcore.Qt__ToolButtonIconOnly)                                     // 114
 	this.ToolButton.SetAutoRaise(true)                                                                    // 114
 
-	this.HorizontalLayout.Layout().AddWidget(this.ToolButton) // 115
+	this.HorizontalLayout_17.Layout().AddWidget(this.ToolButton) // 115
 
 	this.VerticalLayout_2.Layout().AddWidget(this.Widget) // 115
 
