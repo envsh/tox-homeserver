@@ -274,7 +274,7 @@ func RmtCallExecuteHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Even
 		prev_batch, err := strconv.Atoi(req.Args[1])
 		gopp.ErrPrint(err, req.Args)
 		if err == nil {
-			msgos, err := appctx.st.FindEventsByContactId(req.Args[0], int64(prev_batch), common.PullPageSize)
+			msgos, err := appctx.st.FindEventsByContactId2(req.Args[0], int64(prev_batch), common.PullPageSize)
 			gopp.ErrPrint(err)
 			if err == nil {
 				data, err := json.Marshal(msgos)

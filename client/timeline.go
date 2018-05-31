@@ -10,7 +10,7 @@ import (
 	"tox-homeserver/thspbs"
 )
 
-func (this *LigTox) PullEventsByContactId(pubkey string, prev_batch int64) ([]store.Message, error) {
+func (this *LigTox) PullEventsByContactId(pubkey string, prev_batch int64) ([]store.MessageJoined, error) {
 	args := &thspbs.Event{}
 	args.Name = "PullEventsByContactId"
 	args.Args = []string{pubkey, fmt.Sprintf("%d", prev_batch)}
@@ -22,7 +22,7 @@ func (this *LigTox) PullEventsByContactId(pubkey string, prev_batch int64) ([]st
 		return nil, err
 	}
 
-	rets := []store.Message{}
+	rets := []store.MessageJoined{}
 	err = json.Unmarshal([]byte(rsp.Args[0]), &rets)
 	gopp.ErrPrint(err)
 	if err != nil {

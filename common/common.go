@@ -20,7 +20,7 @@ var GrpcAddr = fmt.Sprintf("%s:%d", GrpcIp, GrpcPort)
 var WSAddr = fmt.Sprintf("ws://%s:%d", GrpcIp, WSPort)
 var WSAddrlo = fmt.Sprintf("ws://%s:%d", "127.0.0.1", WSPort)
 
-const DefaultUserName = "Tox User"
+const DefaultUserName = "ToxUser"
 const GroupTitleSep = " ::: " // group title and group stmsg title, "@title@ ::: @stmsg@"
 
 const LogPrefix = "[gofiat] "

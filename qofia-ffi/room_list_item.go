@@ -21,16 +21,16 @@ import (
 )
 
 type Message struct {
-	Msg     string
-	Peer    string
-	Time    time.Time
-	EventId int64
+	Msg      string
+	PeerName string
+	Time     time.Time
+	EventId  int64
 
-	Me        bool
-	MsgUi     string
-	PeerUi    string
-	TimeUi    string
-	LastMsgUi string
+	Me         bool
+	MsgUi      string
+	PeerNameUi string
+	TimeUi     string
+	LastMsgUi  string
 }
 
 func NewMessageForGroup(jso *simplejson.Json) *Message {
@@ -49,7 +49,7 @@ func NewMessageForGroup(jso *simplejson.Json) *Message {
 
 	this := &Message{}
 	this.Msg = message
-	this.Peer = peerName
+	this.PeerName = peerName
 	this.Time = time.Now()
 	this.EventId = eventId
 
@@ -66,7 +66,7 @@ func NewMessageForFriend(jso *simplejson.Json) *Message {
 
 	this := &Message{}
 	this.Msg = msg
-	this.Peer = fname
+	this.PeerName = fname
 	this.Time = time.Now()
 	this.EventId = eventId
 
@@ -77,7 +77,7 @@ func NewMessageForFriend(jso *simplejson.Json) *Message {
 func NewMessageForMe(itext string) *Message {
 	msgo := &Message{}
 	msgo.Msg = itext
-	msgo.Peer = vtcli.SelfGetName()
+	msgo.PeerName = vtcli.SelfGetName()
 	msgo.Time = time.Now()
 	msgo.Me = true
 	msgo.refmtmsg()
@@ -101,10 +101,10 @@ func (this *Message) refmtmsg() {
 }
 func (this *Message) refmtmsgRUser() {
 	if this.Me {
-		this.PeerUi, this.MsgUi = this.Peer, this.Msg
+		this.PeerNameUi, this.MsgUi = this.PeerName, this.Msg
 	} else {
-		newPeer, newMsg, _ := bridges.ExtractRealUser(this.Peer, this.Msg)
-		this.PeerUi = newPeer
+		newPeerName, newMsg, _ := bridges.ExtractRealUser(this.PeerName, this.Msg)
+		this.PeerNameUi = newPeerName
 		this.MsgUi = newMsg
 		this.LastMsgUi = newMsg
 	}
@@ -371,12 +371,12 @@ func (this *RoomListItem) AddMessage(msgo *Message, prev bool) {
 		this.msgos = append([]*Message{msgo}, this.msgos...)
 		msgiw := NewUi_MessageItemView2()
 		this.msgitmdl = append([]*Ui_MessageItemView{msgiw}, this.msgitmdl...)
-		this.AddMessageImpl(msgo, msgiw)
+		this.AddMessageImpl(msgo, msgiw, prev)
 	} else {
 		this.msgos = append(this.msgos, msgo)
 		msgiw := NewUi_MessageItemView2()
 		this.msgitmdl = append(this.msgitmdl, msgiw)
-		this.AddMessageImpl(msgo, msgiw)
+		this.AddMessageImpl(msgo, msgiw, prev)
 		// test and update storage's sync info
 		if msgo.EventId >= this.timeline.NextBatch {
 			this.timeline.NextBatch = msgo.EventId + 1
@@ -389,23 +389,14 @@ func (this *RoomListItem) AddMessage(msgo *Message, prev bool) {
 	}
 }
 
-func (this *RoomListItem) AddMessageImpl(msgo *Message, msgiw *Ui_MessageItemView) {
-	// 计算是否省略掉显示与上一条相同的用户名
-	lastSame := func(peerUi string) bool {
-		if len(this.msgos) >= 2 {
-			if this.msgos[len(this.msgos)-2].PeerUi == peerUi {
-				return true
-			}
-		}
-		return false
-	}
+func (this *RoomListItem) AddMessageImpl(msgo *Message, msgiw *Ui_MessageItemView, prev bool) {
 
 	showMeIcon := msgo.Me // 是否显示自己的icon。根据是否是自己的消息
-	showName := !lastSame(msgo.PeerUi)
-	showPeerIcon := !lastSame(msgo.PeerUi) && !msgo.Me // 是否显示对方的icon。根据前一条消息判断
+	showName := true
+	showPeerIcon := true
 
 	msgiw.Label_5.SetText(msgo.MsgUi)
-	msgiw.Label_3.SetText(fmt.Sprintf("%s", msgo.PeerUi))
+	msgiw.Label_3.SetText(fmt.Sprintf("%s", msgo.PeerNameUi))
 	msgiw.LabelMsgTime.SetText(Time2Today(msgo.Time))
 	msgiw.LabelMsgTime.SetToolTip(gopp.TimeToFmt1(msgo.Time))
 	msgiw.ToolButton_3.SetVisible(showMeIcon)
@@ -417,7 +408,7 @@ func (this *RoomListItem) AddMessageImpl(msgo *Message, msgiw *Ui_MessageItemVie
 		vlo3 := uictx.uiw.VerticalLayout_3
 		vlo3.Layout().AddWidget(msgiw.QWidget_PTR())
 	}
-	this.SetLastMsg(fmt.Sprintf("%s: %s", gopp.StrSuf4ui(msgo.PeerUi, 9, 1), msgo.LastMsgUi),
+	this.SetLastMsg(fmt.Sprintf("%s: %s", gopp.StrSuf4ui(msgo.PeerNameUi, 9, 1), msgo.LastMsgUi),
 		msgo.Time, msgo.EventId)
 
 	this.totalCount += 1
@@ -428,6 +419,28 @@ func (this *RoomListItem) AddMessageImpl(msgo *Message, msgiw *Ui_MessageItemVie
 	this.unreadedCount += 1
 	this.ToolButton.SetText(fmt.Sprintf("%d", this.unreadedCount))
 	// this.floatUnreadCountLabel.SetText(fmt.Sprintf("%d", this.unreadedCount))
+}
+
+// TODO 计算是否省略掉显示与上一条相同的用户名
+func (this *RoomListItem) AddMessageHiddenCloseSameUser(prev bool) {
+	// prev is true, compare [0], [1]
+	// prev is false, compare [len-2], [len-1]
+	if len(this.msgos) < 2 {
+		return
+	}
+
+	var m0, m1 *Message
+	if prev {
+		m0 = this.msgos[0]
+		m1 = this.msgos[1]
+	} else {
+		m0 = this.msgos[len(this.msgos)-2]
+		m1 = this.msgos[len(this.msgos)-1]
+	}
+
+	if m0.PeerNameUi == m1.PeerNameUi {
+		// can not get Ui_MessageItemView
+	}
 }
 
 func (this *RoomListItem) GetName() string {

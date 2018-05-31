@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 	"runtime"
-	"tox-homeserver/common"
+	thscom "tox-homeserver/common"
 
 	"github.com/go-xorm/xorm"
 	// "github.com/hashicorp/go-uuid"
@@ -23,7 +23,7 @@ func NewStorage() *Storage {
 	var dsn string
 	if runtime.GOOS == "android" {
 		dsn = fmt.Sprintf("file:///data/data/io.dnesth.tofia/toxhs.sqlite")
-		dsn = fmt.Sprintf("file://%s/toxhs.sqlite", common.AndroidGetDataDir())
+		dsn = fmt.Sprintf("file://%s/toxhs.sqlite", thscom.AndroidGetDataDir())
 		log.Println(dsn)
 	} else {
 		dsn = fmt.Sprintf("toxhs.sqlite?cache=shared&mode=rwc")
@@ -35,7 +35,7 @@ func NewStorage() *Storage {
 	this.dbh = dbh
 	this.SetWAL(true)
 
-	logger := xorm.NewSimpleLogger2(os.Stdout, common.LogPrefix, 0)
+	logger := xorm.NewSimpleLogger2(os.Stdout, thscom.LogPrefix, 0)
 	dbh.SetLogger(logger)
 	dbh.ShowSQL(false)
 	this.initTables()
@@ -131,7 +131,7 @@ func (this *Storage) AddPeer(peerPubkey string, num uint32, name string) (int64,
 }
 
 func (this *Storage) AddContact(c *Contact) (int64, error) {
-	c.Created = common.NowTimeStr()
+	c.Created = thscom.NowTimeStr()
 	c.Updated = c.Created
 
 	id, err := this.dbh.InsertOne(c)
@@ -139,7 +139,7 @@ func (this *Storage) AddContact(c *Contact) (int64, error) {
 }
 
 func (this *Storage) UpdateContactByPubkey(c *Contact) (int64, error) {
-	c.Updated = common.NowTimeStr()
+	c.Updated = thscom.NowTimeStr()
 
 	id, err := this.dbh.Where("pubkey = ?", c.Pubkey).Update(c)
 	gopp.ErrPrint(err, id)
@@ -201,11 +201,55 @@ func (this *Storage) AddGroupMessage(msg string, mtype string, identify string, 
 
 //
 func (this *Storage) AddMessage(m *Message) (*Message, error) {
-	m.Updated = common.NowTimeStr()
+	m.Updated = thscom.NowTimeStr()
 	// m.EventId <=0认为是server端，否则客户端
 	if m.EventId <= 0 {
 		m.Created = m.Updated
 		m.EventId = this.NextId()
+	}
+
+	id, err := this.dbh.InsertOne(m)
+	_ = id
+	return m, err
+}
+
+func (this *Storage) AddMessageJoined(mj *MessageJoined) (*Message, error) {
+	mj.Updated = thscom.NowTimeStr()
+	// m.EventId <=0认为是server端，否则客户端
+	if mj.EventId <= 0 {
+		mj.Created = mj.Updated
+		mj.EventId = this.NextId()
+	}
+
+	m := &Message{}
+	m.EventId = mj.EventId
+	m.Content = mj.Content
+	m.Mtype = mj.Mtype
+	m.Created = mj.Created
+	m.Updated = mj.Updated
+
+	ct, _ := this.GetContactByPubkey(mj.PeerPubkey)
+	if ct == nil {
+		ct = &Contact{}
+		ct.Pubkey = mj.PeerPubkey
+		ct.Name = mj.PeerName
+		_, err := this.AddContact(ct)
+		gopp.ErrPrint(err)
+	}
+	if ct != nil {
+		m.ContactId = ct.Id
+	}
+
+	room, _ := this.GetContactByPubkey(mj.RoomPubkey)
+	if room == nil {
+		room = &Contact{}
+		room.Pubkey = mj.RoomPubkey
+		room.Name = mj.RoomName
+		_, err := this.AddContact(room)
+		gopp.ErrPrint(err)
+	}
+	if room != nil {
+		m.RoomId = room.Id
 	}
 
 	id, err := this.dbh.InsertOne(m)
@@ -241,6 +285,29 @@ func (this *Storage) FindEventsByContactId(pubkey string, prev_batch int64, page
 	return r, err
 }
 
+/*
+select message.*, ctroom.name as room_name, ctpeer.name as peer_name,ctpeer.pubkey as peer_pubkey from message
+left join contact ctroom on message.room_id = ctroom.id
+left join contact ctpeer on message.contact_id=ctpeer.id
+where ctroom.pubkey = 'FD056CBxxxxxx order by message.event_id desc limit 20
+*/
+func (this *Storage) FindEventsByContactId2(pubkey string, prev_batch int64, page_size int) ([]MessageJoined, error) {
+	sqltpl := `select message.*, ctroom.name as room_name, ctroom.pubkey as room_pubkey,
+ ctpeer.name as peer_name,ctpeer.pubkey as peer_pubkey from message
+left join contact ctroom on message.room_id = ctroom.id
+left join contact ctpeer on message.contact_id=ctpeer.id
+where ctroom.pubkey = ? and event_id <= ? order by message.event_id desc limit ?`
+
+	r := []MessageJoined{}
+	err := this.dbh.SQL(sqltpl, pubkey, prev_batch, page_size).Find(&r)
+	for i := 0; i < len(r); i++ {
+		if r[i].PeerName == "" {
+			r[i].PeerName = fmt.Sprintf("%s.%s", thscom.DefaultUserName, r[i].PeerPubkey[:7])
+		}
+	}
+	return r, err
+}
+
 func (this *Storage) AddDevice() error {
 	return this.AddDevice2(uuid.NewV4().String())
 }
@@ -248,7 +315,7 @@ func (this *Storage) AddDevice() error {
 func (this *Storage) AddDevice2(name string) error {
 	dv := Device{}
 	dv.Uuid = name
-	dv.Created = common.NowTimeStr()
+	dv.Created = thscom.NowTimeStr()
 	dv.Updated = dv.Created
 
 	id, err := this.dbh.InsertOne(&dv)
@@ -286,7 +353,7 @@ func (this *Storage) AddSyncInfo(ct_id int64, next_batch int64, prev_batch int64
 	dv.CtId = ct_id
 	dv.NextBatch = next_batch
 	dv.PrevBatch = prev_batch
-	dv.Updated = common.NowTimeStr()
+	dv.Updated = thscom.NowTimeStr()
 
 	id, err := this.dbh.InsertOne(&dv)
 	gopp.ErrPrint(err, id)
@@ -309,7 +376,7 @@ func (this *Storage) UpdateSyncInfo(ct_id int64, next_batch int64, prev_batch in
 	c.CtId = ct_id
 	c.NextBatch = next_batch
 	c.PrevBatch = prev_batch
-	c.Updated = common.NowTimeStr()
+	c.Updated = thscom.NowTimeStr()
 
 	_, err := this.dbh.Where("ct_id = ?", ct_id).Update(c)
 	gopp.ErrPrint(err, ct_id)
@@ -343,7 +410,7 @@ func (this *Storage) SetSetting(name, value string) (int64, error) {
 	c = &Setting{}
 	c.Name = name
 	c.Value = value
-	c.Updated = common.NowTimeStr()
+	c.Updated = thscom.NowTimeStr()
 
 	if exist {
 		return this.dbh.Where("name = ?", name).Update(c)

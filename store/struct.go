@@ -28,6 +28,22 @@ type Message struct {
 	EventId   int64  `xorm:"unique INTEGER"`
 }
 
+type MessageJoined struct {
+	Id        int64  `xorm:"pk autoincr INTEGER"`
+	Updated   string `xorm:"TEXT"`
+	Created   string `xorm:"TEXT"`
+	Content   string `xorm:"TEXT"`
+	Mtype     int    `xorm:"INTEGER"`
+	ContactId int64  `xorm:"index INTEGER"`
+	RoomId    int64  `xorm:"index INTEGER"` // it's really another ContactId
+	EventId   int64  `xorm:"unique INTEGER"`
+
+	RoomName   string
+	RoomPubkey string
+	PeerName   string
+	PeerPubkey string
+}
+
 // for server
 type Device struct {
 	Id        int64  `xorm:"pk autoincr INTEGER"`

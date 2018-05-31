@@ -58,7 +58,7 @@ func (this *Fetcher) PullPrevHistoryById(pubkey string, prev_batch int64) {
 	this.RefreshPrevStorageByItem(item, pubkey)
 }
 
-func (this *Fetcher) RefreshPrevRealtime(item *RoomListItem, msgos []store.Message) {
+func (this *Fetcher) RefreshPrevRealtime(item *RoomListItem, msgos []store.MessageJoined) {
 	min := item.timeline.PrevBatch
 	for _, msgo := range msgos {
 		if msgo.EventId <= min {
@@ -106,15 +106,11 @@ func (this *Fetcher) RefreshPrevStorageTimeLine(itemtl *thscli.TimeLine, pubkey 
 	log.Println("runtime/storage timeline:", itemtl, rtl, mrgcnt, itemName)
 }
 
-func NewMessageFromStoreRecord(m *store.Message) *Message {
+func NewMessageFromStoreRecord(m *store.MessageJoined) *Message {
 	this := &Message{}
 	this.EventId = m.EventId
 	this.Msg = m.Content
-	this.Peer = "unknown" // ??? TODO
-	cto := appctx.GetStorage().GetContactById(m.ContactId)
-	if cto != nil {
-		this.Peer = cto.Name
-	}
+	this.PeerName = gopp.IfElseStr(m.PeerName == "", "unknown", m.PeerName)
 
 	defaultTimeStringLayout := common.DefaultTimeLayout
 	tm, err := time.Parse(defaultTimeStringLayout, m.Updated)
@@ -125,7 +121,7 @@ func NewMessageFromStoreRecord(m *store.Message) *Message {
 	return this
 }
 
-func (this *Fetcher) NotifyUiPrevHistory(item *RoomListItem, msgos []store.Message) {
+func (this *Fetcher) NotifyUiPrevHistory(item *RoomListItem, msgos []store.MessageJoined) {
 	for i := 0; i < len(msgos); i++ {
 		msgoe := msgos[i]
 		msgou := NewMessageFromStoreRecord(&msgoe)
@@ -138,11 +134,11 @@ func (this *Fetcher) NotifyUiPrevHistory(item *RoomListItem, msgos []store.Messa
 	}
 }
 
-func (this *Fetcher) SavePrevHistory(msgos []store.Message) {
+func (this *Fetcher) SavePrevHistory(msgos []store.MessageJoined) {
 	for i := 0; i < len(msgos); i++ {
 		msgoe := msgos[i]
 		_ = msgoe
-		_, err := appctx.GetStorage().AddMessage(&msgoe)
+		_, err := appctx.GetStorage().AddMessageJoined(&msgoe)
 		gopp.FalsePrint(store.IsUniqueConstraintErr(err), err, i)
 	}
 }
