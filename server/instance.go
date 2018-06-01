@@ -1,6 +1,7 @@
 package server
 
 import (
+	"encoding/json"
 	"fmt"
 	"gopp"
 	"log"
@@ -13,19 +14,25 @@ import (
 )
 
 type ToxVM struct {
-	t    *tox.Tox
-	abft int
+	t *tox.Tox
+
+	autobotFeatures  int
+	groupPeerPubkeys map[string][]string // groupId = > peerPubkey
+	groupPeerNames   map[string]string   // peerPubkey => name
 }
 
 var tvmCtx = xtox.NewToxContext("toxhs.tsbin", "toxhs0", "i'm toxhs0")
 
 func newToxVM() *ToxVM {
 	this := &ToxVM{}
+	this.groupPeerPubkeys = make(map[string][]string)
+	this.groupPeerNames = make(map[string]string)
+
 	this.t = xtox.New(tvmCtx)
 	gopp.NilFatal("tox is nil")
-	this.abft = xtox.FOTA_ADD_NET_HELP_BOTS | xtox.FOTA_REMOVE_ONLY_ME_ALL |
+	this.autobotFeatures = xtox.FOTA_ADD_NET_HELP_BOTS | xtox.FOTA_REMOVE_ONLY_ME_ALL |
 		xtox.FOTA_ACCEPT_FRIEND_REQUEST | xtox.FOTA_ACCEPT_GROUP_INVITE
-	xtox.SetAutoBotFeatures(this.t, this.abft)
+	xtox.SetAutoBotFeatures(this.t, this.autobotFeatures)
 	this.setupCallbacks()
 	err := xtox.Connect(this.t)
 	gopp.ErrPrint(err)
@@ -279,13 +286,15 @@ func (this *ToxVM) setupCallbacks() {
 			groupId, _ = t.ConferenceGetIdentifier(groupNumber)
 		}
 
+		oldPeerName := this.groupPeerNames[peerPubkey]
+		this.groupPeerNames[peerPubkey] = peerName
 		ctid, err := appctx.st.AddPeerOrUpdateName(peerPubkey, groupNumber, peerName)
 		gopp.ErrPrint(err, peerNumber, name, peerPubkey)
 
-		evt.Margs = []string{peerName, peerPubkey, title, groupId, fmt.Sprintf("%d", ctid)}
+		evt.Margs = []string{peerName, peerPubkey, title, groupId, fmt.Sprintf("%d", ctid), oldPeerName}
 		this.pubmsg(&evt)
 	}, nil)
-	// TODO detect which peer added/deleted here and directly tell client, make client lighter.
+	// detect which peer added/deleted here and directly tell client, make client lighter.
 	t.CallbackConferencePeerListChangedAdd(func(_ *tox.Tox, groupNumber uint32, userData interface{}) {
 		evt := thspbs.Event{}
 		evt.Name = "ConferencePeerListChange"
@@ -299,7 +308,14 @@ func (this *ToxVM) setupCallbacks() {
 			groupId, _ = t.ConferenceGetIdentifier(groupNumber)
 		}
 
-		evt.Margs = []string{title, groupId}
+		oldPeerPubkeys := this.groupPeerPubkeys[groupId]
+		newPeerPubkeys := t.ConferenceGetPeerPubkeys(groupNumber)
+		added, deleted := DiffSliceAsString(oldPeerPubkeys, newPeerPubkeys)
+		this.groupPeerPubkeys[groupId] = newPeerPubkeys
+
+		addedjs, _ := json.Marshal(added)
+		deletedjs, _ := json.Marshal(deleted)
+		evt.Margs = []string{title, groupId, gopp.ToStr(len(newPeerPubkeys)), string(addedjs), string(deletedjs)}
 		this.pubmsg(&evt)
 	}, nil)
 

@@ -17,6 +17,7 @@ import (
 	simplejson "github.com/bitly/go-simplejson"
 
 	thscli "tox-homeserver/client"
+	thscom "tox-homeserver/common"
 	"tox-homeserver/store"
 	"tox-homeserver/thspbs"
 )
@@ -366,12 +367,12 @@ func (this *MainWindow) connectSignals() {
 
 	uiw.Label_2.InheritMousePressEvent(func(ev *qtgui.QMouseEvent) {
 		uiw.Label_2.SetVisible(false)
-		uiw.LineEdit_5.SetText(uiw.Label_2.Text())
+		uiw.LineEdit_5.SetText(uiw.Label_2.ToolTip())
 		uiw.LineEdit_5.SetVisible(true)
 	})
 	uiw.Label_3.InheritMousePressEvent(func(ev *qtgui.QMouseEvent) {
 		uiw.Label_3.SetVisible(false)
-		uiw.LineEdit_6.SetText(uiw.Label_3.Text())
+		uiw.LineEdit_6.SetText(uiw.Label_3.ToolTip())
 		uiw.LineEdit_6.SetVisible(true)
 	})
 	qtrt.Connect(uiw.LineEdit_5, "editingFinished()", func() {
@@ -381,8 +382,9 @@ func (this *MainWindow) connectSignals() {
 		txt := uiw.LineEdit_5.Text()
 		uiw.LineEdit_5.SetVisible(false)
 		txt = strings.TrimSpace(txt)
-		if txt != "" && txt != uiw.Label_3.Text() {
-			uiw.Label_2.SetText(txt)
+		if txt != "" && txt != uiw.Label_3.ToolTip() {
+			uiw.Label_2.SetText(gopp.StrSuf4ui(txt, thscom.UiNameLen))
+			uiw.Label_2.SetToolTip(txt)
 			vtcli.SelfSetName(txt)
 		}
 		uiw.Label_2.SetVisible(true)
@@ -394,8 +396,9 @@ func (this *MainWindow) connectSignals() {
 		txt := uiw.LineEdit_6.Text()
 		uiw.LineEdit_6.SetVisible(false)
 		txt = strings.TrimSpace(txt)
-		if txt != "" && txt != uiw.Label_3.Text() {
-			uiw.Label_3.SetText(txt)
+		if txt != "" && txt != uiw.Label_3.ToolTip() {
+			uiw.Label_3.SetText(gopp.StrSuf4ui(txt, thscom.UiStmsgLen))
+			uiw.Label_3.SetToolTip(txt)
 			vtcli.SelfSetStatusMessage(txt)
 		}
 		uiw.Label_3.SetVisible(true)
@@ -525,12 +528,14 @@ func (this *MainWindow) initAppBackend() {
 	vtcli.OnNewMsg = func() { mech.Trigger() }
 
 	condWait(50, func() bool { return vtcli.SelfGetAddress() != "" })
-	log.Println(vtcli.SelfGetAddress())
+	log.Println("My ToxID:", vtcli.SelfGetAddress())
 	runOnUiThread(func() { this.switchUiStack(UIST_MAINUI) })
 
-	uiw.Label_2.SetText(vtcli.SelfGetName())
+	uiw.Label_2.SetText(gopp.StrSuf4ui(vtcli.SelfGetName(), thscom.UiNameLen))
+	uiw.Label_2.SetToolTip(vtcli.SelfGetName())
 	stmsg, _ := vtcli.SelfGetStatusMessage()
-	uiw.Label_3.SetText(stmsg)
+	uiw.Label_3.SetText(gopp.StrSuf4ui(stmsg, thscom.UiStmsgLen))
+	uiw.Label_3.SetToolTip(stmsg)
 	uiw.ToolButton_17.SetToolTip(vtcli.SelfGetAddress())
 
 	listw := uiw.ListWidget_2
@@ -789,6 +794,12 @@ func dispatchEvent(jso *simplejson.Json) {
 		log.Println("TODO", jso)
 	case "ConferencePeerListChange":
 		log.Println("TODO", jso)
+		groupId := jso.Get("margs").GetIndex(1).MustString()
+		peerCount := gopp.MustInt(jso.Get("margs").GetIndex(2).MustString())
+		item := uictx.iteman.Get(groupId)
+		if item != nil {
+			item.SetPeerCount(peerCount)
+		}
 	case "ConferenceNameListChange":
 		groupTitle := jso.Get("margs").GetIndex(2).MustString()
 		groupId := jso.Get("margs").GetIndex(3).MustString()
@@ -798,30 +809,6 @@ func dispatchEvent(jso *simplejson.Json) {
 			break
 		}
 		_ = groupTitle
-
-		/*
-			valuex, found := appctx.contactStates.Get(groupId)
-			var ctis *ContactItemState
-			if !found {
-				ctis = newContactItemState()
-				ctis.group = true
-				appctx.contactStates.Put(groupId, ctis)
-				log.Println("new group contact:", groupId)
-			} else {
-				ctis = valuex.(*ContactItemState)
-			}
-			if groupTitle != "" && groupTitle != ctis.ctname {
-				ctis.ctname = groupTitle
-				if appctx.app.Child == nil {
-					InterBackRelay.Signal()
-				}
-			}
-		*/
-
-		///
-		// peerPubkey := jso.Get("margs").GetIndex(1).MustString()
-		// _, err := appctx.store.AddPeer(peerPubkey, 0)
-		// gopp.ErrPrint(err)
 
 	case "ConferenceMessage":
 		groupId := jso.Get("margs").GetIndex(3).MustString()

@@ -176,3 +176,11 @@ func (this *MessageListWin) ShowSCWContextMenu(pos *qtcore.QPoint) {
 	gpos := pos
 	this.ctxmenu.Popup__(gpos)
 }
+
+func tr(string, string) {}
+
+func (this *MessageListWin) SetPeerCount(n int) {
+	mw := uictx.mw
+	mw.Label_6.SetText(fmt.Sprintf("%d users in chat", n))
+	// QObject::tr("ccc", "dummy123")
+}

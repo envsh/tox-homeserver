@@ -526,7 +526,7 @@ func (this *RoomListItem) SetLastMsg(msg string, tm time.Time, eventId int64) {
 
 func (this *RoomListItem) SetPressState(pressed bool) {
 	changed := this.pressed != pressed
-	log.Println("changed:", changed, "pressed:", pressed, this.GetName())
+	// log.Println("changed:", changed, "pressed:", pressed, this.GetName())
 	if changed {
 		this.pressed = pressed
 		this.SetBgColor(gopp.IfElseStr(pressed, "selected", "default"))
@@ -632,4 +632,11 @@ func (this *RoomListItem) floatTextOverWidget(w qtwidgets.QWidget_ITF) *qtwidget
 	lab := qtwidgets.NewQLabel__()
 	lo.AddWidget(lab, 0, qtcore.Qt__AlignCenter)
 	return lab
+}
+
+func (this *RoomListItem) SetPeerCount(n int) {
+	this.peerCount = n
+	if uictx.msgwin.item == this {
+		uictx.msgwin.SetPeerCount(n)
+	}
 }

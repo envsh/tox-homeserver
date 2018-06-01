@@ -89,10 +89,10 @@ func (this *Ui_MessageItemView) SetupUi(MessageItemView *qtwidgets.QWidget) {
 	this.LabelUserName4MessageItem = qtwidgets.NewQLabel(this.MessageItemView, 0) // 111
 	this.LabelUserName4MessageItem.SetObjectName("LabelUserName4MessageItem")     // 112
 	this.Font = qtgui.NewQFont()
-	this.Font.SetBold(false)                                                                                                                                                                                                                      // 114
-	this.Font.SetWeight(50)                                                                                                                                                                                                                       // 114
-	this.LabelUserName4MessageItem.SetFont(this.Font)                                                                                                                                                                                             // 114
-	this.LabelUserName4MessageItem.SetTextInteractionFlags(qtcore.Qt__LinksAccessibleByKeyboard | qtcore.Qt__LinksAccessibleByMouse | qtcore.Qt__TextBrowserInteraction | qtcore.Qt__TextSelectableByKeyboard | qtcore.Qt__TextSelectableByMouse) // 114
+	this.Font.SetBold(false)                                                                  // 114
+	this.Font.SetWeight(50)                                                                   // 114
+	this.LabelUserName4MessageItem.SetFont(this.Font)                                         // 114
+	this.LabelUserName4MessageItem.SetTextInteractionFlags(qtcore.Qt__TextBrowserInteraction) // 114
 
 	this.HorizontalLayout.Layout().AddWidget(this.LabelUserName4MessageItem) // 115
 
@@ -100,10 +100,10 @@ func (this *Ui_MessageItemView) SetupUi(MessageItemView *qtwidgets.QWidget) {
 
 	this.HorizontalLayout.AddItem(this.HorizontalSpacer) // 115
 
-	this.LabelMsgTime = qtwidgets.NewQLabel(this.MessageItemView, 0)                                                                                                                                                                 // 111
-	this.LabelMsgTime.SetObjectName("LabelMsgTime")                                                                                                                                                                                  // 112
-	this.LabelMsgTime.SetAlignment(qtcore.Qt__AlignRight | qtcore.Qt__AlignTrailing | qtcore.Qt__AlignVCenter)                                                                                                                       // 114
-	this.LabelMsgTime.SetTextInteractionFlags(qtcore.Qt__LinksAccessibleByKeyboard | qtcore.Qt__LinksAccessibleByMouse | qtcore.Qt__TextBrowserInteraction | qtcore.Qt__TextSelectableByKeyboard | qtcore.Qt__TextSelectableByMouse) // 114
+	this.LabelMsgTime = qtwidgets.NewQLabel(this.MessageItemView, 0)                                           // 111
+	this.LabelMsgTime.SetObjectName("LabelMsgTime")                                                            // 112
+	this.LabelMsgTime.SetAlignment(qtcore.Qt__AlignRight | qtcore.Qt__AlignTrailing | qtcore.Qt__AlignVCenter) // 114
+	this.LabelMsgTime.SetTextInteractionFlags(qtcore.Qt__TextBrowserInteraction)                               // 114
 
 	this.HorizontalLayout.Layout().AddWidget(this.LabelMsgTime) // 115
 
@@ -119,14 +119,14 @@ func (this *Ui_MessageItemView) SetupUi(MessageItemView *qtwidgets.QWidget) {
 	this.Label_5 = qtwidgets.NewQLabel(this.MessageItemView, 0) // 111
 	this.Label_5.SetObjectName("Label_5")                       // 112
 	this.SizePolicy1 = qtwidgets.NewQSizePolicy_1(qtwidgets.QSizePolicy__Expanding, qtwidgets.QSizePolicy__Preferred, 1)
-	this.SizePolicy1.SetHorizontalStretch(0)                                                                                                                                                                                    // 114
-	this.SizePolicy1.SetVerticalStretch(0)                                                                                                                                                                                      // 114
-	this.SizePolicy1.SetHeightForWidth(this.Label_5.SizePolicy().HasHeightForWidth())                                                                                                                                           // 114
-	this.Label_5.SetSizePolicy(this.SizePolicy1)                                                                                                                                                                                // 114
-	this.Label_5.SetContextMenuPolicy(qtcore.Qt__DefaultContextMenu)                                                                                                                                                            // 114
-	this.Label_5.SetWordWrap(true)                                                                                                                                                                                              // 114
-	this.Label_5.SetOpenExternalLinks(true)                                                                                                                                                                                     // 114
-	this.Label_5.SetTextInteractionFlags(qtcore.Qt__LinksAccessibleByKeyboard | qtcore.Qt__LinksAccessibleByMouse | qtcore.Qt__TextBrowserInteraction | qtcore.Qt__TextSelectableByKeyboard | qtcore.Qt__TextSelectableByMouse) // 114
+	this.SizePolicy1.SetHorizontalStretch(0)                                          // 114
+	this.SizePolicy1.SetVerticalStretch(0)                                            // 114
+	this.SizePolicy1.SetHeightForWidth(this.Label_5.SizePolicy().HasHeightForWidth()) // 114
+	this.Label_5.SetSizePolicy(this.SizePolicy1)                                      // 114
+	this.Label_5.SetContextMenuPolicy(qtcore.Qt__DefaultContextMenu)                  // 114
+	this.Label_5.SetWordWrap(true)                                                    // 114
+	this.Label_5.SetOpenExternalLinks(true)                                           // 114
+	this.Label_5.SetTextInteractionFlags(qtcore.Qt__TextBrowserInteraction)           // 114
 
 	this.VerticalLayout.Layout().AddWidget(this.Label_5) // 115
 

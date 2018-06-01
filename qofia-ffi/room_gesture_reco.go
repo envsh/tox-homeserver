@@ -49,7 +49,6 @@ func (this *RoomGestureReco) onMouseRelease(item *RoomListItem, event *qtgui.QMo
 		// if runtime.GOOS == "android" {
 		if now.Sub(this.touchStart).Seconds() < 0.5 {
 			// reco as clicked
-			log.Println("clicked")
 			if this.OnClick != nil {
 				this.OnClick(item, event.Pos())
 			}
