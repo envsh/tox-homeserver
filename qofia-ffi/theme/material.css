@@ -11,6 +11,9 @@
 #LabelMsgCount,#LabelMsgCount2,#LabelMsgTime,#LabelLastMsgTime {
     color: #a4a4a4;
 }
+#LabelUserName4MessageItem {
+    color: #a4a4a4;
+}
 QWidget#Widget {
     background-color: #d6dde3;
     border-style: solid;

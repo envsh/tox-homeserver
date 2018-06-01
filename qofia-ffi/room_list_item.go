@@ -396,12 +396,12 @@ func (this *RoomListItem) AddMessageImpl(msgo *Message, msgiw *Ui_MessageItemVie
 	showPeerIcon := true
 
 	msgiw.Label_5.SetText(msgo.MsgUi)
-	msgiw.Label_3.SetText(fmt.Sprintf("%s", msgo.PeerNameUi))
+	msgiw.LabelUserName4MessageItem.SetText(fmt.Sprintf("%s", msgo.PeerNameUi))
 	msgiw.LabelMsgTime.SetText(Time2Today(msgo.Time))
 	msgiw.LabelMsgTime.SetToolTip(gopp.TimeToFmt1(msgo.Time))
 	msgiw.ToolButton_3.SetVisible(showMeIcon)
 	msgiw.ToolButton_2.SetVisible(showPeerIcon)
-	msgiw.Label_3.SetVisible(showName)
+	msgiw.LabelUserName4MessageItem.SetVisible(showName)
 	msgiw.ToolButton.SetVisible(false)
 
 	if uictx.msgwin.item == this {

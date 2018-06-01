@@ -279,7 +279,7 @@ func (this *ToxVM) setupCallbacks() {
 			groupId, _ = t.ConferenceGetIdentifier(groupNumber)
 		}
 
-		ctid, err := appctx.st.AddPeer(peerPubkey, groupNumber, peerName)
+		ctid, err := appctx.st.AddPeerOrUpdateName(peerPubkey, groupNumber, peerName)
 		gopp.ErrPrint(err, peerNumber, name, peerPubkey)
 
 		evt.Margs = []string{peerName, peerPubkey, title, groupId, fmt.Sprintf("%d", ctid)}

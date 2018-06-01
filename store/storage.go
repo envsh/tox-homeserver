@@ -130,6 +130,18 @@ func (this *Storage) AddPeer(peerPubkey string, num uint32, name string) (int64,
 	return this.AddContact(c)
 }
 
+func (this *Storage) AddPeerOrUpdateName(peerPubkey string, num uint32, name string) (int64, error) {
+	no, err := this.AddPeer(peerPubkey, num, name)
+	if IsUniqueConstraintErr(err) {
+		c := &Contact{}
+		c.IsPeer = 1
+		c.RtId = int(num)
+		c.Name = name
+		return this.dbh.Where("pubkey=? and name != ?", peerPubkey, name).Update(c)
+	}
+	return no, err
+}
+
 func (this *Storage) AddContact(c *Contact) (int64, error) {
 	c.Created = thscom.NowTimeStr()
 	c.Updated = c.Created

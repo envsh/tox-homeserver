@@ -21,25 +21,25 @@ func NewUi_MessageItemView() *Ui_MessageItemView {
 }
 
 type Ui_MessageItemView struct {
-	HorizontalLayout_2 *qtwidgets.QHBoxLayout
-	VerticalLayout_3   *qtwidgets.QVBoxLayout
-	ToolButton_2       *qtwidgets.QToolButton
-	VerticalSpacer     *qtwidgets.QSpacerItem
-	VerticalLayout     *qtwidgets.QVBoxLayout
-	HorizontalLayout   *qtwidgets.QHBoxLayout
-	Label_3            *qtwidgets.QLabel
-	HorizontalSpacer   *qtwidgets.QSpacerItem
-	LabelMsgTime       *qtwidgets.QLabel
-	ToolButton         *qtwidgets.QToolButton
-	Label_5            *qtwidgets.QLabel
-	VerticalLayout_2   *qtwidgets.QVBoxLayout
-	ToolButton_3       *qtwidgets.QToolButton
-	VerticalSpacer_2   *qtwidgets.QSpacerItem
-	MessageItemView    *qtwidgets.QWidget
-	SizePolicy         *qtwidgets.QSizePolicy
-	Icon               *qtgui.QIcon // 116
-	Font               *qtgui.QFont // 116
-	SizePolicy1        *qtwidgets.QSizePolicy
+	HorizontalLayout_2        *qtwidgets.QHBoxLayout
+	VerticalLayout_3          *qtwidgets.QVBoxLayout
+	ToolButton_2              *qtwidgets.QToolButton
+	VerticalSpacer            *qtwidgets.QSpacerItem
+	VerticalLayout            *qtwidgets.QVBoxLayout
+	HorizontalLayout          *qtwidgets.QHBoxLayout
+	LabelUserName4MessageItem *qtwidgets.QLabel
+	HorizontalSpacer          *qtwidgets.QSpacerItem
+	LabelMsgTime              *qtwidgets.QLabel
+	ToolButton                *qtwidgets.QToolButton
+	Label_5                   *qtwidgets.QLabel
+	VerticalLayout_2          *qtwidgets.QVBoxLayout
+	ToolButton_3              *qtwidgets.QToolButton
+	VerticalSpacer_2          *qtwidgets.QSpacerItem
+	MessageItemView           *qtwidgets.QWidget
+	SizePolicy                *qtwidgets.QSizePolicy
+	Icon                      *qtgui.QIcon // 116
+	Font                      *qtgui.QFont // 116
+	SizePolicy1               *qtwidgets.QSizePolicy
 }
 
 //  struct block end
@@ -82,19 +82,19 @@ func (this *Ui_MessageItemView) SetupUi(MessageItemView *qtwidgets.QWidget) {
 
 	this.HorizontalLayout_2.AddLayout(this.VerticalLayout_3, 0) // 115
 
-	this.VerticalLayout = qtwidgets.NewQVBoxLayout()            // 111
-	this.VerticalLayout.SetObjectName("VerticalLayout")         // 112
-	this.HorizontalLayout = qtwidgets.NewQHBoxLayout()          // 111
-	this.HorizontalLayout.SetObjectName("HorizontalLayout")     // 112
-	this.Label_3 = qtwidgets.NewQLabel(this.MessageItemView, 0) // 111
-	this.Label_3.SetObjectName("Label_3")                       // 112
+	this.VerticalLayout = qtwidgets.NewQVBoxLayout()                              // 111
+	this.VerticalLayout.SetObjectName("VerticalLayout")                           // 112
+	this.HorizontalLayout = qtwidgets.NewQHBoxLayout()                            // 111
+	this.HorizontalLayout.SetObjectName("HorizontalLayout")                       // 112
+	this.LabelUserName4MessageItem = qtwidgets.NewQLabel(this.MessageItemView, 0) // 111
+	this.LabelUserName4MessageItem.SetObjectName("LabelUserName4MessageItem")     // 112
 	this.Font = qtgui.NewQFont()
-	this.Font.SetBold(true)                                                                                                                                                                                                     // 114
-	this.Font.SetWeight(75)                                                                                                                                                                                                     // 114
-	this.Label_3.SetFont(this.Font)                                                                                                                                                                                             // 114
-	this.Label_3.SetTextInteractionFlags(qtcore.Qt__LinksAccessibleByKeyboard | qtcore.Qt__LinksAccessibleByMouse | qtcore.Qt__TextBrowserInteraction | qtcore.Qt__TextSelectableByKeyboard | qtcore.Qt__TextSelectableByMouse) // 114
+	this.Font.SetBold(false)                                                                                                                                                                                                                      // 114
+	this.Font.SetWeight(50)                                                                                                                                                                                                                       // 114
+	this.LabelUserName4MessageItem.SetFont(this.Font)                                                                                                                                                                                             // 114
+	this.LabelUserName4MessageItem.SetTextInteractionFlags(qtcore.Qt__LinksAccessibleByKeyboard | qtcore.Qt__LinksAccessibleByMouse | qtcore.Qt__TextBrowserInteraction | qtcore.Qt__TextSelectableByKeyboard | qtcore.Qt__TextSelectableByMouse) // 114
 
-	this.HorizontalLayout.Layout().AddWidget(this.Label_3) // 115
+	this.HorizontalLayout.Layout().AddWidget(this.LabelUserName4MessageItem) // 115
 
 	this.HorizontalSpacer = qtwidgets.NewQSpacerItem(10, 20, qtwidgets.QSizePolicy__Expanding, qtwidgets.QSizePolicy__Minimum)
 
@@ -164,7 +164,7 @@ func (this *Ui_MessageItemView) RetranslateUi(MessageItemView *qtwidgets.QWidget
 	// noimpl: {
 	this.MessageItemView.SetWindowTitle(qtcore.QCoreApplication_Translate("MessageItemView", "Form", "dummy123", 0))
 	this.ToolButton_2.SetText(qtcore.QCoreApplication_Translate("MessageItemView", "...", "dummy123", 0))
-	this.Label_3.SetText(qtcore.QCoreApplication_Translate("MessageItemView", "TextLabel", "dummy123", 0))
+	this.LabelUserName4MessageItem.SetText(qtcore.QCoreApplication_Translate("MessageItemView", "TextLabel", "dummy123", 0))
 	this.LabelMsgTime.SetText(qtcore.QCoreApplication_Translate("MessageItemView", "TextLabel", "dummy123", 0))
 	this.ToolButton.SetText(qtcore.QCoreApplication_Translate("MessageItemView", "...", "dummy123", 0))
 	// noimpl: label_5->setText(QString());
