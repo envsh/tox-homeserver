@@ -7,6 +7,7 @@ import (
 	"tox-homeserver/thspbs"
 
 	"github.com/kitech/qt.go/qtcore"
+	"github.com/kitech/qt.go/qtgui"
 	"github.com/kitech/qt.go/qtrt"
 	"github.com/kitech/qt.go/qtwidgets"
 )
@@ -14,6 +15,7 @@ import (
 type RoomChatState struct {
 	roomOpMenu             *qtwidgets.QMenu
 	actDisableNotification *qtwidgets.QAction
+	actShowMembers         *qtwidgets.QAction
 	actInviteFrient        *qtwidgets.QAction
 	actLeaveRoom           *qtwidgets.QAction
 	tblItems               []*qtwidgets.QTableWidgetItem
@@ -22,17 +24,21 @@ type RoomChatState struct {
 func (this *MainWindow) initRoomChat() {
 	this.initRoomChatUi()
 	this.initRoomChatSignals()
+	this.initRoomChatEvents()
 }
 
 func (this *MainWindow) initRoomChatUi() {
 	this.TableWidget.InsertColumn(0)
 	this.TableWidget.InsertColumn(1)
 	this.TableWidget.InsertColumn(2)
+	this.TableWidget.SetColumnCount(3)
 	this.roomOpMenu = qtwidgets.NewQMenu(nil)
 	this.actDisableNotification = this.roomOpMenu.AddAction("Disable Notification")
+	this.actShowMembers = this.roomOpMenu.AddAction("Members")
 	this.actInviteFrient = this.roomOpMenu.AddAction("Invite Friend")
 	this.actLeaveRoom = this.roomOpMenu.AddAction("Leave Room")
 	this.ToolButton_22.SetMenu(this.roomOpMenu)
+	this.ScrollArea_2.SetWidgetResizable(true)
 }
 
 func (this *MainWindow) initRoomChatSignals() {
@@ -41,6 +47,11 @@ func (this *MainWindow) initRoomChatSignals() {
 		this.ToolButton_22.ShowMenu()
 	})
 
+	qtrt.Connect(this.actShowMembers, "triggered()", func() {
+		log.Println("hehhe")
+		this.switchUiStack(UIST_MEMBERS)
+		this.LoadGroupMemberList(uictx.msgwin.item.GetId())
+	})
 	qtrt.Connect(this.actInviteFrient, "triggered()", func() {
 		log.Println("hehhe")
 		this.switchUiStack(UIST_INVITE_FRIEND)
@@ -48,6 +59,22 @@ func (this *MainWindow) initRoomChatSignals() {
 	})
 	qtrt.Connect(this.actLeaveRoom, "triggered()", func() {
 		log.Println("hehhe")
+	})
+}
+
+func (this *MainWindow) initRoomChatEvents() {
+	// for long content on QLabel, this will truncate can not wrap part
+	this.ScrollArea_2.InheritResizeEvent(func(arg0 *qtgui.QResizeEvent) {
+		osz := arg0.OldSize()
+		nsz := arg0.Size()
+		if false {
+			log.Println(osz.Width(), osz.Height(), nsz.Width(), nsz.Height())
+		}
+		if osz.Width() != nsz.Width() {
+			this.ScrollAreaWidgetContents_2.SetMaximumWidth(nsz.Width())
+		}
+		// this.ScrollArea_2.ResizeEvent(arg0)
+		arg0.Ignore() // I ignore, you handle it. replace explict call parent's
 	})
 }
 

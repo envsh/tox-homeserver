@@ -96,6 +96,7 @@ func (this *MainWindow) init() {
 	this.initRoomChat()
 	this.initInivteFriend()
 	this.initAddFriend()
+	this.initGroupMemberList()
 }
 
 func (this *MainWindow) initMainUi() {
@@ -792,6 +793,12 @@ func dispatchEvent(jso *simplejson.Json) {
 		}
 	case "ConferencePeerName":
 		log.Println("TODO", jso)
+		gnum := gopp.MustUint32(jso.Get("args").GetIndex(0).MustString())
+		pnum := gopp.MustUint32(jso.Get("args").GetIndex(1).MustString())
+		groupId := jso.Get("margs").GetIndex(3).MustString()
+		pname := jso.Get("margs").GetIndex(0).MustString()
+		ppubkey := jso.Get("margs").GetIndex(1).MustString()
+		vtcli.Binfo.UpdatePeerInfo(gnum, groupId, ppubkey, pname, pnum)
 	case "ConferencePeerListChange":
 		log.Println("TODO", jso)
 		groupId := jso.Get("margs").GetIndex(1).MustString()
