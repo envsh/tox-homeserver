@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"tox-homeserver/thspbs"
 
 	"github.com/kitech/qt.go/qtrt"
@@ -49,7 +48,6 @@ func (this *MainWindow) AddGroupMember(peero *thspbs.MemberInfo) {
 
 	tabwgt.InsertRow(0)
 	cell := qtwidgets.NewQTableWidgetItem_1(peero.Name, 0)
-	log.Println(cell)
 	tabwgt.SetItem(0, 1, cell)
 	this.tblItems = append(this.tblItems, cell)
 

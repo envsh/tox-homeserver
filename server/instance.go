@@ -185,28 +185,31 @@ func (this *ToxVM) setupCallbacks() {
 		switch itype {
 		case tox.CONFERENCE_TYPE_TEXT:
 			gn, err = t.ConferenceJoin(friendNumber, cookie)
-			gopp.ErrPrint(err)
+			gopp.ErrPrint(err, fname, gn, len(cookie))
 		case tox.CONFERENCE_TYPE_AV:
 			gn_, err_ := t.JoinAVGroupChat(friendNumber, cookie)
-			gopp.ErrPrint(err_)
+			gopp.ErrPrint(err_, fname, gn, len(cookie))
 			err = err_
 			gn = uint32(gn_)
 		}
+		gopp.ErrPrint(err, fname, gn, len(cookie))
 		if err != nil {
 			if false {
 				time.Sleep(300 * time.Millisecond)
 			}
+			// join group chat failed: 4
 			if gn_, found := xtox.ConferenceGetByCookie(t, cookie); found {
 				gn = gn_
+				log.Println("Maybe already joined, correct to:", gn)
 			} else {
 				log.Println("why not found:", cookie)
 			}
 		}
 		evt.Margs = append(evt.Margs, fmt.Sprintf("%d", gn))
 
-		log.Println(gn)
 		cookie2, _ := t.ConferenceGetIdentifier(gn)
 		log.Println(cookie2 == cookie, cookie, cookie2)
+		gopp.Assert(!xtox.ConferenceIdIsEmpty(cookie2), fname)
 
 		ctid, err := appctx.st.AddGroup(cookie2, gn, "")
 		gopp.ErrPrint(err)
@@ -363,7 +366,7 @@ func (this *ToxVM) setupCallbacks() {
 		peerPubkey, _ := xtox.ConferencePeerGetPubkey(t, groupNumber, peerNumber)
 		peerName, _ := xtox.ConferencePeerGetName(t, groupNumber, peerNumber)
 		if peerName == "" || peerPubkey == "" {
-			log.Println("peer not found:", peerNumber, peerName, peerPubkey)
+			log.Println("peer not found:", groupNumber, peerNumber, title, peerName, peerPubkey)
 		}
 
 		ctid, err := appctx.st.AddGroup(groupId, groupNumber, title)

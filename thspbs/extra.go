@@ -1,5 +1,7 @@
 package thspbs
 
+import "log"
+
 // extra for proto auto generated
 type ContactInfo = MemberInfo
 type ContactType = MemberInfo_MemType
@@ -23,7 +25,19 @@ func (this *BaseInfo) UpdatePeerInfo(grpnum uint32, groupId string, pubkey strin
 	grpo := NewGroupInfo()
 	grpo.AddPeerInfo(pubkey, name, rtnum)
 	// if there has grpnum, override it
+	if grpo, ok := this.Groups[grpnum]; ok {
+		log.Println("Override group info:", grpnum, grpo.Gnum, grpo.Title)
+	}
 	this.Groups[grpnum] = grpo
+}
+
+func (this *BaseInfo) DeletePeerInfo(gnum uint32, groupId, pubkey string) {
+	for _, grpo := range this.Groups {
+		if grpo.GroupId == groupId {
+			grpo.DeletePeerInfo(pubkey)
+			return
+		}
+	}
 }
 
 func NewGroupInfo() *GroupInfo {
@@ -36,6 +50,9 @@ func (this *GroupInfo) AddPeerInfo(pubkey string, name string, rtnum uint32) {
 	peero.Name = name
 	peero.Pubkey = pubkey
 	peero.Pnum = rtnum
+	if peero, ok := this.Members[rtnum]; ok {
+		log.Println("Override peer info:", rtnum, name, peero.Pnum, peero.Name)
+	}
 	this.Members[rtnum] = peero
 }
 
@@ -49,6 +66,15 @@ func (this *GroupInfo) UpdatePeerInfo(pubkey string, name string, rtnum uint32) 
 	}
 	// not found
 	this.AddPeerInfo(pubkey, name, rtnum)
+}
+
+func (this *GroupInfo) DeletePeerInfo(pubkey string) {
+	for pnum, peero := range this.Members {
+		if peero.Pubkey == pubkey {
+			delete(this.Members, pnum)
+			return
+		}
+	}
 }
 
 ///

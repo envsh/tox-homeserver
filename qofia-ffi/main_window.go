@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"gopp"
 	"io/ioutil"
@@ -756,7 +757,13 @@ func dispatchEvent(jso *simplejson.Json) {
 			grpInfo.Gnum = gopp.MustUint32(groupNumber)
 			grpInfo.Title = fmt.Sprintf("Group #%s", groupNumber)
 			item.SetContactInfo(grpInfo)
-			log.Println("new group contact:", groupNumber, grpInfo.Title, groupId)
+			log.Println("New group contact item:", groupNumber, grpInfo.Title, groupId)
+		} else {
+			log.Println("Reuse group contact item:", groupNumber, item.grpInfo.Title, groupId)
+			if gopp.MustUint32(groupNumber) != item.grpInfo.Gnum {
+				log.Println("GroupNumber changed, update it.", item.grpInfo.Gnum, groupNumber)
+				item.grpInfo.Gnum = gopp.MustUint32(groupNumber)
+			}
 		}
 
 		///
@@ -767,7 +774,6 @@ func dispatchEvent(jso *simplejson.Json) {
 		groupNumber := jso.Get("args").GetIndex(1).MustString()
 		groupTitle := jso.Get("args").GetIndex(2).MustString()
 		groupId := jso.Get("margs").GetIndex(0).MustString()
-		log.Println(groupId)
 		if thscli.ConferenceIdIsEmpty(groupId) {
 			break
 		}
@@ -776,7 +782,7 @@ func dispatchEvent(jso *simplejson.Json) {
 		item := uictx.iteman.Get(groupId)
 		if item != nil {
 			item.UpdateName(groupTitle)
-			log.Println("update group contact title:", groupNumber, groupId, groupTitle)
+			log.Println("Reuse item and update group contact title:", groupNumber, groupId, groupTitle)
 		} else {
 			item = NewRoomListItem()
 			item.OnConextMenu = func(w *qtwidgets.QWidget, pos *qtcore.QPoint) {
@@ -789,25 +795,41 @@ func dispatchEvent(jso *simplejson.Json) {
 			grpInfo.Gnum = gopp.MustUint32(groupNumber)
 			grpInfo.Title = groupTitle
 			item.SetContactInfo(grpInfo)
-			log.Println("new group contact:", groupNumber, groupId, groupTitle)
+			log.Println("New group contact item:", groupNumber, groupId, groupTitle)
 		}
 	case "ConferencePeerName":
-		log.Println("TODO", jso)
 		gnum := gopp.MustUint32(jso.Get("args").GetIndex(0).MustString())
 		pnum := gopp.MustUint32(jso.Get("args").GetIndex(1).MustString())
 		groupId := jso.Get("margs").GetIndex(3).MustString()
 		pname := jso.Get("margs").GetIndex(0).MustString()
 		ppubkey := jso.Get("margs").GetIndex(1).MustString()
 		vtcli.Binfo.UpdatePeerInfo(gnum, groupId, ppubkey, pname, pnum)
+		peeros := vtcli.Binfo.GetGroupMembers(gnum)
+		item := uictx.iteman.Get(groupId)
+		if item != nil {
+			if item.peerCount != len(peeros) {
+				// item.SetPeerCount(len(peeros))
+			}
+		}
 	case "ConferencePeerListChange":
-		log.Println("TODO", jso)
 		groupId := jso.Get("margs").GetIndex(1).MustString()
 		peerCount := gopp.MustInt(jso.Get("margs").GetIndex(2).MustString())
 		item := uictx.iteman.Get(groupId)
 		if item != nil {
-			item.SetPeerCount(peerCount)
+			if item.peerCount != peerCount {
+				item.SetPeerCount(peerCount)
+			}
 		}
-	case "ConferenceNameListChange":
+		// update deleted ones
+		gnum := gopp.MustUint32(jso.Get("args").GetIndex(0).MustString())
+		deletedPeerPubkeysjs := jso.Get("margs").GetIndex(4).MustString()
+		deletedPeerPubkeys := []string{}
+		err := json.Unmarshal([]byte(deletedPeerPubkeysjs), deletedPeerPubkeys)
+		gopp.ErrPrint(err, deletedPeerPubkeysjs)
+		for _, pubkey := range deletedPeerPubkeys {
+			vtcli.Binfo.DeletePeerInfo(gnum, groupId, pubkey)
+		}
+	case "ConferenceNameListChange": // depcreated
 		groupTitle := jso.Get("margs").GetIndex(2).MustString()
 		groupId := jso.Get("margs").GetIndex(3).MustString()
 		log.Println(groupId)
@@ -819,7 +841,6 @@ func dispatchEvent(jso *simplejson.Json) {
 
 	case "ConferenceMessage":
 		groupId := jso.Get("margs").GetIndex(3).MustString()
-		log.Println(groupId)
 		if thscli.ConferenceIdIsEmpty(groupId) {
 			break
 		}

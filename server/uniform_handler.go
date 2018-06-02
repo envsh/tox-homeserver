@@ -173,6 +173,8 @@ func RmtCallExecuteHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Even
 		_, err = t.ConferenceSetTitle(gn, rname)
 		gopp.ErrPrint(err, gn, rname)
 		groupId, _ := t.ConferenceGetIdentifier(gn)
+		gopp.Assert(!xtox.ConferenceIdIsEmpty(groupId), rname, gn)
+		// TODO not needed
 		gopp.CondWait(10, func() bool {
 			t.Iterate2(nil)
 			groupId, _ = t.ConferenceGetIdentifier(gn)
@@ -187,9 +189,11 @@ func RmtCallExecuteHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Even
 	case "ConferenceDelete": // "groupNumber"
 		gnum := gopp.MustUint32(req.Args[0])
 		groupId, _ := t.ConferenceGetIdentifier(gnum)
+		title, _ := t.ConferenceGetTitle(gnum)
 		_, err = t.ConferenceDelete(gnum)
 		gopp.ErrPrint(err, req.Args)
 		out.Args = append(out.Args, groupId)
+		log.Println(req.Name, req.Args[0], title, groupId)
 
 	case "ConferenceSendMessage": // "groupNumber" or groupIdentity,"mtype","msg", optional4web("groupTitle")
 		gnum := uint32(gopp.MustInt(req.Args[0]))
