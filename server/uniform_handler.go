@@ -241,6 +241,8 @@ func RmtCallExecuteHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Even
 			out.Emsg = err.Error()
 		} else {
 			out.Args = []string{gopp.ToStr(frndno)}
+			err := xtox.WriteSavedata(t, tvmCtx.SaveFile)
+			gopp.ErrPrint(err)
 		}
 	case "FriendAddNorequest": // toxid
 		toxid := req.Args[0]
@@ -251,6 +253,8 @@ func RmtCallExecuteHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Even
 			out.Emsg = err.Error()
 		} else {
 			out.Args = []string{gopp.ToStr(frndno)}
+			err := xtox.WriteSavedata(t, tvmCtx.SaveFile)
+			gopp.ErrPrint(err)
 		}
 	case "FriendDelete": // frndno
 		frndno := gopp.MustUint32(req.Args[0])
@@ -260,6 +264,8 @@ func RmtCallExecuteHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Even
 		gopp.ErrPrint(err, frndno)
 		if err != nil {
 			out.Ecode, out.Emsg = -1, err.Error()
+			err := xtox.WriteSavedata(t, tvmCtx.SaveFile)
+			gopp.ErrPrint(err)
 		}
 	case "SelfSetName":
 		name := req.Args[0]

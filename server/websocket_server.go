@@ -72,7 +72,7 @@ func (this *WebsocketServer) toxhsrpc(w http.ResponseWriter, r *http.Request) {
 		gopp.ErrPrint(err)
 
 	}
-	log.Println("disconnected from:", raddr, time.Now().Sub(ctime))
+	log.Println("WSRpc disconnected from:", raddr, time.Since(ctime))
 }
 
 func (this *WebsocketServer) toxhspush(w http.ResponseWriter, r *http.Request) {
@@ -103,7 +103,7 @@ func (this *WebsocketServer) toxhspush(w http.ResponseWriter, r *http.Request) {
 		}
 		log.Printf("recv: %s of %d\n", message, mt)
 	}
-	log.Println("disconnected from:", raddr, time.Now().Sub(ctime))
+	log.Println("WSPusher disconnected from:", raddr, time.Since(ctime))
 }
 
 func (this *WebsocketServer) pushevt(evt *thspbs.Event) error {

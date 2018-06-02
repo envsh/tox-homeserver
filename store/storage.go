@@ -356,7 +356,6 @@ func (this *Storage) NextId() int64 {
 	idv := &Idgen{}
 	affected, err := this.dbh.InsertOne(idv)
 	gopp.ErrPrint(err, affected)
-	log.Println(affected, idv)
 	return idv.Id
 }
 

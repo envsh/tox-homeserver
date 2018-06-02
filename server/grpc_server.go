@@ -6,6 +6,8 @@ import (
 	"log"
 	"net"
 	"sync"
+	"sync/atomic"
+	"time"
 
 	// tox "github.com/envsh/go-toxcore"
 
@@ -23,12 +25,12 @@ type GrpcServer struct {
 	svc   *GrpcService
 
 	connsmu   sync.Mutex
-	grpcConns map[thspbs.Toxhs_PollCallbackServer]int
+	grpcConns map[thspbs.Toxhs_PollCallbackServer]uint64
 }
 
 func newGrpcServer() *GrpcServer {
 	this := &GrpcServer{}
-	this.grpcConns = make(map[thspbs.Toxhs_PollCallbackServer]int)
+	this.grpcConns = make(map[thspbs.Toxhs_PollCallbackServer]uint64)
 
 	// TODO 压缩支持
 	this.srv = grpc.NewServer()
@@ -84,10 +86,14 @@ func (this *GrpcService) Ping(ctx context.Context, req *thspbs.EmptyReq) (*thspb
 	return out, nil
 }
 
+var grpcStreamConnNo uint64 = 0
+
 func (this *GrpcService) PollCallback(req *thspbs.EmptyReq, stm thspbs.Toxhs_PollCallbackServer) error {
-	log.Println("New grpc stream poll connect.", len(appctx.rpcs.grpcConns))
+	nowt := time.Now()
+	conno := atomic.AddUint64(&grpcStreamConnNo, 1)
+	log.Println("New grpc stream poll connect.", len(appctx.rpcs.grpcConns), conno)
 	appctx.rpcs.connsmu.Lock()
-	appctx.rpcs.grpcConns[stm] = 1
+	appctx.rpcs.grpcConns[stm] = conno
 	appctx.rpcs.connsmu.Unlock()
 	defer func() {
 		appctx.rpcs.connsmu.Lock()
@@ -95,10 +101,12 @@ func (this *GrpcService) PollCallback(req *thspbs.EmptyReq, stm thspbs.Toxhs_Pol
 		appctx.rpcs.connsmu.Unlock()
 	}()
 
-	for {
-		select {}
+	select {
+	case <-stm.Context().Done():
+		break
 	}
-	// return nil
+	log.Println("A stream done:", conno, time.Since(nowt))
+	return nil
 }
 
 func demofn1() {

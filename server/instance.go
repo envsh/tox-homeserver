@@ -311,12 +311,15 @@ func (this *ToxVM) setupCallbacks() {
 		oldPeerPubkeys := this.groupPeerPubkeys[groupId]
 		newPeerPubkeys := t.ConferenceGetPeerPubkeys(groupNumber)
 		added, deleted := DiffSliceAsString(oldPeerPubkeys, newPeerPubkeys)
-		this.groupPeerPubkeys[groupId] = newPeerPubkeys
 
-		addedjs, _ := json.Marshal(added)
-		deletedjs, _ := json.Marshal(deleted)
-		evt.Margs = []string{title, groupId, gopp.ToStr(len(newPeerPubkeys)), string(addedjs), string(deletedjs)}
-		this.pubmsg(&evt)
+		if len(added) > 0 || len(deleted) > 0 { // omit empty event
+			this.groupPeerPubkeys[groupId] = newPeerPubkeys
+
+			addedjs, _ := json.Marshal(added)
+			deletedjs, _ := json.Marshal(deleted)
+			evt.Margs = []string{title, groupId, gopp.ToStr(len(newPeerPubkeys)), string(addedjs), string(deletedjs)}
+			this.pubmsg(&evt)
+		}
 	}, nil)
 
 	/*
