@@ -1,7 +1,6 @@
 package client
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"gopp"
@@ -15,8 +14,7 @@ func (this *LigTox) PullEventsByContactId(pubkey string, prev_batch int64) ([]st
 	args.Name = "PullEventsByContactId"
 	args.Args = []string{pubkey, fmt.Sprintf("%d", prev_batch)}
 
-	cli := thspbs.NewToxhsClient(this.rpcli)
-	rsp, err := cli.RmtCall(context.Background(), args)
+	rsp, err := this.rmtCall(args)
 	gopp.ErrPrint(err)
 	if err != nil {
 		return nil, err

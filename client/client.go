@@ -14,12 +14,9 @@ import (
 	"time"
 	"unsafe"
 
-	thscom "tox-homeserver/common"
 	"tox-homeserver/thspbs"
 
 	simplejson "github.com/bitly/go-simplejson"
-	"github.com/gorilla/websocket"
-	"google.golang.org/grpc"
 )
 
 // friend callback type
@@ -58,11 +55,8 @@ type LigTox struct {
 	bemsgsmu sync.RWMutex
 	OnNewMsg func()
 
-	srvurl   string
-	rpcli    *grpc.ClientConn
-	wsc4push *websocket.Conn
-	wsc4rpc  *websocket.Conn
-	usewstp  bool // use websocket transport for replace grpc
+	srvurl string
+	srvtp  Transport
 
 	// some callbacks, should be private. &fn => ud
 	cb_friend_requests           map[unsafe.Pointer]interface{}
@@ -98,6 +92,8 @@ func NewLigTox(srvurl string) *LigTox {
 	this := &LigTox{}
 	this.srvurl = srvurl
 	this.bemsgs = make([][]byte, 0)
+	this.srvtp = NewGrpcTransport()
+	this.srvtp.OnData(this.onBackendEventDeduped)
 	this.initCbmap()
 
 	return this
@@ -105,51 +101,17 @@ func NewLigTox(srvurl string) *LigTox {
 
 func (this *LigTox) Connect() error {
 	srvurl := this.srvurl
-	log.Println("connecting grpc:", srvurl)
-	rpcli, err := grpc.Dial(srvurl, grpc.WithInsecure())
-	gopp.ErrPrint(err, rpcli)
-	if err != nil {
-		return err
-	}
 
-	// ping test, seems grpc is lazy connect
-	cc := rpcli
-	thsc := thspbs.NewToxhsClient(cc)
-	in := &thspbs.EmptyReq{}
-	_, err = thsc.Ping(context.Background(), in)
-	gopp.ErrPrint(err)
+	err := this.srvtp.Connect(srvurl)
+	gopp.ErrPrint(err, srvurl)
 	if err != nil {
-		return err
-	}
-	this.rpcli = rpcli
-
-	if err := this.connectWS(); err != nil {
-		gopp.ErrPrint(err, srvurl)
 		return err
 	}
 
 	return nil
 }
 
-func (this *LigTox) connectWS() (err error) {
-	srvurl := this.srvurl
-	wsurl := fmt.Sprintf("ws://%s:%d", strings.Split(srvurl, ":")[0], thscom.WSPort)
-	this.wsc4rpc, _, err = websocket.DefaultDialer.Dial(fmt.Sprintf("%s/toxhsrpc", wsurl), nil)
-	gopp.ErrPrint(err, wsurl)
-	this.wsc4push, _, err = websocket.DefaultDialer.Dial(fmt.Sprintf("%s/toxhspush", wsurl), nil)
-	gopp.ErrPrint(err, wsurl)
-	return
-}
-
-func (this *LigTox) start() {
-
-	// this.initConnections()
-
-	go this.serveBackendEventWS()
-
-	go this.serveBackendEventGrpc()
-	// TODO reconnect
-}
+func (this *LigTox) start() { this.srvtp.Start() }
 
 func (this *LigTox) initCbmap() {
 	this.cb_friend_requests = make(map[unsafe.Pointer]interface{})
@@ -177,93 +139,6 @@ func (this *LigTox) initCbmap() {
 
 	this.cb_baseinfos = make(map[unsafe.Pointer]interface{})
 
-}
-
-// TODO 两个同时接收导致重复消息
-// should block
-func (this *LigTox) serveBackendEventWS() {
-	var err error
-	for {
-		err = this.serveBackendEventWSImpl()
-		for retry := 1; ; retry++ {
-			log.Println("Websocket maybe disconnect, retry 3 secs...")
-			time.Sleep(time.Duration(retry+retry) * time.Second)
-			err = this.connectWS()
-			gopp.ErrPrint(err, "ws reconnect error")
-			if err == nil {
-				log.Println("Websocket reconnect success.")
-				break
-			}
-			if err != nil && retry > 10000 {
-				goto funcend
-			}
-
-		}
-	}
-funcend:
-	log.Println("Websocket given up!!!")
-}
-func (this *LigTox) serveBackendEventWSImpl() error {
-	var errtop error
-	for {
-		c := this.wsc4push
-		_, message, err := c.ReadMessage()
-		if err != nil {
-			log.Println("read:", err)
-			errtop = err
-			break
-		}
-		log.Printf("wsrecv: %s\n", message)
-
-		jso, err := simplejson.NewJson(message)
-		gopp.ErrPrint(err)
-		if rdatao, ok := jso.CheckGet("data"); ok {
-			rmessage, _ := rdatao.Encode()
-			this.onBackendEventDeduped(rdatao, rmessage)
-		} else if _, ok := jso.CheckGet("name"); ok {
-			this.onBackendEventDeduped(jso, message)
-		} else {
-			log.Println("Unknown packet:", string(message))
-		}
-	}
-	log.Println("Websocket poll done")
-	return errtop
-}
-
-// should block
-func (this *LigTox) serveBackendEventGrpc() {
-
-	for {
-		this.serveBackendEventGrpcImpl()
-		log.Println("Grpc maybe disconnect, retry 3 secs...")
-		time.Sleep(3 * time.Second)
-	}
-}
-
-func (this *LigTox) serveBackendEventGrpcImpl() {
-	clio := thspbs.NewToxhsClient(this.rpcli)
-	stmc, err := clio.PollCallback(context.Background(), &thspbs.EmptyReq{})
-	gopp.ErrPrint(err)
-	if err != nil {
-		return
-	}
-	cnter := uint64(0)
-	for {
-		evt, err := stmc.Recv()
-		gopp.ErrPrint(err)
-		if err != nil {
-			break
-		}
-		cnter++
-
-		jcc, err := json.Marshal(evt)
-		gopp.ErrPrint(err)
-		log.Println("grpcrecv:", string(jcc))
-		jso, err := simplejson.NewJson(jcc)
-		gopp.ErrPrint(err)
-		this.onBackendEventDeduped(jso, jcc)
-	}
-	log.Println("Grpc poll got events:", cnter)
 }
 
 var evtmd5smu sync.Mutex
@@ -345,26 +220,12 @@ func (this *LigTox) onBackendEvent(jso *simplejson.Json, data []byte) {
 }
 
 func (this *LigTox) rmtCall(args *thspbs.Event) (*thspbs.Event, error) {
-	if this.usewstp {
-		data, err := json.Marshal(args)
-		gopp.ErrPrint(err)
-		err = this.wsc4rpc.WriteMessage(websocket.TextMessage, data)
-		gopp.ErrPrint(err)
-		mt, rdata, err := this.wsc4rpc.ReadMessage()
-		gopp.ErrPrint(err, mt)
-		rsp := &thspbs.Event{}
-		err = json.Unmarshal(rdata, rsp)
-		gopp.ErrPrint(err)
-		return rsp, err
-	} else {
-		cli := thspbs.NewToxhsClient(this.rpcli)
-		rsp, err := cli.RmtCall(context.Background(), args)
-		return rsp, err
-	}
+	return this.srvtp.rmtCall(args)
 }
 
 func (this *LigTox) GetBaseInfo() {
-	if this.usewstp {
+	switch tp := this.srvtp.(type) {
+	case *WebsocketTransport:
 		in := &thspbs.Event{}
 		in.Name = "GetBaseInfo"
 		rsp, err := this.rmtCall(in)
@@ -374,8 +235,8 @@ func (this *LigTox) GetBaseInfo() {
 		err = json.Unmarshal([]byte(rsp.Args[0]), binfo)
 		gopp.ErrPrint(err)
 		this.ParseBaseInfo(binfo)
-	} else {
-		cli := thspbs.NewToxhsClient(this.rpcli)
+	case *GrpcTransport:
+		cli := thspbs.NewToxhsClient(tp.rpcli)
 		in := &thspbs.EmptyReq{}
 		bi, err := cli.GetBaseInfo(context.Background(), in)
 		gopp.ErrPrint(err)

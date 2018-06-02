@@ -82,10 +82,10 @@ func (this *Storage) initTables() {
 	}
 }
 
-func (this *Storage) AddFriend(pubkey string, num uint32, name, stmsg string) (int64, error) {
+func (this *Storage) AddFriend(pubkey string, rtnum uint32, name, stmsg string) (int64, error) {
 	c := &Contact{}
 	c.Pubkey = pubkey
-	c.RtId = int(num)
+	c.RtId = rtnum
 	c.Name = name
 	c.Stmsg = stmsg
 	c.Status = 0
@@ -93,49 +93,57 @@ func (this *Storage) AddFriend(pubkey string, num uint32, name, stmsg string) (i
 	return this.AddContact(c)
 }
 
-func (this *Storage) AddGroup(identify string, num uint32, title string) (int64, error) {
+func (this *Storage) AddGroup(identify string, rtnum uint32, title string) (int64, error) {
 	c := &Contact{}
 	c.IsGroup = 1
 	c.Pubkey = identify
-	c.RtId = int(num)
+	c.RtId = rtnum
 	c.Name = title
 	return this.AddContact(c)
 }
 
-func (this *Storage) UpdateGroup(identifier string, num uint32, title string) (int64, error) {
+func (this *Storage) UpdateGroup(identifier string, rtnum uint32, title string) (int64, error) {
 	c := &Contact{}
 	c.IsGroup = 1
 	c.Pubkey = identifier
-	c.RtId = int(num)
+	c.RtId = rtnum
 	c.Name = title
 	return this.UpdateContactByPubkey(c)
 }
 
-func (this *Storage) SetGroup(identifier string, num uint32, title string) (ret int64, err error) {
-	ret, err = this.AddGroup(identifier, num, title)
+func (this *Storage) SetGroup(identifier string, rtnum uint32, title string) (ret int64, err error) {
+	ret, err = this.AddGroup(identifier, rtnum, title)
 	gopp.ErrPrint(err, title)
 	if IsUniqueConstraintErr(err) {
-		ret, err = this.UpdateGroup(identifier, num, title)
+		ret, err = this.UpdateGroup(identifier, rtnum, title)
 		gopp.ErrPrint(err, title)
 	}
 	return
 }
 
-func (this *Storage) AddPeer(peerPubkey string, num uint32, name string) (int64, error) {
+func (this *Storage) AddPeer(peerPubkey string, rtnum uint32, name string) (int64, error) {
 	c := &Contact{}
 	c.IsPeer = 1
 	c.Pubkey = peerPubkey
-	c.RtId = int(num)
+	c.RtId = rtnum
 	c.Name = name
 	return this.AddContact(c)
 }
 
-func (this *Storage) AddPeerOrUpdateName(peerPubkey string, num uint32, name string) (int64, error) {
-	no, err := this.AddPeer(peerPubkey, num, name)
+func (this *Storage) UpdatePeer(peerPubkey string, rtnum uint32, name string) (int64, error) {
+	c := &Contact{}
+	c.Pubkey = peerPubkey
+	c.RtId = rtnum
+	c.Name = name
+	return this.UpdateContactByPubkey(c)
+}
+
+func (this *Storage) AddPeerOrUpdateName(peerPubkey string, rtnum uint32, name string) (int64, error) {
+	no, err := this.AddPeer(peerPubkey, rtnum, name)
 	if IsUniqueConstraintErr(err) {
 		c := &Contact{}
 		c.IsPeer = 1
-		c.RtId = int(num)
+		c.RtId = rtnum
 		c.Name = name
 		return this.dbh.Where("pubkey=? and name != ?", peerPubkey, name).Update(c)
 	}

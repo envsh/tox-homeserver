@@ -1,7 +1,6 @@
 package client
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"gopp"
@@ -97,11 +96,11 @@ func (this *LigTox) CallbackConferenceNameListChangeAdd(cbfn cb_conference_namel
 //////
 func (this *LigTox) ConferenceSendMessage(groupNumber uint32, mtype int, msg string) error {
 	fname := this.getMethodName()
-	args := thspbs.Event{}
+	args := &thspbs.Event{}
 	args.Name = fname
 	args.Args = []string{fmt.Sprintf("%d", groupNumber), fmt.Sprintf("%d", mtype), msg}
-	cli := thspbs.NewToxhsClient(this.rpcli)
-	rsp, err := cli.RmtCall(context.Background(), &args)
+
+	rsp, err := this.rmtCall(args)
 	gopp.ErrPrint(err, rsp)
 	log.Println(rsp)
 	if rsp.Ecode != 0 {
@@ -112,11 +111,11 @@ func (this *LigTox) ConferenceSendMessage(groupNumber uint32, mtype int, msg str
 
 func (this *LigTox) ConferenceJoin(friendNumber uint32, cookie string) (uint32, error) {
 	fname := this.getMethodName()
-	args := thspbs.Event{}
+	args := &thspbs.Event{}
 	args.Name = fname
 	args.Args = []string{fmt.Sprintf("%d", friendNumber), cookie}
-	cli := thspbs.NewToxhsClient(this.rpcli)
-	rsp, err := cli.RmtCall(context.Background(), &args)
+
+	rsp, err := this.rmtCall(args)
 	gopp.ErrPrint(err, rsp)
 	log.Println(rsp)
 	if rsp.Ecode != 0 {
@@ -127,11 +126,11 @@ func (this *LigTox) ConferenceJoin(friendNumber uint32, cookie string) (uint32, 
 
 func (this *LigTox) ConferenceNew(name string) (uint32, string, error) {
 	fname := this.getMethodName()
-	args := thspbs.Event{}
+	args := &thspbs.Event{}
 	args.Name = fname
 	args.Args = []string{fmt.Sprintf("%s", name)}
-	cli := thspbs.NewToxhsClient(this.rpcli)
-	rsp, err := cli.RmtCall(context.Background(), &args)
+
+	rsp, err := this.rmtCall(args)
 	gopp.ErrPrint(err, rsp)
 	log.Println(rsp)
 	if rsp.Ecode != 0 {
@@ -142,11 +141,11 @@ func (this *LigTox) ConferenceNew(name string) (uint32, string, error) {
 
 func (this *LigTox) ConferenceDelete(groupNumber uint32) (uint32, error) {
 	fname := this.getMethodName()
-	args := thspbs.Event{}
+	args := &thspbs.Event{}
 	args.Name = fname
 	args.Args = []string{fmt.Sprintf("%d", groupNumber)}
-	cli := thspbs.NewToxhsClient(this.rpcli)
-	rsp, err := cli.RmtCall(context.Background(), &args)
+
+	rsp, err := this.rmtCall(args)
 	gopp.ErrPrint(err, rsp)
 	log.Println(rsp)
 	if rsp.Ecode != 0 {
@@ -157,11 +156,11 @@ func (this *LigTox) ConferenceDelete(groupNumber uint32) (uint32, error) {
 
 func (this *LigTox) ConferencePeerCount(groupNumber uint32) (uint32, error) {
 	fname := this.getMethodName()
-	args := thspbs.Event{}
+	args := &thspbs.Event{}
 	args.Name = fname
 	args.Args = []string{fmt.Sprintf("%d", groupNumber)}
-	cli := thspbs.NewToxhsClient(this.rpcli)
-	rsp, err := cli.RmtCall(context.Background(), &args)
+
+	rsp, err := this.rmtCall(args)
 	gopp.ErrPrint(err, rsp)
 	log.Println(rsp)
 	if rsp.Ecode != 0 {
@@ -172,14 +171,11 @@ func (this *LigTox) ConferencePeerCount(groupNumber uint32) (uint32, error) {
 
 func (this *LigTox) ConferencePeerGetName(groupNumber uint32, peerNumber uint32) (string, error) {
 	fname := this.getMethodName()
-	args := thspbs.Event{}
+	args := &thspbs.Event{}
 	args.Name = fname
 	args.Args = []string{fmt.Sprintf("%d", groupNumber), fmt.Sprintf("%d", peerNumber)}
 
-	// cli := thspbs.NewToxhsClient(this.rpcli)
-	// rsp, err := cli.RmtCall(context.Background(), &args)
-	rsp, err := this.rmtCall(&args)
-
+	rsp, err := this.rmtCall(args)
 	gopp.ErrPrint(err, rsp)
 	log.Println(rsp)
 	if rsp.Ecode != 0 {

@@ -11,7 +11,7 @@ type Contact struct {
 	Created    string `xorm:"TEXT"`
 	Updated    string `xorm:"TEXT"`
 	IsGroup    int    `xorm:"index INTEGER"`
-	RtId       int    `xorm:"INTEGER"`
+	RtId       uint32 `xorm:"INTEGER"`
 	IsPeer     int    `xorm:"index INTEGER"`
 	ChatType   int    `xorm:"INTEGER"`
 	IsFriend   int    `xorm:"index INTEGER"`
