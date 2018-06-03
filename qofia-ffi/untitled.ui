@@ -840,7 +840,7 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>84</width>
+             <width>98</width>
              <height>16</height>
             </rect>
            </property>
@@ -1369,8 +1369,8 @@
            <property name="geometry">
             <rect>
              <x>0</x>
-             <y>0</y>
-             <width>66</width>
+             <y>12</y>
+             <width>98</width>
              <height>16</height>
             </rect>
            </property>
@@ -1772,7 +1772,7 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>66</width>
+             <width>98</width>
              <height>18</height>
             </rect>
            </property>
@@ -1932,11 +1932,11 @@
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton_13">
+       <widget class="QToolButton" name="toolButton_30">
         <property name="text">
-         <string>◁ Back</string>
+         <string>  ◁ Back  </string>
         </property>
-        <property name="flat">
+        <property name="autoRaise">
          <bool>true</bool>
         </property>
        </widget>
@@ -1955,11 +1955,11 @@
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton_14">
+       <widget class="QToolButton" name="toolButton_31">
         <property name="text">
-         <string>O Home</string>
+         <string> O Home </string>
         </property>
-        <property name="flat">
+        <property name="autoRaise">
          <bool>true</bool>
         </property>
        </widget>
@@ -1978,11 +1978,11 @@
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton_15">
+       <widget class="QToolButton" name="toolButton_32">
         <property name="text">
-         <string>◻ Switch</string>
+         <string> ◻ Switch </string>
         </property>
-        <property name="flat">
+        <property name="autoRaise">
          <bool>true</bool>
         </property>
        </widget>

@@ -232,9 +232,9 @@ func (this *RoomListItem) initUis() {
 }
 
 func (this *RoomListItem) initEvents() {
-	labs := []*qtwidgets.QLabel{this.Label_2, this.Label_3, this.Label_4, this.Label_5, this.LabelLastMsgTime}
+	labs := []*qtwidgets.QLabel{this.Label_2, this.Label_3, this.Label_4, this.LabelLastMsgTime}
 	for _, lab := range labs {
-		lab.SetText("")
+		lab.Clear()
 		lab.SetAttribute(qtcore.Qt__WA_TranslucentBackground, false)
 		lab.SetMouseTracking(true)
 		this.subws = append(this.subws, lab)
@@ -329,6 +329,9 @@ func (this *RoomListItem) SetContactInfo(info interface{}) {
 		this.Label_2.SetToolTip(nametip)
 		this.Label_4.SetText(trtxt(ct.GetStmsg(), 36))
 		this.Label_4.SetToolTip(ct.GetStmsg())
+		SetQLabelElideText(this.Label_2, name)
+		SetQLabelElideText(this.Label_4, ct.Stmsg)
+
 		avataricon := fmt.Sprintf("%s/.config/tox/avatars/%s.png", os.Getenv("HOME"), ct.GetPubkey())
 		if gopp.FileExist(avataricon) {
 			this.cticon = qtgui.NewQIcon_2(avataricon)
@@ -341,9 +344,11 @@ func (this *RoomListItem) SetContactInfo(info interface{}) {
 	case *thspbs.GroupInfo:
 		this.grpInfo = ct
 		this.isgroup = true
+		this.Label_4.SetHidden(true)
 		this.Label_2.SetText(trtxt(ct.GetTitle(), 26))
 		this.Label_2.SetToolTip(ct.GetTitle())
-		this.Label_4.SetHidden(true)
+		SetQLabelElideText(this.Label_2, ct.Title)
+
 		// this maybe call multiple times, so -20 -20 then, the item is 0 height.
 		// this.QWidget_PTR().SetFixedHeight(this.QWidget_PTR().Height() - 20)
 		this.cticon = qtgui.NewQIcon_2(":/icons/groupgray.png")
@@ -514,12 +519,13 @@ func (this *RoomListItem) SetLastMsg(msg string, tm time.Time, eventId int64) {
 
 	this.LastMsgEventId = eventId
 	refmter := func(s string) string {
-		s = gopp.StrSuf4ui(s, 36)
+		// s = gopp.StrSuf4ui(s, 36)
 		return strings.Replace(s, "\n", " ", -1)
 	}
 	cmsg := refmter(msg)
 	this.Label_3.SetText(cmsg)
 	this.Label_3.SetToolTip(msg)
+	SetQLabelElideText(this.Label_3, cmsg)
 	this.LabelLastMsgTime.SetText(Time2TodayMinute(tm))
 	this.LabelLastMsgTime.SetToolTip(gopp.TimeToFmt1(tm))
 }

@@ -30,11 +30,10 @@ type Ui_ContactItemView struct {
 	HorizontalLayout   *qtwidgets.QHBoxLayout
 	Label_2            *qtwidgets.QLabel
 	HorizontalSpacer   *qtwidgets.QSpacerItem
-	Label_5            *qtwidgets.QLabel
+	LabelLastMsgTime   *qtwidgets.QLabel
 	HorizontalLayout_2 *qtwidgets.QHBoxLayout
 	Label_3            *qtwidgets.QLabel
 	HorizontalSpacer_2 *qtwidgets.QSpacerItem
-	LabelLastMsgTime   *qtwidgets.QLabel
 	Label_4            *qtwidgets.QLabel
 	VerticalLayout_2   *qtwidgets.QVBoxLayout
 	VerticalSpacer     *qtwidgets.QSpacerItem
@@ -119,22 +118,22 @@ func (this *Ui_ContactItemView) SetupUi(ContactItemView *qtwidgets.QWidget) {
 
 	this.HorizontalLayout.Layout().AddWidget(this.Label_2) // 115
 
-	this.HorizontalSpacer = qtwidgets.NewQSpacerItem(3, 20, qtwidgets.QSizePolicy__Expanding, qtwidgets.QSizePolicy__Minimum)
+	this.HorizontalSpacer = qtwidgets.NewQSpacerItem(3, 20, qtwidgets.QSizePolicy__Preferred, qtwidgets.QSizePolicy__Minimum)
 
 	this.HorizontalLayout.AddItem(this.HorizontalSpacer) // 115
 
-	this.Label_5 = qtwidgets.NewQLabel(this.ContactItemView, 0) // 111
-	this.Label_5.SetObjectName("Label_5")                       // 112
+	this.LabelLastMsgTime = qtwidgets.NewQLabel(this.ContactItemView, 0) // 111
+	this.LabelLastMsgTime.SetObjectName("LabelLastMsgTime")              // 112
 	this.SizePolicy2 = qtwidgets.NewQSizePolicy_1(qtwidgets.QSizePolicy__Preferred, qtwidgets.QSizePolicy__Preferred, 1)
-	this.SizePolicy2.SetHorizontalStretch(0)                                                              // 114
-	this.SizePolicy2.SetVerticalStretch(0)                                                                // 114
-	this.SizePolicy2.SetHeightForWidth(this.Label_5.SizePolicy().HasHeightForWidth())                     // 114
-	this.Label_5.SetSizePolicy(this.SizePolicy2)                                                          // 114
-	this.Label_5.SetContextMenuPolicy(qtcore.Qt__NoContextMenu)                                           // 114
-	this.Label_5.SetAlignment(qtcore.Qt__AlignRight | qtcore.Qt__AlignTrailing | qtcore.Qt__AlignVCenter) // 114
-	this.Label_5.SetTextInteractionFlags(qtcore.Qt__TextBrowserInteraction)                               // 114
+	this.SizePolicy2.SetHorizontalStretch(0)                                                                       // 114
+	this.SizePolicy2.SetVerticalStretch(0)                                                                         // 114
+	this.SizePolicy2.SetHeightForWidth(this.LabelLastMsgTime.SizePolicy().HasHeightForWidth())                     // 114
+	this.LabelLastMsgTime.SetSizePolicy(this.SizePolicy2)                                                          // 114
+	this.LabelLastMsgTime.SetContextMenuPolicy(qtcore.Qt__NoContextMenu)                                           // 114
+	this.LabelLastMsgTime.SetAlignment(qtcore.Qt__AlignRight | qtcore.Qt__AlignTrailing | qtcore.Qt__AlignVCenter) // 114
+	this.LabelLastMsgTime.SetTextInteractionFlags(qtcore.Qt__TextBrowserInteraction)                               // 114
 
-	this.HorizontalLayout.Layout().AddWidget(this.Label_5) // 115
+	this.HorizontalLayout.Layout().AddWidget(this.LabelLastMsgTime) // 115
 
 	this.VerticalLayout.AddLayout(this.HorizontalLayout, 0) // 115
 
@@ -150,19 +149,9 @@ func (this *Ui_ContactItemView) SetupUi(ContactItemView *qtwidgets.QWidget) {
 
 	this.HorizontalLayout_2.Layout().AddWidget(this.Label_3) // 115
 
-	this.HorizontalSpacer_2 = qtwidgets.NewQSpacerItem(3, 20, qtwidgets.QSizePolicy__Expanding, qtwidgets.QSizePolicy__Minimum)
+	this.HorizontalSpacer_2 = qtwidgets.NewQSpacerItem(3, 20, qtwidgets.QSizePolicy__Preferred, qtwidgets.QSizePolicy__Minimum)
 
 	this.HorizontalLayout_2.AddItem(this.HorizontalSpacer_2) // 115
-
-	this.LabelLastMsgTime = qtwidgets.NewQLabel(this.ContactItemView, 0)                                           // 111
-	this.LabelLastMsgTime.SetObjectName("LabelLastMsgTime")                                                        // 112
-	this.SizePolicy2.SetHeightForWidth(this.LabelLastMsgTime.SizePolicy().HasHeightForWidth())                     // 114
-	this.LabelLastMsgTime.SetSizePolicy(this.SizePolicy2)                                                          // 114
-	this.LabelLastMsgTime.SetContextMenuPolicy(qtcore.Qt__NoContextMenu)                                           // 114
-	this.LabelLastMsgTime.SetAlignment(qtcore.Qt__AlignRight | qtcore.Qt__AlignTrailing | qtcore.Qt__AlignVCenter) // 114
-	this.LabelLastMsgTime.SetTextInteractionFlags(qtcore.Qt__TextBrowserInteraction)                               // 114
-
-	this.HorizontalLayout_2.Layout().AddWidget(this.LabelLastMsgTime) // 115
 
 	this.VerticalLayout.AddLayout(this.HorizontalLayout_2, 0) // 115
 
@@ -221,9 +210,8 @@ func (this *Ui_ContactItemView) RetranslateUi(ContactItemView *qtwidgets.QWidget
 	this.ContactItemView.SetWindowTitle(qtcore.QCoreApplication_Translate("ContactItemView", "Form", "dummy123", 0))
 	this.ToolButton_2.SetText(qtcore.QCoreApplication_Translate("ContactItemView", "...", "dummy123", 0))
 	this.Label_2.SetText(qtcore.QCoreApplication_Translate("ContactItemView", "TextLabel", "dummy123", 0))
-	this.Label_5.SetText(qtcore.QCoreApplication_Translate("ContactItemView", "TextLabel", "dummy123", 0))
-	this.Label_3.SetText(qtcore.QCoreApplication_Translate("ContactItemView", "TextLabel", "dummy123", 0))
 	this.LabelLastMsgTime.SetText(qtcore.QCoreApplication_Translate("ContactItemView", "TextLabel", "dummy123", 0))
+	this.Label_3.SetText(qtcore.QCoreApplication_Translate("ContactItemView", "TextLabel", "dummy123", 0))
 	this.Label_4.SetText(qtcore.QCoreApplication_Translate("ContactItemView", "TextLabel", "dummy123", 0))
 	// noimpl: #ifndef QT_NO_TOOLTIP
 	this.ToolButton.SetToolTip(qtcore.QCoreApplication_Translate("ContactItemView", "1 Online status. 2 Unread message count.", "dummy123", 0))

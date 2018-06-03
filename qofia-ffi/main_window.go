@@ -84,7 +84,7 @@ func NewMainWindow() *MainWindow {
 	uictx.uiw = this.Ui_MainWindow
 
 	this.initStartup()
-	this.initFirstShow() // TODO really first show
+	// this.initFirstShow() // TODO really first show
 	return this
 }
 
@@ -243,13 +243,8 @@ func tryReadEvent() {
 	tryReadUifnEvent()
 
 	if !baseInfoGot {
-		log.Println("wtf")
+		log.Println("baseInfoGot is not set, not need other works.")
 		return
-	}
-
-	// 这个return不会节省cpu???
-	if true {
-		// return
 	}
 
 	tryReadContactEvent()
@@ -268,17 +263,18 @@ func tryReadContactEvent() {
 	for len(contactQueue) > 0 {
 		contactx := <-contactQueue
 		ctv := NewRoomListItem()
+		if uictx.iteman.Get(ctv.GetId()) != nil {
+			log.Println("Already in list:", ctv.GetName(), ctv.GetId())
+			continue
+		}
+		uictx.iteman.addRoomItem(ctv)
+
 		ctv.OnConextMenu = func(w *qtwidgets.QWidget, pos *qtcore.QPoint) {
 			uictx.mw.onRoomContextMenu(ctv, w, pos)
 		}
 		ctv.timeline = thscli.TimeLine{NextBatch: vtcli.Binfo.NextBatch, PrevBatch: vtcli.Binfo.NextBatch - 1}
 		ctv.SetContactInfo(contactx)
-		if uictx.iteman.Get(ctv.GetId()) != nil {
-			log.Println("Already in list:", ctv.GetName(), ctv.GetId())
-			continue
-		}
 
-		uictx.iteman.addRoomItem(ctv)
 		log.Println("add contact...", len(uictx.ctitmdl))
 		if len(uictx.ctitmdl) == 1 {
 			// ctv.SetPressState(true)

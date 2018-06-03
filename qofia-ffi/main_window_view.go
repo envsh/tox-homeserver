@@ -275,13 +275,15 @@ func (this *MainWindow) initMainWindowSignals() {
 		}
 		txt := uiw.LineEdit_5.Text()
 		uiw.LineEdit_5.SetVisible(false)
+		uiw.Label_2.SetVisible(true)
+
 		txt = strings.TrimSpace(txt)
 		if txt != "" && txt != uiw.Label_3.ToolTip() {
 			uiw.Label_2.SetText(gopp.StrSuf4ui(txt, thscom.UiNameLen))
 			uiw.Label_2.SetToolTip(txt)
+			SetQLabelElideText(uiw.Label_2, txt)
 			vtcli.SelfSetName(txt)
 		}
-		uiw.Label_2.SetVisible(true)
 	})
 	qtrt.Connect(uiw.LineEdit_6, "editingFinished()", func() {
 		if !uiw.LineEdit_6.IsVisible() {
@@ -289,13 +291,15 @@ func (this *MainWindow) initMainWindowSignals() {
 		}
 		txt := uiw.LineEdit_6.Text()
 		uiw.LineEdit_6.SetVisible(false)
+		uiw.Label_3.SetVisible(true)
+
 		txt = strings.TrimSpace(txt)
 		if txt != "" && txt != uiw.Label_3.ToolTip() {
 			uiw.Label_3.SetText(gopp.StrSuf4ui(txt, thscom.UiStmsgLen))
 			uiw.Label_3.SetToolTip(txt)
+			SetQLabelElideText(uiw.Label_3, txt)
 			vtcli.SelfSetStatusMessage(txt)
 		}
-		uiw.Label_3.SetVisible(true)
 	})
 
 }
@@ -333,6 +337,17 @@ func (this *MainWindow) initMainWindowEvents() {
 			event.Ignore() // default don't touch it.
 		default:
 			event.Ignore() // default don't touch it.
+		}
+	})
+
+	firstShow := true
+	capwgt.InheritShowEvent(func(event *qtgui.QShowEvent) {
+		event.Ignore()
+		log.Println(event.Spontaneous())
+		if firstShow {
+			firstShow = false
+			// do after show
+			runOnUiThread(func() { this.initFirstShow() })
 		}
 	})
 }

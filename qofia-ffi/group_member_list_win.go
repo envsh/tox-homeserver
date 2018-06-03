@@ -35,6 +35,9 @@ func (this *MainWindow) initGroupMemberListSignals() {
 }
 
 func (this *MainWindow) LoadGroupMemberList(pubkey string) {
+	// clear?
+	this.ClearGroupMemberList()
+
 	vtcli := appctx.GetLigTox()
 	binfo := vtcli.Binfo
 	peers := binfo.GetGroupMembersByPubkey(pubkey)

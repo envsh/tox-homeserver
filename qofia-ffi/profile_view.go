@@ -1,5 +1,7 @@
 package main
 
+// profile and login ui
+
 import (
 	"gopp"
 	"log"
@@ -9,8 +11,6 @@ import (
 
 	"github.com/kitech/qt.go/qtrt"
 )
-
-// profile and login ui
 
 func (this *MainWindow) initProfile() {
 	this.initProfileUi()
