@@ -94,6 +94,8 @@ func NewMainWindow() *MainWindow {
 
 func (this *MainWindow) init() {
 	this.initMainWin()
+	this.initMainWindowEvents()
+	this.initHeaderFooter()
 	this.initRoomChat()
 	this.initInivteFriend()
 	this.initAddFriend()
@@ -104,6 +106,7 @@ func (this *MainWindow) initMainUi() {
 	this.setConnStatus(false)
 	this.LineEdit_5.SetVisible(false)
 	this.LineEdit_6.SetVisible(false)
+	SetScrollContentTrackerSize(this.ScrollArea)
 }
 
 func (this *MainWindow) initMainWin() {
@@ -435,7 +438,44 @@ const (
 	UIST_LOGUI         = 11
 )
 
+func (this *MainWindow) initMainWindowEvents() {
+	// can not capture back button for all of these methods
+	// in C++, it's override keyPressEvent(), works fine. but why here not work???
+	// good, it's captured by centralWidget
+	// capwgt := this.MainWindow
+	capwgt := this.Centralwidget
+	// must accept when event.Key() == Qt__Key_Back, or the app is crash, not exit.
+	// but in qt.go, it's seems has some problem for handle this case, always crash.
+	capwgt.InheritKeyPressEvent(func(event *qtgui.QKeyEvent) {
+		log.Println(event.Key(), event.Text())
+		switch event.Key() {
+		case qtcore.Qt__Key_Back:
+			log.Println("[[Back button]]")
+			quit := this.onAppBackButton(true)
+			this.quitClean(quit)
+			event.SetAccepted(!quit)
+		case qtcore.Qt__Key_Menu:
+			log.Println("[[Menu button]]")
+			event.Ignore() // default don't touch it.
+		case qtcore.Qt__Key_TopMenu:
+			log.Println("[[Top menu button]]")
+			event.Ignore() // default don't touch it.
+		default:
+			event.Ignore() // default don't touch it.
+		}
+	})
+}
+
+// push
 func (this *MainWindow) switchUiStack(x int) {
+	_HeaderFooterState.viewStack.Push(x)
+	uictx.uiw.ComboBox.SetCurrentIndex(x)
+	uictx.uiw.StackedWidget.SetCurrentIndex(x)
+}
+
+// pop
+func (this *MainWindow) switchUiStackPop(x int) {
+	// _HeaderFooterState.viewStack.Pop()
 	uictx.uiw.ComboBox.SetCurrentIndex(x)
 	uictx.uiw.StackedWidget.SetCurrentIndex(x)
 }

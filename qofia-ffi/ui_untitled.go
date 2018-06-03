@@ -191,6 +191,14 @@ type Ui_MainWindow struct {
 	Page_5                     *qtwidgets.QWidget
 	VerticalLayout_12          *qtwidgets.QVBoxLayout
 	TextBrowser                *qtwidgets.QTextBrowser
+	HorizontalLayout_21        *qtwidgets.QHBoxLayout
+	HorizontalSpacer_8         *qtwidgets.QSpacerItem
+	PushButton_13              *qtwidgets.QPushButton
+	HorizontalSpacer_9         *qtwidgets.QSpacerItem
+	PushButton_14              *qtwidgets.QPushButton
+	HorizontalSpacer_10        *qtwidgets.QSpacerItem
+	PushButton_15              *qtwidgets.QPushButton
+	HorizontalSpacer_11        *qtwidgets.QSpacerItem
 	MainWindow                 *qtwidgets.QMainWindow
 	Icon                       *qtgui.QIcon // 116
 	SizePolicy                 *qtwidgets.QSizePolicy
@@ -230,7 +238,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	if MainWindow.ObjectName() == "" {
 		MainWindow.SetObjectName("MainWindow")
 	}
-	MainWindow.Resize(382, 598)
+	MainWindow.Resize(368, 599)
 	this.MainWindow.SetDocumentMode(false)                                 // 114
 	this.Actionooo = qtwidgets.NewQAction(MainWindow)                      // 111
 	this.Actionooo.SetObjectName("Actionooo")                              // 112
@@ -241,9 +249,9 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.Centralwidget = qtwidgets.NewQWidget(this.MainWindow, 0)          // 111
 	this.Centralwidget.SetObjectName("Centralwidget")                      // 112
 	this.VerticalLayout_6 = qtwidgets.NewQVBoxLayout_1(this.Centralwidget) // 111
-	this.VerticalLayout_6.SetSpacing(0)                                    // 114
+	this.VerticalLayout_6.SetSpacing(1)                                    // 114
 	this.VerticalLayout_6.SetObjectName("VerticalLayout_6")                // 112
-	this.VerticalLayout_6.SetContentsMargins(0, 0, 0, 0)                   // 114
+	this.VerticalLayout_6.SetContentsMargins(1, 1, 1, 1)                   // 114
 	this.HorizontalLayout_7 = qtwidgets.NewQHBoxLayout()                   // 111
 	this.HorizontalLayout_7.SetSpacing(0)                                  // 114
 	this.HorizontalLayout_7.SetObjectName("HorizontalLayout_7")            // 112
@@ -495,7 +503,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 
 	this.PushButton_7 = qtwidgets.NewQPushButton(this.Page_8) // 111
 	this.PushButton_7.SetObjectName("PushButton_7")           // 112
-	this.PushButton_7.SetFlat(false)                          // 114
+	this.PushButton_7.SetFlat(true)                           // 114
 
 	this.VerticalLayout_8.Layout().AddWidget(this.PushButton_7) // 115
 
@@ -639,7 +647,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.ScrollArea.SetAlignment(qtcore.Qt__AlignLeading | qtcore.Qt__AlignLeft | qtcore.Qt__AlignTop) // 114
 	this.ScrollAreaWidgetContents = qtwidgets.NewQWidget(nil, 0)                                       // 111
 	this.ScrollAreaWidgetContents.SetObjectName("ScrollAreaWidgetContents")                            // 112
-	this.ScrollAreaWidgetContents.SetGeometry(0, 0, 380, 16)                                           // 114
+	this.ScrollAreaWidgetContents.SetGeometry(0, 0, 84, 16)                                            // 114
 	this.SizePolicy.SetHeightForWidth(this.ScrollAreaWidgetContents.SizePolicy().HasHeightForWidth())  // 114
 	this.ScrollAreaWidgetContents.SetSizePolicy(this.SizePolicy)                                       // 114
 	this.VerticalLayout_9 = qtwidgets.NewQVBoxLayout_1(this.ScrollAreaWidgetContents)                  // 111
@@ -914,7 +922,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.ScrollArea_2.SetAlignment(qtcore.Qt__AlignBottom | qtcore.Qt__AlignLeading | qtcore.Qt__AlignLeft) // 114
 	this.ScrollAreaWidgetContents_2 = qtwidgets.NewQWidget(nil, 0)                                          // 111
 	this.ScrollAreaWidgetContents_2.SetObjectName("ScrollAreaWidgetContents_2")                             // 112
-	this.ScrollAreaWidgetContents_2.SetGeometry(0, 410, 362, 16)                                            // 114
+	this.ScrollAreaWidgetContents_2.SetGeometry(0, 0, 66, 16)                                               // 114
 	this.SizePolicy.SetHeightForWidth(this.ScrollAreaWidgetContents_2.SizePolicy().HasHeightForWidth())     // 114
 	this.ScrollAreaWidgetContents_2.SetSizePolicy(this.SizePolicy)                                          // 114
 	this.VerticalLayout_3 = qtwidgets.NewQVBoxLayout_1(this.ScrollAreaWidgetContents_2)                     // 111
@@ -1155,7 +1163,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.ScrollArea_3.SetAlignment(qtcore.Qt__AlignLeading | qtcore.Qt__AlignLeft | qtcore.Qt__AlignTop) // 114
 	this.ScrollAreaWidgetContents_3 = qtwidgets.NewQWidget(nil, 0)                                       // 111
 	this.ScrollAreaWidgetContents_3.SetObjectName("ScrollAreaWidgetContents_3")                          // 112
-	this.ScrollAreaWidgetContents_3.SetGeometry(0, 0, 362, 18)                                           // 114
+	this.ScrollAreaWidgetContents_3.SetGeometry(0, 0, 66, 18)                                            // 114
 	this.SizePolicy.SetHeightForWidth(this.ScrollAreaWidgetContents_3.SizePolicy().HasHeightForWidth())  // 114
 	this.ScrollAreaWidgetContents_3.SetSizePolicy(this.SizePolicy)                                       // 114
 	this.VerticalLayout_17 = qtwidgets.NewQVBoxLayout_1(this.ScrollAreaWidgetContents_3)                 // 111
@@ -1253,6 +1261,44 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.StackedWidget.AddWidget(this.Page_5) // 115
 
 	this.VerticalLayout_6.Layout().AddWidget(this.StackedWidget) // 115
+
+	this.HorizontalLayout_21 = qtwidgets.NewQHBoxLayout()         // 111
+	this.HorizontalLayout_21.SetObjectName("HorizontalLayout_21") // 112
+	this.HorizontalSpacer_8 = qtwidgets.NewQSpacerItem(13, 20, qtwidgets.QSizePolicy__Expanding, qtwidgets.QSizePolicy__Minimum)
+
+	this.HorizontalLayout_21.AddItem(this.HorizontalSpacer_8) // 115
+
+	this.PushButton_13 = qtwidgets.NewQPushButton(this.Centralwidget) // 111
+	this.PushButton_13.SetObjectName("PushButton_13")                 // 112
+	this.PushButton_13.SetFlat(true)                                  // 114
+
+	this.HorizontalLayout_21.Layout().AddWidget(this.PushButton_13) // 115
+
+	this.HorizontalSpacer_9 = qtwidgets.NewQSpacerItem(13, 20, qtwidgets.QSizePolicy__Expanding, qtwidgets.QSizePolicy__Minimum)
+
+	this.HorizontalLayout_21.AddItem(this.HorizontalSpacer_9) // 115
+
+	this.PushButton_14 = qtwidgets.NewQPushButton(this.Centralwidget) // 111
+	this.PushButton_14.SetObjectName("PushButton_14")                 // 112
+	this.PushButton_14.SetFlat(true)                                  // 114
+
+	this.HorizontalLayout_21.Layout().AddWidget(this.PushButton_14) // 115
+
+	this.HorizontalSpacer_10 = qtwidgets.NewQSpacerItem(13, 20, qtwidgets.QSizePolicy__Expanding, qtwidgets.QSizePolicy__Minimum)
+
+	this.HorizontalLayout_21.AddItem(this.HorizontalSpacer_10) // 115
+
+	this.PushButton_15 = qtwidgets.NewQPushButton(this.Centralwidget) // 111
+	this.PushButton_15.SetObjectName("PushButton_15")                 // 112
+	this.PushButton_15.SetFlat(true)                                  // 114
+
+	this.HorizontalLayout_21.Layout().AddWidget(this.PushButton_15) // 115
+
+	this.HorizontalSpacer_11 = qtwidgets.NewQSpacerItem(13, 20, qtwidgets.QSizePolicy__Expanding, qtwidgets.QSizePolicy__Minimum)
+
+	this.HorizontalLayout_21.AddItem(this.HorizontalSpacer_11) // 115
+
+	this.VerticalLayout_6.AddLayout(this.HorizontalLayout_21, 0) // 115
 
 	this.MainWindow.SetCentralWidget(this.Centralwidget) // 114
 
@@ -1405,6 +1451,9 @@ func (this *Ui_MainWindow) RetranslateUi(MainWindow *qtwidgets.QMainWindow) {
 	this.Label_26.SetText(qtcore.QCoreApplication_Translate("MainWindow", "Group Members", "dummy123", 0))
 	this.PushButton_9.SetText(qtcore.QCoreApplication_Translate("MainWindow", "Done", "dummy123", 0))
 	this.Label_25.SetText(qtcore.QCoreApplication_Translate("MainWindow", "Search", "dummy123", 0))
+	this.PushButton_13.SetText(qtcore.QCoreApplication_Translate("MainWindow", "\342\227\201 Back", "dummy123", 0))
+	this.PushButton_14.SetText(qtcore.QCoreApplication_Translate("MainWindow", "O Home", "dummy123", 0))
+	this.PushButton_15.SetText(qtcore.QCoreApplication_Translate("MainWindow", "\342\227\273 Switch", "dummy123", 0))
 	// noimpl: } // retranslateUi
 	// noimpl:
 	// noimpl: };
