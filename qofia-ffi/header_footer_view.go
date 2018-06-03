@@ -52,7 +52,7 @@ func (this *MainWindow) onAppBackButton(bool) bool {
 	stack := _HeaderFooterState.viewStack
 	log.Println("Current stack:", stack.Size(), strings.Replace(stack.String(), "\n", " ", -1))
 
-	initNum := 2
+	initNum := 2 // 1: loginui, 2: mainui
 	switch {
 	case stack.Size() < initNum: // do nothing
 		return true

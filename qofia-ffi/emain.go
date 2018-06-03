@@ -14,6 +14,7 @@ import (
 )
 
 func main() {
+	log.Println("Enter main...")
 
 	// Create application
 	if runtime.GOOS == "android" {
