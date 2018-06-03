@@ -103,8 +103,8 @@ func (this *LigTox) ConferenceSendMessage(groupNumber uint32, mtype int, msg str
 	rsp, err := this.rmtCall(args)
 	gopp.ErrPrint(err, rsp)
 	log.Println(rsp)
-	if rsp.Ecode != 0 {
-		return errors.New(rsp.Emsg)
+	if rsp.ErrCode != 0 {
+		return errors.New(rsp.ErrMsg)
 	}
 	return err
 }
@@ -118,10 +118,10 @@ func (this *LigTox) ConferenceJoin(friendNumber uint32, cookie string) (uint32, 
 	rsp, err := this.rmtCall(args)
 	gopp.ErrPrint(err, rsp)
 	log.Println(rsp)
-	if rsp.Ecode != 0 {
-		return 0, errors.New(rsp.Emsg)
+	if rsp.ErrCode != 0 {
+		return 0, errors.New(rsp.ErrMsg)
 	}
-	return uint32(rsp.Mid), nil
+	return uint32(rsp.EventId), nil
 }
 
 func (this *LigTox) ConferenceNew(name string) (uint32, string, error) {
@@ -133,10 +133,10 @@ func (this *LigTox) ConferenceNew(name string) (uint32, string, error) {
 	rsp, err := this.rmtCall(args)
 	gopp.ErrPrint(err, rsp)
 	log.Println(rsp)
-	if rsp.Ecode != 0 {
-		return 0, "", errors.New(rsp.Emsg)
+	if rsp.ErrCode != 0 {
+		return 0, "", errors.New(rsp.ErrMsg)
 	}
-	return uint32(rsp.Mid), rsp.Args[0], nil
+	return uint32(rsp.EventId), rsp.Args[0], nil
 }
 
 func (this *LigTox) ConferenceDelete(groupNumber uint32) (uint32, error) {
@@ -148,10 +148,10 @@ func (this *LigTox) ConferenceDelete(groupNumber uint32) (uint32, error) {
 	rsp, err := this.rmtCall(args)
 	gopp.ErrPrint(err, rsp)
 	log.Println(rsp)
-	if rsp.Ecode != 0 {
-		return 0, errors.New(rsp.Emsg)
+	if rsp.ErrCode != 0 {
+		return 0, errors.New(rsp.ErrMsg)
 	}
-	return uint32(rsp.Mid), nil
+	return uint32(rsp.EventId), nil
 }
 
 func (this *LigTox) ConferencePeerCount(groupNumber uint32) (uint32, error) {
@@ -163,10 +163,10 @@ func (this *LigTox) ConferencePeerCount(groupNumber uint32) (uint32, error) {
 	rsp, err := this.rmtCall(args)
 	gopp.ErrPrint(err, rsp)
 	log.Println(rsp)
-	if rsp.Ecode != 0 {
-		return 0, errors.New(rsp.Emsg)
+	if rsp.ErrCode != 0 {
+		return 0, errors.New(rsp.ErrMsg)
 	}
-	return uint32(rsp.Mid), nil
+	return uint32(rsp.EventId), nil
 }
 
 func (this *LigTox) ConferencePeerGetName(groupNumber uint32, peerNumber uint32) (string, error) {
@@ -178,8 +178,8 @@ func (this *LigTox) ConferencePeerGetName(groupNumber uint32, peerNumber uint32)
 	rsp, err := this.rmtCall(args)
 	gopp.ErrPrint(err, rsp)
 	log.Println(rsp)
-	if rsp.Ecode != 0 {
-		return "", errors.New(rsp.Emsg)
+	if rsp.ErrCode != 0 {
+		return "", errors.New(rsp.ErrMsg)
 	}
 	return rsp.Args[0], nil
 }
@@ -196,8 +196,8 @@ func (this *LigTox) ConferenceInvite(groupNumber uint32, peerNumber uint32) erro
 
 	gopp.ErrPrint(err, rsp)
 	log.Println(rsp)
-	if rsp.Ecode != 0 {
-		return errors.New(rsp.Emsg)
+	if rsp.ErrCode != 0 {
+		return errors.New(rsp.ErrMsg)
 	}
 	return nil
 }

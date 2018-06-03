@@ -242,7 +242,7 @@ func (this *WebsocketTransport) serveBackendEventWSImpl() error {
 		if rdatao, ok := jso.CheckGet("data"); ok {
 			rmessage, _ := rdatao.Encode()
 			this.runOnData(jso, rmessage)
-		} else if _, ok := jso.CheckGet("name"); ok {
+		} else if _, ok := jso.CheckGet("Name"); ok {
 			this.runOnData(jso, message)
 		} else {
 			log.Println("Unknown packet:", string(message))

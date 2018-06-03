@@ -10,71 +10,69 @@ service Toxhs {
 }
 
 message Event {
-    int32  id = 1; // event id
-    int64  mid = 2; // msg id
-    string name = 3; // event name
-    repeated string args = 4;
-    repeated string margs = 5; // more info based on args
-    uint64 gid = 6; // global sequnce
-    map<string,string> nargs = 7; // named args
-    int32 ecode = 8; // error code
-    string emsg = 9; // error msg
+    int64 EventId = 1;
+    string Name = 2; // event name
+    repeated string Args = 3;
+    repeated string Margs = 4; // more info based on args
+    map<string,string> Nargs = 5; // named args
+    int32 ErrCode = 6; // error code
+    string ErrMsg = 7; // error msg
 }
 
 message BaseInfo {
-    string id = 1;
-    string name = 2;
-    string stmsg = 3;
-    uint32 status = 4; // statusText
-    map<uint32,FriendInfo> friends = 5;
-    map<uint32,GroupInfo> groups = 6;
-    int32 connStatus = 7;
-    int64 nextBatch = 8;
+    string ToxId = 1;
+    string Name = 2;
+    string Stmsg = 3; // statusText
+    uint32 Status = 4;
+    map<uint32,FriendInfo> Friends = 5;
+    map<uint32,GroupInfo> Groups = 6;
+    int32 ConnStatus = 7;
+    int64 NextBatch = 8;
 }
 
 message FriendInfo {
-    uint32 fnum = 1;
-    uint32 status = 2;
-    string pubkey = 3;
-    string name = 4;
-    string stmsg = 5;
-    string avatar = 6;
-    uint64 seen  = 7;
-    int32 connStatus = 8;
+    uint32 Fnum = 1;
+    uint32 Status = 2;
+    string Pubkey = 3;
+    string Name = 4;
+    string Stmsg = 5;
+    string Avatar = 6;
+    uint64 Seen  = 7;
+    int32 ConnStatus = 8;
 }
 
 message GroupInfo {
-    uint32 gnum = 1;
-    uint32 mtype = 2;
-    string groupId = 3;
-    string title = 4;
-    string stmsg = 5;
-    bool ours = 6;
-    map<uint32, MemberInfo> members = 7;
+    uint32 Gnum = 1;
+    uint32 Mtype = 2;
+    string GroupId = 3;
+    string Title = 4;
+    string Stmsg = 5;
+    bool Ours = 6;
+    map<uint32, MemberInfo> Members = 7;
 }
 
 // = ContactInfo
 // 可用于friend,group,peer
 message MemberInfo {
-    uint32 pnum = 1;
-    string pubkey = 2;
-    string name = 3;
+    uint32 Pnum = 1;
+    string Pubkey = 2;
+    string Name = 3;
     enum MemType { UNKNOWN = 0; FRIEND = 1; GROUP = 2; PEER = 3;}
-    MemType mtype = 4; // member type, friend, group, peer
+    MemType Mtype = 4; // member type, friend, group, peer
 }
 
 message Message 
 {
-    uint64 gid = 1;
-    string content = 2;
-    MemberInfo peer = 3;
-    uint64 created = 4;
-    uint64 updated = 5;
+    uint64 MsgId = 1;
+    string Content = 2;
+    MemberInfo Peer = 3;
+    uint64 Created = 4;
+    uint64 Updated = 5;
 }
 
 message Messages
 {
-    repeated Message msgs = 1;
+    repeated Message Msgs = 1;
 }
 
 
@@ -88,11 +86,11 @@ service Greeter {
 message EmptyReq {}
 
 message HelloReq {
-    string name = 1;
-    string msg = 2;
+    string Name = 1;
+    string Msg = 2;
 }
 message HelloResp {
-    int32 code = 1;
-    int64 status = 2;
+    int32 Code = 1;
+    int64 Status = 2;
 }
 

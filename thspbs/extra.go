@@ -15,6 +15,9 @@ func (this *MemberInfo) IsGroup() bool  { return this.Mtype == MemberInfo_GROUP 
 func (this *MemberInfo) IsPeer() bool   { return this.Mtype == MemberInfo_PEER }
 
 func (this *BaseInfo) UpdatePeerInfo(grpnum uint32, groupId string, pubkey string, name string, rtnum uint32) {
+	if this.Groups == nil {
+		return
+	}
 	for _, grpo := range this.Groups {
 		if grpo.GroupId == groupId {
 			grpo.UpdatePeerInfo(pubkey, name, rtnum)

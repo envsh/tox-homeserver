@@ -184,8 +184,8 @@ func (this *LigTox) onBackendEvent(jso *simplejson.Json, data []byte) {
 		}
 	}()
 
-	argso := jso.Get("args")
-	evtName := jso.Get("name").MustString()
+	argso := jso.Get("Args")
+	evtName := jso.Get("Name").MustString()
 	switch evtName {
 	case "FriendConnectionStatus":
 		fnum := gopp.MustUint32(argso.GetIndex(0).MustString())
@@ -618,7 +618,7 @@ func (this *LigTox) Bootstrap(addr string, port uint16, pubkey string) (bool, er
 	return true, err
 }
 
-func (this *LigTox) SelfGetAddress() string       { return this.Binfo.GetId() }
+func (this *LigTox) SelfGetAddress() string       { return this.Binfo.GetToxId() }
 func (this *LigTox) SelfGetConnectionStatus() int { return int(this.Binfo.GetConnStatus()) }
 
 func (this *LigTox) SelfSetName(name string) error {
@@ -881,7 +881,7 @@ func (this *LigTox) SelfSetNospam(nospam uint32) {
 }
 
 func (this *LigTox) SelfGetPublicKey() string {
-	return this.Binfo.GetId()[:64]
+	return this.Binfo.GetToxId()[:64]
 }
 
 func (this *LigTox) SelfGetSecretKey() string {

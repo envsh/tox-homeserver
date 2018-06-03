@@ -34,18 +34,18 @@ type Message struct {
 }
 
 func NewMessageForGroup(jso *simplejson.Json) *Message {
-	groupId := jso.Get("margs").GetIndex(3).MustString()
+	groupId := jso.Get("Margs").GetIndex(3).MustString()
 	log.Println(groupId)
 	// log.Println(jso)
 	if thscli.ConferenceIdIsEmpty(groupId) {
 		// break
 	}
 
-	message := jso.Get("args").GetIndex(3).MustString()
-	peerName := jso.Get("margs").GetIndex(0).MustString()
-	groupTitle := jso.Get("margs").GetIndex(2).MustString()
+	message := jso.Get("Args").GetIndex(3).MustString()
+	peerName := jso.Get("Margs").GetIndex(0).MustString()
+	groupTitle := jso.Get("Margs").GetIndex(2).MustString()
 	_ = groupTitle
-	eventId := int64(gopp.MustInt(jso.Get("margs").GetIndex(4).MustString()))
+	eventId := int64(gopp.MustInt(jso.Get("Margs").GetIndex(4).MustString()))
 
 	this := &Message{}
 	this.Msg = message
@@ -58,11 +58,11 @@ func NewMessageForGroup(jso *simplejson.Json) *Message {
 }
 
 func NewMessageForFriend(jso *simplejson.Json) *Message {
-	msg := jso.Get("args").GetIndex(1).MustString()
-	fname := jso.Get("margs").GetIndex(0).MustString()
-	pubkey := jso.Get("margs").GetIndex(1).MustString()
+	msg := jso.Get("Args").GetIndex(1).MustString()
+	fname := jso.Get("Margs").GetIndex(0).MustString()
+	pubkey := jso.Get("Margs").GetIndex(1).MustString()
 	_, _, _ = msg, fname, pubkey
-	eventId := int64(gopp.MustInt(jso.Get("margs").GetIndex(2).MustString()))
+	eventId := int64(gopp.MustInt(jso.Get("Margs").GetIndex(2).MustString()))
 
 	this := &Message{}
 	this.Msg = msg

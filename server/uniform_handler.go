@@ -20,7 +20,7 @@ import (
 func packBaseInfo(t *tox.Tox) (*thspbs.BaseInfo, error) {
 
 	out := &thspbs.BaseInfo{}
-	out.Id = t.SelfGetAddress()
+	out.ToxId = t.SelfGetAddress()
 	out.Name = t.SelfGetName()
 	out.Stmsg, _ = t.SelfGetStatusMessage()
 	out.Status = uint32(t.SelfGetStatus())
@@ -95,7 +95,7 @@ func packBaseInfo(t *tox.Tox) (*thspbs.BaseInfo, error) {
 // 自己的消息做多终端同步转发
 // conn caller connection
 func RmtCallHandlers(ctx context.Context, req *thspbs.Event) (*thspbs.Event, error) {
-	log.Println(req.Id, req.Name, req.Args, req.Margs)
+	log.Println(req.EventId, req.Name, req.Args, req.Margs)
 
 	// 先把消息同步到不同协议的不同终端上, not need execute result
 	switch req.Name {
@@ -159,9 +159,9 @@ func RmtCallExecuteHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Even
 		wn, err := t.FriendSendMessage(fnum, req.Args[1])
 		gopp.ErrPrint(err)
 		pubkey := t.SelfGetPublicKey()
-		msgo, err := appctx.st.AddFriendMessage(req.Args[1], pubkey, req.Mid)
+		msgo, err := appctx.st.AddFriendMessage(req.Args[1], pubkey, req.EventId)
 		gopp.ErrPrint(err)
-		out.Mid = msgo.EventId
+		out.EventId = msgo.EventId
 		out.Args = append(out.Args, fmt.Sprintf("%d", wn))
 
 		// groups
@@ -169,7 +169,7 @@ func RmtCallExecuteHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Even
 		rname := req.Args[0]
 		gn, err := t.ConferenceNew()
 		gopp.ErrPrint(err, rname)
-		out.Mid = int64(gn)
+		out.EventId = int64(gn)
 		_, err = t.ConferenceSetTitle(gn, rname)
 		gopp.ErrPrint(err, gn, rname)
 		groupId, _ := t.ConferenceGetIdentifier(gn)
@@ -205,25 +205,25 @@ func RmtCallExecuteHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Even
 		_, err = t.ConferenceSendMessage(gnum, mtype, req.Args[2])
 		gopp.ErrPrint(err)
 		if err != nil {
-			out.Ecode = -1
-			out.Emsg = err.Error()
+			out.ErrCode = -1
+			out.ErrMsg = err.Error()
 		}
 		identifier, _ := xtox.ConferenceGetIdentifier(t, uint32(gnum))
 		pubkey := t.SelfGetPublicKey()
-		msgo, err := appctx.st.AddGroupMessage(req.Args[2], "0", identifier, pubkey, req.Mid)
+		msgo, err := appctx.st.AddGroupMessage(req.Args[2], "0", identifier, pubkey, req.EventId)
 		gopp.ErrPrint(err)
-		out.Mid = msgo.EventId
+		out.EventId = msgo.EventId
 	case "ConferenceJoin": // friendNumber, cookie
 		fnum := gopp.MustUint32(req.Args[0])
 		cookie := req.Args[1]
 		gn, err := t.ConferenceJoin(fnum, cookie)
 		gopp.ErrPrint(err, fnum, len(cookie))
-		out.Mid = int64(gn)
+		out.EventId = int64(gn)
 
 	case "ConferencePeerCount": // groupNumber
 		gnum := gopp.MustUint32(req.Args[0])
 		cnt := t.ConferencePeerCount(gnum)
-		out.Mid = int64(cnt)
+		out.EventId = int64(cnt)
 	case "ConferencePeerGetName": // groupNumber, peerNumber
 		gnum := gopp.MustUint32(req.Args[0])
 		pnum := gopp.MustUint32(req.Args[1])
@@ -241,8 +241,8 @@ func RmtCallExecuteHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Even
 		frndno, err := t.FriendAdd(toxid, addmsg)
 		gopp.ErrPrint(err, toxid, addmsg)
 		if err != nil {
-			out.Ecode = -1
-			out.Emsg = err.Error()
+			out.ErrCode = -1
+			out.ErrMsg = err.Error()
 		} else {
 			out.Args = []string{gopp.ToStr(frndno)}
 			err := xtox.WriteSavedata(t, tvmCtx.SaveFile)
@@ -253,8 +253,8 @@ func RmtCallExecuteHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Even
 		frndno, err := t.FriendAddNorequest(toxid)
 		gopp.ErrPrint(err, toxid)
 		if err != nil {
-			out.Ecode = -1
-			out.Emsg = err.Error()
+			out.ErrCode = -1
+			out.ErrMsg = err.Error()
 		} else {
 			out.Args = []string{gopp.ToStr(frndno)}
 			err := xtox.WriteSavedata(t, tvmCtx.SaveFile)
@@ -267,7 +267,7 @@ func RmtCallExecuteHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Even
 		_, err := t.FriendDelete(frndno)
 		gopp.ErrPrint(err, frndno)
 		if err != nil {
-			out.Ecode, out.Emsg = -1, err.Error()
+			out.ErrCode, out.ErrMsg = -1, err.Error()
 			err := xtox.WriteSavedata(t, tvmCtx.SaveFile)
 			gopp.ErrPrint(err)
 		}
@@ -294,8 +294,8 @@ func RmtCallExecuteHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Even
 		}
 	default:
 		log.Println("unimpled:", req.Name, req.Args)
-		out.Ecode = -1
-		out.Emsg = fmt.Sprintf("Unimpled: %s", req.Name)
+		out.ErrCode = -1
+		out.ErrMsg = fmt.Sprintf("Unimpled: %s", req.Name)
 	}
 
 	common.BytesRecved(len(req.String()))
@@ -307,7 +307,7 @@ func RmtCallExecuteHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Even
 // 把其中一个端发送的消息再同步到其他端上
 // 需要记录一个终端的id
 func RmtCallResyncHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Event, error) {
-	log.Println(req.Id, req.Name, req.Args, req.Margs)
+	log.Println(req.EventId, req.Name, req.Args, req.Margs)
 	out := &thspbs.Event{}
 
 	var err error
@@ -329,7 +329,7 @@ func RmtCallResyncHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Event
 		pubkey, err := t.FriendGetPublicKey(fnum)
 		gopp.ErrPrint(err)
 		eventId := st.NextId()
-		req.Mid = eventId
+		req.EventId = eventId
 		out.Margs = []string{fname, pubkey, gopp.ToStr(eventId)}
 
 	//  依赖执行结果，不能转。而在处理的时候获取Resp
@@ -350,7 +350,7 @@ func RmtCallResyncHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Event
 		peerPubkey := t.SelfGetPublicKey()
 		peerName := t.SelfGetName()
 		eventId := st.NextId()
-		req.Mid = eventId
+		req.EventId = eventId
 		out.Margs = []string{peerName, peerPubkey, title, groupId, gopp.ToStr(eventId)}
 	default:
 		return nil, errors.New("not need/impl resync " + req.Name)
