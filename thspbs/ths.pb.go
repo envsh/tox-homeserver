@@ -69,8 +69,9 @@ func (x MemberInfo_MemType) String() string {
 func (MemberInfo_MemType) EnumDescriptor() ([]byte, []int) { return fileDescriptor0, []int{4, 0} }
 
 type Event struct {
-	EventId int64             `protobuf:"varint,1,opt,name=EventId" json:"EventId,omitempty"`
-	Name    string            `protobuf:"bytes,2,opt,name=Name" json:"Name,omitempty"`
+	EventId int64  `protobuf:"varint,1,opt,name=EventId" json:"EventId,omitempty"`
+	Name    string `protobuf:"bytes,2,opt,name=Name" json:"Name,omitempty"`
+	// int32 NameId = 8;  // TODO
 	Args    []string          `protobuf:"bytes,3,rep,name=Args" json:"Args,omitempty"`
 	Margs   []string          `protobuf:"bytes,4,rep,name=Margs" json:"Margs,omitempty"`
 	Nargs   map[string]string `protobuf:"bytes,5,rep,name=Nargs" json:"Nargs,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`

@@ -113,8 +113,20 @@ func demofn1() {
 
 }
 
+// fill full args, so client can not crash
+func fillmsgall(evto *thspbs.Event) {
+	for len(evto.Args) < 10 {
+		evto.Args = append(evto.Args, "")
+	}
+	for len(evto.Margs) < 10 {
+		evto.Margs = append(evto.Margs, "")
+	}
+}
+
 ///
 func pubmsgall(ctx context.Context, evt *thspbs.Event) error {
+	fillmsgall(evt)
+
 	var err error
 	err = pubmsg2ws(ctx, evt)
 	{

@@ -13,7 +13,6 @@ import (
 	thscli "tox-homeserver/client"
 	"tox-homeserver/thspbs"
 
-	simplejson "github.com/bitly/go-simplejson"
 	"github.com/kitech/qt.go/qtcore"
 	"github.com/kitech/qt.go/qtgui"
 	"github.com/kitech/qt.go/qtwidgets"
@@ -33,19 +32,17 @@ type Message struct {
 	LastMsgUi  string
 }
 
-func NewMessageForGroup(jso *simplejson.Json) *Message {
-	groupId := jso.Get("Margs").GetIndex(3).MustString()
-	log.Println(groupId)
-	// log.Println(jso)
+func NewMessageForGroup(evto *thspbs.Event) *Message {
+	groupId := evto.Margs[3]
 	if thscli.ConferenceIdIsEmpty(groupId) {
 		// break
 	}
 
-	message := jso.Get("Args").GetIndex(3).MustString()
-	peerName := jso.Get("Margs").GetIndex(0).MustString()
-	groupTitle := jso.Get("Margs").GetIndex(2).MustString()
+	message := evto.Args[3]
+	peerName := evto.Margs[0]
+	groupTitle := evto.Margs[2]
 	_ = groupTitle
-	eventId := int64(gopp.MustInt(jso.Get("Margs").GetIndex(4).MustString()))
+	eventId := gopp.MustInt64(evto.Margs[4])
 
 	this := &Message{}
 	this.Msg = message
@@ -57,12 +54,12 @@ func NewMessageForGroup(jso *simplejson.Json) *Message {
 	return this
 }
 
-func NewMessageForFriend(jso *simplejson.Json) *Message {
-	msg := jso.Get("Args").GetIndex(1).MustString()
-	fname := jso.Get("Margs").GetIndex(0).MustString()
-	pubkey := jso.Get("Margs").GetIndex(1).MustString()
+func NewMessageForFriend(evto *thspbs.Event) *Message {
+	msg := evto.Args[1]
+	fname := evto.Margs[0]
+	pubkey := evto.Margs[1]
 	_, _, _ = msg, fname, pubkey
-	eventId := int64(gopp.MustInt(jso.Get("Margs").GetIndex(2).MustString()))
+	eventId := gopp.MustInt64(evto.Margs[2])
 
 	this := &Message{}
 	this.Msg = msg

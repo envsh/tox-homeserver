@@ -3,6 +3,7 @@ package main
 // really is main_window_ctrl.go
 
 import (
+	"encoding/json"
 	"fmt"
 	"gopp"
 	"io/ioutil"
@@ -13,9 +14,8 @@ import (
 	"github.com/kitech/qt.go/qtrt"
 	"github.com/kitech/qt.go/qtwidgets"
 
-	simplejson "github.com/bitly/go-simplejson"
-
 	thscli "tox-homeserver/client"
+	"tox-homeserver/thspbs"
 )
 
 var appctx *thscli.AppContext
@@ -289,11 +289,12 @@ func tryReadMessageEvent() {
 		if bcc == nil {
 			break
 		} else {
-			jso, err := simplejson.NewJson(bcc)
-			gopp.ErrPrint(err, jso)
+			evto := &thspbs.Event{}
+			err := json.Unmarshal(bcc, evto)
+			gopp.ErrPrint(err)
 			if err == nil {
-				dispatchEvent(jso)
-				dispatchEventResp(jso)
+				dispatchEvent(evto)
+				dispatchEventResp(evto)
 			}
 		}
 	}

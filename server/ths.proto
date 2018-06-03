@@ -12,6 +12,7 @@ service Toxhs {
 message Event {
     int64 EventId = 1;
     string Name = 2; // event name
+    // int32 NameId = 8;  // TODO
     repeated string Args = 3;
     repeated string Margs = 4; // more info based on args
     map<string,string> Nargs = 5; // named args

@@ -15,8 +15,6 @@ import (
 	"unsafe"
 
 	"tox-homeserver/thspbs"
-
-	simplejson "github.com/bitly/go-simplejson"
 )
 
 // friend callback type
@@ -144,8 +142,8 @@ func (this *LigTox) initCbmap() {
 var evtmd5smu sync.Mutex
 var evtmd5s = make(map[string]time.Time)
 
-func (this *LigTox) onBackendEventDeduped(jso *simplejson.Json, data []byte) {
-	data, err := jso.Encode()
+func (this *LigTox) onBackendEventDeduped(evto *thspbs.Event, data []byte) {
+	data, err := json.Marshal(evto)
 	gopp.ErrPrint(err)
 	md5b := md5.New().Sum(data)
 	isdup := false
@@ -165,11 +163,11 @@ func (this *LigTox) onBackendEventDeduped(jso *simplejson.Json, data []byte) {
 	}
 	evtmd5smu.Unlock()
 	if !isdup {
-		this.onBackendEvent(jso, data)
+		this.onBackendEvent(evto, data)
 	}
 }
 
-func (this *LigTox) onBackendEvent(jso *simplejson.Json, data []byte) {
+func (this *LigTox) onBackendEvent(evto *thspbs.Event, data []byte) {
 
 	defer func() {
 		this.bemsgsmu.Lock()
@@ -184,37 +182,34 @@ func (this *LigTox) onBackendEvent(jso *simplejson.Json, data []byte) {
 		}
 	}()
 
-	argso := jso.Get("Args")
-	evtName := jso.Get("Name").MustString()
-	switch evtName {
+	switch evto.Name {
 	case "FriendConnectionStatus":
-		fnum := gopp.MustUint32(argso.GetIndex(0).MustString())
-		st := gopp.MustInt(argso.GetIndex(1).MustString())
+		fnum := gopp.MustUint32(evto.Args[0])
+		st := gopp.MustInt(evto.Args[1])
 		this.callbackFriendConnectionStatus(fnum, st)
 	case "FriendMessage":
-		fnum := gopp.MustUint32(argso.GetIndex(0).MustString())
-		log.Println(fnum)
-		this.callbackFriendMessage(fnum, 0, argso.GetIndex(1).MustString())
+		fnum := gopp.MustUint32(evto.Args[0])
+		this.callbackFriendMessage(fnum, 0, evto.Args[1])
 	case "ConferenceInvite":
-		fnum := gopp.MustUint32(argso.GetIndex(0).MustString())
-		itype := gopp.MustInt(argso.GetIndex(1).MustString())
-		cookie := argso.GetIndex(2).MustString()
+		fnum := gopp.MustUint32(evto.Args[0])
+		itype := gopp.MustInt(evto.Args[1])
+		cookie := evto.Args[2]
 		this.callbackConferenceInvite(fnum, itype, cookie)
 	case "ConferenceMessage":
-		gnum := gopp.MustUint32(argso.GetIndex(0).MustString())
-		pnum := gopp.MustUint32(argso.GetIndex(1).MustString())
-		mtype := gopp.MustInt(argso.GetIndex(2).MustString())
-		msg := argso.GetIndex(3).MustString()
+		gnum := gopp.MustUint32(evto.Args[0])
+		pnum := gopp.MustUint32(evto.Args[1])
+		mtype := gopp.MustInt(evto.Args[2])
+		msg := evto.Args[3]
 		this.callbackConferenceMessage(gnum, pnum, mtype, msg)
 	case "ConferenceTitle":
-		gnum := gopp.MustUint32(argso.GetIndex(0).MustString())
-		pnum := gopp.MustUint32(argso.GetIndex(1).MustString())
-		title := argso.GetIndex(2).MustString()
+		gnum := gopp.MustUint32(evto.Args[0])
+		pnum := gopp.MustUint32(evto.Args[1])
+		title := evto.Args[2]
 		this.callbackConferenceTitle(gnum, pnum, title)
 	case "ConferenceNameListChange":
-		gnum := gopp.MustUint32(argso.GetIndex(0).MustString())
-		pnum := gopp.MustUint32(argso.GetIndex(1).MustString())
-		change := gopp.MustInt(argso.GetIndex(2).MustString())
+		gnum := gopp.MustUint32(evto.Args[0])
+		pnum := gopp.MustUint32(evto.Args[1])
+		change := gopp.MustInt(evto.Args[2])
 		this.callbackConferenceNameListChange(gnum, pnum, change)
 	}
 }

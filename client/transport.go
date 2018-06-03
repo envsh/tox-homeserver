@@ -28,7 +28,7 @@ type Transport interface {
 	Connect(host string) error
 	Start() error
 	Close() error
-	OnData(func(*simplejson.Json, []byte))
+	OnData(func(*thspbs.Event, []byte))
 	OnDisconnected(func(error))
 	OnConnected(func())
 	// WriteMessage([]byte) error
@@ -39,7 +39,7 @@ type Transport interface {
 type _TransportBase struct {
 	name        string
 	srvurl      string
-	datacbs     []func(*simplejson.Json, []byte)
+	datacbs     []func(*thspbs.Event, []byte)
 	disconncdbs []func(error)
 	connedcbs   []func()
 	closed      bool
@@ -47,13 +47,13 @@ type _TransportBase struct {
 
 func newTransportBase() *_TransportBase {
 	this := &_TransportBase{}
-	this.datacbs = make([]func(*simplejson.Json, []byte), 0)
+	this.datacbs = make([]func(*thspbs.Event, []byte), 0)
 	this.disconncdbs = make([]func(error), 0)
 	this.connedcbs = make([]func(), 0)
 	return this
 }
 
-func (this *_TransportBase) OnData(f func(*simplejson.Json, []byte)) {
+func (this *_TransportBase) OnData(f func(*thspbs.Event, []byte)) {
 	this.datacbs = append(this.datacbs, f)
 }
 func (this *_TransportBase) OnDisconnected(f func(err error)) {
@@ -63,9 +63,9 @@ func (this *_TransportBase) OnConnected(f func()) {
 	this.connedcbs = append(this.connedcbs, f)
 }
 
-func (this *_TransportBase) runOnData(jso *simplejson.Json, data []byte) {
+func (this *_TransportBase) runOnData(evto *thspbs.Event, data []byte) {
 	for _, datacb := range this.datacbs {
-		datacb(jso, data)
+		datacb(evto, data)
 	}
 }
 func (this *_TransportBase) runOnDisconnected(err error) {
@@ -145,19 +145,17 @@ func (this *GrpcTransport) serveBackendEventGrpcImpl() {
 	}
 	cnter := uint64(0)
 	for !this.closed {
-		evt, err := stmc.Recv()
+		evto, err := stmc.Recv()
 		gopp.ErrPrint(err)
 		if err != nil {
 			break
 		}
 		cnter++
 
-		jcc, err := json.Marshal(evt)
+		jcc, err := json.Marshal(evto)
 		gopp.ErrPrint(err)
 		log.Println("grpcrecv:", string(jcc))
-		jso, err := simplejson.NewJson(jcc)
-		gopp.ErrPrint(err)
-		this.runOnData(jso, jcc)
+		this.runOnData(evto, jcc)
 	}
 	log.Println("Grpc poll got events:", cnter)
 }
@@ -239,11 +237,14 @@ func (this *WebsocketTransport) serveBackendEventWSImpl() error {
 
 		jso, err := simplejson.NewJson(message)
 		gopp.ErrPrint(err)
+		evto := &thspbs.Event{}
+		err = json.Unmarshal(message, evto)
+		gopp.ErrPrint(err)
 		if rdatao, ok := jso.CheckGet("data"); ok {
 			rmessage, _ := rdatao.Encode()
-			this.runOnData(jso, rmessage)
+			this.runOnData(evto, rmessage)
 		} else if _, ok := jso.CheckGet("Name"); ok {
-			this.runOnData(jso, message)
+			this.runOnData(evto, message)
 		} else {
 			log.Println("Unknown packet:", string(message))
 		}

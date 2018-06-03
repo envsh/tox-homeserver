@@ -8,20 +8,18 @@ import (
 	thscli "tox-homeserver/client"
 	"tox-homeserver/thspbs"
 
-	simplejson "github.com/bitly/go-simplejson"
 	"github.com/kitech/qt.go/qtcore"
 	"github.com/kitech/qt.go/qtwidgets"
 )
 
-func dispatchEvent(jso *simplejson.Json) {
+func dispatchEvent(evto *thspbs.Event) {
 	uiw, ctitmdl := uictx.uiw, uictx.ctitmdl
 	// listwp1 := Ui_MainWindow_Get_listWidget(uiw)
 	// listw1 := widgets.NewQListWidgetFromPointer(listwp1)
 
-	evtName := jso.Get("Name").MustString()
-	switch evtName {
+	switch evto.Name {
 	case "SelfConnectionStatus": // {"Name":"SelfConnectionStatus","Args":["2"],"Margs":["CONNECTION_UDP"]}
-		status := gopp.MustUint32(jso.Get("Args").GetIndex(0).MustString())
+		status := gopp.MustUint32(evto.Args[0])
 		uictx.mw.setConnStatus(status > 0)
 	case "FriendRequest":
 		///
@@ -31,9 +29,9 @@ func dispatchEvent(jso *simplejson.Json) {
 
 	case "FriendMessage":
 		// jso.Get("Args").GetIndex(0).MustString()
-		msg := jso.Get("Args").GetIndex(1).MustString()
-		fname := jso.Get("Margs").GetIndex(0).MustString()
-		pubkey := jso.Get("Margs").GetIndex(1).MustString()
+		msg := evto.Args[1]
+		fname := evto.Margs[0]
+		pubkey := evto.Margs[1]
 		_, _, _ = msg, fname, pubkey
 
 		itext := fmt.Sprintf("%s: %s", fname, msg)
@@ -44,7 +42,7 @@ func dispatchEvent(jso *simplejson.Json) {
 		if item == nil {
 			log.Println("wtf", fname, pubkey, msg)
 		} else {
-			msgo := NewMessageForFriend(jso)
+			msgo := NewMessageForFriend(evto)
 			item.AddMessage(msgo, false)
 		}
 
@@ -53,10 +51,10 @@ func dispatchEvent(jso *simplejson.Json) {
 		// gopp.ErrPrint(err)
 
 	case "FriendConnectionStatus":
-		fname := jso.Get("Margs").GetIndex(0).MustString()
-		pubkey := jso.Get("Margs").GetIndex(1).MustString()
+		fname := evto.Margs[0]
+		pubkey := evto.Margs[1]
 		_, _ = fname, pubkey
-		st := gopp.MustInt(jso.Get("Args").GetIndex(1).MustString())
+		st := gopp.MustInt(evto.Args[1])
 
 		item := uictx.iteman.Get(pubkey)
 		if item != nil {
@@ -69,8 +67,8 @@ func dispatchEvent(jso *simplejson.Json) {
 		}
 
 	case "FriendName":
-		fname := jso.Get("Args").GetIndex(1).MustString()
-		pubkey := jso.Get("Margs").GetIndex(0).MustString()
+		fname := evto.Args[1]
+		pubkey := evto.Margs[0]
 		_, _ = fname, pubkey
 		item := uictx.iteman.Get(pubkey)
 		if item != nil {
@@ -80,9 +78,9 @@ func dispatchEvent(jso *simplejson.Json) {
 		}
 
 	case "FriendStatusMessage":
-		statusText := jso.Get("Args").GetIndex(1).MustString()
-		fname := jso.Get("Margs").GetIndex(0).MustString()
-		pubkey := jso.Get("Margs").GetIndex(1).MustString()
+		statusText := evto.Args[1]
+		fname := evto.Margs[0]
+		pubkey := evto.Margs[1]
 		_, _ = fname, pubkey
 		item := uictx.iteman.Get(pubkey)
 		if item != nil {
@@ -92,9 +90,9 @@ func dispatchEvent(jso *simplejson.Json) {
 		}
 
 	case "FriendStatus":
-		status := gopp.MustInt(jso.Get("Args").GetIndex(1).MustString())
-		fname := jso.Get("Margs").GetIndex(0).MustString()
-		pubkey := jso.Get("Margs").GetIndex(1).MustString()
+		status := gopp.MustInt(evto.Args[1])
+		fname := evto.Margs[0]
+		pubkey := evto.Margs[1]
 		_, _ = fname, pubkey
 		item := uictx.iteman.Get(pubkey)
 		if item != nil {
@@ -104,8 +102,8 @@ func dispatchEvent(jso *simplejson.Json) {
 		}
 
 	case "ConferenceInvite":
-		groupNumber := jso.Get("Margs").GetIndex(2).MustString()
-		cookie := jso.Get("Args").GetIndex(2).MustString()
+		groupNumber := evto.Margs[2]
+		cookie := evto.Args[2]
 		groupId := thscli.ConferenceCookieToIdentifier(cookie)
 		log.Println(groupId)
 		_ = groupNumber
@@ -137,9 +135,9 @@ func dispatchEvent(jso *simplejson.Json) {
 		// gopp.ErrPrint(err)
 
 	case "ConferenceTitle":
-		groupNumber := jso.Get("Args").GetIndex(1).MustString()
-		groupTitle := jso.Get("Args").GetIndex(2).MustString()
-		groupId := jso.Get("Margs").GetIndex(0).MustString()
+		groupNumber := evto.Args[1]
+		groupTitle := evto.Args[2]
+		groupId := evto.Margs[0]
 		if thscli.ConferenceIdIsEmpty(groupId) {
 			break
 		}
@@ -164,11 +162,11 @@ func dispatchEvent(jso *simplejson.Json) {
 			log.Println("New group contact item:", groupNumber, groupId, groupTitle)
 		}
 	case "ConferencePeerName":
-		gnum := gopp.MustUint32(jso.Get("Args").GetIndex(0).MustString())
-		pnum := gopp.MustUint32(jso.Get("Args").GetIndex(1).MustString())
-		groupId := jso.Get("Margs").GetIndex(3).MustString()
-		pname := jso.Get("Margs").GetIndex(0).MustString()
-		ppubkey := jso.Get("Margs").GetIndex(1).MustString()
+		gnum := gopp.MustUint32(evto.Args[0])
+		pnum := gopp.MustUint32(evto.Args[1])
+		groupId := evto.Margs[3]
+		pname := evto.Margs[0]
+		ppubkey := evto.Margs[1]
 		vtcli.Binfo.UpdatePeerInfo(gnum, groupId, ppubkey, pname, pnum)
 		peeros := vtcli.Binfo.GetGroupMembers(gnum)
 		item := uictx.iteman.Get(groupId)
@@ -178,8 +176,8 @@ func dispatchEvent(jso *simplejson.Json) {
 			}
 		}
 	case "ConferencePeerListChange":
-		groupId := jso.Get("Margs").GetIndex(1).MustString()
-		peerCount := gopp.MustInt(jso.Get("Margs").GetIndex(2).MustString())
+		groupId := evto.Margs[1]
+		peerCount := gopp.MustInt(evto.Margs[2])
 		item := uictx.iteman.Get(groupId)
 		if item != nil {
 			if item.peerCount != peerCount {
@@ -187,8 +185,8 @@ func dispatchEvent(jso *simplejson.Json) {
 			}
 		}
 		// update deleted ones
-		gnum := gopp.MustUint32(jso.Get("Args").GetIndex(0).MustString())
-		deletedPeerPubkeysjs := jso.Get("Margs").GetIndex(4).MustString()
+		gnum := gopp.MustUint32(evto.Args[0])
+		deletedPeerPubkeysjs := evto.Margs[4]
 		deletedPeerPubkeys := []string{}
 		err := json.Unmarshal([]byte(deletedPeerPubkeysjs), deletedPeerPubkeys)
 		gopp.ErrPrint(err, deletedPeerPubkeysjs)
@@ -196,8 +194,8 @@ func dispatchEvent(jso *simplejson.Json) {
 			vtcli.Binfo.DeletePeerInfo(gnum, groupId, pubkey)
 		}
 	case "ConferenceNameListChange": // depcreated
-		groupTitle := jso.Get("Margs").GetIndex(2).MustString()
-		groupId := jso.Get("Margs").GetIndex(3).MustString()
+		groupTitle := evto.Margs[2]
+		groupId := evto.Margs[3]
 		log.Println(groupId)
 		if thscli.ConferenceIdIsEmpty(groupId) {
 			log.Println("empty")
@@ -206,14 +204,14 @@ func dispatchEvent(jso *simplejson.Json) {
 		_ = groupTitle
 
 	case "ConferenceMessage":
-		groupId := jso.Get("Margs").GetIndex(3).MustString()
+		groupId := evto.Margs[3]
 		if thscli.ConferenceIdIsEmpty(groupId) {
 			break
 		}
 
-		message := jso.Get("Args").GetIndex(3).MustString()
-		peerName := jso.Get("Margs").GetIndex(0).MustString()
-		groupTitle := jso.Get("Margs").GetIndex(2).MustString()
+		message := evto.Args[3]
+		peerName := evto.Margs[0]
+		groupTitle := evto.Margs[2]
 
 		// raw message show area
 		itext := fmt.Sprintf("%s@%s: %s", peerName, groupTitle, message)
@@ -227,15 +225,15 @@ func dispatchEvent(jso *simplejson.Json) {
 		for _, room := range ctitmdl {
 			// log.Println(room.GetName(), ",", groupTitle, ",", room.GetId(), ",", groupId)
 			if room.GetId() == groupId && room.GetName() == groupTitle {
-				room.AddMessage(NewMessageForGroup(jso), false)
+				room.AddMessage(NewMessageForGroup(evto), false)
 				break
 			}
 		}
 
 	case "FriendSendMessage":
-		itext := jso.Get("Args").GetIndex(1).MustString()
-		pubkey := jso.Get("Margs").GetIndex(1).MustString()
-		eventId := gopp.MustInt64(jso.Get("Margs").GetIndex(2).MustString())
+		itext := evto.Args[1]
+		pubkey := evto.Margs[1]
+		eventId := gopp.MustInt64(evto.Margs[2])
 
 		found := false
 		for _, room := range ctitmdl {
@@ -249,10 +247,10 @@ func dispatchEvent(jso *simplejson.Json) {
 		log.Println(found, pubkey, itext)
 
 	case "ConferenceSendMessage":
-		itext := jso.Get("Args").GetIndex(2).MustString()
-		groupTitle := jso.Get("Margs").GetIndex(2).MustString()
-		groupId := jso.Get("Margs").GetIndex(3).MustString()
-		eventId := gopp.MustInt64(jso.Get("Margs").GetIndex(4).MustString())
+		itext := evto.Args[2]
+		groupTitle := evto.Margs[2]
+		groupId := evto.Margs[3]
+		eventId := gopp.MustInt64(evto.Margs[4])
 
 		found := false
 		for _, room := range ctitmdl {
@@ -266,20 +264,19 @@ func dispatchEvent(jso *simplejson.Json) {
 		log.Println(found, groupId, itext)
 
 	default:
-		log.Println(jso)
+		log.Printf("%#v\n", evto)
 	}
 }
 
-func dispatchEventResp(jso *simplejson.Json) {
+func dispatchEventResp(evto *thspbs.Event) {
 	// uiw, ctitmdl := uictx.uiw, uictx.ctitmdl
 	// listwp1 := Ui_MainWindow_Get_listWidget(uiw)
 	// listw1 := widgets.NewQListWidgetFromPointer(listwp1)
 
-	evtName := jso.Get("Name").MustString()
-	switch evtName {
+	switch evto.Name {
 	case "FriendAddResp":
-		fnum := gopp.MustUint32(jso.Get("Args").GetIndex(0).MustString())
-		toxid := jso.Get("Margs").GetIndex(0).MustString()
+		fnum := gopp.MustUint32(evto.Args[0])
+		toxid := evto.Margs[0]
 		pubkey := toxid[:64]
 		item := uictx.iteman.Get(pubkey)
 		if item == nil {
@@ -291,8 +288,8 @@ func dispatchEventResp(jso *simplejson.Json) {
 			uictx.mech.Trigger()
 		}
 	case "FriendAddNorequestResp":
-		fnum := gopp.MustUint32(jso.Get("Args").GetIndex(0).MustString())
-		toxid := jso.Get("Margs").GetIndex(0).MustString()
+		fnum := gopp.MustUint32(evto.Args[0])
+		toxid := evto.Margs[0]
 		pubkey := toxid[:64]
 		item := uictx.iteman.Get(pubkey)
 		if item == nil {
@@ -304,15 +301,15 @@ func dispatchEventResp(jso *simplejson.Json) {
 			uictx.mech.Trigger()
 		}
 	case "FriendDeleteResp":
-		pubkey := jso.Get("Margs").GetIndex(0).MustString()
+		pubkey := evto.Margs[0]
 		item := uictx.iteman.Get(pubkey)
 		if item != nil {
 			uictx.iteman.Delete(item)
 		}
 	case "ConferenceNewResp":
-		pubkey := jso.Get("Args").GetIndex(0).MustString()
-		title := jso.Get("Margs").GetIndex(0).MustString()
-		gnum := gopp.MustUint32(jso.Get("Args").GetIndex(1).MustString())
+		pubkey := evto.Args[0]
+		title := evto.Margs[0]
+		gnum := gopp.MustUint32(evto.Args[1])
 		item := uictx.iteman.Get(pubkey)
 		if item == nil {
 			grpo := &thspbs.GroupInfo{}
@@ -323,18 +320,18 @@ func dispatchEventResp(jso *simplejson.Json) {
 			uictx.mech.Trigger()
 		}
 	case "ConferenceDeleteResp":
-		pubkey := jso.Get("Args").GetIndex(0).MustString()
+		pubkey := evto.Args[0]
 		item := uictx.iteman.Get(pubkey)
 		if item != nil {
 			uictx.iteman.Delete(item)
 		}
 	case "SelfSetNameResp":
-		name := jso.Get("Args").GetIndex(0).MustString()
+		name := evto.Args[0]
 		uictx.uiw.Label_2.SetText(name)
 	case "SelfSetStatusMessageResp":
-		stmsg := jso.Get("Args").GetIndex(0).MustString()
+		stmsg := evto.Args[0]
 		uictx.uiw.Label_3.SetText(stmsg)
 	default:
-		log.Println(jso)
+		log.Printf("%#v\n", evto)
 	}
 }

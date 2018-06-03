@@ -9,7 +9,6 @@ import (
 	"tox-homeserver/store"
 	"tox-homeserver/thspbs"
 
-	simplejson "github.com/bitly/go-simplejson"
 	"github.com/go-xorm/xorm"
 )
 
@@ -64,7 +63,7 @@ func AppConnect(srvurl string) error {
 	}
 
 	appctx.srvtp = appctx.vtcli.srvtp
-	appctx.srvtp.OnData(func(jso *simplejson.Json, data []byte) { appctx.dispatchEvent(jso) })
+	appctx.srvtp.OnData(func(evto *thspbs.Event, data []byte) { appctx.dispatchEvent(evto) })
 
 	time.Sleep(1 * time.Millisecond)
 	go appctx.getAndPersistBaseInfo()
@@ -84,36 +83,44 @@ func (this *AppContext) GetLigTox() *LigTox         { return this.vtcli }
 func (this *AppContext) GetStorage() *store.Storage { return this.store }
 
 // 只用做消息存储
-func (this *AppContext) dispatchEvent(jso *simplejson.Json) {
-	evtName := jso.Get("Name").MustString()
-	switch evtName {
+func (this *AppContext) dispatchEvent(evto *thspbs.Event) {
+	switch evto.Name {
 	case "SelfConnectionStatus":
 	case "FriendRequest":
 		///
-		pubkey := jso.Get("Args").GetIndex(0).MustString()
+		// pubkey := jso.Get("Args").GetIndex(0).MustString()
+		pubkey := evto.Args[0]
 		_, err := appctx.store.AddFriend(pubkey, 0, "", "")
-		gopp.ErrPrint(err, jso.Get("Args"))
+		gopp.ErrPrint(err, evto.Args)
 
 	case "FriendMessage":
 		// jso.Get("Args").GetIndex(0).MustString()
-		msg := jso.Get("Args").GetIndex(1).MustString()
-		fname := jso.Get("Margs").GetIndex(0).MustString()
-		pubkey := jso.Get("Margs").GetIndex(1).MustString()
+		// msg := jso.Get("Args").GetIndex(1).MustString()
+		msg := evto.Args[1]
+		// fname := jso.Get("Margs").GetIndex(0).MustString()
+		fname := evto.Margs[0]
+		// pubkey := jso.Get("Margs").GetIndex(1).MustString()
+		pubkey := evto.Margs[1]
 		_ = fname
 		///
-		eventId := int64(gopp.MustInt(jso.Get("Margs").GetIndex(2).MustString()))
+		// eventId := int64(gopp.MustInt(jso.Get("Margs").GetIndex(2).MustString()))
+		eventId := gopp.MustInt64(evto.Margs[2])
 		_, err := appctx.store.AddFriendMessage(msg, pubkey, eventId)
 		gopp.ErrPrint(err)
 
 	case "FriendConnectionStatus":
-		fname := jso.Get("Margs").GetIndex(0).MustString()
-		pubkey := jso.Get("Margs").GetIndex(1).MustString()
+		// fname := jso.Get("Margs").GetIndex(0).MustString()
+		fname := evto.Margs[0]
+		// pubkey := jso.Get("Margs").GetIndex(1).MustString()
+		pubkey := evto.Margs[1]
 		_, _ = fname, pubkey
 
 	case "ConferenceInvite":
-		groupNumber := jso.Get("Margs").GetIndex(2).MustString()
+		// groupNumber := jso.Get("Margs").GetIndex(2).MustString()
+		groupNumber := evto.Margs[2]
 		_ = groupNumber
-		cookie := jso.Get("Args").GetIndex(2).MustString()
+		// cookie := jso.Get("Args").GetIndex(2).MustString()
+		cookie := evto.Args[2]
 		groupId := ConferenceCookieToIdentifier(cookie)
 
 		///
@@ -121,8 +128,10 @@ func (this *AppContext) dispatchEvent(jso *simplejson.Json) {
 		gopp.ErrPrint(err)
 
 	case "ConferenceTitle":
-		groupTitle := jso.Get("Args").GetIndex(2).MustString()
-		groupId := jso.Get("Margs").GetIndex(0).MustString()
+		// groupTitle := jso.Get("Args").GetIndex(2).MustString()
+		groupTitle := evto.Args[2]
+		// groupId := jso.Get("Margs").GetIndex(0).MustString()
+		groupId := evto.Margs[0]
 		if ConferenceIdIsEmpty(groupId) {
 			break
 		}
@@ -131,9 +140,12 @@ func (this *AppContext) dispatchEvent(jso *simplejson.Json) {
 
 	case "ConferencePeerName":
 		// TODO
-		peerNumber := gopp.MustUint32(jso.Get("Args").GetIndex(1).MustString())
-		peerName := jso.Get("Margs").GetIndex(1).MustString()
-		peerPubkey := jso.Get("Margs").GetIndex(1).MustString()
+		// peerNumber := gopp.MustUint32(jso.Get("Args").GetIndex(1).MustString())
+		peerNumber := gopp.MustUint32(evto.Args[1])
+		// peerName := jso.Get("Margs").GetIndex(1).MustString()
+		peerName := evto.Margs[1]
+		// peerPubkey := jso.Get("Margs").GetIndex(1).MustString()
+		peerPubkey := evto.Margs[2] // TODO two same???
 		_, err := appctx.store.AddPeer(peerPubkey, 0, "")
 		gopp.ErrPrint(err)
 		if store.IsUniqueConstraintErr(err) {
@@ -143,37 +155,43 @@ func (this *AppContext) dispatchEvent(jso *simplejson.Json) {
 	case "ConferencePeerListChange":
 		// TODO
 	case "ConferenceNameListChange": // TODO depcreated
-		groupTitle := jso.Get("Margs").GetIndex(2).MustString()
-		groupId := jso.Get("Margs").GetIndex(3).MustString()
+		// groupTitle := jso.Get("Margs").GetIndex(2).MustString()
+		groupTitle := evto.Margs[2]
+		// groupId := jso.Get("Margs").GetIndex(3).MustString()
+		groupId := evto.Margs[3]
 		if ConferenceIdIsEmpty(groupId) {
-			log.Println("empty")
-			break
+			log.Panicln("not possible", evto.Args)
 		}
 		_ = groupTitle
 		///
-		peerPubkey := jso.Get("Margs").GetIndex(1).MustString()
+		// peerPubkey := jso.Get("Margs").GetIndex(1).MustString()
+		peerPubkey := evto.Margs[1]
 		_, err := appctx.store.AddPeer(peerPubkey, 0, "")
 		gopp.ErrPrint(err)
 
 	case "ConferenceMessage":
-		groupId := jso.Get("Margs").GetIndex(3).MustString()
+		// groupId := jso.Get("Margs").GetIndex(3).MustString()
+		groupId := evto.Margs[3]
 		if ConferenceIdIsEmpty(groupId) {
-			break
+			log.Panicln("not possible", evto.Args)
 		}
 
-		message := jso.Get("Args").GetIndex(3).MustString()
-
-		//
-		peerName := jso.Get("Margs").GetIndex(0).MustString()
-		peerPubkey := jso.Get("Margs").GetIndex(1).MustString()
+		// message := jso.Get("Args").GetIndex(3).MustString()
+		message := evto.Args[3]
+		// peerName := jso.Get("Margs").GetIndex(0).MustString()
+		peerName := evto.Margs[0]
+		// peerPubkey := jso.Get("Margs").GetIndex(1).MustString()
+		peerPubkey := evto.Margs[1]
 		_, err := appctx.store.GetContactByPubkey(peerPubkey)
 		if err == xorm.ErrNotExist {
-			peerNum := gopp.MustUint32(jso.Get("Args").GetIndex(1).MustString())
+			// peerNum := gopp.MustUint32(jso.Get("Args").GetIndex(1).MustString())
+			peerNum := gopp.MustUint32(evto.Args[1])
 			appctx.store.AddPeer(peerPubkey, peerNum, peerName)
 		}
-		eventId := int64(gopp.MustInt(jso.Get("Margs").GetIndex(4).MustString()))
+		// eventId := int64(gopp.MustInt(jso.Get("Margs").GetIndex(4).MustString()))
+		eventId := gopp.MustInt64(evto.Margs[4])
 		_, err = appctx.store.AddGroupMessage(message, "0", groupId, peerPubkey, eventId)
-		gopp.ErrPrint(err, jso)
+		gopp.ErrPrint(err, evto)
 
 	default:
 	}
