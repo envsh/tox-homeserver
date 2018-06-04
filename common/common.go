@@ -49,3 +49,5 @@ func NowTimeStr() string { return time.Now().Format(DefaultTimeLayout) }
 
 const UiNameLen = 32
 const UiStmsgLen = 45
+const MaxOfflineMessageTTL = 56 * 86400 * time.Second
+const MaxOfflineMessageCount = 123

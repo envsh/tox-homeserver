@@ -156,15 +156,29 @@ func RmtCallExecuteHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Even
 			log.Println(fnum, " <- ", req.Args[0])
 		}
 		log.Println("fnum:", fnum, req.Args)
-		wn, err := t.FriendSendMessage(fnum, req.Args[1])
-		gopp.ErrPrint(err)
+		wn, errSend := t.FriendSendMessage(fnum, req.Args[1])
+		gopp.ErrPrint(errSend)
 		friendpk, err := t.FriendGetPublicKey(fnum)
 		gopp.ErrPrint(err, fnum, req.Args)
 		selfpk := t.SelfGetPublicKey()
-		msgo, err := appctx.st.AddFriendMessage(req.Args[1], friendpk, selfpk, req.EventId)
-		gopp.ErrPrint(err)
+		msgo, errSave := appctx.st.AddFriendMessage(req.Args[1], friendpk, selfpk, req.EventId)
+		gopp.ErrPrint(errSave)
+
+		if errSend == nil && errSave == nil {
+			err := appctx.st.SetMessageSent(msgo.Id)
+			gopp.ErrPrint(err, msgo.Id)
+			msgo.Sent = gopp.IfElseInt(err == nil, 1, 0)
+		}
+		if errSend != nil {
+			out.ErrCode, out.ErrMsg = -1, errSend.Error()
+			// to offline struct
+			err := OffMsgMan().AddMessage(friendpk, msgo)
+			gopp.ErrPrint(err)
+		}
+
 		out.EventId = msgo.EventId
-		out.Args = append(out.Args, fmt.Sprintf("%d", wn))
+		out.Args = append(out.Args, fmt.Sprintf("%d", wn)) // TODO, dont modify Args, use Margs
+		out.Margs = gopp.ToStrs(wn, msgo.Sent)
 
 		// groups
 	case "ConferenceNew": // args:name,returns:
@@ -204,17 +218,29 @@ func RmtCallExecuteHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Even
 			gnum, _ = xtox.ConferenceGetByIdentifier(t, req.Args[0])
 			log.Println(gnum, " <- ", req.Args[0])
 		}
-		_, err = t.ConferenceSendMessage(gnum, mtype, req.Args[2])
-		gopp.ErrPrint(err)
-		if err != nil {
-			out.ErrCode = -1
-			out.ErrMsg = err.Error()
-		}
+		_, errSend := t.ConferenceSendMessage(gnum, mtype, req.Args[2])
+		gopp.ErrPrint(errSend)
+
 		identifier, _ := xtox.ConferenceGetIdentifier(t, uint32(gnum))
 		pubkey := t.SelfGetPublicKey()
-		msgo, err := appctx.st.AddGroupMessage(req.Args[2], "0", identifier, pubkey, req.EventId)
+		msgo, errSave := appctx.st.AddGroupMessage(req.Args[2], "0", identifier, pubkey, req.EventId)
 		gopp.ErrPrint(err)
+
+		if errSend == nil && errSave == nil {
+			err := appctx.st.SetMessageSent(msgo.Id)
+			gopp.ErrPrint(err, msgo.Id)
+			msgo.Sent = gopp.IfElseInt(err == nil, 1, 0)
+		}
+		if errSend != nil {
+			out.ErrCode, out.ErrMsg = -1, errSend.Error()
+			// to offline struct
+			err := OffMsgMan().AddMessage(identifier, msgo)
+			gopp.ErrPrint(err)
+		}
+
 		out.EventId = msgo.EventId
+		out.Margs = gopp.ToStrs(msgo.Sent)
+
 	case "ConferenceJoin": // friendNumber, cookie
 		fnum := gopp.MustUint32(req.Args[0])
 		cookie := req.Args[1]

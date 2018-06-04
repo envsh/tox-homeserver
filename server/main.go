@@ -38,6 +38,10 @@ func Main() {
 
 	appctx.st = store.NewStorage()
 	thscom.SetLogMetrics()
+
+	log.Println("Loading unsents messages...")
+	OffMsgMan().LoadFromStorage(appctx.st)
+
 	go func() {
 		// 为简单debug,stats,socketio,websocket使用
 		wso := NewWebsocketServer()

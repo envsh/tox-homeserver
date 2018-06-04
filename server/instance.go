@@ -95,8 +95,12 @@ func (this *ToxVM) setupCallbacks() {
 		selfpk := t.SelfGetPublicKey()
 		msgo, err := appctx.st.AddFriendMessage(message, friendpk, selfpk, 0)
 		gopp.ErrPrint(err)
+		if err == nil {
+			err := appctx.st.SetMessageSent(msgo.Id)
+			gopp.ErrPrint(err, msgo.Id)
+		}
 
-		evt.Margs = []string{fname, friendpk, fmt.Sprintf("%d", msgo.EventId)}
+		evt.Margs = []string{fname, friendpk, fmt.Sprintf("%d", msgo.EventId), "1"}
 		this.pubmsg(&evt)
 	}, nil)
 
@@ -110,6 +114,29 @@ func (this *ToxVM) setupCallbacks() {
 		gopp.ErrPrint(err)
 		evt.Margs = []string{fname, pubkey, tox.ConnStatusString(status)}
 		this.pubmsg(evt)
+
+		// offline message
+		if status > 0 {
+			time.AfterFunc(20*time.Millisecond, func() {
+				ofm := OffMsgMan()
+				offmsgs := ofm.GetByPubkey(pubkey)
+				if len(offmsgs) == 0 {
+					return
+				}
+				sentCount := 0
+				for idx, offmsg := range offmsgs {
+					time.Sleep(time.Duration(idx+1) * 345 * time.Millisecond)
+					_, err := t.FriendSendMessage(friendNumber, offmsg.Content)
+					gopp.ErrPrint(err)
+					if err == nil {
+						sentCount += 1
+						ofm.DeleteMessage(pubkey, offmsg.Id)
+						appctx.st.SetMessageSent(offmsg.Id)
+					}
+				}
+				log.Printf("Send unsents: %d/%d to %s\n", sentCount, len(offmsgs), fname)
+			})
+		}
 	}, nil)
 
 	t.CallbackFriendNameAdd(func(_ *tox.Tox, friendNumber uint32, fname string, userData interface{}) {
@@ -247,8 +274,13 @@ func (this *ToxVM) setupCallbacks() {
 
 		msgo, err := appctx.st.AddGroupMessage(message, "0", groupId, peerPubkey, 0)
 		gopp.ErrPrint(err)
+		if err == nil {
+			err := appctx.st.SetMessageSent(msgo.Id)
+			gopp.ErrPrint(err, msgo.Id)
+			msgo.Sent = 1
+		}
 
-		evt.Margs = []string{peerName, peerPubkey, title, groupId, fmt.Sprintf("%d", msgo.EventId)}
+		evt.Margs = []string{peerName, peerPubkey, title, groupId, fmt.Sprintf("%d", msgo.EventId), "1"}
 		if t.SelfGetPublicKey() == peerPubkey {
 		} else {
 			this.pubmsg(&evt)

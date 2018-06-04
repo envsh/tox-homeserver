@@ -26,8 +26,10 @@ type Message struct {
 	ContactId int64  `xorm:"index INTEGER"`
 	RoomId    int64  `xorm:"index INTEGER"` // it's really another ContactId
 	EventId   int64  `xorm:"unique INTEGER"`
+	Sent      int    `xorm:"index INTEGER"`
 }
 
+// no table
 type MessageJoined struct {
 	Id        int64  `xorm:"pk autoincr INTEGER"`
 	Updated   string `xorm:"TEXT"`
@@ -37,6 +39,7 @@ type MessageJoined struct {
 	ContactId int64  `xorm:"index INTEGER"`
 	RoomId    int64  `xorm:"index INTEGER"` // it's really another ContactId
 	EventId   int64  `xorm:"unique INTEGER"`
+	Sent      int    `xorm:"index INTEGER"`
 
 	RoomName   string
 	RoomPubkey string

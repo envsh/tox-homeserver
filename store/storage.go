@@ -32,6 +32,9 @@ func NewStorage() *Storage {
 	gopp.ErrPrint(err)
 	err = dbh.Ping()
 	gopp.ErrPrint(err, dsn)
+	if err == nil {
+		log.Println("PING DATABASE OK:", dsn)
+	}
 	this.dbh = dbh
 	this.SetWAL(true)
 
@@ -286,6 +289,30 @@ func (this *Storage) AddMessageJoined(mj *MessageJoined) (*Message, error) {
 	id, err := this.dbh.InsertOne(m)
 	_ = id
 	return m, err
+}
+
+func (this *Storage) SetMessageSent(msgid int64) error {
+	mo := &Message{}
+	mo.Sent = 1
+	mo.Updated = thscom.NowTimeStr()
+
+	_, err := this.dbh.Where("id=?", msgid).Update(mo)
+	gopp.ErrPrint(err, msgid)
+	return err
+}
+
+func (this *Storage) FindUnsentMessages() (unsents []Message, err error) {
+	err = this.dbh.Where("sent=?", 0).Asc("id").Find(&unsents)
+	return
+}
+
+func (this *Storage) FindUnsentMessagesByPubkey(pubkey string) (unsents []Message, err error) {
+	c, err := this.GetContactByPubkey(pubkey)
+	if err != nil {
+		return
+	}
+	err = this.dbh.Where("room_id=? and sent=?", c.Id, 0).Asc("id").Find(&unsents)
+	return
 }
 
 func (this *Storage) MaxEventId() (int64, error) {
