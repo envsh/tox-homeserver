@@ -275,7 +275,7 @@ func tryReadContactEvent() {
 		ctv.timeline = thscli.TimeLine{NextBatch: vtcli.Binfo.NextBatch, PrevBatch: vtcli.Binfo.NextBatch - 1}
 		ctv.SetContactInfo(contactx)
 
-		log.Println("add contact...", len(uictx.ctitmdl))
+		log.Println("add contact", gopp.IfElseStr(ctv.isgroup, "group", "friend"), "...", len(uictx.ctitmdl))
 		if len(uictx.ctitmdl) == 1 {
 			// ctv.SetPressState(true)
 		}

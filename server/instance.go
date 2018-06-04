@@ -87,15 +87,16 @@ func (this *ToxVM) setupCallbacks() {
 		evt := thspbs.Event{}
 		evt.Name = "FriendMessage"
 		evt.Args = []string{fmt.Sprintf("%d", friendNumber), message}
-		pubkey, err := t.FriendGetPublicKey(friendNumber)
+		friendpk, err := t.FriendGetPublicKey(friendNumber)
 		gopp.ErrPrint(err)
 		fname, err := t.FriendGetName(friendNumber)
 		gopp.ErrPrint(err)
 
-		msgo, err := appctx.st.AddFriendMessage(message, pubkey, 0)
+		selfpk := t.SelfGetPublicKey()
+		msgo, err := appctx.st.AddFriendMessage(message, friendpk, selfpk, 0)
 		gopp.ErrPrint(err)
 
-		evt.Margs = []string{fname, pubkey, fmt.Sprintf("%d", msgo.EventId)}
+		evt.Margs = []string{fname, friendpk, fmt.Sprintf("%d", msgo.EventId)}
 		this.pubmsg(&evt)
 	}, nil)
 
@@ -132,6 +133,7 @@ func (this *ToxVM) setupCallbacks() {
 		evt.Margs = []string{fname, pubkey}
 		this.pubmsg(evt)
 	}, nil)
+
 	t.CallbackFriendStatusAdd(func(_ *tox.Tox, friendNumber uint32, status int, ud interface{}) {
 		evt := &thspbs.Event{}
 		evt.Name = "FriendStatus"
@@ -229,6 +231,11 @@ func (this *ToxVM) setupCallbacks() {
 		gopp.ErrPrint(err)
 		peerName, err := t.ConferencePeerGetName(groupNumber, peerNumber)
 		gopp.ErrPrint(err)
+
+		// dont store, dont dispatch. because already processed by rpc handler.
+		if peerPubkey == t.SelfGetPublicKey() {
+			return
+		}
 
 		title, err := t.ConferenceGetTitle(groupNumber)
 		gopp.ErrPrint(err)

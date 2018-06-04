@@ -165,9 +165,9 @@ func dispatchEvent(evto *thspbs.Event) {
 		gnum := gopp.MustUint32(evto.Args[0])
 		pnum := gopp.MustUint32(evto.Args[1])
 		groupId := evto.Margs[3]
-		pname := evto.Margs[0]
-		ppubkey := evto.Margs[1]
-		vtcli.Binfo.UpdatePeerInfo(gnum, groupId, ppubkey, pname, pnum)
+		peerName := evto.Margs[0]
+		peerPubkey := evto.Margs[1]
+		vtcli.Binfo.UpdatePeerInfo(gnum, groupId, peerPubkey, peerName, pnum)
 		peeros := vtcli.Binfo.GetGroupMembers(gnum)
 		item := uictx.iteman.Get(groupId)
 		if item != nil {

@@ -158,8 +158,10 @@ func RmtCallExecuteHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Even
 		log.Println("fnum:", fnum, req.Args)
 		wn, err := t.FriendSendMessage(fnum, req.Args[1])
 		gopp.ErrPrint(err)
-		pubkey := t.SelfGetPublicKey()
-		msgo, err := appctx.st.AddFriendMessage(req.Args[1], pubkey, req.EventId)
+		friendpk, err := t.FriendGetPublicKey(fnum)
+		gopp.ErrPrint(err, fnum, req.Args)
+		selfpk := t.SelfGetPublicKey()
+		msgo, err := appctx.st.AddFriendMessage(req.Args[1], friendpk, selfpk, req.EventId)
 		gopp.ErrPrint(err)
 		out.EventId = msgo.EventId
 		out.Args = append(out.Args, fmt.Sprintf("%d", wn))

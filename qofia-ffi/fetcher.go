@@ -117,6 +117,8 @@ func NewMessageFromStoreRecord(m *store.MessageJoined) *Message {
 	gopp.ErrPrint(err)
 	this.Time = tm
 
+	this.Me = m.PeerPubkey == vtcli.SelfGetPublicKey()
+
 	this.refmtmsg()
 	return this
 }

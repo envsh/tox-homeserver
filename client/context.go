@@ -95,31 +95,24 @@ func (this *AppContext) dispatchEvent(evto *thspbs.Event) {
 
 	case "FriendMessage":
 		// jso.Get("Args").GetIndex(0).MustString()
-		// msg := jso.Get("Args").GetIndex(1).MustString()
 		msg := evto.Args[1]
-		// fname := jso.Get("Margs").GetIndex(0).MustString()
 		fname := evto.Margs[0]
-		// pubkey := jso.Get("Margs").GetIndex(1).MustString()
-		pubkey := evto.Margs[1]
+		friendpk := evto.Margs[1]
 		_ = fname
 		///
-		// eventId := int64(gopp.MustInt(jso.Get("Margs").GetIndex(2).MustString()))
+		selfpk := this.vtcli.SelfGetPublicKey()
 		eventId := gopp.MustInt64(evto.Margs[2])
-		_, err := appctx.store.AddFriendMessage(msg, pubkey, eventId)
+		_, err := appctx.store.AddFriendMessage(msg, friendpk, selfpk, eventId)
 		gopp.ErrPrint(err)
 
 	case "FriendConnectionStatus":
-		// fname := jso.Get("Margs").GetIndex(0).MustString()
 		fname := evto.Margs[0]
-		// pubkey := jso.Get("Margs").GetIndex(1).MustString()
 		pubkey := evto.Margs[1]
 		_, _ = fname, pubkey
 
 	case "ConferenceInvite":
-		// groupNumber := jso.Get("Margs").GetIndex(2).MustString()
 		groupNumber := evto.Margs[2]
 		_ = groupNumber
-		// cookie := jso.Get("Args").GetIndex(2).MustString()
 		cookie := evto.Args[2]
 		groupId := ConferenceCookieToIdentifier(cookie)
 
@@ -128,9 +121,7 @@ func (this *AppContext) dispatchEvent(evto *thspbs.Event) {
 		gopp.ErrPrint(err)
 
 	case "ConferenceTitle":
-		// groupTitle := jso.Get("Args").GetIndex(2).MustString()
 		groupTitle := evto.Args[2]
-		// groupId := jso.Get("Margs").GetIndex(0).MustString()
 		groupId := evto.Margs[0]
 		if ConferenceIdIsEmpty(groupId) {
 			break
@@ -140,11 +131,8 @@ func (this *AppContext) dispatchEvent(evto *thspbs.Event) {
 
 	case "ConferencePeerName":
 		// TODO
-		// peerNumber := gopp.MustUint32(jso.Get("Args").GetIndex(1).MustString())
 		peerNumber := gopp.MustUint32(evto.Args[1])
-		// peerName := jso.Get("Margs").GetIndex(1).MustString()
 		peerName := evto.Margs[1]
-		// peerPubkey := jso.Get("Margs").GetIndex(1).MustString()
 		peerPubkey := evto.Margs[2] // TODO two same???
 		_, err := appctx.store.AddPeer(peerPubkey, 0, "")
 		gopp.ErrPrint(err)
@@ -155,40 +143,31 @@ func (this *AppContext) dispatchEvent(evto *thspbs.Event) {
 	case "ConferencePeerListChange":
 		// TODO
 	case "ConferenceNameListChange": // TODO depcreated
-		// groupTitle := jso.Get("Margs").GetIndex(2).MustString()
 		groupTitle := evto.Margs[2]
-		// groupId := jso.Get("Margs").GetIndex(3).MustString()
 		groupId := evto.Margs[3]
 		if ConferenceIdIsEmpty(groupId) {
 			log.Panicln("not possible", evto.Args)
 		}
 		_ = groupTitle
 		///
-		// peerPubkey := jso.Get("Margs").GetIndex(1).MustString()
 		peerPubkey := evto.Margs[1]
 		_, err := appctx.store.AddPeer(peerPubkey, 0, "")
 		gopp.ErrPrint(err)
 
 	case "ConferenceMessage":
-		// groupId := jso.Get("Margs").GetIndex(3).MustString()
 		groupId := evto.Margs[3]
 		if ConferenceIdIsEmpty(groupId) {
 			log.Panicln("not possible", evto.Args)
 		}
 
-		// message := jso.Get("Args").GetIndex(3).MustString()
 		message := evto.Args[3]
-		// peerName := jso.Get("Margs").GetIndex(0).MustString()
 		peerName := evto.Margs[0]
-		// peerPubkey := jso.Get("Margs").GetIndex(1).MustString()
 		peerPubkey := evto.Margs[1]
 		_, err := appctx.store.GetContactByPubkey(peerPubkey)
 		if err == xorm.ErrNotExist {
-			// peerNum := gopp.MustUint32(jso.Get("Args").GetIndex(1).MustString())
 			peerNum := gopp.MustUint32(evto.Args[1])
 			appctx.store.AddPeer(peerPubkey, peerNum, peerName)
 		}
-		// eventId := int64(gopp.MustInt(jso.Get("Margs").GetIndex(4).MustString()))
 		eventId := gopp.MustInt64(evto.Margs[4])
 		_, err = appctx.store.AddGroupMessage(message, "0", groupId, peerPubkey, eventId)
 		gopp.ErrPrint(err, evto)

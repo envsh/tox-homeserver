@@ -395,7 +395,7 @@ func (this *RoomListItem) AddMessageImpl(msgo *Message, msgiw *Ui_MessageItemVie
 
 	showMeIcon := msgo.Me // 是否显示自己的icon。根据是否是自己的消息
 	showName := true
-	showPeerIcon := true
+	showPeerIcon := !showMeIcon
 
 	msgiw.Label_5.SetText(msgo.MsgUi)
 	msgiw.LabelUserName4MessageItem.SetText(fmt.Sprintf("%s", msgo.PeerNameUi))
