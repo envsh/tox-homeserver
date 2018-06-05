@@ -58,6 +58,10 @@ func (this *MessageListWin) SetRoom(item *RoomListItem) {
 		mw.Label_7.SetVisible(true)
 		mw.Label_7.SetText(gopp.StrSuf4ui(item.frndInfo.GetStmsg(), 32))
 	}
+	if item.cticon != nil {
+		mw.Label_4.SetPixmap(item.cticon.Pixmap_1_(32, 32))
+	}
+	mw.updateRoomOpMenu(!item.isgroup)
 	mw.LabelMsgCount2.SetText(fmt.Sprintf("%3d", item.totalCount))
 	mw.LabelMsgCount.SetText(fmt.Sprintf("%3d", item.totalCount))
 
@@ -69,7 +73,7 @@ func (this *MessageListWin) ReloadMessages(oldItem *RoomListItem) {
 
 	btime := time.Now()
 	vlo8 := uictx.uiw.VerticalLayout_3
-	log.Println("clean msg list win:", vlo8.Count())
+	log.Println("clean msg list win:", vlo8.Count(), item.GetName())
 	if oldItem != nil {
 		log.Println("clean msg list win:", vlo8.Count(), len(oldItem.msgitmdl))
 		// i > 0 leave the QSpacerItem there // not need QSpacerItem anymore

@@ -195,3 +195,12 @@ func (this *MainWindow) addFriendByToxId(toxid, addmsg string, phmsg string) (ui
 	}
 	return math.MaxUint32, nil
 }
+
+func (this *MainWindow) updateRoomOpMenu(friend bool) {
+
+	this.actShowMembers.SetEnabled(!friend)
+	this.actInviteFrient.SetEnabled(!friend)
+	this.actLeaveRoom.SetEnabled(!friend)
+
+	this.ToolButton_14.SetEnabled(friend)
+}

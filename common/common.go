@@ -1,9 +1,13 @@
 package common
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"fmt"
 	"log"
+	"math"
 	"runtime"
+	"strings"
 	"time"
 )
 
@@ -51,3 +55,15 @@ const UiNameLen = 32
 const UiStmsgLen = 45
 const MaxOfflineMessageTTL = 56 * 86400 * time.Second
 const MaxOfflineMessageCount = 123
+
+const HalfMaxUint32 = math.MaxUint32 / 2
+const FileHelperName = "FileHelper"
+const FileHelperFnum = math.MaxUint32 - 1
+
+func md5topk(s string) string {
+	md5bin := md5.Sum([]byte(s))
+	mymd5 := strings.ToUpper(hex.EncodeToString(md5bin[:]))
+	return mymd5 + mymd5
+}
+
+var FileHelperPk = md5topk(FileHelperName)

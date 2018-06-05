@@ -64,5 +64,6 @@
     <file>icons/voice_40.png</file>
     <file>icons/volum_40.png</file>
     <file>icons/MessageListSending@2x.png</file>
+    <file>icons/filehelper.png</file>
   </qresource>
 </RCC>

@@ -11,6 +11,7 @@ import (
 
 	"go-purple/msgflt-prpl/bridges"
 	thscli "tox-homeserver/client"
+	thscom "tox-homeserver/common"
 	"tox-homeserver/thspbs"
 
 	"github.com/kitech/qt.go/qtcore"
@@ -341,6 +342,10 @@ func (this *RoomListItem) SetContactInfo(info interface{}) {
 		if ct.GetConnStatus() == 0 {
 			this.sticon = qtgui.NewQIcon_2(":/icons/offline_30.png")
 			this.ToolButton.SetIcon(this.sticon)
+		}
+		if ct.Fnum == thscom.FileHelperFnum {
+			this.cticon = qtgui.NewQIcon_2(":/icons/filehelper.png")
+			this.ToolButton_2.SetIcon(this.cticon)
 		}
 	case *thspbs.GroupInfo:
 		this.grpInfo = ct

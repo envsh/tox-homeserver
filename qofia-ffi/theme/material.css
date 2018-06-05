@@ -24,6 +24,7 @@ QToolButtoncc,QLineEdit,QScrollArea,QListWidget,QTextBrowser {
 }
 QMenu {
     background-color: white;
+    border: 1px solid black;
 }
 QMenu::item:selected {
     background-color: #5294e2;

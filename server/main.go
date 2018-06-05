@@ -38,6 +38,7 @@ func Main() {
 
 	appctx.st = store.NewStorage()
 	thscom.SetLogMetrics()
+	addFileHelperAsContact(appctx.st)
 
 	log.Println("Loading unsents messages...")
 	OffMsgMan().LoadFromStorage(appctx.st)
@@ -59,6 +60,10 @@ func Main() {
 	go xtox.Run(appctx.tvm.t)
 	time.Sleep(50 * time.Millisecond)
 	rpcs.run()
+}
+
+func addFileHelperAsContact(st *store.Storage) {
+	st.AddFriend(thscom.FileHelperPk, thscom.FileHelperFnum, thscom.FileHelperName, "")
 }
 
 // build info

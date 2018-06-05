@@ -28,6 +28,17 @@ func packBaseInfo(t *tox.Tox) (*thspbs.BaseInfo, error) {
 	out.Friends = make(map[uint32]*thspbs.FriendInfo)
 	out.Groups = make(map[uint32]*thspbs.GroupInfo)
 
+	// add myself as a special contact
+	{
+		frnd := &thspbs.FriendInfo{}
+		frnd.Pubkey = common.FileHelperPk
+		frnd.Name = common.FileHelperName
+		frnd.Fnum = common.FileHelperFnum
+		frnd.ConnStatus = 1
+
+		out.Friends[frnd.Fnum] = frnd
+	}
+
 	fns := t.SelfGetFriendList()
 	for _, fn := range fns {
 		pubkey, _ := t.FriendGetPublicKey(fn)
@@ -157,6 +168,10 @@ func RmtCallExecuteHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Even
 		gopp.ErrPrint(errSend)
 		friendpk, err := t.FriendGetPublicKey(fnum)
 		gopp.ErrPrint(err, fnum, req.Args)
+		if fnum == common.FileHelperFnum {
+			friendpk = common.FileHelperPk
+			errSend = nil
+		}
 		selfpk := t.SelfGetPublicKey()
 		msgo, errSave := appctx.st.AddFriendMessage(req.Args[1], friendpk, selfpk, req.EventId, req.UserCode)
 		gopp.ErrPrint(errSave)
@@ -171,6 +186,11 @@ func RmtCallExecuteHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Even
 			// to offline struct
 			err := OffMsgMan().AddMessage(friendpk, msgo)
 			gopp.ErrPrint(err)
+		}
+		if fnum == common.FileHelperFnum {
+			out.ErrCode, out.ErrMsg = 0, ""
+			msgo.Sent = 1
+			OffMsgMan().DeleteMessage(friendpk, msgo.Id)
 		}
 
 		out.EventId = msgo.EventId
@@ -349,10 +369,16 @@ func RmtCallResyncHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Event
 			log.Println(fnum, " <- ", req.Args[0])
 		} else {
 		}
-		fname, err := t.FriendGetName(fnum)
-		gopp.ErrPrint(err)
-		pubkey, err := t.FriendGetPublicKey(fnum)
-		gopp.ErrPrint(err)
+		var fname, pubkey string
+		if fnum == common.FileHelperFnum {
+			fname = common.FileHelperName
+			pubkey = common.FileHelperPk
+		} else {
+			fname, err = t.FriendGetName(fnum)
+			gopp.ErrPrint(err)
+			pubkey, err = t.FriendGetPublicKey(fnum)
+			gopp.ErrPrint(err)
+		}
 		eventId := st.NextId()
 		req.EventId = eventId
 		out.Margs = []string{fname, pubkey, gopp.ToStr(eventId)}
