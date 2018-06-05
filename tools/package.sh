@@ -23,10 +23,7 @@ make bd >> $logfile 2>&1 && \
 # compile client android
 echo "Build Android client..."
 sh make.sh 2 >> $logfile 2>&1 && \
-    cp -v ./build/build/outputs/apk/build-debug.apk qofia-ffi.apk && \
-    zip qofia-ffi.apk.zip qofia-ffi.apk && \
-    mv -v qofia-ffi.apk.zip ../packages/ && \
-    rm -fv qofia-ffi.apk
+    cp -v ./build/build/outputs/apk/build-debug.apk ../packages/qofia-ffi.apk
 
 # compile client windows
 echo "Build Windows desktop client..."

@@ -59,7 +59,8 @@ dep:
 	dep init -v -gopath -no-examples
 
 wc:
-	ls *.go server/*.go client/*.go common/*.go qofia-ffi/*.go | grep -v ui_ | grep -v rcc_rc.go | xargs wc -l
+	ls *.go server/*.go client/*.go common/*.go qofia-ffi/*.go gomain2c/*.go \
+			| grep -v ui_ | grep -v rcc_rc.go | xargs wc -l
 
 lint:
 

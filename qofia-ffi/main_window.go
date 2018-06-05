@@ -106,6 +106,7 @@ func (this *MainWindow) initFirstShow() {
 
 	this.initProfileStorage()
 	// this.initOtherStorage()
+	go _CheckIntentMessage()
 	log.Println("Init first show ui done.")
 }
 

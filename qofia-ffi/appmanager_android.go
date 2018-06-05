@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"time"
 
 	"github.com/kitech/qt.go/qtandroidextras"
 	"github.com/kitech/qt.go/qtrt"
@@ -86,4 +87,26 @@ func _KeepScreenOn2(on bool) {
 	ion := qtrt.IfElseInt(on, 1, 0)
 	rv, err := qtrt.InvokeQtFunc6("C_KeepScreenOn", qtrt.FFI_TYPE_POINTER, ion)
 	qtrt.ErrPrint(err, rv)
+}
+
+// for Android Intent
+// should block
+func _CheckIntentMessage() {
+	className := "im/fixlan/golem/PendingIntents"
+	for {
+		time.Sleep(3 * time.Second)
+
+		cnt := qtandroidextras.QAndroidJniObject__callStaticMethod_6(
+			className, "GetPendingCount", "()I")
+		if cnt > 0 {
+			log.Println("PendingIntents count:", cnt)
+		}
+		if cnt > 0 {
+			jstro := qtandroidextras.QAndroidJniObject__callStaticObjectMethod(
+				className, "GetPendingData", "()Ljava/lang/String;")
+			str := jstro.ToString()
+			log.Println("PendingIntents data:", len(str), str)
+		}
+	}
+	log.Println("done.")
 }
