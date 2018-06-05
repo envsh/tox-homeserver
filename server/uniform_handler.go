@@ -117,15 +117,12 @@ func RmtCallHandlers(ctx context.Context, req *thspbs.Event) (*thspbs.Event, err
 
 	// re sync to client, need execute result
 	switch req.Name {
-	case "FriendAdd": //
+	case "FriendAdd", "FriendAddNorequest", "FriendDelete",
+		"FriendSendMessage":
 		fallthrough
-	case "FriendAddNorequest":
-		fallthrough
-	case "FriendDelete": //
-		fallthrough
-	case "ConferenceNew":
-		fallthrough
-	case "ConferenceDelete":
+	case "ConferenceNew", "ConferenceDelete",
+		"ConferenceSendMessage":
+		rsp.UserCode = req.UserCode
 		rsp.Margs = append(rsp.Margs, req.Args...)
 		pubmsgall(ctx, rsp)
 	}
@@ -161,7 +158,7 @@ func RmtCallExecuteHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Even
 		friendpk, err := t.FriendGetPublicKey(fnum)
 		gopp.ErrPrint(err, fnum, req.Args)
 		selfpk := t.SelfGetPublicKey()
-		msgo, errSave := appctx.st.AddFriendMessage(req.Args[1], friendpk, selfpk, req.EventId)
+		msgo, errSave := appctx.st.AddFriendMessage(req.Args[1], friendpk, selfpk, req.EventId, req.UserCode)
 		gopp.ErrPrint(errSave)
 
 		if errSend == nil && errSave == nil {
@@ -178,7 +175,7 @@ func RmtCallExecuteHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Even
 
 		out.EventId = msgo.EventId
 		out.Args = append(out.Args, fmt.Sprintf("%d", wn)) // TODO, dont modify Args, use Margs
-		out.Margs = gopp.ToStrs(wn, msgo.Sent)
+		out.Margs = gopp.ToStrs(wn, msgo.Sent, friendpk)
 
 		// groups
 	case "ConferenceNew": // args:name,returns:
@@ -221,9 +218,9 @@ func RmtCallExecuteHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Even
 		_, errSend := t.ConferenceSendMessage(gnum, mtype, req.Args[2])
 		gopp.ErrPrint(errSend)
 
-		identifier, _ := xtox.ConferenceGetIdentifier(t, uint32(gnum))
+		identifier, _ := xtox.ConferenceGetIdentifier(t, gnum)
 		pubkey := t.SelfGetPublicKey()
-		msgo, errSave := appctx.st.AddGroupMessage(req.Args[2], "0", identifier, pubkey, req.EventId)
+		msgo, errSave := appctx.st.AddGroupMessage(req.Args[2], "0", identifier, pubkey, req.EventId, req.UserCode)
 		gopp.ErrPrint(err)
 
 		if errSend == nil && errSave == nil {
@@ -239,7 +236,7 @@ func RmtCallExecuteHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Even
 		}
 
 		out.EventId = msgo.EventId
-		out.Margs = gopp.ToStrs(msgo.Sent)
+		out.Margs = gopp.ToStrs(0, msgo.Sent, identifier)
 
 	case "ConferenceJoin": // friendNumber, cookie
 		fnum := gopp.MustUint32(req.Args[0])

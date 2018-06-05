@@ -731,11 +731,12 @@ func (this *LigTox) FriendExists(friendNumber uint32) bool {
 	return false
 }
 
-func (this *LigTox) FriendSendMessage(friendNumber uint32, message string) (uint32, error) {
+func (this *LigTox) FriendSendMessage(friendNumber uint32, message string, userCode int64) (uint32, error) {
 	fname := this.getMethodName()
 	args := thspbs.Event{}
 	args.Name = fname
 	args.Args = []string{fmt.Sprintf("%d", friendNumber), message}
+	args.UserCode = userCode
 
 	// cli := thspbs.NewToxhsClient(this.rpcli)
 	// rsp, err := cli.RmtCall(context.Background(), &args)

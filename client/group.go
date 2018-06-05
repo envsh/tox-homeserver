@@ -94,11 +94,12 @@ func (this *LigTox) CallbackConferenceNameListChangeAdd(cbfn cb_conference_namel
 }
 
 //////
-func (this *LigTox) ConferenceSendMessage(groupNumber uint32, mtype int, msg string) error {
+func (this *LigTox) ConferenceSendMessage(groupNumber uint32, mtype int, msg string, userCode int64) error {
 	fname := this.getMethodName()
 	args := &thspbs.Event{}
 	args.Name = fname
 	args.Args = []string{fmt.Sprintf("%d", groupNumber), fmt.Sprintf("%d", mtype), msg}
+	args.UserCode = userCode
 
 	rsp, err := this.rmtCall(args)
 	gopp.ErrPrint(err, rsp)

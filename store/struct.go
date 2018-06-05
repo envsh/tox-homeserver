@@ -27,9 +27,11 @@ type Message struct {
 	RoomId    int64  `xorm:"index INTEGER"` // it's really another ContactId
 	EventId   int64  `xorm:"unique INTEGER"`
 	Sent      int    `xorm:"index INTEGER"`
+	UserCode  int64  `xorm:"INTEGER"`
 }
 
-// no table
+// no table. can not use embed, json will eencode the struct name
+// TODO maybe can embed
 type MessageJoined struct {
 	Id        int64  `xorm:"pk autoincr INTEGER"`
 	Updated   string `xorm:"TEXT"`
@@ -40,6 +42,7 @@ type MessageJoined struct {
 	RoomId    int64  `xorm:"index INTEGER"` // it's really another ContactId
 	EventId   int64  `xorm:"unique INTEGER"`
 	Sent      int    `xorm:"index INTEGER"`
+	UserCode  int64  `xorm:"INTEGER"`
 
 	RoomName   string
 	RoomPubkey string

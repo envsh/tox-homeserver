@@ -216,14 +216,16 @@ func (this *MainWindow) sendMessage() {
 	itext := uiw.LineEdit_2.Text()
 	item := uictx.msgwin.item
 	if item != nil && len(itext) > 0 {
+		userCode := thscli.NextUserCode(devInfo.Uuid)
 		if item.isgroup {
-			vtcli.ConferenceSendMessage(item.grpInfo.Gnum, 0, itext)
+			vtcli.ConferenceSendMessage(item.grpInfo.Gnum, 0, itext, userCode)
 		} else {
-			vtcli.FriendSendMessage(item.frndInfo.Fnum, itext)
+			vtcli.FriendSendMessage(item.frndInfo.Fnum, itext, userCode)
 		}
 		uiw.LineEdit_2.Clear()
 		msgo := NewMessageForMe(itext)
-		log.Println(msgo)
+		msgo.UserCode = userCode
+		log.Println(msgo.UserCode)
 		item.AddMessage(msgo, false)
 	} else {
 		log.Println("not send:", len(itext), item)

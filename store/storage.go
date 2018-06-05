@@ -171,7 +171,7 @@ func (this *Storage) UpdateContactByPubkey(c *Contact) (int64, error) {
 
 // eventId 参数可选，为0表示服务器使用，自动生成
 // friendpk => room id, pubkey => peer(contact)
-func (this *Storage) AddFriendMessage(msg string, friendpk, pubkey string, eventId int64) (*Message, error) {
+func (this *Storage) AddFriendMessage(msg string, friendpk, pubkey string, eventId int64, userCode int64) (*Message, error) {
 	c := &Contact{}
 	c.Pubkey = pubkey
 	exist, err := this.dbh.Get(c)
@@ -198,11 +198,12 @@ func (this *Storage) AddFriendMessage(msg string, friendpk, pubkey string, event
 	m.ContactId = c.Id
 	m.RoomId = c2.Id // for friend, room id is contact id. contact is a room
 	m.EventId = eventId
+	m.UserCode = userCode
 	return this.AddMessage(m)
 }
 
 // eventId 参数可选，为0表示服务器使用，自动生成
-func (this *Storage) AddGroupMessage(msg string, mtype string, identify string, peerPubkey string, eventId int64) (*Message, error) {
+func (this *Storage) AddGroupMessage(msg string, mtype string, identify string, peerPubkey string, eventId int64, userCode int64) (*Message, error) {
 	c0 := &Contact{}
 	c0.Pubkey = identify
 	exist, err := this.dbh.Get(c0)
@@ -230,6 +231,7 @@ func (this *Storage) AddGroupMessage(msg string, mtype string, identify string, 
 	m.ContactId = c1.Id
 	m.RoomId = c0.Id
 	m.EventId = eventId
+	m.UserCode = userCode
 	return this.AddMessage(m)
 }
 

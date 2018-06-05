@@ -322,7 +322,6 @@ func (this *MainWindow) initMainWindowEvents() {
 	// must accept when event.Key() == Qt__Key_Back, or the app is crash, not exit.
 	// but in qt.go, it's seems has some problem for handle this case, always crash.
 	capwgt.InheritKeyPressEvent(func(event *qtgui.QKeyEvent) {
-		log.Println(event.Key(), event.Text())
 		switch event.Key() {
 		case qtcore.Qt__Key_Back:
 			log.Println("[[Back button]]")

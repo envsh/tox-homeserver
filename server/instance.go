@@ -93,7 +93,7 @@ func (this *ToxVM) setupCallbacks() {
 		gopp.ErrPrint(err)
 
 		selfpk := t.SelfGetPublicKey()
-		msgo, err := appctx.st.AddFriendMessage(message, friendpk, selfpk, 0)
+		msgo, err := appctx.st.AddFriendMessage(message, friendpk, selfpk, 0, 0)
 		gopp.ErrPrint(err)
 		if err == nil {
 			err := appctx.st.SetMessageSent(msgo.Id)
@@ -132,6 +132,13 @@ func (this *ToxVM) setupCallbacks() {
 						sentCount += 1
 						ofm.DeleteMessage(pubkey, offmsg.Id)
 						appctx.st.SetMessageSent(offmsg.Id)
+						// construct a FriendSendMessageResp
+						evt := &thspbs.Event{}
+						evt.Name = "FriendSendMessageResp"
+						evt.Args = gopp.ToStrs(friendNumber)
+						evt.Margs = gopp.ToStrs(0, 1, pubkey)
+						evt.EventId, evt.UserCode = offmsg.EventId, offmsg.UserCode
+						this.pubmsg(evt)
 					}
 				}
 				log.Printf("Send unsents: %d/%d to %s\n", sentCount, len(offmsgs), fname)
@@ -272,7 +279,7 @@ func (this *ToxVM) setupCallbacks() {
 			groupId, _ = t.ConferenceGetIdentifier(groupNumber)
 		}
 
-		msgo, err := appctx.st.AddGroupMessage(message, "0", groupId, peerPubkey, 0)
+		msgo, err := appctx.st.AddGroupMessage(message, "0", groupId, peerPubkey, 0, 0)
 		gopp.ErrPrint(err)
 		if err == nil {
 			err := appctx.st.SetMessageSent(msgo.Id)

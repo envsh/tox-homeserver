@@ -43,6 +43,8 @@ func (this *MainWindow) loadStorage() {
 	log.Println("Open storage done")
 }
 
+var devInfo *store.Device
+
 func (this *MainWindow) loadDataForProfileUi() {
 	st := appctx.GetStorage()
 	setting, err := st.GetSetting(store.SK_HOMESERVER_URL)
@@ -50,6 +52,8 @@ func (this *MainWindow) loadDataForProfileUi() {
 	if setting != nil {
 		this.ComboBox_6.SetCurrentText(setting.Value)
 	}
+
+	devInfo = st.GetDevice()
 }
 
 func (this *MainWindow) saveLastLoginHost() {

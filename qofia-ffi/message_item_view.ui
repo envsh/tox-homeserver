@@ -112,6 +112,19 @@
         </spacer>
        </item>
        <item>
+        <widget class="QLabel" name="labelSendState">
+         <property name="toolTip">
+          <string>send_state</string>
+         </property>
+         <property name="text">
+          <string>   </string>
+         </property>
+         <property name="textInteractionFlags">
+          <set>Qt::NoTextInteraction</set>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QLabel" name="LabelMsgTime">
          <property name="text">
           <string>TextLabel</string>

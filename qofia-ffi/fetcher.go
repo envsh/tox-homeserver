@@ -7,7 +7,7 @@ import (
 	"math/rand"
 	"time"
 	thscli "tox-homeserver/client"
-	"tox-homeserver/common"
+	thscom "tox-homeserver/common"
 	"tox-homeserver/store"
 )
 
@@ -47,7 +47,7 @@ func (this *Fetcher) PullPrevHistoryById(pubkey string, prev_batch int64) {
 
 	// 判断 >0 防止可能出现错误导致这里也错? 可以用err判断吧
 	// if len(msgos) > 0 && len(msgos) < common.PullPageSize {
-	if len(msgos) < common.PullPageSize {
+	if len(msgos) < thscom.PullPageSize {
 		// think as no more data
 		item.timeline.PrevBatch = 0 // 该room同步结束
 	}
@@ -110,9 +110,11 @@ func NewMessageFromStoreRecord(m *store.MessageJoined) *Message {
 	this := &Message{}
 	this.EventId = m.EventId
 	this.Msg = m.Content
-	this.PeerName = gopp.IfElseStr(m.PeerName == "", "unknown", m.PeerName)
+	this.PeerName = gopp.IfElseStr(m.PeerName == "", thscom.DefaultUserName, m.PeerName)
+	this.Sent = m.Sent > 0
+	this.UserCode = m.UserCode
 
-	defaultTimeStringLayout := common.DefaultTimeLayout
+	defaultTimeStringLayout := thscom.DefaultTimeLayout
 	tm, err := time.Parse(defaultTimeStringLayout, m.Updated)
 	gopp.ErrPrint(err)
 	this.Time = tm

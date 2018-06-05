@@ -239,7 +239,13 @@ func dispatchEvent(evto *thspbs.Event) {
 		for _, room := range ctitmdl {
 			if room.GetId() == pubkey {
 				msgo := NewMessageForMeFromJson(itext, eventId)
-				room.AddMessage(msgo, false)
+				msgo.UserCode = evto.UserCode
+				// 有可能是自己同步回来的消息，所以要确定是添加还是更新
+				if room.FindMessageByUserCode(evto.UserCode) != nil {
+					room.UpdateMessageState(msgo)
+				} else {
+					room.AddMessage(msgo, false)
+				}
 				found = true
 				break
 			}
@@ -256,7 +262,13 @@ func dispatchEvent(evto *thspbs.Event) {
 		for _, room := range ctitmdl {
 			if room.GetId() == groupId && room.GetName() == groupTitle {
 				msgo := NewMessageForMeFromJson(itext, eventId)
-				room.AddMessage(msgo, false)
+				msgo.UserCode = evto.UserCode
+				// 有可能是自己同步回来的消息，所以要确定是添加还是更新
+				if room.FindMessageByUserCode(evto.UserCode) != nil {
+					room.UpdateMessageState(msgo)
+				} else {
+					room.AddMessage(msgo, false)
+				}
 				found = true
 				break
 			}
@@ -331,6 +343,28 @@ func dispatchEventResp(evto *thspbs.Event) {
 	case "SelfSetStatusMessageResp":
 		stmsg := evto.Args[0]
 		uictx.uiw.Label_3.SetText(stmsg)
+	case "FriendSendMessageResp":
+		sent := evto.Margs[1] == "1"
+		roompk := evto.Margs[2]
+
+		roomo := uictx.iteman.Get(roompk)
+		if roomo != nil {
+			msgo := NewMessageForMeFromJson("", evto.EventId)
+			msgo.Sent = sent
+			msgo.UserCode = evto.UserCode
+			roomo.UpdateMessageState(msgo) // 必定已经存在
+		}
+	case "ConferenceSendMessageResp":
+		sent := evto.Margs[1] == "1"
+		roompk := evto.Margs[2]
+
+		roomo := uictx.iteman.Get(roompk)
+		if roomo != nil {
+			msgo := NewMessageForMeFromJson("", evto.EventId)
+			msgo.Sent = sent
+			msgo.UserCode = evto.UserCode
+			roomo.UpdateMessageState(msgo) // 必定已经存在
+		}
 	default:
 		log.Printf("%#v\n", evto)
 	}

@@ -102,7 +102,7 @@ func (this *AppContext) dispatchEvent(evto *thspbs.Event) {
 		///
 		selfpk := this.vtcli.SelfGetPublicKey()
 		eventId := gopp.MustInt64(evto.Margs[2])
-		_, err := appctx.store.AddFriendMessage(msg, friendpk, selfpk, eventId)
+		_, err := appctx.store.AddFriendMessage(msg, friendpk, selfpk, eventId, evto.UserCode)
 		gopp.ErrPrint(err)
 
 	case "FriendConnectionStatus":
@@ -169,7 +169,7 @@ func (this *AppContext) dispatchEvent(evto *thspbs.Event) {
 			appctx.store.AddPeer(peerPubkey, peerNum, peerName)
 		}
 		eventId := gopp.MustInt64(evto.Margs[4])
-		_, err = appctx.store.AddGroupMessage(message, "0", groupId, peerPubkey, eventId)
+		_, err = appctx.store.AddGroupMessage(message, "0", groupId, peerPubkey, eventId, evto.UserCode)
 		gopp.ErrPrint(err, evto)
 
 	default:

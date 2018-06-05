@@ -30,6 +30,8 @@ type Message struct {
 	PeerNameUi string
 	TimeUi     string
 	LastMsgUi  string
+	Sent       bool
+	UserCode   int64
 }
 
 func NewMessageForGroup(evto *thspbs.Event) *Message {
@@ -77,6 +79,8 @@ func NewMessageForMe(itext string) *Message {
 	msgo.PeerName = vtcli.SelfGetName()
 	msgo.Time = time.Now()
 	msgo.Me = true
+	// msgo.UserCode = thscli.NextUserCode(devInfo.Uuid)
+
 	msgo.refmtmsg()
 	return msgo
 }
@@ -176,7 +180,7 @@ type RoomListItem struct {
 
 	floatUnreadCountLabel *qtwidgets.QLabel
 
-	msgitmdl []*Ui_MessageItemView
+	msgitmdl []*MessageItem
 	msgos    []*Message
 
 	pressed  bool
@@ -363,7 +367,7 @@ func (this *RoomListItem) SetContactInfo(info interface{}) {
 func (this *RoomListItem) AddMessage(msgo *Message, prev bool) {
 	// check in list
 	for _, msgoe := range this.msgos {
-		if msgoe.EventId == msgo.EventId {
+		if msgoe.EventId == msgo.EventId && msgo.EventId != 0 {
 			log.Printf("msg already in list: %d, %+v\n", msgo.EventId, msgo)
 			return
 		}
@@ -371,12 +375,16 @@ func (this *RoomListItem) AddMessage(msgo *Message, prev bool) {
 
 	if prev {
 		this.msgos = append([]*Message{msgo}, this.msgos...)
-		msgiw := NewUi_MessageItemView2()
-		this.msgitmdl = append([]*Ui_MessageItemView{msgiw}, this.msgitmdl...)
+		msgiw := NewMessageItem()
+		msgiw.Sent = msgo.Sent
+		msgiw.UserCode = msgo.UserCode
+		this.msgitmdl = append([]*MessageItem{msgiw}, this.msgitmdl...)
 		this.AddMessageImpl(msgo, msgiw, prev)
 	} else {
 		this.msgos = append(this.msgos, msgo)
-		msgiw := NewUi_MessageItemView2()
+		msgiw := NewMessageItem()
+		msgiw.Sent = msgo.Sent
+		msgiw.UserCode = msgo.UserCode
 		this.msgitmdl = append(this.msgitmdl, msgiw)
 		this.AddMessageImpl(msgo, msgiw, prev)
 		// test and update storage's sync info
@@ -391,7 +399,7 @@ func (this *RoomListItem) AddMessage(msgo *Message, prev bool) {
 	}
 }
 
-func (this *RoomListItem) AddMessageImpl(msgo *Message, msgiw *Ui_MessageItemView, prev bool) {
+func (this *RoomListItem) AddMessageImpl(msgo *Message, msgiw *MessageItem, prev bool) {
 
 	showMeIcon := msgo.Me // 是否显示自己的icon。根据是否是自己的消息
 	showName := true
@@ -405,13 +413,21 @@ func (this *RoomListItem) AddMessageImpl(msgo *Message, msgiw *Ui_MessageItemVie
 	msgiw.ToolButton_2.SetVisible(showPeerIcon)
 	msgiw.LabelUserName4MessageItem.SetVisible(showName)
 	msgiw.ToolButton.SetVisible(false)
+	if msgo.Me && !msgo.Sent {
+		msgiw.LabelSendState.SetPixmap(qtgui.NewQPixmap_3_(":/icons/MessageListSending@2x.png"))
+	}
+	if msgo.Me {
+		msgiw.LabelSendState.SetToolTip(gopp.ToStr(gopp.ToStrs(msgo.Sent, msgo.UserCode)))
+	} else /*!msgo.Me*/ {
+		// msgiw.LabelSendState.SetVisible(false)
+	}
 
 	if uictx.msgwin.item == this {
 		vlo3 := uictx.uiw.VerticalLayout_3
 		vlo3.Layout().AddWidget(msgiw.QWidget_PTR())
 	}
-	this.SetLastMsg(fmt.Sprintf("%s: %s", gopp.StrSuf4ui(msgo.PeerNameUi, 9, 1), msgo.LastMsgUi),
-		msgo.Time, msgo.EventId)
+	this.SetLastMsg(fmt.Sprintf("%s: %s",
+		gopp.StrSuf4ui(msgo.PeerNameUi, 9, 1), msgo.LastMsgUi), msgo.Time, msgo.EventId)
 
 	this.totalCount += 1
 	if uictx.msgwin.item == this {
@@ -421,6 +437,39 @@ func (this *RoomListItem) AddMessageImpl(msgo *Message, msgiw *Ui_MessageItemVie
 	this.unreadedCount += 1
 	this.ToolButton.SetText(fmt.Sprintf("%d", this.unreadedCount))
 	// this.floatUnreadCountLabel.SetText(fmt.Sprintf("%d", this.unreadedCount))
+}
+
+func (this *RoomListItem) UpdateMessageState(msgo *Message) {
+	for idx := len(this.msgos) - 1; idx >= 0; idx-- {
+		msgo_ := this.msgos[idx]
+		if msgo_.UserCode == msgo.UserCode {
+			msgo_.EventId = msgo.EventId
+			msgo_.Sent = msgo.Sent
+			break
+		}
+	}
+	for idx := len(this.msgitmdl) - 1; idx >= 0; idx-- {
+		msgitm := this.msgitmdl[idx]
+		if msgitm.UserCode == msgo.UserCode {
+			if !msgitm.Sent && msgo.Sent {
+				msgitm.Sent = msgo.Sent
+				msgitm.LabelSendState.Clear()
+				msgitm.LabelSendState.SetToolTip(gopp.ToStr(gopp.ToStrs(msgo.Sent, msgo.UserCode)))
+			}
+
+			break
+		}
+	}
+}
+
+func (this *RoomListItem) FindMessageByUserCode(userCode int64) *Message {
+	for idx := len(this.msgos) - 1; idx >= 0; idx-- {
+		msgo_ := this.msgos[idx]
+		if msgo_.UserCode == userCode {
+			return msgo_
+		}
+	}
+	return nil
 }
 
 // TODO 计算是否省略掉显示与上一条相同的用户名

@@ -29,6 +29,7 @@ type Ui_MessageItemView struct {
 	HorizontalLayout          *qtwidgets.QHBoxLayout
 	LabelUserName4MessageItem *qtwidgets.QLabel
 	HorizontalSpacer          *qtwidgets.QSpacerItem
+	LabelSendState            *qtwidgets.QLabel
 	LabelMsgTime              *qtwidgets.QLabel
 	ToolButton                *qtwidgets.QToolButton
 	Label_5                   *qtwidgets.QLabel
@@ -100,6 +101,12 @@ func (this *Ui_MessageItemView) SetupUi(MessageItemView *qtwidgets.QWidget) {
 
 	this.HorizontalLayout.AddItem(this.HorizontalSpacer) // 115
 
+	this.LabelSendState = qtwidgets.NewQLabel(this.MessageItemView, 0)        // 111
+	this.LabelSendState.SetObjectName("LabelSendState")                       // 112
+	this.LabelSendState.SetTextInteractionFlags(qtcore.Qt__NoTextInteraction) // 114
+
+	this.HorizontalLayout.Layout().AddWidget(this.LabelSendState) // 115
+
 	this.LabelMsgTime = qtwidgets.NewQLabel(this.MessageItemView, 0)                                           // 111
 	this.LabelMsgTime.SetObjectName("LabelMsgTime")                                                            // 112
 	this.LabelMsgTime.SetAlignment(qtcore.Qt__AlignRight | qtcore.Qt__AlignTrailing | qtcore.Qt__AlignVCenter) // 114
@@ -165,6 +172,10 @@ func (this *Ui_MessageItemView) RetranslateUi(MessageItemView *qtwidgets.QWidget
 	this.MessageItemView.SetWindowTitle(qtcore.QCoreApplication_Translate("MessageItemView", "Form", "dummy123", 0))
 	this.ToolButton_2.SetText(qtcore.QCoreApplication_Translate("MessageItemView", "...", "dummy123", 0))
 	this.LabelUserName4MessageItem.SetText(qtcore.QCoreApplication_Translate("MessageItemView", "TextLabel", "dummy123", 0))
+	// noimpl: #ifndef QT_NO_TOOLTIP
+	this.LabelSendState.SetToolTip(qtcore.QCoreApplication_Translate("MessageItemView", "send_state", "dummy123", 0))
+	// noimpl: #endif // QT_NO_TOOLTIP
+	// noimpl: labelSendState->setText(QString());
 	this.LabelMsgTime.SetText(qtcore.QCoreApplication_Translate("MessageItemView", "TextLabel", "dummy123", 0))
 	this.ToolButton.SetText(qtcore.QCoreApplication_Translate("MessageItemView", "...", "dummy123", 0))
 	// noimpl: label_5->setText(QString());
