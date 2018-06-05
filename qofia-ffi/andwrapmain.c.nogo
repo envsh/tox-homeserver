@@ -1,9 +1,9 @@
-extern void go_wrapper_main();
+extern void go_main_wrapper();
 
 double keepThismainInMainThread;
 int main(int argc, char**argv) {
     keepThismainInMainThread = 123.456;
-    go_wrapper_main();
+    go_main_wrapper();
     return 0;
 }
 

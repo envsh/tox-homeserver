@@ -12,12 +12,12 @@ bd: com
 	tar zcvf bin/toxhs.tar.gz bin/toxhs
 
 democ: com
-	go build -v -o bin/democ ./examples/
+	go build -v -o bin/democ ./demos/native-console-grpc-client/
 
 com:
 	protoc -I./server ./server/ths.proto --go_out=plugins=grpc:./thspbs/
 	# cd ${HOME}/golib/src/github.com/go-xorm/cmd/xorm && xorm reverse -s sqlite3 "${CPWD}/data/toxhs.sqlite" templates/goxorm "${CPWD}/gofia/"
-	go install -v ./thspbs/ ./common/ ./client/ ./store/
+	go install -v ./thspbs/ ./common/ ./client/ ./store/ ./gomain2c/
 
 
 allfia: gofiab tofiab tofiai

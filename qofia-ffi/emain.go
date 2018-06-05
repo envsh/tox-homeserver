@@ -11,7 +11,12 @@ import (
 	"github.com/kitech/qt.go/qtcore"
 	"github.com/kitech/qt.go/qtrt"
 	"github.com/kitech/qt.go/qtwidgets"
+
+	"tox-homeserver/gomain2c"
 )
+
+// for android, but other OS still ok
+func init() { gomain2c.Set(main) }
 
 func main() {
 	log.Println("Enter main...")
