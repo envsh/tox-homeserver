@@ -217,31 +217,37 @@ func (this *MainWindow) sendMessage() {
 	itext := uiw.LineEdit_2.Text()
 	item := uictx.msgwin.item
 	if item != nil && len(itext) > 0 {
-		userCode := thscli.NextUserCode(devInfo.Uuid)
-		if item.isgroup {
-			vtcli.ConferenceSendMessage(item.grpInfo.Gnum, 0, itext, userCode)
-		} else {
-			vtcli.FriendSendMessage(item.frndInfo.Fnum, itext, userCode)
-		}
+		this.sendMessageImpl(item, itext, item.isgroup, item.GetNum())
 		uiw.LineEdit_2.Clear()
-		msgo := NewMessageForMe(itext)
-		msgo.UserCode = userCode
-		log.Println(msgo.UserCode)
-		item.AddMessage(msgo, false)
 	} else {
 		log.Println("not send:", len(itext), item)
+	}
+}
+
+func (this *MainWindow) sendMessageImpl(item *RoomListItem, itext string, isgroup bool, ctnum uint32) {
+	userCode := thscli.NextUserCode(devInfo.Uuid)
+	msgo := NewMessageForMe(itext)
+	msgo.UserCode = userCode
+	item.AddMessage(msgo, false)
+
+	if isgroup {
+		vtcli.ConferenceSendMessage(ctnum, 0, itext, userCode)
+	} else {
+		vtcli.FriendSendMessage(ctnum, itext, userCode)
 	}
 }
 
 var baseInfoGot bool = false
 var contactQueue = make(chan interface{}, 1234)
 var uifnQueue = make(chan func(), 1234)
+var intentQueue = make(chan *thspbs.Event, 123) // for android intent message
 
 func runOnUiThread(fn func()) {
 	uifnQueue <- fn
 	uictx.mech.Trigger()
 }
 
+// recv left and return
 func tryReadEvent() {
 	tryReadUifnEvent()
 
@@ -252,6 +258,7 @@ func tryReadEvent() {
 
 	tryReadContactEvent()
 	tryReadMessageEvent()
+	tryRecvIntentMessageEvent()
 }
 
 func tryReadUifnEvent() {
@@ -300,5 +307,12 @@ func tryReadMessageEvent() {
 				dispatchEventResp(evto)
 			}
 		}
+	}
+}
+
+func tryRecvIntentMessageEvent() {
+	for len(intentQueue) > 0 {
+		evto := <-intentQueue
+		dispatchOtherEvent(evto)
 	}
 }

@@ -25,7 +25,7 @@ var WSAddr = fmt.Sprintf("ws://%s:%d", GrpcIp, WSPort)
 var WSAddrlo = fmt.Sprintf("ws://%s:%d", "127.0.0.1", WSPort)
 
 const DefaultUserName = "ToxUser"
-const GroupTitleSep = " ::: " // group title and group stmsg title, "@title@ ::: @stmsg@"
+const GroupTitleSep = "-:::-" // group title and group stmsg title, "@title@-:::-@stmsg@"
 
 const LogPrefix = "[gofiat] "
 
@@ -60,10 +60,14 @@ const HalfMaxUint32 = math.MaxUint32 / 2
 const FileHelperName = "FileHelper"
 const FileHelperFnum = math.MaxUint32 - 1
 
+var FileHelperPk = md5topk(FileHelperName)
+
 func md5topk(s string) string {
 	md5bin := md5.Sum([]byte(s))
 	mymd5 := strings.ToUpper(hex.EncodeToString(md5bin[:]))
 	return mymd5 + mymd5
 }
 
-var FileHelperPk = md5topk(FileHelperName)
+func IsFixedSpecialContact(fnum uint32) bool {
+	return fnum < math.MaxUint32 && fnum >= FileHelperFnum
+}

@@ -22,6 +22,7 @@ QToolButton{
 QMenu {
     background-color: #383c4a;
     color: #caccd1;
+    border: 1px solid white;
 }
 QMenu::item:selected {
     background-color: #5294e2;

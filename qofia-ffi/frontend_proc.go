@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"gopp"
 	"log"
+
 	thscli "tox-homeserver/client"
+	thscom "tox-homeserver/common"
 	"tox-homeserver/thspbs"
 
 	"github.com/kitech/qt.go/qtcore"
@@ -365,6 +367,25 @@ func dispatchEventResp(evto *thspbs.Event) {
 			msgo.UserCode = evto.UserCode
 			roomo.UpdateMessageState(msgo) // 必定已经存在
 		}
+	default:
+		log.Printf("%#v\n", evto)
+	}
+}
+
+// intent
+func dispatchOtherEvent(evto *thspbs.Event) {
+	log.Println(evto)
+
+	switch evto.Name {
+	case "IntentMessage":
+		mtype := evto.Args[0]
+		mcontent := evto.Args[1]
+
+		item := uictx.iteman.Get(thscom.FileHelperPk)
+		gopp.NilPrint(item, "Why FileHelper item nil?")
+		uictx.msgwin.SetRoom(item)
+		uictx.mw.switchUiStack(UIST_MESSAGEUI)
+		uictx.mw.sendMessageImpl(item, mtype+":"+mcontent, false, thscom.FileHelperFnum)
 	default:
 		log.Printf("%#v\n", evto)
 	}

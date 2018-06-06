@@ -2,7 +2,11 @@ package main
 
 import (
 	"log"
+	"strings"
 	"time"
+
+	thscom "tox-homeserver/common"
+	"tox-homeserver/thspbs"
 
 	"github.com/kitech/qt.go/qtandroidextras"
 	"github.com/kitech/qt.go/qtrt"
@@ -106,6 +110,20 @@ func _CheckIntentMessage() {
 				className, "GetPendingData", "()Ljava/lang/String;")
 			str := jstro.ToString()
 			log.Println("PendingIntents data:", len(str), str)
+
+			if strings.HasPrefix(str, thscom.GroupTitleSep) {
+				str = str[len(thscom.GroupTitleSep):]
+			}
+			parts := strings.Split(str, thscom.GroupTitleSep)
+			log.Println(len(parts), parts)
+			for idx := 0; idx < len(parts)/2; idx++ {
+				evto := &thspbs.Event{}
+				evto.Name = "IntentMessage"
+				evto.Args = []string{parts[idx*2], parts[idx*2+1]}
+				intentQueue <- evto
+				uictx.mech.Trigger()
+				log.Println("Populate a ", evto.Name)
+			}
 		}
 	}
 	log.Println("done.")

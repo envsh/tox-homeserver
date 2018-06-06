@@ -21,16 +21,23 @@ import android.database.Cursor;
  * 功能:接入系统分享时使用,可以作为接受的一方,也可以作为分享的一方
  */
 public class ShareSysUtils {
-    public static ShareSysUtils sysShareUtils;
+    // public static ShareSysUtils sysShareUtils;
+    private Intent intent;
     private Activity activity;
     private OnShareDataOkListener listener;
     public static int TYPE_TEXT = 0, TYPE_IMAGE = 1;
 
+    // used for receive intent message
+    public ShareSysUtils(Intent intent) {
+        this.intent = intent;
+    }
+
+    // used for send intent message
     public ShareSysUtils(Activity activity) {
         this.activity = activity;
     }
 
-
+    /*
     public static ShareSysUtils get(Activity activity) {
         if (sysShareUtils == null) {
             synchronized (ShareSysUtils.class) {
@@ -41,6 +48,7 @@ public class ShareSysUtils {
         }
         return sysShareUtils;
     }
+    */
 
     /**
      * 作为接受分享的一方,处理分享来的数据
@@ -49,7 +57,7 @@ public class ShareSysUtils {
      */
     public void handleShare(OnShareDataOkListener listener) {
         this.listener = listener;
-        Intent intent = activity.getIntent();
+        // Intent intent = activity.getIntent();
         String action = intent.getAction();
         String type = intent.getType();
         if (null == action || type == null) {

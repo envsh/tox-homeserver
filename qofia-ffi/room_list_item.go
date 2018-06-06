@@ -510,6 +510,10 @@ func (this *RoomListItem) GetId() string {
 	return gopp.IfElseStr(this.isgroup, this.grpInfo.GetGroupId(), this.frndInfo.GetPubkey())
 }
 
+func (this *RoomListItem) GetNum() uint32 {
+	return uint32(gopp.IfElseInt(this.isgroup, int(this.grpInfo.GetGnum()), int(this.frndInfo.GetFnum())))
+}
+
 func (this *RoomListItem) UpdateName(name string) {
 	if this.isgroup {
 		if this.grpInfo.Title != name {

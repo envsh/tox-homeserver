@@ -7,6 +7,8 @@ import (
 	"strings"
 	"time"
 
+	thscom "tox-homeserver/common"
+
 	"github.com/kitech/qt.go/qtcore"
 	"github.com/kitech/qt.go/qtrt"
 	"github.com/kitech/qt.go/qtwidgets"
@@ -61,7 +63,8 @@ func (this *MessageListWin) SetRoom(item *RoomListItem) {
 	if item.cticon != nil {
 		mw.Label_4.SetPixmap(item.cticon.Pixmap_1_(32, 32))
 	}
-	mw.updateRoomOpMenu(!item.isgroup)
+	enableFriend := !item.isgroup && !thscom.IsFixedSpecialContact(item.GetNum())
+	mw.updateRoomOpMenu(enableFriend)
 	mw.LabelMsgCount2.SetText(fmt.Sprintf("%3d", item.totalCount))
 	mw.LabelMsgCount.SetText(fmt.Sprintf("%3d", item.totalCount))
 
@@ -71,24 +74,24 @@ func (this *MessageListWin) SetRoom(item *RoomListItem) {
 func (this *MessageListWin) ReloadMessages(oldItem *RoomListItem) {
 	item := this.item
 
-	btime := time.Now()
 	vlo8 := uictx.uiw.VerticalLayout_3
-	log.Println("clean msg list win:", vlo8.Count(), item.GetName())
+
 	if oldItem != nil {
-		log.Println("clean msg list win:", vlo8.Count(), len(oldItem.msgitmdl))
+		btime := time.Now()
 		// i > 0 leave the QSpacerItem there // not need QSpacerItem anymore
 		for i := vlo8.Count() - 1; i >= 0; i-- {
 			itemv := vlo8.TakeAt(i)
 			itemv.Widget().SetVisible(false)
 		}
+		log.Println("Clean done, used:", time.Since(btime), vlo8.Count(), item.GetName())
 	}
-	log.Println(time.Now().Sub(btime))
-	log.Println("add msg list win:", len(item.msgitmdl), item.GetName())
+
+	btime := time.Now()
 	for _, msgiw := range item.msgitmdl {
 		vlo8.Layout().AddWidget(msgiw.QWidget_PTR())
 		msgiw.QWidget_PTR().SetVisible(true)
 	}
-	log.Println(time.Now().Sub(btime))
+	log.Println("Add to msg list win, used:", time.Since(btime), len(item.msgitmdl), item.GetName())
 	// TODO too slow, 500ms+
 }
 

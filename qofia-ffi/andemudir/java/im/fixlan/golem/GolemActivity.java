@@ -23,6 +23,8 @@ public class GolemActivity extends QtActivity
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d("golemscorner", "onCreate GolemActivity");
+        getAndCacheIntentData(getIntent());
+        handleSendText(getIntent());
     }
 
     // if we are opened from other apps:
@@ -32,12 +34,14 @@ public class GolemActivity extends QtActivity
         super.onNewIntent(intent);
 
         // processIntent();
-        getIntentData();
+        getAndCacheIntentData(intent);
+        handleSendText(intent);
     }
 
-    private void getIntentData() {
+    // 好像得到的消息有问题，有时会得到旧的分享消息？
+    private void getAndCacheIntentData(Intent intent) {
         //如果你按照前面的要求注册了Activity，你可以在Activity中使用下面的代码处理分享得到的数据
-        ShareSysUtils shareSysUtils = ShareSysUtils.get(GolemActivity.this);
+        ShareSysUtils shareSysUtils = new ShareSysUtils(intent);
         shareSysUtils.handleShare(new ShareSysUtils.OnShareDataOkListener() {
                 @Override
                 public void OnHandleOk(int type, List<String> list, String title, String content) {
@@ -54,15 +58,29 @@ public class GolemActivity extends QtActivity
 
     //一行代码发起分享，会调起QQ,微信等App
     public void ShareImg(View view) {
-        ShareSysUtils shareSysUtils = ShareSysUtils.get(GolemActivity.this);
+        ShareSysUtils shareSysUtils = new ShareSysUtils(this);
         shareSysUtils.shareSingleImage("我是图片路径path");
     }
 
     public void ShareTxt(View view) {
-        ShareSysUtils shareSysUtils = ShareSysUtils.get(GolemActivity.this);
+        ShareSysUtils shareSysUtils = new ShareSysUtils(this);
         shareSysUtils.shareText("我是title", "我是content");
     }
 
+    ///
+    /**
+     * 处理分享的文本
+     *
+     * @param intent
+     */
+    private void handleSendText(Intent intent) {
+        String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
+        String sharedTitle = intent.getStringExtra(Intent.EXTRA_TITLE);
+        // handleListener(TYPE_TEXT, null, sharedTitle, sharedText);
+        Log.d("golemscorner, intent text:", sharedTitle + "   " + sharedText);
+    }
+
+    ///
     private void processIntent(){
       Intent intent = getIntent();
 
