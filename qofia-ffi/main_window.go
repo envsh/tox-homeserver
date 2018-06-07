@@ -15,6 +15,7 @@ import (
 	"github.com/kitech/qt.go/qtwidgets"
 
 	thscli "tox-homeserver/client"
+	thscom "tox-homeserver/common"
 	"tox-homeserver/thspbs"
 )
 
@@ -215,6 +216,10 @@ func (this *MainWindow) setConnStatus(on bool) {
 func (this *MainWindow) sendMessage() {
 	uiw := uictx.uiw
 	itext := uiw.LineEdit_2.Text()
+	if len(itext) > thscom.MaxMessageLen {
+		ShowToast("Message too long", 1)
+		return
+	}
 	item := uictx.msgwin.item
 	if item != nil && len(itext) > 0 {
 		this.sendMessageImpl(item, itext, item.isgroup, item.GetNum())

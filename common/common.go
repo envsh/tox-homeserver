@@ -51,6 +51,8 @@ const DefaultTimeLayout = "2006-01-02 15:04:05.999999999 -0700 MST"
 
 func NowTimeStr() string { return time.Now().Format(DefaultTimeLayout) }
 
+const MaxMessageLen = 1372
+const MaxImageLen = 1024 * 1024 * 50 // 50M???
 const UiNameLen = 32
 const UiStmsgLen = 45
 const MaxOfflineMessageTTL = 56 * 86400 * time.Second
