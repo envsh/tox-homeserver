@@ -429,7 +429,11 @@ func (this *RoomListItem) AddMessageImpl(msgo *Message, msgiw *MessageItem, prev
 
 	if uictx.msgwin.item == this {
 		vlo3 := uictx.uiw.VerticalLayout_3
-		vlo3.Layout().AddWidget(msgiw.QWidget_PTR())
+		if prev {
+			vlo3.InsertWidget__(0, msgiw.QWidget_PTR())
+		} else {
+			vlo3.Layout().AddWidget(msgiw.QWidget_PTR())
+		}
 	}
 	this.SetLastMsg(fmt.Sprintf("%s: %s",
 		gopp.StrSuf4ui(msgo.PeerNameUi, 9, 1), msgo.LastMsgUi), msgo.Time, msgo.EventId)
