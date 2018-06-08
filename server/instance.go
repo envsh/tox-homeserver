@@ -7,6 +7,8 @@ import (
 	"log"
 	"math"
 	"time"
+
+	thscom "tox-homeserver/common"
 	"tox-homeserver/thspbs"
 
 	tox "github.com/TokTok/go-toxcore-c"
@@ -56,6 +58,11 @@ func (this *ToxVM) exportFriendInfoToDb() {
 }
 
 func (this *ToxVM) setupCallbacks() {
+	this.setupCallbacksForMessage()
+	this.setupCallbacksForFile()
+}
+
+func (this *ToxVM) setupCallbacksForMessage() {
 	t := this.t
 
 	t.CallbackSelfConnectionStatusAdd(func(_ *tox.Tox, status int, userData interface{}) {
@@ -84,6 +91,9 @@ func (this *ToxVM) setupCallbacks() {
 	}, nil)
 
 	t.CallbackFriendMessageAdd(func(_ *tox.Tox, friendNumber uint32, message string, userData interface{}) {
+		// if this.testSendFile(friendNumber, message) {
+		//	return
+		// }
 		evt := thspbs.Event{}
 		evt.Name = "FriendMessage"
 		evt.Args = []string{fmt.Sprintf("%d", friendNumber), message}
@@ -100,7 +110,7 @@ func (this *ToxVM) setupCallbacks() {
 			gopp.ErrPrint(err, msgo.Id)
 		}
 
-		evt.Margs = []string{fname, friendpk, fmt.Sprintf("%d", msgo.EventId), "1"}
+		evt.Margs = []string{fname, friendpk, fmt.Sprintf("%d", msgo.EventId), "1", thscom.MSGTYPE_TEXT, "text/plain"}
 		this.pubmsg(&evt)
 	}, nil)
 
@@ -286,8 +296,10 @@ func (this *ToxVM) setupCallbacks() {
 			gopp.ErrPrint(err, msgo.Id)
 			msgo.Sent = 1
 		}
+		evt.EventId = msgo.EventId
 
-		evt.Margs = []string{peerName, peerPubkey, title, groupId, fmt.Sprintf("%d", msgo.EventId), "1"}
+		evt.Margs = []string{peerName, peerPubkey, title, groupId, gopp.ToStr(msgo.EventId), "1",
+			thscom.MSGTYPE_TEXT, "text/plain"}
 		if t.SelfGetPublicKey() == peerPubkey {
 		} else {
 			this.pubmsg(&evt)

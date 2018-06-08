@@ -47,6 +47,7 @@ func Main() {
 		// 为简单debug,stats,socketio,websocket使用
 		wso := NewWebsocketServer()
 		appctx.wssrv = wso
+		store.GetFS().SetupHttpServer(nil)
 		log.Printf("Listen on WS: *:%d ..., %#v\n", thscom.WSPort, wso)
 		err := http.ListenAndServe(fmt.Sprintf(":%d", thscom.WSPort), nil)
 		gopp.ErrPrint(err)

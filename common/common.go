@@ -53,6 +53,8 @@ func NowTimeStr() string { return time.Now().Format(DefaultTimeLayout) }
 
 const MaxMessageLen = 1372
 const MaxImageLen = 1024 * 1024 * 50 // 50M???
+const MaxAutoRecvFileSize = MaxImageLen
+
 const UiNameLen = 32
 const UiStmsgLen = 45
 const MaxOfflineMessageTTL = 56 * 86400 * time.Second
@@ -73,3 +75,15 @@ func md5topk(s string) string {
 func IsFixedSpecialContact(fnum uint32) bool {
 	return fnum < math.MaxUint32 && fnum >= FileHelperFnum
 }
+
+// m.text, m.image, m.audio, m.video, m.location, m.emote
+// m.file
+const (
+	MSGTYPE_TEXT     = "m.text"
+	MSGTYPE_IMAGE    = "m.image"
+	MSGTYPE_AUDIO    = "m.audio"
+	MSGTYPE_VIDEO    = "m.video"
+	MSGTYPE_LOCATION = "m.location"
+	MSGTYPE_EMOTE    = "m.emote"
+	MSGTYPE_FILE     = "m.file"
+)
