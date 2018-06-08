@@ -119,14 +119,14 @@ func (this *ToxVM) setupCallbacksForFileFromTox() {
 		high := gopp.IfElseInt(position+uint64(length) > uint64(len(fio.fdata)), len(fio.fdata), int(position+uint64(length)))
 		chunk := fio.fdata[position:high]
 		_, err := t.FileSendChunk(friend_number, file_number, position, chunk)
-		gopp.ErrPrint(err)
+		gopp.ErrPrint(err, file_number, position, length, len(chunk))
 	}, nil)
 }
 
 func (this *ToxVM) setupCallbacksForFileFromHttp() {
 	fso := store.GetFS()
 	fso.OnFileUploaded(func(md5str string, frndpk string, userCodeStr string) {
-		log.Println("New file uplaoded:", md5str)
+		log.Println("New file uplaoded:", md5str, frndpk, userCodeStr)
 		data, err := fso.ReadFile(md5str)
 		gopp.ErrPrint(err, md5str)
 		oname, err := fso.GetOrigName(md5str)
@@ -141,10 +141,11 @@ func (this *ToxVM) setupCallbacksForFileFromHttp() {
 
 		evto := &thspbs.Event{}
 		evto.Name = "FriendSendMessage"
-		evto.Args = gopp.ToStrs(frndnum, msgContentFromFileData(data, md5str))
+		evto.Args = gopp.ToStrs(frndnum, msgContentFromFileData(data, md5str, oname))
+		evto.UserCode = userCode
 
 		// save
-		msgo, err := appctx.st.AddFriendMessage(evto.Args[1], selfpk, frndpk, 0, userCode)
+		msgo, err := appctx.st.AddFriendMessage(evto.Args[1], frndpk, selfpk, 0, userCode)
 		gopp.ErrPrint(err, md5str, oname)
 		msgty, mimety := msgTypeFromFileData(data)
 		evto.Margs = gopp.ToStrs(0, 0, frndpk, msgty, mimety)
@@ -158,6 +159,7 @@ func (this *ToxVM) setupCallbacksForFileFromHttp() {
 			// set sent ok
 			appctx.st.SetMessageSent(msgo.Id)
 			// publish the last sent state
+			evto.Name = "FriendSendMessageResp"
 			evto.Margs[1] = gopp.ToStr(1)
 			this.pubmsg(evto)
 		})
@@ -183,9 +185,11 @@ func (this *ToxVM) startSendAvatar(friendNumber uint32) {
 func (this *ToxVM) startSendFile(friendNumber uint32, kind uint32, fileName string, data []byte, donefn func(error)) {
 	t := this.t
 	fileId := gopp.Md5AsStr(data)
+	log.Println(friendNumber, kind, len(data), fileId, fileName)
 	fnum, err := t.FileSend(friendNumber, kind, uint64(len(data)), fileId, fileName)
 	gopp.ErrPrint(err, fileName)
 	if err != nil {
+		// TODO move to offline file
 		return
 	}
 	fio := NewFileInfo(uint64(len(data)))
@@ -219,15 +223,14 @@ func (this *ToxVM) onFileRecvDone(fio *FileInfo) {
 	this.pubmsg(evto)
 }
 
-func msgContentFromFileData(data []byte, md5str string) string {
+func msgContentFromFileData(data []byte, md5str string, origName string) string {
 	ftyo, err := filetype.Match(data)
 	gopp.ErrPrint(err)
-	msg := fmt.Sprintf("file;%s;%d;%s.%s", ftyo.MIME.Value, len(data), md5str, ftyo.Extension)
-	return msg
+	return thscom.NewFileInfoLine(int64(len(data)), ftyo.MIME.Value, md5str, ftyo.Extension, origName).String()
 }
 func NewEventFromFileInfo(fio *FileInfo, frndname, frndpk string, EventId int64) *thspbs.Event {
 	md5str := fio.Md5Sum()
-	msg := msgContentFromFileData(fio.fdata, md5str)
+	msg := msgContentFromFileData(fio.fdata, md5str, fio.fname)
 
 	evto := &thspbs.Event{}
 	evto.Name = "FriendMessage"

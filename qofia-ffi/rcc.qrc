@@ -1,5 +1,6 @@
 <RCC>
   <qresource>
+    <file>icons/snapshot@2x.png</file>
     <file>icons/dot_away.png</file>
     <file>icons/dot_busy.png</file>
     <file>icons/dot_groupchat.png</file>

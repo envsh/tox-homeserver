@@ -98,6 +98,7 @@ func (this *MainWindow) initStartup() {
 	this.initInivteFriend()
 	this.initAddFriend()
 	this.initGroupMemberList()
+	this.initRoomFile()
 	log.Println("Init startup ui done.")
 }
 
@@ -106,6 +107,7 @@ func (this *MainWindow) initFirstShow() {
 	this.loadStorage()
 
 	this.initProfileStorage()
+	this.initRoomFileStorage()
 	// this.initOtherStorage()
 	go _CheckIntentMessage()
 	log.Println("Init first show ui done.")
@@ -229,7 +231,7 @@ func (this *MainWindow) sendMessage() {
 	}
 }
 
-func (this *MainWindow) sendMessageImpl(item *RoomListItem, itext string, isgroup bool, ctnum uint32) {
+func (this *MainWindow) sendMessageImpl(item *RoomListItem, itext string, isgroup bool, ctnum uint32) *Message {
 	userCode := thscli.NextUserCode(devInfo.Uuid)
 	msgo := NewMessageForMe(itext)
 	msgo.UserCode = userCode
@@ -240,6 +242,7 @@ func (this *MainWindow) sendMessageImpl(item *RoomListItem, itext string, isgrou
 	} else {
 		vtcli.FriendSendMessage(ctnum, itext, userCode)
 	}
+	return msgo
 }
 
 var baseInfoGot bool = false

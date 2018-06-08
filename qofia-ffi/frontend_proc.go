@@ -252,7 +252,7 @@ func dispatchEvent(evto *thspbs.Event) {
 				break
 			}
 		}
-		log.Println(found, pubkey, itext)
+		log.Println(found, gopp.IfElseStr(found, "", "not"), "found", pubkey, itext)
 
 	case "ConferenceSendMessage":
 		itext := evto.Args[2]

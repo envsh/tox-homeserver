@@ -840,7 +840,7 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>98</width>
+             <width>364</width>
              <height>16</height>
             </rect>
            </property>
@@ -1369,8 +1369,8 @@
            <property name="geometry">
             <rect>
              <x>0</x>
-             <y>12</y>
-             <width>98</width>
+             <y>382</y>
+             <width>346</width>
              <height>16</height>
             </rect>
            </property>
@@ -1438,7 +1438,7 @@
             </property>
             <property name="icon">
              <iconset resource="rcc.qrc">
-              <normaloff>:/icons/question-mark-gray64.png</normaloff>:/icons/question-mark-gray64.png</iconset>
+              <normaloff>:/icons/snapshot@2x.png</normaloff>:/icons/snapshot@2x.png</iconset>
             </property>
             <property name="iconSize">
              <size>

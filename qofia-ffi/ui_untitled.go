@@ -647,7 +647,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.ScrollArea.SetAlignment(qtcore.Qt__AlignLeading | qtcore.Qt__AlignLeft | qtcore.Qt__AlignTop) // 114
 	this.ScrollAreaWidgetContents = qtwidgets.NewQWidget(nil, 0)                                       // 111
 	this.ScrollAreaWidgetContents.SetObjectName("ScrollAreaWidgetContents")                            // 112
-	this.ScrollAreaWidgetContents.SetGeometry(0, 0, 98, 16)                                            // 114
+	this.ScrollAreaWidgetContents.SetGeometry(0, 0, 364, 16)                                           // 114
 	this.SizePolicy.SetHeightForWidth(this.ScrollAreaWidgetContents.SizePolicy().HasHeightForWidth())  // 114
 	this.ScrollAreaWidgetContents.SetSizePolicy(this.SizePolicy)                                       // 114
 	this.VerticalLayout_9 = qtwidgets.NewQVBoxLayout_1(this.ScrollAreaWidgetContents)                  // 111
@@ -922,7 +922,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.ScrollArea_2.SetAlignment(qtcore.Qt__AlignBottom | qtcore.Qt__AlignLeading | qtcore.Qt__AlignLeft) // 114
 	this.ScrollAreaWidgetContents_2 = qtwidgets.NewQWidget(nil, 0)                                          // 111
 	this.ScrollAreaWidgetContents_2.SetObjectName("ScrollAreaWidgetContents_2")                             // 112
-	this.ScrollAreaWidgetContents_2.SetGeometry(0, 12, 98, 16)                                              // 114
+	this.ScrollAreaWidgetContents_2.SetGeometry(0, 382, 346, 16)                                            // 114
 	this.SizePolicy.SetHeightForWidth(this.ScrollAreaWidgetContents_2.SizePolicy().HasHeightForWidth())     // 114
 	this.ScrollAreaWidgetContents_2.SetSizePolicy(this.SizePolicy)                                          // 114
 	this.VerticalLayout_3 = qtwidgets.NewQVBoxLayout_1(this.ScrollAreaWidgetContents_2)                     // 111
@@ -951,10 +951,10 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.ToolButton_9.SetObjectName("ToolButton_9")           // 112
 	this.ToolButton_9.SetFocusPolicy(qtcore.Qt__NoFocus)      // 114
 	this.Icon15 = qtgui.NewQIcon()
-	this.Icon15.AddFile(":/icons/question-mark-gray64.png", qtcore.NewQSize(), qtgui.QIcon__Normal, qtgui.QIcon__Off) // 115
-	this.ToolButton_9.SetIcon(this.Icon15)                                                                            // 114
-	this.ToolButton_9.SetIconSize(qtcore.NewQSize_1(22, 22))                                                          // 113
-	this.ToolButton_9.SetAutoRaise(true)                                                                              // 114
+	this.Icon15.AddFile(":/icons/snapshot@2x.png", qtcore.NewQSize(), qtgui.QIcon__Normal, qtgui.QIcon__Off) // 115
+	this.ToolButton_9.SetIcon(this.Icon15)                                                                   // 114
+	this.ToolButton_9.SetIconSize(qtcore.NewQSize_1(22, 22))                                                 // 113
+	this.ToolButton_9.SetAutoRaise(true)                                                                     // 114
 
 	this.HorizontalLayout_6.Layout().AddWidget(this.ToolButton_9) // 115
 
