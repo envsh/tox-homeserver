@@ -8,7 +8,7 @@ import (
 	"gopp"
 	"log"
 	"strconv"
-	"tox-homeserver/common"
+	thscom "tox-homeserver/common"
 	"tox-homeserver/thspbs"
 
 	tox "github.com/TokTok/go-toxcore-c"
@@ -31,9 +31,9 @@ func packBaseInfo(t *tox.Tox) (*thspbs.BaseInfo, error) {
 	// add myself as a special contact
 	{
 		frnd := &thspbs.FriendInfo{}
-		frnd.Pubkey = common.FileHelperPk
-		frnd.Name = common.FileHelperName
-		frnd.Fnum = common.FileHelperFnum
+		frnd.Pubkey = thscom.FileHelperPk
+		frnd.Name = thscom.FileHelperName
+		frnd.Fnum = thscom.FileHelperFnum
 		frnd.ConnStatus = 1
 
 		out.Friends[frnd.Fnum] = frnd
@@ -80,7 +80,7 @@ func packBaseInfo(t *tox.Tox) (*thspbs.BaseInfo, error) {
 			pname, err := t.ConferencePeerGetName(gn, i)
 			gopp.ErrPrint(err, pname)
 			if pname == "" {
-				pname = common.DefaultUserName
+				pname = thscom.DefaultUserName
 			}
 			ppubkey, err := t.ConferencePeerGetPublicKey(gn, i)
 			gopp.ErrPrint(err, ppubkey)
@@ -168,8 +168,8 @@ func RmtCallExecuteHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Even
 		gopp.ErrPrint(errSend)
 		friendpk, err := t.FriendGetPublicKey(fnum)
 		gopp.ErrPrint(err, fnum, req.Args)
-		if fnum == common.FileHelperFnum {
-			friendpk = common.FileHelperPk
+		if fnum == thscom.FileHelperFnum {
+			friendpk = thscom.FileHelperPk
 			errSend = nil
 		}
 		selfpk := t.SelfGetPublicKey()
@@ -187,7 +187,7 @@ func RmtCallExecuteHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Even
 			err := OffMsgMan().AddMessage(friendpk, msgo)
 			gopp.ErrPrint(err)
 		}
-		if fnum == common.FileHelperFnum {
+		if fnum == thscom.FileHelperFnum {
 			out.ErrCode, out.ErrMsg = 0, ""
 			msgo.Sent = 1
 			OffMsgMan().DeleteMessage(friendpk, msgo.Id)
@@ -195,7 +195,7 @@ func RmtCallExecuteHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Even
 
 		out.EventId = msgo.EventId
 		out.Args = append(out.Args, fmt.Sprintf("%d", wn)) // TODO, dont modify Args, use Margs
-		out.Margs = gopp.ToStrs(wn, msgo.Sent, friendpk)
+		out.Margs = gopp.ToStrs(wn, msgo.Sent, friendpk, thscom.MSGTYPE_TEXT, "text/plain")
 
 		// groups
 	case "ConferenceNew": // args:name,returns:
@@ -329,7 +329,7 @@ func RmtCallExecuteHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Even
 		prev_batch, err := strconv.Atoi(req.Args[1])
 		gopp.ErrPrint(err, req.Args)
 		if err == nil {
-			msgos, err := appctx.st.FindEventsByContactId2(req.Args[0], int64(prev_batch), common.PullPageSize)
+			msgos, err := appctx.st.FindEventsByContactId2(req.Args[0], int64(prev_batch), thscom.PullPageSize)
 			gopp.ErrPrint(err)
 			if err == nil {
 				data, err := json.Marshal(msgos)
@@ -343,8 +343,8 @@ func RmtCallExecuteHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Even
 		out.ErrMsg = fmt.Sprintf("Unimpled: %s", req.Name)
 	}
 
-	common.BytesRecved(len(req.String()))
-	common.BytesSent(len(out.String()))
+	thscom.BytesRecved(len(req.String()))
+	thscom.BytesSent(len(out.String()))
 	return out, nil
 }
 
@@ -370,9 +370,9 @@ func RmtCallResyncHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Event
 		} else {
 		}
 		var fname, pubkey string
-		if fnum == common.FileHelperFnum {
-			fname = common.FileHelperName
-			pubkey = common.FileHelperPk
+		if fnum == thscom.FileHelperFnum {
+			fname = thscom.FileHelperName
+			pubkey = thscom.FileHelperPk
 		} else {
 			fname, err = t.FriendGetName(fnum)
 			gopp.ErrPrint(err)

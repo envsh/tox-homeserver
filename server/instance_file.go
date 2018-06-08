@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"gopp"
-	"hash"
 	"io/ioutil"
 	"log"
 	"time"
@@ -126,7 +125,7 @@ func (this *ToxVM) setupCallbacksForFileFromTox() {
 
 func (this *ToxVM) setupCallbacksForFileFromHttp() {
 	fso := store.GetFS()
-	fso.OnFileUploaded(func(md5str string, frndpk string) {
+	fso.OnFileUploaded(func(md5str string, frndpk string, userCodeStr string) {
 		log.Println("New file uplaoded:", md5str)
 		data, err := fso.ReadFile(md5str)
 		gopp.ErrPrint(err, md5str)
@@ -136,9 +135,31 @@ func (this *ToxVM) setupCallbacksForFileFromHttp() {
 
 		frndnum, err := this.t.FriendByPublicKey(frndpk)
 		gopp.ErrPrint(err)
+		// frndname, _ := this.t.FriendGetName(frndnum)
+		userCode := gopp.MustInt64(userCodeStr)
+		selfpk := this.t.SelfGetPublicKey()
+
+		evto := &thspbs.Event{}
+		evto.Name = "FriendSendMessage"
+		evto.Args = gopp.ToStrs(frndnum, msgContentFromFileData(data, md5str))
+
+		// save
+		msgo, err := appctx.st.AddFriendMessage(evto.Args[1], selfpk, frndpk, 0, userCode)
+		gopp.ErrPrint(err, md5str, oname)
+		msgty, mimety := msgTypeFromFileData(data)
+		evto.Margs = gopp.ToStrs(0, 0, frndpk, msgty, mimety)
+		evto.EventId = msgo.EventId
+
+		// publish to other client
+		this.pubmsg(evto)
 
 		this.startSendFileData(frndnum, oname, data, func(err error) {
-			log.Println("send file:", err)
+			log.Println("Send file to friend:", err)
+			// set sent ok
+			appctx.st.SetMessageSent(msgo.Id)
+			// publish the last sent state
+			evto.Margs[1] = gopp.ToStr(1)
+			this.pubmsg(evto)
 		})
 	})
 }
@@ -173,6 +194,7 @@ func (this *ToxVM) startSendFile(friendNumber uint32, kind uint32, fileName stri
 	fio.fsize = uint64(len(data))
 	fio.fname = fileName
 	fio.fdata = data
+	fio.md5str = fileId
 	fio.fkind = tox.FILE_KIND_DATA
 	fio.donefn = donefn
 	fileSendState[fnum] = fio
@@ -187,27 +209,50 @@ func (this *ToxVM) onFileRecvDone(fio *FileInfo) {
 	md5str, err := store.GetFS().SaveFile(fio.fdata, fio.fname)
 	gopp.ErrPrint(err, fio, md5str)
 
-	ftyo, err := filetype.Match(fio.fdata)
-	gopp.ErrPrint(err)
-	msg := fmt.Sprintf("file;%s;%d;%s.%s", ftyo.MIME.Value, fio.fsize, md5str, ftyo.Extension)
+	evto := NewEventFromFileInfo(fio, frndname, frndpk, -1)
+	msg := evto.Args[1]
 	msgo, err := appctx.st.AddFriendMessage(msg, frndpk, frndpk, 0, 0)
 	gopp.ErrPrint(err)
 	appctx.st.SetMessageSent(msgo.Id)
+	evto.EventId = msgo.EventId
+
+	this.pubmsg(evto)
+}
+
+func msgContentFromFileData(data []byte, md5str string) string {
+	ftyo, err := filetype.Match(data)
+	gopp.ErrPrint(err)
+	msg := fmt.Sprintf("file;%s;%d;%s.%s", ftyo.MIME.Value, len(data), md5str, ftyo.Extension)
+	return msg
+}
+func NewEventFromFileInfo(fio *FileInfo, frndname, frndpk string, EventId int64) *thspbs.Event {
+	md5str := fio.Md5Sum()
+	msg := msgContentFromFileData(fio.fdata, md5str)
 
 	evto := &thspbs.Event{}
 	evto.Name = "FriendMessage"
 	evto.Args = []string{fmt.Sprintf("%d", fio.frndnum), msg}
-	msgty := thscom.MSGTYPE_FILE
-	if filetype.IsImage(fio.fdata) {
+	msgty, mimety := msgTypeFromFileData(fio.fdata)
+	// for file, the sent is already 1. because we save it and then here
+	evto.Margs = []string{frndname, frndpk, gopp.ToStr(EventId), "1", msgty, mimety}
+	evto.EventId = EventId
+	return evto
+}
+
+func msgTypeFromFileData(data []byte) (msgty, mimety string) {
+	ftyo, err := filetype.Match(data)
+	gopp.ErrPrint(err)
+	mimety = ftyo.MIME.Value
+
+	msgty = thscom.MSGTYPE_FILE
+	if filetype.IsImage(data) {
 		msgty = thscom.MSGTYPE_IMAGE
-	} else if filetype.IsAudio(fio.fdata) {
+	} else if filetype.IsAudio(data) {
 		msgty = thscom.MSGTYPE_AUDIO
-	} else if filetype.IsVideo(fio.fdata) {
+	} else if filetype.IsVideo(data) {
 		msgty = thscom.MSGTYPE_VIDEO
 	}
-	evto.Margs = []string{frndname, frndpk, gopp.ToStr(msgo.EventId), "1", msgty, ftyo.MIME.Value}
-	evto.EventId = msgo.EventId
-	this.pubmsg(evto)
+	return
 }
 
 func (this *FileInfo) WriteAt(pos uint64, data []byte) int {
@@ -225,6 +270,13 @@ func NewFileInfo(size uint64) *FileInfo {
 	return this
 }
 
+func (this *FileInfo) Md5Sum() string {
+	if this.md5str == "" {
+		this.md5str = gopp.Md5AsStr(this.fdata)
+	}
+	return this.md5str
+}
+
 var fileRecvState = map[uint32]*FileInfo{}
 var fileSendState = map[uint32]*FileInfo{}
 var tfrs = fileRecvState
@@ -237,7 +289,7 @@ type FileInfo struct {
 	fsize   uint64
 	fkind   uint32
 	fdata   []byte
-	md5h    *hash.Hash
+	md5str  string
 	btime   time.Time
 	done    bool
 	donefn  func(error)

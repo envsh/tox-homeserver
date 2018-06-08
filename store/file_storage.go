@@ -23,7 +23,7 @@ type FileStorage struct {
 	dv       *diskv.Diskv    // store meta info
 
 	dir              string // rootdir
-	onFileUploadedFn func(md5str string, frndpk string)
+	onFileUploadedFn func(md5str string, frndpk string, userCode string)
 }
 
 var fso *FileStorage
@@ -105,28 +105,29 @@ func (this *FileStorage) SetupHttpServer(srvmux *http.ServeMux) {
 		data, err := ioutil.ReadAll(r.Body)
 		gopp.ErrPrint(err)
 		if err == nil {
-			fname := r.URL.Query().Get("file")
-			frndpk := r.URL.Query().Get("frndpk")
+			fname := r.URL.Query().Get("fileName")
+			frndpk := r.URL.Query().Get("friendPubkey")
+			userCode := r.URL.Query().Get("userCode")
 			md5str, err := this.SaveFile(data, fname)
 			gopp.ErrPrint(err)
 			time.AfterFunc(1*time.Millisecond, func() {
 				if this.onFileUploadedFn != nil {
-					this.onFileUploadedFn(md5str, frndpk)
+					this.onFileUploadedFn(md5str, frndpk, userCode)
 				}
 			})
 		}
 	})
 }
 
-func (this *FileStorage) OnFileUploaded(f func(md5str string, frndpk string)) {
+func (this *FileStorage) OnFileUploaded(f func(md5str string, frndpk string, userCode string)) {
 	oldfn := this.onFileUploadedFn
-	this.onFileUploadedFn = func(md5str string, frndpk string) {
+	this.onFileUploadedFn = func(md5str string, frndpk string, userCode string) {
 		if f != nil {
-			f(md5str, frndpk)
+			f(md5str, frndpk, userCode)
 		}
 
 		if oldfn != nil {
-			oldfn(md5str, frndpk)
+			oldfn(md5str, frndpk, userCode)
 		}
 	}
 }
