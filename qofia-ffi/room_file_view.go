@@ -65,7 +65,8 @@ func (this *MainWindow) sendFile(fname string) {
 	gopp.ErrPrint(err, ftyo)
 
 	picw := gopp.IfElseInt(strings.HasPrefix(ftyo.MIME.Value, "image/"), 200, 50)
-	itext := fmt.Sprintf("<img width='%d' src='%s' alt='%s'/><br/>%s (%s; %s)",
+	itext := fmt.Sprintf("<a href='%s'><img width='%d' src='%s' alt='%s'/></a><br/>%s (%s; %s)",
+		fname,
 		picw, fname, fname, filepath.Base(fname), ftyo.MIME.Value, humanize.Bytes(uint64(fi.Size())))
 	userCode := thscli.NextUserCode(devInfo.Uuid)
 	msgo := NewMessageForMe(itext)

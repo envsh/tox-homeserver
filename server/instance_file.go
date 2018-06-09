@@ -14,6 +14,7 @@ import (
 
 	tox "github.com/TokTok/go-toxcore-c"
 	"github.com/dustin/go-humanize"
+	"github.com/envsh/go-toxcore/xtox"
 	"gopkg.in/h2non/filetype.v1"
 )
 
@@ -124,46 +125,115 @@ func (this *ToxVM) setupCallbacksForFileFromTox() {
 }
 
 func (this *ToxVM) setupCallbacksForFileFromHttp() {
-	fso := store.GetFS()
-	fso.OnFileUploaded(func(md5str string, frndpk string, userCodeStr string) {
+	locfso := store.GetFS()
+	locfso.OnFileUploaded(func(md5str string, frndpk string, userCodeStr string) {
 		log.Println("New file uplaoded:", md5str, frndpk, userCodeStr)
-		data, err := fso.ReadFile(md5str)
-		gopp.ErrPrint(err, md5str)
-		oname, err := fso.GetOrigName(md5str)
-		gopp.ErrPrint(err, oname)
-		log.Println(md5str, oname, len(data))
+		t := this.t
+		_, err := t.FriendByPublicKey(frndpk)
+		if err == nil {
+			this.onFriendFileUploaded(md5str, frndpk, userCodeStr)
+		} else {
+			_, found := xtox.ConferenceGetByIdentifier(t, frndpk)
+			if found {
+				this.onGroupFileUploaded(md5str, frndpk, userCodeStr)
+			} else {
+				log.Println("Not found dest:", frndpk)
+			}
+		}
+	})
+}
 
-		frndnum, err := this.t.FriendByPublicKey(frndpk)
-		gopp.ErrPrint(err)
-		// frndname, _ := this.t.FriendGetName(frndnum)
-		userCode := gopp.MustInt64(userCodeStr)
-		selfpk := this.t.SelfGetPublicKey()
+func (this *ToxVM) onFriendFileUploaded(md5str string, frndpk string, userCodeStr string) {
+	locfso := store.GetFS()
+
+	data, err := locfso.ReadFile(md5str)
+	gopp.ErrPrint(err, md5str)
+	oname, err := locfso.GetOrigName(md5str)
+	gopp.ErrPrint(err, oname)
+	log.Println(md5str, oname, len(data))
+
+	frndnum, err := this.t.FriendByPublicKey(frndpk)
+	gopp.ErrPrint(err)
+	// frndname, _ := this.t.FriendGetName(frndnum)
+	userCode := gopp.MustInt64(userCodeStr)
+	selfpk := this.t.SelfGetPublicKey()
+
+	evto := &thspbs.Event{}
+	evto.Name = "FriendSendMessage"
+	evto.Args = gopp.ToStrs(frndnum, msgContentFromFileData(data, md5str, oname))
+	evto.UserCode = userCode
+
+	// save
+	msgo, err := appctx.st.AddFriendMessage(evto.Args[1], frndpk, selfpk, 0, userCode)
+	gopp.ErrPrint(err, md5str, oname)
+	msgty, mimety := msgTypeFromFileData(data)
+	evto.Margs = gopp.ToStrs(0, 0, frndpk, msgty, mimety)
+	evto.EventId = msgo.EventId
+
+	// publish to other client
+	this.pubmsg(evto)
+
+	this.startSendFileData(frndnum, oname, data, func(err error) {
+		log.Println("Send file to friend:", err)
+		// set sent ok
+		appctx.st.SetMessageSent(msgo.Id)
+		// publish the last sent state
+		evto.Name = "FriendSendMessageResp"
+		evto.Margs[1] = gopp.ToStr(1)
+		this.pubmsg(evto)
+	})
+}
+
+func (this *ToxVM) onGroupFileUploaded(md5str string, frndpk string, userCodeStr string) {
+	locfso := store.GetFS()
+
+	data, err := locfso.ReadFile(md5str)
+	gopp.ErrPrint(err, md5str)
+	oname, err := locfso.GetOrigName(md5str)
+	gopp.ErrPrint(err, oname)
+	log.Println(md5str, oname, len(data))
+
+	frndnum, found := xtox.ConferenceGetByIdentifier(this.t, frndpk)
+	gopp.FalsePrint(found, frndpk)
+	// frndname, _ := this.t.FriendGetName(frndnum)
+	userCode := gopp.MustInt64(userCodeStr)
+	selfpk := this.t.SelfGetPublicKey()
+
+	go func() {
+		// put to external file store
+		extfso := store.GetExtFS()
+		urlval, err := extfso.PutFileByData(data, oname)
+		gopp.ErrPrint(err, oname)
+		log.Println("Send file to external file store:", err)
 
 		evto := &thspbs.Event{}
-		evto.Name = "FriendSendMessage"
-		evto.Args = gopp.ToStrs(frndnum, msgContentFromFileData(data, md5str, oname))
+		evto.Name = "ConferenceSendMessage"
+		evto.Args = gopp.ToStrs(frndnum, msgContentFromFileDataUrl(data, md5str, oname, urlval))
 		evto.UserCode = userCode
 
 		// save
-		msgo, err := appctx.st.AddFriendMessage(evto.Args[1], frndpk, selfpk, 0, userCode)
+		msgo, err := appctx.st.AddGroupMessage(evto.Args[1], "0", frndpk, selfpk, 0, userCode)
 		gopp.ErrPrint(err, md5str, oname)
 		msgty, mimety := msgTypeFromFileData(data)
 		evto.Margs = gopp.ToStrs(0, 0, frndpk, msgty, mimety)
 		evto.EventId = msgo.EventId
 
+		// send message/url to group
+		// db store full FileInfoLine.String(), but send message don't
+		// this.t.ConferenceSendMessage(frndnum, 0, evto.Args[1])
+		b58str := thscom.Base58EncodeFromHex(md5str)
+		this.t.ConferenceSendMessage(frndnum, 0, urlval+"?"+b58str)
+
 		// publish to other client
 		this.pubmsg(evto)
 
-		this.startSendFileData(frndnum, oname, data, func(err error) {
-			log.Println("Send file to friend:", err)
-			// set sent ok
-			appctx.st.SetMessageSent(msgo.Id)
-			// publish the last sent state
-			evto.Name = "FriendSendMessageResp"
-			evto.Margs[1] = gopp.ToStr(1)
-			this.pubmsg(evto)
-		})
-	})
+		// set sent ok
+		appctx.st.SetMessageSent(msgo.Id)
+		// publish the last sent state
+		evto.Name = "ConferenceSendMessageResp"
+		evto.Margs[1] = gopp.ToStr(1)
+		this.pubmsg(evto)
+	}()
 }
 
 func (this *ToxVM) testSendFile(friendNumber uint32, msg string) bool {
@@ -175,6 +245,7 @@ func (this *ToxVM) testSendFile(friendNumber uint32, msg string) bool {
 	}
 	return false
 }
+
 func (this *ToxVM) startSendFileData(friendNumber uint32, fileName string, data []byte, donefn func(error)) {
 	this.startSendFile(friendNumber, tox.FILE_KIND_DATA, fileName, data, donefn)
 }
@@ -226,7 +297,14 @@ func (this *ToxVM) onFileRecvDone(fio *FileInfo) {
 func msgContentFromFileData(data []byte, md5str string, origName string) string {
 	ftyo, err := filetype.Match(data)
 	gopp.ErrPrint(err)
-	return thscom.NewFileInfoLine(int64(len(data)), ftyo.MIME.Value, md5str, ftyo.Extension, origName).String()
+	return thscom.NewFileInfoLine(int64(len(data)), ftyo.MIME.Value,
+		md5str, ftyo.Extension, origName).String()
+}
+func msgContentFromFileDataUrl(data []byte, md5str string, origName string, urlval string) string {
+	ftyo, err := filetype.Match(data)
+	gopp.ErrPrint(err)
+	return thscom.NewFileInfoLineUrl(int64(len(data)), ftyo.MIME.Value,
+		md5str, ftyo.Extension, origName, urlval).String()
 }
 func NewEventFromFileInfo(fio *FileInfo, frndname, frndpk string, EventId int64) *thspbs.Event {
 	md5str := fio.Md5Sum()

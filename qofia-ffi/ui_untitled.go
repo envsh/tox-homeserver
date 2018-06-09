@@ -69,6 +69,12 @@ type Ui_MainWindow struct {
 	HorizontalSpacer_3         *qtwidgets.QSpacerItem
 	Label_23                   *qtwidgets.QLabel
 	ComboBox_6                 *qtwidgets.QComboBox
+	HorizontalLayout_20        *qtwidgets.QHBoxLayout
+	HorizontalSpacer_4         *qtwidgets.QSpacerItem
+	RadioButton_3              *qtwidgets.QRadioButton
+	HorizontalSpacer_6         *qtwidgets.QSpacerItem
+	RadioButton_4              *qtwidgets.QRadioButton
+	HorizontalSpacer_5         *qtwidgets.QSpacerItem
 	PushButton_7               *qtwidgets.QPushButton
 	Label_24                   *qtwidgets.QLabel
 	VerticalSpacer_2           *qtwidgets.QSpacerItem
@@ -500,6 +506,34 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.ComboBox_6.SetModelColumn(0)                         // 114
 
 	this.VerticalLayout_8.Layout().AddWidget(this.ComboBox_6) // 115
+
+	this.HorizontalLayout_20 = qtwidgets.NewQHBoxLayout()         // 111
+	this.HorizontalLayout_20.SetObjectName("HorizontalLayout_20") // 112
+	this.HorizontalSpacer_4 = qtwidgets.NewQSpacerItem(40, 20, qtwidgets.QSizePolicy__Expanding, qtwidgets.QSizePolicy__Minimum)
+
+	this.HorizontalLayout_20.AddItem(this.HorizontalSpacer_4) // 115
+
+	this.RadioButton_3 = qtwidgets.NewQRadioButton(this.Page_8) // 111
+	this.RadioButton_3.SetObjectName("RadioButton_3")           // 112
+	this.RadioButton_3.SetChecked(true)                         // 114
+
+	this.HorizontalLayout_20.Layout().AddWidget(this.RadioButton_3) // 115
+
+	this.HorizontalSpacer_6 = qtwidgets.NewQSpacerItem(40, 20, qtwidgets.QSizePolicy__Expanding, qtwidgets.QSizePolicy__Minimum)
+
+	this.HorizontalLayout_20.AddItem(this.HorizontalSpacer_6) // 115
+
+	this.RadioButton_4 = qtwidgets.NewQRadioButton(this.Page_8) // 111
+	this.RadioButton_4.SetObjectName("RadioButton_4")           // 112
+	this.RadioButton_4.SetEnabled(false)                        // 114
+
+	this.HorizontalLayout_20.Layout().AddWidget(this.RadioButton_4) // 115
+
+	this.HorizontalSpacer_5 = qtwidgets.NewQSpacerItem(40, 20, qtwidgets.QSizePolicy__Expanding, qtwidgets.QSizePolicy__Minimum)
+
+	this.HorizontalLayout_20.AddItem(this.HorizontalSpacer_5) // 115
+
+	this.VerticalLayout_8.AddLayout(this.HorizontalLayout_20, 0) // 115
 
 	this.PushButton_7 = qtwidgets.NewQPushButton(this.Page_8) // 111
 	this.PushButton_7.SetObjectName("PushButton_7")           // 112
@@ -1370,6 +1404,14 @@ func (this *Ui_MainWindow) RetranslateUi(MainWindow *qtwidgets.QMainWindow) {
 	this.Label_23.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
 	this.ComboBox_6.SetItemText(0, qtcore.QCoreApplication_Translate("MainWindow", "txhs.duckdns.org:2080", "dummy123", 0))
 	// noimpl:
+	// noimpl: #ifndef QT_NO_TOOLTIP
+	this.RadioButton_3.SetToolTip(qtcore.QCoreApplication_Translate("MainWindow", "For this one, need a seperate running server. Recommanded.", "dummy123", 0))
+	// noimpl: #endif // QT_NO_TOOLTIP
+	this.RadioButton_3.SetText(qtcore.QCoreApplication_Translate("MainWindow", "&Remote Server", "dummy123", 0))
+	// noimpl: #ifndef QT_NO_TOOLTIP
+	this.RadioButton_4.SetToolTip(qtcore.QCoreApplication_Translate("MainWindow", "For this one, not need a seperate server, this program has embeded one, and auto start it. Preview purpose.", "dummy123", 0))
+	// noimpl: #endif // QT_NO_TOOLTIP
+	this.RadioButton_4.SetText(qtcore.QCoreApplication_Translate("MainWindow", "Self &Contains", "dummy123", 0))
 	this.PushButton_7.SetText(qtcore.QCoreApplication_Translate("MainWindow", "Sign in", "dummy123", 0))
 	this.Label_24.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
 	this.ToolButton_17.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
@@ -1422,8 +1464,17 @@ func (this *Ui_MainWindow) RetranslateUi(MainWindow *qtwidgets.QMainWindow) {
 	this.ToolButton_23.SetToolTip(qtcore.QCoreApplication_Translate("MainWindow", "Load older messages", "dummy123", 0))
 	// noimpl: #endif // QT_NO_TOOLTIP
 	this.ToolButton_23.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
+	// noimpl: #ifndef QT_NO_TOOLTIP
+	this.ToolButton_8.SetToolTip(qtcore.QCoreApplication_Translate("MainWindow", "Send File", "dummy123", 0))
+	// noimpl: #endif // QT_NO_TOOLTIP
 	this.ToolButton_8.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
+	// noimpl: #ifndef QT_NO_TOOLTIP
+	this.ToolButton_9.SetToolTip(qtcore.QCoreApplication_Translate("MainWindow", "Send snapshot", "dummy123", 0))
+	// noimpl: #endif // QT_NO_TOOLTIP
 	this.ToolButton_9.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
+	// noimpl: #ifndef QT_NO_TOOLTIP
+	this.ToolButton_10.SetToolTip(qtcore.QCoreApplication_Translate("MainWindow", "Emoji", "dummy123", 0))
+	// noimpl: #endif // QT_NO_TOOLTIP
 	this.ToolButton_10.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
 	this.LineEdit_2.SetPlaceholderText(qtcore.QCoreApplication_Translate("MainWindow", "Write a message...", "dummy123", 0))
 	this.ToolButton_18.SetText(qtcore.QCoreApplication_Translate("MainWindow", "&Send", "dummy123", 0))

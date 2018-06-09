@@ -26,12 +26,12 @@ type FileStorage struct {
 	onFileUploadedFn func(md5str string, frndpk string, userCode string)
 }
 
-var fso *FileStorage
-var fsonce sync.Once
+var locfso *FileStorage
+var locfsonce sync.Once
 
 func GetFS() *FileStorage {
-	fsonce.Do(func() { fso = NewFileStorage() })
-	return fso
+	locfsonce.Do(func() { locfso = NewFileStorage() })
+	return locfso
 }
 
 func NewFileStorage() *FileStorage {
