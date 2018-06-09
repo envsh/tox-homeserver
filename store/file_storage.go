@@ -83,6 +83,7 @@ func (this *FileStorage) SetupHttpServer(srvmux *http.ServeMux) {
 	srvmux.HandleFunc("/toxhsfs/", func(w http.ResponseWriter, r *http.Request) {
 		// log.Println("ohhhh", r.URL.String())
 		md5str := r.URL.String()[9:]
+		md5str = gopp.SubStr(md5str, 16)
 		data, err := this.ReadFile(md5str)
 		gopp.ErrPrint(err, r.URL.String(), md5str)
 		w.Write(data)

@@ -17,7 +17,10 @@ import (
 	"github.com/kitech/qt.go/qtcore"
 	"github.com/kitech/qt.go/qtgui"
 	"github.com/kitech/qt.go/qtwidgets"
+	"github.com/levigross/grequests"
 	"mvdan.cc/xurls"
+
+	"github.com/spf13/afero"
 )
 
 type Message struct {
@@ -385,6 +388,7 @@ func (this *RoomListItem) AddMessage(msgo *Message, prev bool) {
 		msgiw.UserCode = msgo.UserCode
 		this.msgitmdl = append([]*MessageItem{msgiw}, this.msgitmdl...)
 		this.AddMessageImpl(msgo, msgiw, prev)
+		this.UpdateMessageMimeContent(msgo, msgiw)
 	} else {
 		this.msgos = append(this.msgos, msgo)
 		msgiw := NewMessageItem()
@@ -392,6 +396,7 @@ func (this *RoomListItem) AddMessage(msgo *Message, prev bool) {
 		msgiw.UserCode = msgo.UserCode
 		this.msgitmdl = append(this.msgitmdl, msgiw)
 		this.AddMessageImpl(msgo, msgiw, prev)
+		this.UpdateMessageMimeContent(msgo, msgiw)
 		// test and update storage's sync info
 		if msgo.EventId >= this.timeline.NextBatch {
 			this.timeline.NextBatch = msgo.EventId + 1
@@ -446,6 +451,43 @@ func (this *RoomListItem) AddMessageImpl(msgo *Message, msgiw *MessageItem, prev
 	this.unreadedCount += 1
 	this.ToolButton.SetText(fmt.Sprintf("%d", this.unreadedCount))
 	// this.floatUnreadCountLabel.SetText(fmt.Sprintf("%d", this.unreadedCount))
+}
+
+func (this *RoomListItem) UpdateMessageMimeContent(msgo *Message, msgiw *MessageItem) {
+	if !msgo.IsFile() {
+		return
+	}
+
+	fil := msgo.GetFileInfoLine()
+	gopp.NilPrint(fil, msgo.Msg)
+	if fil == nil {
+		return
+	}
+	locdir := gopp.IfElseStr(gopp.IsAndroid(), os.Getenv("EXTERNAL_STORAGE"), ".") + "/txcfiles"
+	os.MkdirAll(locdir, 0744)
+	os.Chmod(locdir, 0744)
+	locsrcname := GetLocalPathByHash(fil.Md5str, locdir)
+	locfname := locsrcname[7:] // trim prefix file://
+	rmturl := thscli.HttpFsUrlFor(fil.Md5str)
+
+	richtxt := Msg2FileText(fil, locdir)
+	log.Println(msgo.Msg, richtxt)
+	msgiw.Label_5.SetText(richtxt)
+
+	go func() {
+		if ok, _ := afero.Exists(afero.NewOsFs(), locfname); ok {
+		} else {
+			time.Sleep(3 * time.Second)
+			ro := &grequests.RequestOptions{}
+			resp, err := grequests.Get(rmturl, ro)
+			gopp.ErrPrint(err, rmturl)
+			err = resp.DownloadToFile(locfname)
+			gopp.ErrPrint(err, rmturl)
+
+			runOnUiThread(func() { msgiw.Label_5.SetText(richtxt) })
+		}
+	}()
+
 }
 
 func (this *RoomListItem) UpdateMessageState(msgo *Message) {

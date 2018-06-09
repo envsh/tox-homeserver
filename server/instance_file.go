@@ -208,15 +208,22 @@ func (this *ToxVM) onGroupFileUploaded(md5str string, frndpk string, userCodeStr
 
 		evto := &thspbs.Event{}
 		evto.Name = "ConferenceSendMessage"
-		evto.Args = gopp.ToStrs(frndnum, msgContentFromFileDataUrl(data, md5str, oname, urlval))
+		evto.Args = gopp.ToStrs(frndnum, 0, msgContentFromFileDataUrl(data, md5str, oname, urlval))
 		evto.UserCode = userCode
 
 		// save
 		msgo, err := appctx.st.AddGroupMessage(evto.Args[1], "0", frndpk, selfpk, 0, userCode)
 		gopp.ErrPrint(err, md5str, oname)
 		msgty, mimety := msgTypeFromFileData(data)
-		evto.Margs = gopp.ToStrs(0, 0, frndpk, msgty, mimety)
 		evto.EventId = msgo.EventId
+		peerName := this.t.SelfGetName()
+		peerPubkey := selfpk
+		title := ""
+		groupId := frndpk
+		evto.Margs = gopp.ToStrs(peerName, peerPubkey, title, groupId, msgo.EventId, "0",
+			msgty, mimety)
+		//evt.Margs = []string{peerName, peerPubkey, title, groupId, gopp.ToStr(msgo.EventId), "1",
+		//	thscom.MSGTYPE_TEXT, "text/plain"}
 
 		// send message/url to group
 		// db store full FileInfoLine.String(), but send message don't
@@ -231,7 +238,7 @@ func (this *ToxVM) onGroupFileUploaded(md5str string, frndpk string, userCodeStr
 		appctx.st.SetMessageSent(msgo.Id)
 		// publish the last sent state
 		evto.Name = "ConferenceSendMessageResp"
-		evto.Margs[1] = gopp.ToStr(1)
+		evto.Margs = gopp.ToStrs(0, "1", groupId)
 		this.pubmsg(evto)
 	}()
 }
@@ -290,6 +297,7 @@ func (this *ToxVM) onFileRecvDone(fio *FileInfo) {
 	gopp.ErrPrint(err)
 	appctx.st.SetMessageSent(msgo.Id)
 	evto.EventId = msgo.EventId
+	evto.Margs[2] = gopp.ToStr(msgo.EventId)
 
 	this.pubmsg(evto)
 }

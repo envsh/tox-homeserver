@@ -11,12 +11,12 @@ import (
 )
 
 type FileInfoLine struct {
-	mime     string
-	length   int64
-	md5str   string
-	ext      string
-	origName string
-	urlval   string
+	Mime     string
+	Length   int64
+	Md5str   string
+	Ext      string
+	OrigName string
+	Urlval   string
 }
 
 func ParseFileInfoLine(s string) *FileInfoLine {
@@ -25,7 +25,7 @@ func ParseFileInfoLine(s string) *FileInfoLine {
 		log.Println("fmt error:", s)
 		return nil
 	}
-	if parts[0] != "file" && !strings.HasPrefix(parts[0], "http://") {
+	if parts[0] != "txc" && !strings.HasPrefix(parts[0], "http://") {
 		log.Println("fmt error:", s)
 		return nil
 	}
@@ -35,28 +35,28 @@ func ParseFileInfoLine(s string) *FileInfoLine {
 	return NewFileInfoLine(gopp.MustInt64(parts[2]), parts[1], parts[3], parts[4], parts[5])
 }
 
-// file;mime;len;md5;ext;origName
+// txc;mime;len;md5;ext;origName
 func (this *FileInfoLine) String() string {
-	if this.urlval != "" {
-		return fmt.Sprintf("%s?file;%s;%d;%s;%s;%s", this.urlval,
-			this.mime, this.length, this.md5str, this.ext, this.origName)
+	if this.Urlval != "" {
+		return fmt.Sprintf("%s?txc;%s;%d;%s;%s;%s", this.Urlval,
+			this.Mime, this.Length, this.Md5str, this.Ext, this.OrigName)
 	}
-	return fmt.Sprintf("file;%s;%d;%s;%s;%s", this.mime, this.length, this.md5str, this.ext, this.origName)
+	return fmt.Sprintf("txc;%s;%d;%s;%s;%s", this.Mime, this.Length, this.Md5str, this.Ext, this.OrigName)
 }
 
 func NewFileInfoLine(length int64, mime, md5str, ext, origName string) *FileInfoLine {
 	fis := &FileInfoLine{}
-	fis.mime = mime
-	fis.length = length
-	fis.md5str = md5str
-	fis.ext = ext
-	fis.origName = origName
+	fis.Mime = mime
+	fis.Length = length
+	fis.Md5str = md5str
+	fis.Ext = ext
+	fis.OrigName = origName
 	return fis
 }
 
 func NewFileInfoLineUrl(length int64, mime, md5str, ext, origName, urlval string) *FileInfoLine {
 	fis := NewFileInfoLine(length, mime, md5str, ext, origName)
-	fis.urlval = urlval
+	fis.Urlval = urlval
 	return fis
 }
 

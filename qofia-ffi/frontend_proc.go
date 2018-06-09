@@ -256,19 +256,22 @@ func dispatchEvent(evto *thspbs.Event) {
 
 	case "ConferenceSendMessage":
 		itext := evto.Args[2]
-		groupTitle := evto.Margs[2]
+		// groupTitle := evto.Margs[2]
 		groupId := evto.Margs[3]
 		eventId := gopp.MustInt64(evto.Margs[4])
 
 		found := false
 		for _, room := range ctitmdl {
-			if room.GetId() == groupId && room.GetName() == groupTitle {
+			if room.GetId() == groupId /*&& room.GetName() == groupTitle*/ {
 				msgo := NewMessageForMeFromJson(itext, eventId)
 				msgo.UserCode = evto.UserCode
+				log.Println(msgo)
 				// 有可能是自己同步回来的消息，所以要确定是添加还是更新
 				if room.FindMessageByUserCode(evto.UserCode) != nil {
+					log.Println("Updateing...")
 					room.UpdateMessageState(msgo)
 				} else {
+					log.Println("Adding...")
 					room.AddMessage(msgo, false)
 				}
 				found = true
@@ -366,6 +369,8 @@ func dispatchEventResp(evto *thspbs.Event) {
 			msgo.Sent = sent
 			msgo.UserCode = evto.UserCode
 			roomo.UpdateMessageState(msgo) // 必定已经存在
+		} else {
+			log.Println("room not found:", sent, roompk, evto)
 		}
 	default:
 		log.Printf("%#v\n", evto)

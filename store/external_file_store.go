@@ -2,9 +2,12 @@ package store
 
 import (
 	"bytes"
+	"errors"
 	"gopp"
 	"io"
 	"log"
+	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -38,10 +41,45 @@ func (this *ExtFileStore) getPutUrl() string {
 	return u
 }
 
+// should block
 func (this *ExtFileStore) PutFileByName(fname string, f func()) (uname string, err error) {
-	r, err := os.Open(fname)
-	gopp.ErrPrint(err, fname)
-	return this.PutFileByReader(r, filepath.Base(fname))
+	bname := filepath.Base(fname)
+
+	var r *os.File
+	for i := 0; i < 3; i++ {
+		r, err = os.Open(fname)
+		gopp.ErrPrint(err, fname)
+		uname, err = this.PutFileByReaderFarsee(r, bname)
+		gopp.ErrPrint(err, bname, i)
+		if err == nil {
+			return
+		}
+		time.Sleep(100 * time.Millisecond)
+	}
+
+	for i := 0; i < 3; i++ {
+		r, err = os.Open(fname)
+		gopp.ErrPrint(err, fname)
+		uname, err = this.PutFileByReaderVimcn(r, bname, false)
+		gopp.ErrPrint(err, bname, i)
+		if err == nil {
+			return
+		}
+		time.Sleep(100 * time.Millisecond)
+	}
+
+	for i := 0; i < 3; i++ {
+		r, err = os.Open(fname)
+		gopp.ErrPrint(err, fname)
+		uname, err = this.PutFileByReaderVimcn(r, bname, true)
+		gopp.ErrPrint(err, bname, i)
+		if err == nil {
+			return
+		}
+		time.Sleep(100 * time.Millisecond)
+	}
+
+	return
 }
 
 type ClosingBuffer struct {
@@ -59,24 +97,40 @@ func NewClosingBuffer(data []byte) *ClosingBuffer {
 	return &ClosingBuffer{bytes.NewBuffer(data)}
 }
 
+// should block
 func (this *ExtFileStore) PutFileByData(data []byte, bname string) (uname string, err error) {
-	r := NewClosingBuffer(data)
-	return this.PutFileByReader(r, bname)
-}
-
-func (this *ExtFileStore) PutFileByReader(r io.ReadCloser, bname string) (uname string, err error) {
 	for i := 0; i < 3; i++ {
-		uname, err = this.PutFileByReaderImpl(r, bname)
+		r := NewClosingBuffer(data)
+		uname, err = this.PutFileByReaderFarsee(r, bname)
 		gopp.ErrPrint(err, bname, i)
 		if err == nil {
-			break
+			return
 		}
-		time.Sleep(10 * time.Millisecond)
+		time.Sleep(100 * time.Millisecond)
+	}
+
+	for i := 0; i < 3; i++ {
+		r := NewClosingBuffer(data)
+		uname, err = this.PutFileByReaderVimcn(r, bname, false)
+		gopp.ErrPrint(err, bname, i)
+		if err == nil {
+			return
+		}
+		time.Sleep(100 * time.Millisecond)
+	}
+	for i := 0; i < 3; i++ {
+		r := NewClosingBuffer(data)
+		uname, err = this.PutFileByReaderVimcn(r, bname, true)
+		gopp.ErrPrint(err, bname, i)
+		if err == nil {
+			return
+		}
+		time.Sleep(100 * time.Millisecond)
 	}
 	return
 }
 
-func (this *ExtFileStore) PutFileByReaderImpl(r io.ReadCloser, bname string) (uname string, err error) {
+func (this *ExtFileStore) PutFileByReaderFarsee(r io.ReadCloser, bname string) (uname string, err error) {
 	ro := &grequests.RequestOptions{}
 	ro.Params = map[string]string{
 		// "friendPubkey": item.GetId(),
@@ -95,16 +149,25 @@ func (this *ExtFileStore) PutFileByReaderImpl(r io.ReadCloser, bname string) (un
 	u := this.getPutUrl()
 	resp, err := grequests.Post(u, ro)
 	gopp.ErrPrint(err, u)
-	log.Println(u, resp.StatusCode, resp.String())
+	if false {
+		log.Println(u, resp.StatusCode, resp.String(), resp.Header)
+		req := resp.RawResponse.Request
+		log.Println(req.ContentLength, req.Header)
+	}
+	switch resp.StatusCode {
+	case http.StatusOK, http.StatusMovedPermanently:
+	default:
+		err = errors.New("http status:" + gopp.ToStr(resp.StatusCode))
+		return
+	}
 
 	data := resp.Bytes()
-	retm := this.parseResult(data)
+	retm := this.parseResultFarsee(data)
 	log.Println(retm)
 	uname = retm["url"]
 	return
 }
-
-func (this *ExtFileStore) parseResult(data []byte) (retm map[string]string) {
+func (this *ExtFileStore) parseResultFarsee(data []byte) (retm map[string]string) {
 	retm = make(map[string]string)
 	lines := strings.Split(string(data), "\n")
 	for _, line := range lines {
@@ -115,5 +178,48 @@ func (this *ExtFileStore) parseResult(data []byte) (retm map[string]string) {
 		kv := strings.Split(line, ": ")
 		retm[kv[0]] = kv[1]
 	}
+	return
+}
+
+func (this *ExtFileStore) PutFileByReaderVimcn(r io.ReadCloser, bname string, usepxy bool) (uname string, err error) {
+	ro := &grequests.RequestOptions{}
+	ro.Params = map[string]string{
+		// "friendPubkey": item.GetId(),
+		// "userCode":     gopp.ToStr(userCode),
+		// "fileName":     filepath.Base(fname),
+	}
+	fileo := grequests.FileUpload{}
+	fileo.FileName = bname
+	fileo.FileContents = r
+	fileo.FieldName = "name"
+	ro.Files = append(ro.Files, fileo)
+	ro.RequestTimeout = 20 * time.Second
+	ro.DialTimeout = 10 * time.Second
+	ro.TLSHandshakeTimeout = 10 * time.Second
+	if usepxy {
+		urlo, err := url.Parse("http://127.0.0.1:8117")
+		gopp.ErrPrint(err)
+		ro.Proxies = map[string]*url.URL{"http": urlo, "https": urlo}
+	}
+
+	u := this.getPutUrl()
+	u = "https://img.vim-cn.com/"
+	resp, err := grequests.Post(u, ro)
+	gopp.ErrPrint(err, u)
+	if false {
+		log.Println(u, resp.StatusCode, resp.String(), resp.Header)
+		req := resp.RawResponse.Request
+		log.Println(req.ContentLength, req.Header)
+	}
+	switch resp.StatusCode {
+	case http.StatusOK, http.StatusMovedPermanently:
+	default:
+		err = errors.New("http status:" + gopp.ToStr(resp.StatusCode))
+		return
+	}
+
+	data := resp.Bytes()
+	log.Println(string(data))
+	uname = strings.TrimSpace(string(data))
 	return
 }
