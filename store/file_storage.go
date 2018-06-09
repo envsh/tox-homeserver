@@ -5,14 +5,18 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
+	"os"
 	"path/filepath"
 	"sync"
 	"time"
 
 	thscom "tox-homeserver/common"
 
+	"github.com/levigross/grequests"
 	"github.com/peterbourgon/diskv"
 	"github.com/spf13/afero"
+	filetype "gopkg.in/h2non/filetype.v1"
 )
 
 type FileStorage struct {
@@ -83,7 +87,7 @@ func (this *FileStorage) SetupHttpServer(srvmux *http.ServeMux) {
 	srvmux.HandleFunc("/toxhsfs/", func(w http.ResponseWriter, r *http.Request) {
 		// log.Println("ohhhh", r.URL.String())
 		md5str := r.URL.String()[9:]
-		md5str = gopp.SubStr(md5str, 16)
+		md5str = gopp.SubStr(md5str, 32)
 		data, err := this.ReadFile(md5str)
 		gopp.ErrPrint(err, r.URL.String(), md5str)
 		w.Write(data)
@@ -131,4 +135,65 @@ func (this *FileStorage) OnFileUploaded(f func(md5str string, frndpk string, use
 			oldfn(md5str, frndpk, userCode)
 		}
 	}
+}
+
+func setpxy4ro(ro *grequests.RequestOptions) {
+	urlo, err := url.Parse("http://127.0.0.1:8117")
+	gopp.ErrPrint(err)
+	ro.Proxies = map[string]*url.URL{"http": urlo, "https": urlo}
+}
+
+func (this *FileStorage) DownloadToFile(urltxt string) (string, error) {
+	md5str, err := this.DownloadToFileImpl(urltxt, false)
+	if err != nil {
+		md5str, err = this.DownloadToFileImpl(urltxt, true)
+	}
+	return md5str, err
+}
+
+func (this *FileStorage) DownloadToFileImpl(urltxt string, usepxy bool) (string, error) {
+	ro := &grequests.RequestOptions{}
+	ro.RequestTimeout = 20 * time.Second
+	ro.RedirectLimit = 20
+	if usepxy {
+		setpxy4ro(ro)
+	}
+	resp, err := grequests.Get(urltxt, ro)
+	gopp.ErrPrint(err, urltxt)
+	gopp.ErrPrint(resp.Error, urltxt)
+	if err != nil {
+		return "", err
+	}
+
+	fname := this.dir + "/" + filepath.Base(urltxt) + ".part"
+	err = resp.DownloadToFile(fname)
+	gopp.ErrPrint(err, fname)
+
+	if err == nil {
+		md5str := thscom.Md5file(fname)
+		err = os.Rename(fname, this.dir+"/"+md5str)
+		gopp.ErrPrint(err, fname)
+		this._SaveOrigName(md5str, filepath.Base(urltxt))
+		return md5str, err
+	}
+	return "", err
+}
+
+func (this *FileStorage) GetFilePath(md5str string) string {
+	return this.dir + "/" + md5str
+}
+
+func (this *FileStorage) NewFileInfoLine4Md5(md5str string) *thscom.FileInfoLine {
+	fname := this.GetFilePath(md5str)
+	ftyo, err := filetype.MatchFile(fname)
+	gopp.ErrPrint(err, fname)
+	fi, err := os.Stat(fname)
+	gopp.ErrPrint(err, fname)
+	this_ := &thscom.FileInfoLine{}
+	this_.Mime = ftyo.MIME.Value
+	this_.Ext = ftyo.Extension
+	this_.Length = fi.Size()
+	this_.OrigName = gopp.Retn(this.GetOrigName(md5str))[0].(string)
+	this_.Md5str = md5str
+	return this_
 }

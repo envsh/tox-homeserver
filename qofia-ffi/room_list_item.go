@@ -464,6 +464,7 @@ func (this *RoomListItem) UpdateMessageMimeContent(msgo *Message, msgiw *Message
 		return
 	}
 	locdir := gopp.IfElseStr(gopp.IsAndroid(), os.Getenv("EXTERNAL_STORAGE"), ".") + "/txcfiles"
+	locdir = gopp.IfElseStr(gopp.IsAndroid(), "/sdcard", ".") + "/txcfiles"
 	os.MkdirAll(locdir, 0744)
 	os.Chmod(locdir, 0744)
 	locsrcname := GetLocalPathByHash(fil.Md5str, locdir)
@@ -484,6 +485,8 @@ func (this *RoomListItem) UpdateMessageMimeContent(msgo *Message, msgiw *Message
 			err = resp.DownloadToFile(locfname)
 			gopp.ErrPrint(err, rmturl)
 
+			runOnUiThread(func() { msgiw.Label_5.SetText("Switching...") })
+			time.Sleep(3 * time.Second)
 			runOnUiThread(func() { msgiw.Label_5.SetText(richtxt) })
 		}
 	}()
@@ -518,6 +521,16 @@ func (this *RoomListItem) FindMessageByUserCode(userCode int64) *Message {
 		msgo_ := this.msgos[idx]
 		if msgo_.UserCode == userCode {
 			return msgo_
+		}
+	}
+	return nil
+}
+
+func (this *RoomListItem) FindMessageViewByEventId(eventId int64) *MessageItem {
+	for idx := len(this.msgos) - 1; idx >= 0; idx-- {
+		msgo_ := this.msgos[idx]
+		if msgo_.EventId == eventId {
+			return this.msgitmdl[idx]
 		}
 	}
 	return nil

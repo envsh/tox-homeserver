@@ -83,9 +83,9 @@
             -->
             <meta-data android:name="android.app.extract_android_style" android:value="full"/>
             <!-- extract android style -->
-    </activity>
+        </activity>
 
-    <!-- For adding service(s) please check: https://wiki.qt.io/AndroidServices -->
+        <!-- For adding service(s) please check: https://wiki.qt.io/AndroidServices -->
 
     </application>
 
@@ -94,8 +94,10 @@
 
     <!-- The following comment will be replaced upon deployment with default permissions based on the dependencies of the application.
          Remove the comment if you do not require these default permissions. -->
-        <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
      <uses-permission android:name="android.permission.WAKE_LOCK" />
 
 

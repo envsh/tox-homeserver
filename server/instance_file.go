@@ -208,11 +208,13 @@ func (this *ToxVM) onGroupFileUploaded(md5str string, frndpk string, userCodeStr
 
 		evto := &thspbs.Event{}
 		evto.Name = "ConferenceSendMessage"
-		evto.Args = gopp.ToStrs(frndnum, 0, msgContentFromFileDataUrl(data, md5str, oname, urlval))
+		// 好像url不需要存储啊。只发送出去就好了
+		// evto.Args = gopp.ToStrs(frndnum, 0, msgContentFromFileDataUrl(data, md5str, oname, urlval))
+		evto.Args = gopp.ToStrs(frndnum, 0, msgContentFromFileData(data, md5str, oname))
 		evto.UserCode = userCode
 
 		// save
-		msgo, err := appctx.st.AddGroupMessage(evto.Args[1], "0", frndpk, selfpk, 0, userCode)
+		msgo, err := appctx.st.AddGroupMessage(evto.Args[2], "0", frndpk, selfpk, 0, userCode)
 		gopp.ErrPrint(err, md5str, oname)
 		msgty, mimety := msgTypeFromFileData(data)
 		evto.EventId = msgo.EventId
@@ -239,6 +241,10 @@ func (this *ToxVM) onGroupFileUploaded(md5str string, frndpk string, userCodeStr
 		// publish the last sent state
 		evto.Name = "ConferenceSendMessageResp"
 		evto.Margs = gopp.ToStrs(0, "1", groupId)
+		this.pubmsg(evto)
+
+		// update mime
+		evto.Name = "ConferenceMessageReload"
 		this.pubmsg(evto)
 	}()
 }

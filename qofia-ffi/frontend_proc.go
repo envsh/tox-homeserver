@@ -226,7 +226,7 @@ func dispatchEvent(evto *thspbs.Event) {
 
 		for _, room := range ctitmdl {
 			// log.Println(room.GetName(), ",", groupTitle, ",", room.GetId(), ",", groupId)
-			if room.GetId() == groupId && room.GetName() == groupTitle {
+			if room.GetId() == groupId /* && room.GetName() == groupTitle*/ {
 				room.AddMessage(NewMessageForGroup(evto), false)
 				break
 			}
@@ -371,6 +371,22 @@ func dispatchEventResp(evto *thspbs.Event) {
 			roomo.UpdateMessageState(msgo) // 必定已经存在
 		} else {
 			log.Println("room not found:", sent, roompk, evto)
+		}
+	case "ConferenceMessageReload":
+		groupId := evto.Margs[3]
+		if thscli.ConferenceIdIsEmpty(groupId) {
+			break
+		}
+
+		// message := evto.Args[3]
+		// peerName := evto.Margs[0]
+		// groupTitle := evto.Margs[2]
+
+		room := uictx.iteman.Get(groupId)
+		if room != nil {
+			msgo := NewMessageForGroup(evto)
+			msgiw := room.FindMessageViewByEventId(msgo.EventId)
+			room.UpdateMessageMimeContent(msgo, msgiw)
 		}
 	default:
 		log.Printf("%#v\n", evto)

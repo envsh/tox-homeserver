@@ -1,13 +1,18 @@
 package common
 
 import (
+	"crypto/md5"
 	"encoding/hex"
 	"fmt"
 	"gopp"
+	"io"
 	"log"
+	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/shengdoushi/base58"
+	filetype "gopkg.in/h2non/filetype.v1"
 )
 
 type FileInfoLine struct {
@@ -44,6 +49,17 @@ func (this *FileInfoLine) String() string {
 	return fmt.Sprintf("txc;%s;%d;%s;%s;%s", this.Mime, this.Length, this.Md5str, this.Ext, this.OrigName)
 }
 
+func (this *FileInfoLine) ToType() string {
+	if strings.HasPrefix(this.Mime, "image/") {
+		return MSGTYPE_IMAGE
+	} else if strings.HasPrefix(this.Mime, "audio/") {
+		return MSGTYPE_AUDIO
+	} else if strings.HasPrefix(this.Mime, "video/") {
+		return MSGTYPE_VIDEO
+	}
+	return MSGTYPE_FILE
+}
+
 func NewFileInfoLine(length int64, mime, md5str, ext, origName string) *FileInfoLine {
 	fis := &FileInfoLine{}
 	fis.Mime = mime
@@ -58,6 +74,36 @@ func NewFileInfoLineUrl(length int64, mime, md5str, ext, origName, urlval string
 	fis := NewFileInfoLine(length, mime, md5str, ext, origName)
 	fis.Urlval = urlval
 	return fis
+}
+
+func NewFileInfoLineForFile(fname string) *FileInfoLine {
+	ftyo, err := filetype.MatchFile(fname)
+	gopp.ErrPrint(err, fname)
+	fi, err := os.Stat(fname)
+	gopp.ErrPrint(err, fname)
+	this := &FileInfoLine{}
+	this.Mime = ftyo.MIME.Value
+	this.Ext = ftyo.Extension
+	this.Length = fi.Size()
+	this.OrigName = filepath.Base(fname)
+	this.Md5str = Md5file(fname)
+	return this
+}
+
+func Md5file(fname string) string {
+	f, err := os.Open(fname)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer f.Close()
+
+	h := md5.New()
+	if _, err := io.Copy(h, f); err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Printf("%x", h.Sum(nil))
+	return hex.EncodeToString(h.Sum(nil))
 }
 
 // Bitcoin: 123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz
