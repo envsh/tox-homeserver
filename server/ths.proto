@@ -15,10 +15,42 @@ message Event {
     // int32 NameId = 2;  // TODO
     repeated string Args = 3;
     repeated string Margs = 4; // more info based on args
-    map<string,string> Nargs = 5; // named args
+    Argument Uargs = 5; // replace named arguments. And even replace both Args and Margs fields
     int32 ErrCode = 6; // error code
     string ErrMsg = 7; // error msg
     int64 UserCode = 8; // crc64(device id + runtime sequence)
+}
+
+// like a union struct. collect all possible arguments name
+message Argument {
+    uint32 FriendNumber = 1;
+    string FriendName = 2;
+    string FriendAddress = 3;
+    string FriendPubkey = 4;
+    uint32 GroupNumber = 5;
+    string GroupTitle = 6;
+    string GroupIdentity = 7;
+    string GroupCookie = 8;
+    int32  GroupType = 9;
+    uint32 PeerNumber = 10;
+    string PeerName = 11;
+    string PeerPubkey = 12;
+    int32  MsgType = 13; // action?
+    string Message = 14;
+    int32 IsTyping = 15;
+    uint32 MessageId = 16; // receipt
+    int32 Status = 17;
+    string StatusText = 18;
+    int32 ConnStatus = 19;
+    uint32 Nospam = 20;
+    uint32 FileNumber = 21;
+    int32 FileControl = 22;
+    string FileIdentity = 23;
+    int32  Sent = 24;
+    string MimeMsgType = 25;
+    string MimeValue = 26;
+    int64 NextBatch = 27;
+    int64 PrevBatch = 28;
 }
 
 message BaseInfo {
