@@ -51,8 +51,6 @@ func (this *MainWindow) initMainWindowSignals1() {
 		this.ToolButton_11.SetIconSize(sz)
 		this.ToolButton_12.SetIconSize(sz)
 		this.ToolButton_19.SetIconSize(sz)
-		this.ToolButton_20.SetIconSize(sz)
-		this.ToolButton_21.SetIconSize(sz)
 		this.ToolButton_4.SetIconSize(sz)
 		this.ToolButton_5.SetIconSize(sz)
 		this.ToolButton_6.SetIconSize(sz)
@@ -101,20 +99,6 @@ func (this *MainWindow) initMainWindowSignals1() {
 
 func (this *MainWindow) initMainWindowSignals() {
 	uiw := uictx.uiw
-
-	qtrt.Connect(uiw.ToolButton_19, "clicked(bool)", func(checked bool) {
-		log.Println(checked)
-		ShowToast("hehehh哈哈eehhe", 1)
-	})
-	qtrt.Connect(uiw.ToolButton_20, "clicked(bool)", func(checked bool) {
-		log.Println(checked)
-		// testRunOnAndroidThread()
-		KeepScreenOn(checked)
-	})
-	qtrt.Connect(uiw.ToolButton_21, "clicked(bool)", func(checked bool) {
-		log.Println(checked)
-		setAppStyleSheet()
-	})
 
 	qtrt.Connect(uiw.ToolButton_23, "clicked(bool)", func(checked bool) {
 		log.Println(checked, uictx.msgwin.item == nil)

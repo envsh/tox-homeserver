@@ -59,3 +59,11 @@ func SetQLabelElideText(lab *qtwidgets.QLabel, txt string, skipTooltip ...bool) 
 		lab.SetToolTip(txt)
 	}
 }
+
+func SetQWidgetDropable(w qtwidgets.QWidget_ITF, dropable bool) {
+	w.QWidget_PTR().InheritDragEnterEvent(func(event *qtgui.QDragEnterEvent) {
+		if dropable {
+			event.AcceptProposedAction()
+		}
+	})
+}

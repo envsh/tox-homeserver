@@ -153,8 +153,8 @@ func (this *FileStorage) DownloadToFile(urltxt string) (string, error) {
 
 func (this *FileStorage) DownloadToFileImpl(urltxt string, usepxy bool) (string, error) {
 	ro := &grequests.RequestOptions{}
-	ro.RequestTimeout = 20 * time.Second
-	ro.RedirectLimit = 20
+	ro.RequestTimeout = 40 * time.Second
+	ro.RedirectLimit = 40
 	if usepxy {
 		setpxy4ro(ro)
 	}

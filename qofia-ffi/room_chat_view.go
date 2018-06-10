@@ -7,6 +7,7 @@ import (
 	"tox-homeserver/thspbs"
 
 	"github.com/kitech/qt.go/qtcore"
+	"github.com/kitech/qt.go/qtgui"
 	"github.com/kitech/qt.go/qtrt"
 	"github.com/kitech/qt.go/qtwidgets"
 )
@@ -21,10 +22,13 @@ type RoomChatState struct {
 }
 
 func (this *MainWindow) initRoomChat() {
+	this.initRoomChatState()
 	this.initRoomChatUi()
 	this.initRoomChatSignals()
 	this.initRoomChatEvents()
 }
+
+func (this *MainWindow) initRoomChatState() {}
 
 func (this *MainWindow) initRoomChatUi() {
 	this.TableWidget.InsertColumn(0)
@@ -64,6 +68,44 @@ func (this *MainWindow) initRoomChatSignals() {
 func (this *MainWindow) initRoomChatEvents() {
 	// for long content on QLabel, this will truncate can not wrap part
 	SetScrollContentTrackerSize(this.ScrollArea_2)
+	this.LineEdit_2.InheritDragEnterEvent(func(arg0 *qtgui.QDragEnterEvent) {
+		arg0.AcceptProposedAction()
+	})
+	this.LineEdit_2.InheritDropEvent(func(arg0 *qtgui.QDropEvent) {
+		mmdt := arg0.MimeData()
+		lst := mmdt.Formats()
+		fmts := qtcore.NewQStringListxFromPointer(lst.GetCthis())
+		// [application/x-qt-image text/uri-list text/plain text/html image/png image/bmp image/bw image/cur image/eps image/epsf image/epsi image/icns image/ico image/jp2 image/jpeg image/jpg image/pbm BITMAP image/pcx image/pgm image/pic image/ppm image/rgb image/rgba image/sgi image/tga image/tif image/tiff image/wbmp image/webp image/xbm image/xpm]
+		mimes := fmts.ConvertToSlice()
+		log.Println(mimes)
+		urls := mmdt.Urls()
+		urlsx := qtcore.NewQUrlListxFromPointer(urls.GetCthis_())
+		accepted := false
+		if mmdt.HasFormat("text/uri-list") {
+			for idx, urlo := range urlsx.ConvertToSlice() {
+				log.Println(idx, urlo.IsLocalFile(), urlo.Scheme(), urlo.Port__(), urlo.ToLocalFile())
+				if urlo.IsLocalFile() {
+					this.sendFile(urlo.ToLocalFile())
+					accepted = true
+				} else {
+					// log.Println(urlo.ToPercentEncoding__("123??")) // crash
+				}
+			}
+		}
+
+		if !accepted && (mmdt.HasFormat("text/plain") || mmdt.HasFormat("text/html")) {
+			txt := mmdt.Text()
+			gopp.FalsePrint(txt != "", "Why no text value?")
+			if txt != "" {
+				this.LineEdit_2.SetText(txt)
+				accepted = true
+			}
+		} else if !accepted && mmdt.HasFormat("application/x-qt-image") {
+			vimg := mmdt.ImageData()
+			log.Println(vimg.ToByteArray().Length(), "Can not process this format.")
+		}
+		arg0.Ignore()
+	})
 }
 
 func (this *MainWindow) updateInviteFriendPage() {

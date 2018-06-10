@@ -426,6 +426,10 @@ func detectGroupMessageMime(evt *thspbs.Event, message string) {
 		case "HTTP", "HTTPS":
 			md5str, err := store.GetFS().DownloadToFile(urlt)
 			gopp.ErrPrint(err, urlt)
+			if err != nil {
+				break
+			}
+
 			fil := store.GetFS().NewFileInfoLine4Md5(md5str)
 			if evt.Name != "ConferenceMessage" {
 				log.Println("Rename event:", evt.Name)
