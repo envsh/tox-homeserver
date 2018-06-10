@@ -3,7 +3,7 @@
 
 ### Proposal
 
-The main goal is make tox messages multiple endpoints synchronized and mobile friendly for save power and save network traffic. Keep tox always online.
+The main goal is make tox messages multiple endpoints synchronized and mobile friendly for save power and save network traffic. Then keep tox always online.
 
 * Based on current toxcore protocol. Split out a server instance for personal use.
 * It's support only one toxid. It's not a bouncer, but more like as a bridge.
