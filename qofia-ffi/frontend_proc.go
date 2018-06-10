@@ -386,6 +386,7 @@ func dispatchEventResp(evto *thspbs.Event) {
 		if room != nil {
 			msgo := NewMessageForGroup(evto)
 			msgiw := room.FindMessageViewByEventId(msgo.EventId)
+			gopp.NilPrint(msgiw, "View not found:", msgo.EventId, msgo.UserCode)
 			room.UpdateMessageMimeContent(msgo, msgiw)
 		}
 	default:

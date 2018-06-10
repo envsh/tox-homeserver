@@ -6,12 +6,9 @@ import (
 	"gopp"
 	"log"
 	"math"
-	"net/url"
-	"strings"
 	"time"
 
 	thscom "tox-homeserver/common"
-	"tox-homeserver/store"
 	"tox-homeserver/thspbs"
 
 	tox "github.com/TokTok/go-toxcore-c"
@@ -279,11 +276,6 @@ func (this *ToxVM) setupCallbacksForMessage() {
 		peerName, err := t.ConferencePeerGetName(groupNumber, peerNumber)
 		gopp.ErrPrint(err)
 
-		// dont store, dont dispatch. because already processed by rpc handler.
-		if peerPubkey == t.SelfGetPublicKey() {
-			return
-		}
-
 		title, err := t.ConferenceGetTitle(groupNumber)
 		gopp.ErrPrint(err)
 
@@ -292,6 +284,13 @@ func (this *ToxVM) setupCallbacksForMessage() {
 			groupId, _ = t.ConferenceGetIdentifier(groupNumber)
 		}
 
+		isme := t.SelfGetPublicKey() == peerPubkey
+		if isme {
+			// dont store, dont dispatch. because already processed by rpc handler.
+			return
+		}
+
+		// here only process peer that not me's message
 		msgo, err := appctx.st.AddGroupMessage(message, "0", groupId, peerPubkey, 0, 0)
 		gopp.ErrPrint(err)
 		if err == nil {
@@ -303,35 +302,16 @@ func (this *ToxVM) setupCallbacksForMessage() {
 
 		evt.Margs = []string{peerName, peerPubkey, title, groupId, gopp.ToStr(msgo.EventId), "1",
 			thscom.MSGTYPE_TEXT, "text/plain"}
-		// isme := t.SelfGetPublicKey() == peerPubkey
-		if t.SelfGetPublicKey() == peerPubkey {
+
+		if isme {
+			// dont dispatch. because already processed by rpc handler.
 		} else {
 			this.pubmsg(&evt)
 		}
 
-		// TODO maybe move code to seperate process file, too big now
 		// if url, try to see if it image or file.
 		// and then try download to local and extract file info, and update client
-		go func() {
-			urlt := strings.TrimSpace(message)
-			urlo, err := url.Parse(urlt)
-			if err == nil {
-				log.Println("Got a link message:", urlt)
-				switch strings.ToUpper(urlo.Scheme) {
-				case "HTTP", "HTTPS":
-					md5str, err := store.GetFS().DownloadToFile(urlt)
-					gopp.ErrPrint(err, urlt)
-					fil := store.GetFS().NewFileInfoLine4Md5(md5str)
-					evt.Name = evt.Name + "Reload" // TODO subcommand
-					evt.Args[3] = fil.String()
-					evt.Margs[6] = fil.ToType()
-					evt.Margs[7] = fil.Mime
-					this.pubmsg(&evt)
-				default:
-					log.Println("Unsupported scheme:", urlo.Scheme)
-				}
-			}
-		}()
+		go detectGroupMessageMime(&evt, message)
 	}, nil)
 
 	t.CallbackConferenceActionAdd(func(_ *tox.Tox, groupNumber uint32, peerNumber uint32, message string, userData interface{}) {

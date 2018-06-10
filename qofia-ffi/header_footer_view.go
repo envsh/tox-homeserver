@@ -26,12 +26,10 @@ func (this *MainWindow) initHeaderFooter() {
 func (this *MainWindow) initHeaderFooterUi() {}
 
 func (this *MainWindow) initHeaderFooterSignals() {
-	qtrt.Connect(this.ToolButton_30, "clicked(bool)", func(bool) {
+	qtrt.Connect(this.ToolButton_33, "clicked(bool)", func(bool) {
 		quit := this.onAppBackButton(true)
 		this.quitClean(quit)
 	})
-	qtrt.Connect(this.ToolButton_31, "clicked(bool)", this.onAppHomeButton)
-	qtrt.Connect(this.ToolButton_32, "clicked(bool)", this.onAppSwitchButton)
 }
 
 func (this *MainWindow) initHeaderFooterEvents() {}

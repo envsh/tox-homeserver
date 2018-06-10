@@ -7,8 +7,11 @@ import (
 	"fmt"
 	"gopp"
 	"log"
+	"net/url"
 	"strconv"
+	"strings"
 	thscom "tox-homeserver/common"
+	"tox-homeserver/store"
 	"tox-homeserver/thspbs"
 
 	tox "github.com/TokTok/go-toxcore-c"
@@ -403,9 +406,37 @@ func RmtCallResyncHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Event
 		eventId := st.NextId()
 		req.EventId = eventId
 		out.Margs = []string{peerName, peerPubkey, title, groupId, gopp.ToStr(eventId)}
+
+		go detectGroupMessageMime(out, req.Args[2])
 	default:
 		return nil, errors.New("not need/impl resync " + req.Name)
 	}
 
 	return out, nil
+}
+
+// if url, try to see if it image or file.
+// and then try download to local and extract file info, and update client
+func detectGroupMessageMime(evt *thspbs.Event, message string) {
+	urlt := strings.TrimSpace(message)
+	urlo, err := url.Parse(urlt) // TODO regexp?
+	if err == nil && urlo != nil {
+		log.Println("Got a link message:", urlt)
+		switch strings.ToUpper(urlo.Scheme) {
+		case "HTTP", "HTTPS":
+			md5str, err := store.GetFS().DownloadToFile(urlt)
+			gopp.ErrPrint(err, urlt)
+			fil := store.GetFS().NewFileInfoLine4Md5(md5str)
+			if evt.Name != "ConferenceMessage" {
+				log.Println("Rename event:", evt.Name)
+			}
+			evt.Name = "ConferenceMessageReload" // TODO subcommand
+			evt.Args[3] = fil.String()
+			evt.Margs[6] = fil.ToType()
+			evt.Margs[7] = fil.Mime
+			appctx.tvm.pubmsg(evt)
+		default:
+			log.Println("Unsupported scheme:", urlo.Scheme)
+		}
+	}
 }
