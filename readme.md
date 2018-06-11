@@ -38,10 +38,11 @@ Warning: If you want recompile server, just use envsh/go-toxcore-c fork. There a
 
 Goto release page, downoad a client for your OS:
 
-    android arm: build-debug.apk
+    android arm: qofia-ffi-arm.apk
     windowns x64: qofia-ffi-amd64.tar.gz
     windows x32: qofia-ffi-i386.tar.gz
-    linux x64: qofia-ffi.tar.gz
+    linux x64: qofia-x86_64.AppImage
+    linux x64(tared): qofia-linux-amd64-0.4.0.tar.bz2
     
 For windows and linux clients, need seperate Qt installation.
 

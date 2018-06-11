@@ -103,6 +103,8 @@ function package_desktop_windows()
     mkdir $pkgdir
     mv -v qofia-ffi-amd64.exe $pkgdir/
     cp -a /home/me/oss/qt.inline/packages/qtenv_win64/bin/*.dll $pkgdir/
+    #cp -a /home/me/oss/qt.inline/winx64bd/libQt5Inline.so $pkgdir/Qt5Inline.dll
+    #x86_64-w64-mingw32-strip -v -g $pkgdir/Qt5Inline.dll
     tar jcvf $pkgdir.tar.bz2 $pkgdir/
     rm -rf $pkgdir
 
@@ -110,6 +112,8 @@ function package_desktop_windows()
     mkdir $pkgdir
     mv -v qofia-ffi-i386.exe $pkgdir/
     cp -a /home/me/oss/qt.inline/packages/qtenv_win32/bin/*.dll $pkgdir/
+    #cp -a /home/me/oss/qt.inline/winx32bd/libQt5Inline.so $pkgdir/Qt5Inline.dll
+    #i686-w64-mingw32-strip -v -g $pkgdir/Qt5Inline.dll
     tar jcvf $pkgdir.tar.bz2 $pkgdir/
     rm -rf $pkgdir
 
@@ -118,10 +122,10 @@ function package_desktop_windows()
 
 ######
 
-# package_server;
-# package_desktop_linux;
+package_server;
+package_desktop_linux;
 package_desktop_windows;
-# package_android;
+package_android;
 
 echo `date` >> $logfile
 
