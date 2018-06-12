@@ -1,0 +1,8 @@
+#!/bin/sh
+
+selfdir=$(readlink -f $(dirname $0))
+export LD_LIBRARY_PATH=$selfdir/usr/lib:$LD_LIBRARY_PATH
+
+exec $selfdir/usr/bin/qofia-ffi "$@"
+
+

@@ -51,12 +51,15 @@ function package_desktop_linux()
     unlink AppRun
     mv -v libQt5Inline.so lib/
     cp -v /usr/lib/libopus.so.0 lib/
-    cp -v /usr/lib/libsodium.so.23 lib/
+    # cp -v /usr/lib/libsodium.so.23 lib/
     cp -v /usr/lib/libffi.so.6 lib/
+    # make sure keep GLIBC_2.14
+    cp -a ../../libs/libsodium.so* lib/
 
     cd ..
-    cp -a ../../tools/app.sh AppRun
+    cp -a ../../tools/AppRun ./
     cp -v ../../tools/app.desktop qofia.desktop
+    cp -v ../../tools/qt.conf $pkgdir/usr/bin/
     touch qofia.png
     cd ..
 
