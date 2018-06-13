@@ -18,14 +18,14 @@ import (
 	"gopkg.in/h2non/filetype.v1"
 )
 
-func (this *ToxVM) setupCallbacksForFile() {
-	this.setupCallbacksForFileFromTox()
-	this.setupCallbacksForFileFromHttp()
+func (this *ToxVM) setupEventsForFile() {
+	this.setupEventsForFileFromTox()
+	this.setupEventsForFileFromHttp()
 }
 
 // auto recv and save to toxhsfs
 // if bigger than max, drop now
-func (this *ToxVM) setupCallbacksForFileFromTox() {
+func (this *ToxVM) setupEventsForFileFromTox() {
 	t := this.t
 	t.CallbackFileRecvControlAdd(func(_ *tox.Tox, friendNumber uint32, fileNumber uint32,
 		control int, userData interface{}) {
@@ -124,7 +124,7 @@ func (this *ToxVM) setupCallbacksForFileFromTox() {
 	}, nil)
 }
 
-func (this *ToxVM) setupCallbacksForFileFromHttp() {
+func (this *ToxVM) setupEventsForFileFromHttp() {
 	locfso := store.GetFS()
 	locfso.OnFileUploaded(func(md5str string, frndpk string, userCodeStr string) {
 		log.Println("New file uplaoded:", md5str, frndpk, userCodeStr)

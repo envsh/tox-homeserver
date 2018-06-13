@@ -16,7 +16,8 @@ import (
 )
 
 type ToxVM struct {
-	t *tox.Tox
+	t   *tox.Tox
+	tav *tox.ToxAV
 
 	autobotFeatures  int
 	groupPeerPubkeys map[string][]string // groupId = > peerPubkey
@@ -32,11 +33,15 @@ func newToxVM() *ToxVM {
 
 	this.t = xtox.New(tvmCtx)
 	gopp.NilFatal("tox is nil")
+	tav, err := tox.NewToxAV(this.t)
+	gopp.ErrPrint(err)
+	this.tav = tav
 	this.autobotFeatures = xtox.FOTA_ADD_NET_HELP_BOTS | xtox.FOTA_REMOVE_ONLY_ME_ALL |
 		xtox.FOTA_ACCEPT_FRIEND_REQUEST | xtox.FOTA_ACCEPT_GROUP_INVITE
 	xtox.SetAutoBotFeatures(this.t, this.autobotFeatures)
-	this.setupCallbacks()
-	err := xtox.Connect(this.t)
+	this.setupEvents()
+
+	err = xtox.Connect(this.t)
 	gopp.ErrPrint(err)
 
 	this.exportFriendInfoToDb()
@@ -57,12 +62,13 @@ func (this *ToxVM) exportFriendInfoToDb() {
 	}
 }
 
-func (this *ToxVM) setupCallbacks() {
-	this.setupCallbacksForMessage()
-	this.setupCallbacksForFile()
+func (this *ToxVM) setupEvents() {
+	this.setupEventsForMessage()
+	this.setupEventsForFile()
+	this.setupEventsForAV()
 }
 
-func (this *ToxVM) setupCallbacksForMessage() {
+func (this *ToxVM) setupEventsForMessage() {
 	t := this.t
 
 	t.CallbackSelfConnectionStatusAdd(func(_ *tox.Tox, status int, userData interface{}) {
@@ -233,7 +239,7 @@ func (this *ToxVM) setupCallbacksForMessage() {
 			gn, err = t.ConferenceJoin(friendNumber, cookie)
 			gopp.ErrPrint(err, fname, gn, len(cookie))
 		case tox.CONFERENCE_TYPE_AV:
-			gn_, err_ := t.JoinAVGroupChat(friendNumber, cookie)
+			gn_, err_ := t.JoinAVGroupChat(friendNumber, cookie, nil)
 			gopp.ErrPrint(err_, fname, gn, len(cookie))
 			err = err_
 			gn = uint32(gn_)

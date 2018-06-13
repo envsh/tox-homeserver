@@ -51,6 +51,19 @@ message Argument {
     string MimeValue = 26;
     int64 NextBatch = 27;
     int64 PrevBatch = 28;
+    int32 AudioEnabled = 29;
+    int32 VideoEnabled = 30;
+    uint32 CallState = 31;
+    uint32 AudioBitRate = 32;
+    uint32 VideoBiteRate = 33;
+    bytes Pcm = 34;
+    int32 SampleCount = 35;
+    int32 Channels = 36;
+    int32 SimpleRate = 37;
+    int32 Width = 38;
+    int32 Height = 39;
+    bytes VideoFrame = 40;
+    bytes Json = 41;
 }
 
 message BaseInfo {
