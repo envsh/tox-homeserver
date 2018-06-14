@@ -58,7 +58,7 @@ func Main() {
 
 	appctx.tvm = newToxVM()
 
-	go xtox.Run(appctx.tvm.t)
+	go xtox.Run(appctx.tvm.t, appctx.tvm.tav)
 	time.Sleep(50 * time.Millisecond)
 	rpcs.run()
 }

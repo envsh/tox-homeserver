@@ -154,7 +154,14 @@ func (this *GrpcTransport) serveBackendEventGrpcImpl() {
 
 		jcc, err := json.Marshal(evto)
 		gopp.ErrPrint(err)
-		log.Println("grpcrecv:", string(jcc))
+
+		if strings.Contains(string(jcc), "AudioReceiveFrame") {
+			// log.Println("grpcrecv:", "AudioReceiveFrame", len(jcc))
+		} else if strings.Contains(string(jcc), "VideoReceiveFrame") {
+			// log.Println("grpcrecv:", "VideoReceiveFrame", len(jcc))
+		} else {
+			log.Println("grpcrecv:", string(jcc))
+		}
 		this.runOnData(evto, jcc)
 	}
 	log.Println("Grpc poll got events:", cnter)

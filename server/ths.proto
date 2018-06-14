@@ -59,7 +59,7 @@ message Argument {
     bytes Pcm = 34;
     int32 SampleCount = 35;
     int32 Channels = 36;
-    int32 SimpleRate = 37;
+    int32 SamplingRate = 37;
     int32 Width = 38;
     int32 Height = 39;
     bytes VideoFrame = 40;

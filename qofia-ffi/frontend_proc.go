@@ -6,6 +6,7 @@ import (
 	"gopp"
 	"log"
 
+	"tox-homeserver/avhlp"
 	thscli "tox-homeserver/client"
 	thscom "tox-homeserver/common"
 	"tox-homeserver/thspbs"
@@ -190,7 +191,7 @@ func dispatchEvent(evto *thspbs.Event) {
 		gnum := gopp.MustUint32(evto.Args[0])
 		deletedPeerPubkeysjs := evto.Margs[4]
 		deletedPeerPubkeys := []string{}
-		err := json.Unmarshal([]byte(deletedPeerPubkeysjs), deletedPeerPubkeys)
+		err := json.Unmarshal([]byte(deletedPeerPubkeysjs), &deletedPeerPubkeys)
 		gopp.ErrPrint(err, deletedPeerPubkeysjs)
 		for _, pubkey := range deletedPeerPubkeys {
 			vtcli.Binfo.DeletePeerInfo(gnum, groupId, pubkey)
@@ -280,10 +281,32 @@ func dispatchEvent(evto *thspbs.Event) {
 		}
 		log.Println(found, groupId, itext)
 
+	case "Call":
+		if avp == nil {
+			avp = avhlp.NewPlayer()
+			go avp.Play()
+		}
+	case "CallState":
+		log.Println(evto.Uargs.CallState, CallStateString(evto.Uargs.CallState))
+		if evto.Uargs.CallState == 2 {
+			if avp != nil {
+				avp.Stop()
+				avp = nil
+			}
+		}
+	case "AudioReceiveFrame":
+		pcm := evto.Uargs.Pcm
+		evto.Uargs.Pcm = nil
+		if false {
+			log.Println(evto.Uargs, len(pcm))
+		}
+		avp.PutFrame(pcm)
 	default:
-		log.Printf("%#v\n", evto)
+		log.Printf("%+v\n", evto)
 	}
 }
+
+var avp *avhlp.Player
 
 func dispatchEventResp(evto *thspbs.Event) {
 	// uiw, ctitmdl := uictx.uiw, uictx.ctitmdl
@@ -389,8 +412,10 @@ func dispatchEventResp(evto *thspbs.Event) {
 			gopp.NilPrint(msgiw, "View not found:", msgo.EventId, msgo.UserCode)
 			room.UpdateMessageMimeContent(msgo, msgiw)
 		}
+	case "AudioReceiveFrame": // do nothing
+	case "VideoReceiveFrame": // do nothing
 	default:
-		log.Printf("%#v\n", evto)
+		log.Printf("%+v\n", evto)
 	}
 }
 
@@ -409,6 +434,6 @@ func dispatchOtherEvent(evto *thspbs.Event) {
 		uictx.mw.switchUiStack(UIST_MESSAGEUI)
 		uictx.mw.sendMessageImpl(item, mtype+":"+mcontent, false, thscom.FileHelperFnum)
 	default:
-		log.Printf("%#v\n", evto)
+		log.Printf("%+v\n", evto)
 	}
 }

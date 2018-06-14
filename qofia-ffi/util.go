@@ -51,3 +51,14 @@ func condWait(timeoutms int, f func() bool) {
 		}
 	}
 }
+
+func CallStateString(state uint32) string {
+	states := map[uint32]string{
+		0: "NONE", 1: "ERROR", 2: "FINISH", 4: "SENDING_A", 8: "SENDING_V",
+		16: "ACCEPT_A", 17: "ACCEPT_V",
+	}
+	if s, ok := states[state]; ok {
+		return s
+	}
+	return "Unknown"
+}

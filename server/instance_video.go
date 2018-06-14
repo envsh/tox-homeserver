@@ -29,6 +29,7 @@ func (this *ToxVM) setupEventsForAV() {
 	var videoBitRate uint32 = 64
 
 	tav.CallbackCall(func(_ *tox.ToxAV, friendNumber uint32, audioEnabled bool, videoEnabled bool, userData interface{}) {
+		log.Println(friendNumber, audioEnabled, videoEnabled)
 		evto := _NewEvent4AV("Call", t, friendNumber)
 
 		evto.Uargs.AudioEnabled = int32(gopp.IfElseInt(audioEnabled, 1, 0))
@@ -68,17 +69,19 @@ func (this *ToxVM) setupEventsForAV() {
 	}, nil)
 
 	tav.CallbackAudioReceiveFrame(func(_ *tox.ToxAV, friendNumber uint32, pcm []byte, sampleCount int, channels int, samplingRate int, userData interface{}) {
+		log.Println(friendNumber, len(pcm), sampleCount, channels, samplingRate)
 		evto := _NewEvent4AV("AudioReceiveFrame", t, friendNumber)
 
 		evto.Uargs.Pcm = pcm
-		evto.Uargs.SampleCount = int32(samplingRate)
-		evto.Uargs.Channels = int32(channels)
 		evto.Uargs.SampleCount = int32(sampleCount)
+		evto.Uargs.Channels = int32(channels)
+		evto.Uargs.SamplingRate = int32(samplingRate)
 
 		this.pubmsg(evto)
 	}, nil)
 
 	tav.CallbackVideoReceiveFrame(func(_ *tox.ToxAV, friendNumber uint32, width uint16, height uint16, data []byte, userData interface{}) {
+		log.Println(friendNumber, width, height, len(data))
 		evto := _NewEvent4AV("VideoReceiveFrame", t, friendNumber)
 
 		evto.Uargs.Width = int32(width)
