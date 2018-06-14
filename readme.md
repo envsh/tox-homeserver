@@ -8,7 +8,7 @@ The main goal is make tox messages multiple endpoints synchronized and mobile fr
 * Based on current toxcore protocol. Split out a server instance for personal use.
 * It's support only one toxid. It's not a bouncer, but more like as a bridge.
 * It's use gRPC/websocket for both support native app clients and web apps.
-* The bridge store all messages when it's online. And all bridge's clients can receive messages synchronized .
+* The bridge store all messages when it's online. And all bridge's clients can receive messages synchronized.
 * The clients can pull all history messages, and multiple clients can sync messages each other with bridge's help of cause.
 * This is work in progress, still a demo, anyone interesting can take a look:
 https://github.com/envsh/tox-homeserver
@@ -46,7 +46,7 @@ Goto release page, downoad a client for your OS:
     
 For windows and linux clients, need seperate Qt installation.
 
-Or download runtime simplely from https://github.com/qtchian/, and put .exe into bin directory:
+Or download runtime simplely from https://github.com/qtchina/, and put .exe into bin directory:
 
 * https://github.com/qtchina/qtenv_win64
 * https://github.com/qtchina/qtenv_win32
