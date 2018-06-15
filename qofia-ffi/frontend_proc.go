@@ -6,7 +6,6 @@ import (
 	"gopp"
 	"log"
 
-	"tox-homeserver/avhlp"
 	thscli "tox-homeserver/client"
 	thscom "tox-homeserver/common"
 	"tox-homeserver/thspbs"
@@ -281,18 +280,13 @@ func dispatchEvent(evto *thspbs.Event) {
 		}
 		log.Println(found, groupId, itext)
 
-	case "Call":
-		if avp == nil {
-			avp = avhlp.NewPlayer()
-			go avp.Play()
-		}
+	case "Call": // always from friend
+		avm := AVMan()
+		avm.NewSession(evto.Uargs.FriendPubkey, evto.Uargs.AudioEnabled == 1, evto.Uargs.VideoEnabled == 1)
 	case "CallState":
 		log.Println(evto.Uargs.CallState, CallStateString(evto.Uargs.CallState))
 		if evto.Uargs.CallState == 2 {
-			if avp != nil {
-				avp.Stop()
-				avp = nil
-			}
+			AVMan().RemoveSession(evto.Uargs.FriendPubkey, evto.Uargs.FriendName)
 		}
 	case "AudioReceiveFrame":
 		pcm := evto.Uargs.Pcm
@@ -300,13 +294,18 @@ func dispatchEvent(evto *thspbs.Event) {
 		if false {
 			log.Println(evto.Uargs, len(pcm))
 		}
-		avp.PutFrame(pcm)
+		AVMan().PutAudioFrame(evto.Uargs.FriendPubkey, pcm)
+	case "VideoReceiveFrame":
+		vdfrm := evto.Uargs.VideoFrame
+		evto.Uargs.VideoFrame = nil
+		if false {
+			log.Println(evto.Uargs, len(vdfrm))
+		}
+		AVMan().PutVideoFrame(evto.Uargs.FriendPubkey, vdfrm)
 	default:
 		log.Printf("%+v\n", evto)
 	}
 }
-
-var avp *avhlp.Player
 
 func dispatchEventResp(evto *thspbs.Event) {
 	// uiw, ctitmdl := uictx.uiw, uictx.ctitmdl

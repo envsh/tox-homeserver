@@ -48,9 +48,10 @@ func (this *Player) init() {
 }
 
 func (this *Player) Play() {
-	this.Play1()
+	go this.Play1()
 }
 
+// should block
 func (this *Player) Play1() {
 	if true {
 		for _, buf := range this.bufs {
@@ -62,6 +63,10 @@ func (this *Player) Play1() {
 	al.PlaySources(this.src)
 	errno := al.Error()
 	gopp.FalsePrint(errno == 0, errno, alerrstr(errno))
+	if errno != 0 {
+		log.Println("Player error:", errno, alerrstr(errno))
+		return
+	}
 
 	for !this.stop {
 		np := this.src.BuffersProcessed()
@@ -106,7 +111,9 @@ func (this *Player) PutFrame(data []byte) {
 	if len(this.frmC) == cap(this.frmC) {
 		log.Println("chan is full:", len(this.frmC))
 	} else {
-		this.frmC <- data
+		if !this.stop {
+			this.frmC <- data
+		}
 	}
 }
 
