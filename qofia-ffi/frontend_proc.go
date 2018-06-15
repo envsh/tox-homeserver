@@ -301,7 +301,7 @@ func dispatchEvent(evto *thspbs.Event) {
 		if false {
 			log.Println(evto.Uargs, len(vdfrm))
 		}
-		AVMan().PutVideoFrame(evto.Uargs.FriendPubkey, vdfrm)
+		AVMan().PutVideoFrame(evto.Uargs.FriendPubkey, vdfrm, int(evto.Uargs.Width), int(evto.Uargs.Height))
 	default:
 		log.Printf("%+v\n", evto)
 	}

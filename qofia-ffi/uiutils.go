@@ -3,6 +3,7 @@ package main
 import (
 	"gopp"
 	"log"
+	"unsafe"
 
 	"github.com/kitech/qt.go/qtcore"
 	"github.com/kitech/qt.go/qtgui"
@@ -66,4 +67,16 @@ func SetQWidgetDropable(w qtwidgets.QWidget_ITF, dropable bool) {
 			event.AcceptProposedAction()
 		}
 	})
+}
+
+// case paintEvent crash
+func PointerStep(p unsafe.Pointer, offset uintptr) unsafe.Pointer {
+	return unsafe.Pointer(uintptr(p) + offset)
+}
+
+// the offset calc can used for both Qt4 and Qt5
+func NewQPainter(w qtwidgets.QWidget_ITF) *qtgui.QPainter {
+	ptr := PointerStep(w.QWidget_PTR().GetCthis(), 2*unsafe.Sizeof(uintptr(0)))
+	ptdev := qtgui.NewQPaintDeviceFromPointer(ptr)
+	return qtgui.NewQPainter_1(ptdev)
 }

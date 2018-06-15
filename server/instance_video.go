@@ -69,7 +69,7 @@ func (this *ToxVM) setupEventsForAV() {
 	}, nil)
 
 	tav.CallbackAudioReceiveFrame(func(_ *tox.ToxAV, friendNumber uint32, pcm []byte, sampleCount int, channels int, samplingRate int, userData interface{}) {
-		log.Println(friendNumber, len(pcm), sampleCount, channels, samplingRate)
+		// log.Println("AFrame:", friendNumber, len(pcm), sampleCount, channels, samplingRate)
 		evto := _NewEvent4AV("AudioReceiveFrame", t, friendNumber)
 
 		evto.Uargs.Pcm = pcm
@@ -81,7 +81,7 @@ func (this *ToxVM) setupEventsForAV() {
 	}, nil)
 
 	tav.CallbackVideoReceiveFrame(func(_ *tox.ToxAV, friendNumber uint32, width uint16, height uint16, data []byte, userData interface{}) {
-		log.Println(friendNumber, width, height, len(data))
+		// log.Println("VFrame:", friendNumber, width, height, len(data))
 		evto := _NewEvent4AV("VideoReceiveFrame", t, friendNumber)
 
 		evto.Uargs.Width = int32(width)

@@ -99,6 +99,7 @@ func (this *MainWindow) initStartup() {
 	this.initAddFriend()
 	this.initGroupMemberList()
 	this.initRoomFile()
+	this.initVideoCall()
 	log.Println("Init startup ui done.")
 }
 
@@ -143,7 +144,7 @@ var create_room_dlg *Ui_Dialog
 var add_friend_dlg *Ui_AddFriendDialog
 
 const (
-	UIST_QMLMCTRL = iota + 1
+	UIST_QMLMCTRL = iota + 0
 	UIST_QMLORIGIN
 	UIST_SETTINGS
 	UIST_LOGINUI
@@ -260,28 +261,38 @@ func runOnUiThread(fn func()) {
 
 // recv left and return
 func tryReadEvent() {
-	tryReadUifnEvent()
+	alldone := false
+	// procn := 0
+	for !alldone {
+		done1 := tryReadUifnEvent()
 
-	if !baseInfoGot {
-		log.Println("baseInfoGot is not set, not need other works.")
-		return
+		if !baseInfoGot {
+			log.Println("baseInfoGot is not set, not need other works.")
+			return
+		}
+
+		done2 := tryReadContactEvent()
+		done3 := tryReadMessageEvent()
+		done4 := tryRecvIntentMessageEvent()
+
+		alldone = done1 && done2 && done3 && done4
 	}
-
-	tryReadContactEvent()
-	tryReadMessageEvent()
-	tryRecvIntentMessageEvent()
 }
 
-func tryReadUifnEvent() {
-	for len(uifnQueue) > 0 {
+// return done
+func tryReadUifnEvent() bool {
+	procn := 0
+	for len(uifnQueue) > 0 && procn < 20 {
 		uifn := <-uifnQueue
 		uifn()
+		procn++
 	}
+	return len(uifnQueue) == 0
 }
 
-func tryReadContactEvent() {
-
-	for len(contactQueue) > 0 {
+func tryReadContactEvent() bool {
+	procn := 0
+	for len(contactQueue) > 0 && procn < 20 {
 		contactx := <-contactQueue
 		ctv := NewRoomListItem()
 		if uictx.iteman.Get(ctv.GetId()) != nil {
@@ -300,15 +311,17 @@ func tryReadContactEvent() {
 		if len(uictx.ctitmdl) == 1 {
 			// ctv.SetPressState(true)
 		}
+		procn++
 	}
-
+	return len(contactQueue) == 0
 }
 
-func tryReadMessageEvent() {
-	for {
+func tryReadMessageEvent() bool {
+	procn := 0
+	for procn < 20 {
 		bcc := vtcli.GetNextBackenEvent()
 		if bcc == nil {
-			break
+			return true
 		} else {
 			evto := &thspbs.Event{}
 			err := json.Unmarshal(bcc, evto)
@@ -318,12 +331,17 @@ func tryReadMessageEvent() {
 				dispatchEventResp(evto)
 			}
 		}
+		procn++
 	}
+	return false
 }
 
-func tryRecvIntentMessageEvent() {
-	for len(intentQueue) > 0 {
+func tryRecvIntentMessageEvent() bool {
+	procn := 0
+	for len(intentQueue) > 0 && procn < 20 {
 		evto := <-intentQueue
 		dispatchOtherEvent(evto)
+		procn++
 	}
+	return len(intentQueue) == 0
 }

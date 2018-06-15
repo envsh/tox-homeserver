@@ -10,7 +10,7 @@ import (
 
 type AVSession struct {
 	audioPlayer   *avhlp.Player
-	videoPlayer   interface{}
+	videoPlayer   *VideoPlayer
 	audioEnabled  bool
 	videoEnabled  bool
 	audioRecorder interface{}
@@ -56,6 +56,10 @@ func (this *AVManager) NewSession(contact string, audioEnabled, videoEnabled boo
 	sess.btime = time.Now()
 	sess.audioPlayer = avhlp.NewPlayer()
 
+	if videoEnabled {
+		sess.videoPlayer = NewVideoPlayer()
+	}
+
 	this.sesses[contact] = sess
 	sess.audioPlayer.Play()
 
@@ -87,6 +91,7 @@ func (this *AVManager) RemoveSession(contact string, name string) error {
 	}
 	if sess.videoEnabled {
 		log.Println("Stop video player...", name)
+		sess.videoPlayer.Stop()
 	}
 	if !sess.muteMixer {
 		log.Println("Stop audio player...", name)
@@ -118,12 +123,14 @@ func (this *AVManager) PutAudioFrame(contact string, frame []byte) error {
 	return nil
 }
 
-func (this *AVManager) PutVideoFrame(contact string, frame []byte) error {
+func (this *AVManager) PutVideoFrame(contact string, frame []byte, width, heigh int) error {
 	this.sessmu.RLock()
 	sess := this.sesses[contact]
 	this.sessmu.RUnlock()
 	if sess != nil {
-
+		if sess.videoEnabled {
+			sess.videoPlayer.PutFrame(frame, width, heigh)
+		}
 	}
 	return nil
 }
