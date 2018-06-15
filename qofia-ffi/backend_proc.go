@@ -26,7 +26,7 @@ func (this *MainWindow) initAppBackend() {
 
 	condWait(50, func() bool { return vtcli.SelfGetAddress() != "" })
 	log.Println("My ToxID:", vtcli.SelfGetAddress())
-	runOnUiThread(func() { this.switchUiStack(UIST_MAINUI) })
+	runOnUiThread(func() { this.switchUiStack(UIST_CONTACTUI) })
 
 	uiw.Label_2.SetText(gopp.StrSuf4ui(vtcli.SelfGetName(), thscom.UiNameLen))
 	uiw.Label_2.SetToolTip(vtcli.SelfGetName())

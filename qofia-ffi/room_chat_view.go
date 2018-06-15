@@ -203,7 +203,7 @@ func (this *MainWindow) initAddFriendUi() {
 
 func (this *MainWindow) initAddFriendSignals() {
 	qtrt.Connect(this.PushButton_3, "clicked(bool)", func(bool) {
-		this.switchUiStack(UIST_MAINUI)
+		this.switchUiStack(UIST_CONTACTUI)
 	})
 
 	qtrt.Connect(this.PushButton_4, "clicked(bool)", func(bool) {
@@ -221,7 +221,7 @@ func (this *MainWindow) initAddFriendSignals() {
 			frndo.Name = toxid
 			contactQueue <- frndo
 			uictx.mech.Trigger()
-			this.switchUiStack(UIST_MAINUI)
+			this.switchUiStack(UIST_CONTACTUI)
 		}
 	})
 }
