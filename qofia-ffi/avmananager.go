@@ -14,7 +14,7 @@ type AVSession struct {
 	audioEnabled  bool
 	videoEnabled  bool
 	audioRecorder *avhlp.AudioRecorderAuto
-	videoRecorder interface{}
+	videoRecorder *avhlp.VideoRecorderAuto
 	muteVideo     bool // for self
 	muteMic       bool // for self
 	muteMixer     bool // for self
@@ -61,6 +61,7 @@ func (this *AVManager) NewSession(contact string, audioEnabled, videoEnabled boo
 	sess.audioEnabled = audioEnabled
 	sess.videoEnabled = videoEnabled
 	sess.onNewAudioFrame = onNewAudioFrame
+	sess.onNewVideoFrame = onNewVideoFrame
 	sess.btime = time.Now()
 	sess.audioPlayer = avhlp.NewPlayer()
 
@@ -69,8 +70,11 @@ func (this *AVManager) NewSession(contact string, audioEnabled, videoEnabled boo
 		sess.videoPlayer = NewVideoPlayer()
 	}
 
-	if sess.onNewAudioFrame != nil {
-		sess.audioRecorder = avhlp.NewAudioRecorderAuto(sess.onNewAudioFrame)
+	if sess.onNewAudioFrame != nil && sess.audioEnabled {
+		// sess.audioRecorder = avhlp.NewAudioRecorderAuto(sess.onNewAudioFrame)
+	}
+	if sess.onNewAudioFrame != nil && sess.videoEnabled {
+		sess.videoRecorder = avhlp.NewVideoRecorderAuto(sess.onNewVideoFrame)
 	}
 
 	this.sesses[contact] = sess
@@ -98,6 +102,9 @@ func (this *AVManager) RemoveSession(contact string, name string) error {
 
 	if !sess.muteVideo {
 		log.Println("Stop video recorder...", name)
+		if sess.videoRecorder != nil {
+			sess.audioRecorder = nil
+		}
 	}
 	if !sess.muteMic {
 		log.Println("Stop audio recorder...", name, sess.onNewAudioFrame)

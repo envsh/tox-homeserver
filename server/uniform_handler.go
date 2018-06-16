@@ -354,8 +354,31 @@ func RmtCallExecuteHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Even
 		samplingRate := gopp.MustInt(req.Args[3])
 		pcm := req.Uargs.Pcm
 		_, err := tav.AudioSendFrame(friendNumber, pcm, sampleCount, channels, samplingRate)
-		gopp.ErrPrint(err)
+		gopp.ErrPrint(err, len(pcm), sampleCount, channels, samplingRate)
 	case "VideoSendFrame":
+		tav := appctx.tvm.tav
+		friendNumber := gopp.MustUint32(req.Args[0])
+		width := uint16(gopp.MustInt(req.Args[1]))
+		height := uint16(gopp.MustInt(req.Args[2]))
+		vframe := req.Uargs.VideoFrame
+		// tav.VideoSendFrame no mutex, and every grpc on seperated goroutine,
+		// so maybe trylock block, and return error 4
+		// so for simple, try several time now
+		for i := 0; i < 30; i++ {
+			_, err := tav.VideoSendFrame(friendNumber, width, height, vframe)
+			if err == nil {
+				if i > 0 {
+					log.Println("Send vframe ok:", i, len(vframe), width, height)
+				}
+				break
+			}
+			if err != nil && err.Error() == "toxcore error: 4" {
+				continue
+			} else {
+				gopp.ErrPrint(err, i, len(vframe), width, height)
+				break
+			}
+		}
 	case "GroupSendAudio":
 	default:
 		log.Println("unimpled:", req.Name, req.Args)

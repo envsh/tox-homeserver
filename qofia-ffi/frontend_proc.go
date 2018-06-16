@@ -283,16 +283,20 @@ func dispatchEvent(evto *thspbs.Event) {
 	case "Call": // always from friend
 		avm := AVMan()
 		uargs := evto.Uargs
-		onNewFrame := func(aframe []byte, sampleCount uint32, channels uint8, samplingRate uint32) {
+		onNewAudioFrame := func(aframe []byte, sampleCount uint32, channels uint8, samplingRate uint32) {
 			// send aframe to friend
 			_ = uargs
 			vtcli.AudioSendFrame(uargs.FriendNumber, aframe, sampleCount, channels, samplingRate)
 		}
-		avm.NewSession(evto.Uargs.FriendPubkey, evto.Uargs.AudioEnabled == 1, evto.Uargs.VideoEnabled == 1,
-			onNewFrame, nil)
+		onNewVideoFrame := func(vframe []byte, width, height uint16) {
+			vtcli.VideoSendFrame(uargs.FriendNumber, vframe, width, height)
+		}
+		avm.NewSession(uargs.FriendPubkey, uargs.AudioEnabled == 1, uargs.VideoEnabled == 1,
+			onNewAudioFrame, onNewVideoFrame)
 	case "CallState":
 		log.Println(evto.Name, evto.Uargs.CallState, CallStateString(evto.Uargs.CallState))
-		if evto.Uargs.CallState == 2 {
+		uargs := evto.Uargs
+		if uargs.CallState == 2 /**/ || uargs.CallState == 1 /*error*/ {
 			AVMan().RemoveSession(evto.Uargs.FriendPubkey, evto.Uargs.FriendName)
 		}
 	case "AudioReceiveFrame":
@@ -310,7 +314,7 @@ func dispatchEvent(evto *thspbs.Event) {
 		}
 		AVMan().PutVideoFrame(evto.Uargs.FriendPubkey, vdfrm, int(evto.Uargs.Width), int(evto.Uargs.Height))
 	default:
-		log.Printf("%+v\n", evto)
+		log.Printf("Unimpled: %+v\n", evto)
 	}
 }
 
@@ -421,7 +425,7 @@ func dispatchEventResp(evto *thspbs.Event) {
 	case "AudioReceiveFrame": // do nothing
 	case "VideoReceiveFrame": // do nothing
 	default:
-		log.Printf("%+v\n", evto)
+		log.Printf("Unimpled: %+v\n", evto)
 	}
 }
 
@@ -440,6 +444,6 @@ func dispatchOtherEvent(evto *thspbs.Event) {
 		uictx.mw.switchUiStack(UIST_MESSAGEUI)
 		uictx.mw.sendMessageImpl(item, mtype+":"+mcontent, false, thscom.FileHelperFnum)
 	default:
-		log.Printf("%+v\n", evto)
+		log.Printf("Unimpled: %+v\n", evto)
 	}
 }
