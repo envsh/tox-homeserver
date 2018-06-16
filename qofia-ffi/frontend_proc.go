@@ -286,7 +286,7 @@ func dispatchEvent(evto *thspbs.Event) {
 		onNewFrame := func(aframe []byte, sampleCount uint32, channels uint8, samplingRate uint32) {
 			// send aframe to friend
 			_ = uargs
-			// vtcli.AudioSendFrame(uargs.FriendNumber, aframe, sampleCount, channels, samplingRate)
+			vtcli.AudioSendFrame(uargs.FriendNumber, aframe, sampleCount, channels, samplingRate)
 		}
 		avm.NewSession(evto.Uargs.FriendPubkey, evto.Uargs.AudioEnabled == 1, evto.Uargs.VideoEnabled == 1,
 			onNewFrame, nil)

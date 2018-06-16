@@ -154,6 +154,10 @@ func (this *GrpcTransport) serveBackendEventGrpcImpl() {
 
 		jcc, err := json.Marshal(evto)
 		gopp.ErrPrint(err)
+		if jcc == nil {
+			log.Println("Wtf:", evto)
+			continue
+		}
 
 		if strings.Contains(string(jcc), "AudioReceiveFrame") {
 			// log.Println("grpcrecv:", "AudioReceiveFrame", len(jcc))

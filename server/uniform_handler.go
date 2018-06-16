@@ -109,7 +109,13 @@ func packBaseInfo(t *tox.Tox) (*thspbs.BaseInfo, error) {
 // 自己的消息做多终端同步转发
 // conn caller connection
 func RmtCallHandlers(ctx context.Context, req *thspbs.Event) (*thspbs.Event, error) {
-	log.Println(req.EventId, req.Name, req.Args, req.Margs)
+	switch req.Name {
+	case "AudioSendFrame":
+	case "VideoSendFrame":
+	case "GroupSendAudio":
+	default: // debug output too much
+		log.Println(req.EventId, req.Name, req.Args, req.Margs)
+	}
 
 	// 先把消息同步到不同协议的不同终端上, not need execute result
 	switch req.Name {
@@ -340,6 +346,17 @@ func RmtCallExecuteHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Even
 				out.Args = []string{string(data)}
 			}
 		}
+	case "AudioSendFrame":
+		tav := appctx.tvm.tav
+		friendNumber := gopp.MustUint32(req.Args[0])
+		sampleCount := gopp.MustInt(req.Args[1])
+		channels := gopp.MustInt(req.Args[2])
+		samplingRate := gopp.MustInt(req.Args[3])
+		pcm := req.Uargs.Pcm
+		_, err := tav.AudioSendFrame(friendNumber, pcm, sampleCount, channels, samplingRate)
+		gopp.ErrPrint(err)
+	case "VideoSendFrame":
+	case "GroupSendAudio":
 	default:
 		log.Println("unimpled:", req.Name, req.Args)
 		out.ErrCode = -1

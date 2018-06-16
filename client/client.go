@@ -939,7 +939,7 @@ func (this *LigTox) AudioSendFrame(friendNumber uint32, pcm []byte, sampleCount 
 
 	rsp, err := this.rmtCall(&args)
 	gopp.ErrPrint(err, rsp)
-	log.Println(rsp)
+
 	return err
 }
 
@@ -952,7 +952,7 @@ func (this *LigTox) VideoSendFrame(friendNumber uint32, vframe []byte, width, he
 
 	rsp, err := this.rmtCall(&args)
 	gopp.ErrPrint(err, rsp)
-	log.Println(rsp)
+
 	return err
 }
 
@@ -965,7 +965,7 @@ func (this *LigTox) GroupSendAudio(groupNumber uint32, pcm []byte, samples uint,
 
 	rsp, err := this.rmtCall(&args)
 	gopp.ErrPrint(err, rsp)
-	log.Println(rsp)
+
 	return err
 }
 

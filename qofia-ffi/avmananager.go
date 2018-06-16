@@ -70,7 +70,7 @@ func (this *AVManager) NewSession(contact string, audioEnabled, videoEnabled boo
 	}
 
 	if sess.onNewAudioFrame != nil {
-		// sess.audioRecorder = avhlp.NewAudioRecorderAuto(sess.onNewAudioFrame)
+		sess.audioRecorder = avhlp.NewAudioRecorderAuto(sess.onNewAudioFrame)
 	}
 
 	this.sesses[contact] = sess

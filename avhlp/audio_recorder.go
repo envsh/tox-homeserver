@@ -84,7 +84,7 @@ func (this *AudioRecorder) disconnect(arno uint64) {
 
 func (this *AudioRecorder) start() { go this.runCapture() }
 func (this *AudioRecorder) runCapture() {
-
+	btime := time.Now()
 	log.Println("Capture resumed. stoped:", this.stop)
 	for !this.stop {
 		var samples C.ALint
@@ -93,16 +93,14 @@ func (this *AudioRecorder) runCapture() {
 			time.Sleep(5 * time.Millisecond)
 			continue
 		}
-		buffer := make([]byte, AUDIO_CAPTURE_BUFSIZE)
+		buffer := make([]byte, AUDIO_CAPTURE_BUFSIZE*2) // really should be uint16, but now byte, so *2
+		// dangerous, if buf is small, the stack will mass and crash randomly
 		C.alcCaptureSamples(this.capdev, unsafe.Pointer(&buffer[0]), AUDIO_FRAME_SAMPLE_COUNT)
 		for _, f := range this.onFrames {
-			log.Println("audio captured:", samples, AUDIO_FRAME_SAMPLE_COUNT, AUDIO_CAPTURE_BUFSIZE)
-			if false {
-				(f)(buffer, uint32(samples), AUDIO_CHANNELS, AUDIO_SAMPLE_RATE)
-			}
+			(f)(buffer, AUDIO_FRAME_SAMPLE_COUNT, AUDIO_CHANNELS, AUDIO_SAMPLE_RATE)
 		}
 	}
-	log.Println("Capture paused. stoped:", this.stop, AUDIO_CAPTURE_BUFSIZE)
+	log.Println("Capture paused. stoped:", this.stop, AUDIO_CAPTURE_BUFSIZE, time.Since(btime))
 }
 
 const AUDIO_SAMPLE_RATE = 48000

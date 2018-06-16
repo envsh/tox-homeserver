@@ -57,13 +57,14 @@ func (this *Player) Play() {
 
 // should block
 func (this *Player) Play1() {
+	btime := time.Now()
 	for data := range this.frmC {
 		if data == nil {
 			break
 		}
 		this.playFrame(data.([]byte))
 	}
-	log.Println("Playback stopped.")
+	log.Println("Playback stopped.", time.Since(btime))
 }
 
 const PLAYBACK_BUFFER_COUNT = 16
