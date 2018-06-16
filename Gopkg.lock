@@ -2,6 +2,12 @@
 
 
 [[projects]]
+  branch = "master"
+  name = "github.com/3d0c/gmf"
+  packages = ["."]
+  revision = "feddda3ca02375a63362bfa8000fa1ad6e6861d1"
+
+[[projects]]
   name = "github.com/StackExchange/wmi"
   packages = ["."]
   revision = "5d049714c4a64225c3c79a7cf7d02f7fb5b96338"
@@ -107,6 +113,12 @@
   revision = "e89373fe6b4a7413d7acd6da1725b83ef713e6e4"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/google/go-querystring"
+  packages = ["query"]
+  revision = "53e6ce116135b80d037921a7fdd5138cf32d7a8a"
+
+[[projects]]
   name = "github.com/google/gops"
   packages = [
     "agent",
@@ -164,6 +176,12 @@
   revision = "fa282dd67061ed55fb7187e8f26f8e366e1efc46"
 
 [[projects]]
+  name = "github.com/levigross/grequests"
+  packages = ["."]
+  revision = "3f92c0acb6cd7f2b11aa81f82a33783249fc1bcd"
+  version = "0.9"
+
+[[projects]]
   branch = "master"
   name = "github.com/masatana/go-textdistance"
   packages = ["."]
@@ -172,8 +190,8 @@
 [[projects]]
   name = "github.com/mattn/go-sqlite3"
   packages = ["."]
-  revision = "323a32be5a2421b8c7087225079c6c900ec397cd"
-  version = "v1.7.0"
+  revision = "25ecb14adfc7543176f7d85291ec7dba82c6f7e4"
+  version = "v1.9.0"
 
 [[projects]]
   name = "github.com/nats-io/gnatsd"
@@ -245,15 +263,28 @@
   version = "v1.2.0"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/shengdoushi/base58"
+  packages = ["."]
+  revision = "c2e5dd9cebf91f86ab174cf5fd8bdb66d99c9e22"
+
+[[projects]]
   name = "github.com/shirou/gopsutil"
   packages = [
     "cpu",
     "host",
     "internal/common",
     "mem",
+    "net",
     "process"
   ]
   revision = "3166d415382aa5bbd8bb151cc50a756730cd5ec4"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/shirou/w32"
+  packages = ["."]
+  revision = "bb4de0191aa41b5507caa14b0650cdbddcd9280b"
 
 [[projects]]
   name = "github.com/spf13/afero"
@@ -261,8 +292,8 @@
     ".",
     "mem"
   ]
-  revision = "63644898a8da0bc22138abf860edaf5277b6102e"
-  version = "v1.1.0"
+  revision = "787d034dfe70e44075ccc060d346146ef53270ad"
+  version = "v1.1.1"
 
 [[projects]]
   branch = "master"
@@ -299,6 +330,15 @@
 
 [[projects]]
   branch = "master"
+  name = "golang.org/x/mobile"
+  packages = [
+    "exp/audio/al",
+    "internal/mobileinit"
+  ]
+  revision = "c37eee03d46e9fc317bcb0ed2c930a9c78775b7b"
+
+[[projects]]
+  branch = "master"
   name = "golang.org/x/net"
   packages = [
     "bpf",
@@ -313,9 +353,10 @@
     "internal/timeseries",
     "ipv4",
     "ipv6",
+    "publicsuffix",
     "trace"
   ]
-  revision = "1e491301e022f8f977054da4c2d852decd59571f"
+  revision = "db08ff08e8622530d9ed3a0e8ac279f6d4c02196"
 
 [[projects]]
   name = "golang.org/x/sys"
@@ -355,7 +396,7 @@
   branch = "master"
   name = "google.golang.org/genproto"
   packages = ["googleapis/rpc/status"]
-  revision = "81158efcc9f219c511e4d3c0d61a0e6e49c01a24"
+  revision = "32ee49c4dd805befd833990acba36cb75042378c"
 
 [[projects]]
   name = "google.golang.org/grpc"
@@ -385,8 +426,8 @@
     "tap",
     "transport"
   ]
-  revision = "22a49e732a507a11ac524e4ea5fd1a3e384b6fb8"
-  version = "v1.12.1"
+  revision = "7a6a684ca69eb4cae85ad0a484f2e531598c047b"
+  version = "v1.12.2"
 
 [[projects]]
   name = "gopkg.in/go-playground/stats.v1"
@@ -413,6 +454,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "8e782019051172adf523cf485b8d2a2f3ea5565b0500fe3e3cce9632754134aa"
+  inputs-digest = "90fb5770631fe708f441a86a89064c300b3394b33af038da2d03a1319d3de91e"
   solver-name = "gps-cdcl"
   solver-version = 1

@@ -27,6 +27,10 @@
 
 [[constraint]]
   branch = "master"
+  name = "github.com/3d0c/gmf"
+
+[[constraint]]
+  branch = "master"
   name = "github.com/TokTok/go-toxcore-c"
 
 [[constraint]]
@@ -70,8 +74,12 @@
   name = "github.com/kitech/qt.go"
 
 [[constraint]]
+  name = "github.com/levigross/grequests"
+  version = "0.9.0"
+
+[[constraint]]
   name = "github.com/mattn/go-sqlite3"
-  version = "1.7.0"
+  version = "1.9.0"
 
 [[constraint]]
   name = "github.com/nats-io/gnatsd"
@@ -94,8 +102,12 @@
   version = "1.2.0"
 
 [[constraint]]
+  branch = "master"
+  name = "github.com/shengdoushi/base58"
+
+[[constraint]]
   name = "github.com/spf13/afero"
-  version = "1.1.0"
+  version = "1.1.1"
 
 [[constraint]]
   name = "github.com/thoas/go-funk"
@@ -103,11 +115,15 @@
 
 [[constraint]]
   branch = "master"
+  name = "golang.org/x/mobile"
+
+[[constraint]]
+  branch = "master"
   name = "golang.org/x/net"
 
 [[constraint]]
   name = "google.golang.org/grpc"
-  version = "1.12.1"
+  version = "1.12.2"
 
 [[constraint]]
   name = "gopkg.in/go-playground/stats.v1"
