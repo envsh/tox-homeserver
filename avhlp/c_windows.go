@@ -2,6 +2,6 @@
 package avhlp
 
 /*
-#cgo LDFLAGS: -lopenal
+#cgo LDFLAGS: -lOpenAL32
 */
 import "C"

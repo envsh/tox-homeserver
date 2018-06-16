@@ -35,10 +35,14 @@ func alerrstr(eno int32) string {
 	//	return "AL_INVALID_DEVICE"
 	// case al.INVALID_CONTEXT:
 	//	return "AL_INVALID_CONTEXT"
+	case al.InvalidName:
+		return "AL_INVALID_NAME"
 	case al.InvalidEnum:
 		return "AL_INVALID_ENUM"
 	case al.InvalidValue:
 		return "AL_INVALID_VALUE"
+	case al.InvalidOperation:
+		return "AL_INVALID_OPERATOR"
 	case al.OutOfMemory:
 		return "AL_OUT_OF_MEMORY"
 		/* ... */

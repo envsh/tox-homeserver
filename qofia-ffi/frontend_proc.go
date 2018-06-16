@@ -282,9 +282,16 @@ func dispatchEvent(evto *thspbs.Event) {
 
 	case "Call": // always from friend
 		avm := AVMan()
-		avm.NewSession(evto.Uargs.FriendPubkey, evto.Uargs.AudioEnabled == 1, evto.Uargs.VideoEnabled == 1)
+		uargs := evto.Uargs
+		onNewFrame := func(aframe []byte, sampleCount uint32, channels uint8, samplingRate uint32) {
+			// send aframe to friend
+			_ = uargs
+			// vtcli.AudioSendFrame(uargs.FriendNumber, aframe, sampleCount, channels, samplingRate)
+		}
+		avm.NewSession(evto.Uargs.FriendPubkey, evto.Uargs.AudioEnabled == 1, evto.Uargs.VideoEnabled == 1,
+			onNewFrame, nil)
 	case "CallState":
-		log.Println(evto.Uargs.CallState, CallStateString(evto.Uargs.CallState))
+		log.Println(evto.Name, evto.Uargs.CallState, CallStateString(evto.Uargs.CallState))
 		if evto.Uargs.CallState == 2 {
 			AVMan().RemoveSession(evto.Uargs.FriendPubkey, evto.Uargs.FriendName)
 		}

@@ -13,7 +13,7 @@ type AVSession struct {
 	videoPlayer   *VideoPlayer
 	audioEnabled  bool
 	videoEnabled  bool
-	audioRecorder interface{}
+	audioRecorder *avhlp.AudioRecorderAuto
 	videoRecorder interface{}
 	muteVideo     bool // for self
 	muteMic       bool // for self
@@ -21,7 +21,12 @@ type AVSession struct {
 	btime         time.Time
 	contact       string // group id or friend pubkey
 	initiatorIsMe bool   // is me initate this av session
+
+	// from local recorder
+	onNewAudioFrame func(aframe []byte, samples uint32, channels uint8, samplingRate uint32)
+	onNewVideoFrame func(vframe []byte, width, height uint16)
 }
+
 type AVManager struct {
 	sesses map[string]*AVSession // contact =>
 	sessmu sync.RWMutex
@@ -42,7 +47,9 @@ func NewAVManager() *AVManager {
 	return this
 }
 
-func (this *AVManager) NewSession(contact string, audioEnabled, videoEnabled bool) error {
+func (this *AVManager) NewSession(contact string, audioEnabled, videoEnabled bool,
+	onNewAudioFrame func([]byte, uint32, uint8, uint32),
+	onNewVideoFrame func([]byte, uint16, uint16)) error {
 	if this.HasSession(contact) {
 		return fmt.Errorf("Session already exists: %s", contact)
 	}
@@ -53,11 +60,17 @@ func (this *AVManager) NewSession(contact string, audioEnabled, videoEnabled boo
 	sess.contact = contact
 	sess.audioEnabled = audioEnabled
 	sess.videoEnabled = videoEnabled
+	sess.onNewAudioFrame = onNewAudioFrame
 	sess.btime = time.Now()
 	sess.audioPlayer = avhlp.NewPlayer()
 
 	if videoEnabled {
+		sess.onNewVideoFrame = sess.onNewVideoFrame
 		sess.videoPlayer = NewVideoPlayer()
+	}
+
+	if sess.onNewAudioFrame != nil {
+		// sess.audioRecorder = avhlp.NewAudioRecorderAuto(sess.onNewAudioFrame)
 	}
 
 	this.sesses[contact] = sess
@@ -87,15 +100,20 @@ func (this *AVManager) RemoveSession(contact string, name string) error {
 		log.Println("Stop video recorder...", name)
 	}
 	if !sess.muteMic {
-		log.Println("Stop audio recorder...", name)
+		log.Println("Stop audio recorder...", name, sess.onNewAudioFrame)
+		if sess.audioRecorder != nil {
+			sess.audioRecorder = nil
+		}
 	}
 	if sess.videoEnabled {
 		log.Println("Stop video player...", name)
 		sess.videoPlayer.Stop()
+		sess.videoPlayer = nil
 	}
 	if !sess.muteMixer {
 		log.Println("Stop audio player...", name)
 		sess.audioPlayer.Stop()
+		sess.audioPlayer = nil
 	}
 
 	delete(this.sesses, contact)

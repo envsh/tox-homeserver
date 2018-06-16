@@ -1,5 +1,6 @@
 source ~/triline/shell/android-ndk-env.sh
 source ~/triline/shell/android-go-env.sh
+# export CGO_LDFLAGS="$CGO_LDFLAGS -lopenal"
 
 env | grep CGO_
 set -x

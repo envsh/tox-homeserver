@@ -930,6 +930,45 @@ func (this *LigTox) IsConnected() int {
 	return int(0)
 }
 
+func (this *LigTox) AudioSendFrame(friendNumber uint32, pcm []byte, sampleCount uint32, channels uint8, samplingRate uint32) error {
+	fname := this.getMethodName()
+	args := thspbs.Event{Uargs: &thspbs.Argument{}}
+	args.Name = fname
+	args.Args = gopp.ToStrs(friendNumber, sampleCount, channels, samplingRate)
+	args.Uargs.Pcm = pcm
+
+	rsp, err := this.rmtCall(&args)
+	gopp.ErrPrint(err, rsp)
+	log.Println(rsp)
+	return err
+}
+
+func (this *LigTox) VideoSendFrame(friendNumber uint32, vframe []byte, width, height uint16) error {
+	fname := this.getMethodName()
+	args := thspbs.Event{Uargs: &thspbs.Argument{}}
+	args.Name = fname
+	args.Args = gopp.ToStrs(friendNumber, width, height)
+	args.Uargs.VideoFrame = vframe
+
+	rsp, err := this.rmtCall(&args)
+	gopp.ErrPrint(err, rsp)
+	log.Println(rsp)
+	return err
+}
+
+func (this *LigTox) GroupSendAudio(groupNumber uint32, pcm []byte, samples uint, channels uint8, samplingRate uint32) error {
+	fname := this.getMethodName()
+	args := thspbs.Event{Uargs: &thspbs.Argument{}}
+	args.Name = fname
+	args.Args = gopp.ToStrs(groupNumber, samples, channels, samplingRate)
+	args.Uargs.Pcm = pcm
+
+	rsp, err := this.rmtCall(&args)
+	gopp.ErrPrint(err, rsp)
+	log.Println(rsp)
+	return err
+}
+
 func (this *LigTox) getMethodName() string {
 	pc, _, _, _ := runtime.Caller(1)
 	fno := runtime.FuncForPC(pc)

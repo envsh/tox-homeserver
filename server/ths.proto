@@ -19,6 +19,10 @@ message Event {
     int32 ErrCode = 6; // error code
     string ErrMsg = 7; // error msg
     int64 UserCode = 8; // crc64(device id + runtime sequence)
+    int64 TrackId = 9; // used for global tracker
+    int64 SpanId = 10; // program module id for edge tracker
+    int64 TimeStamp = 11; // used for event creation
+    bytes Json = 12;
 }
 
 // like a union struct. collect all possible arguments name
@@ -63,7 +67,6 @@ message Argument {
     int32 Width = 38;
     int32 Height = 39;
     bytes VideoFrame = 40;
-    bytes Json = 41;
 }
 
 message BaseInfo {
