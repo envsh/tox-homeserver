@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"gopp"
 	"log"
 	"sync"
 	"time"
@@ -63,22 +64,29 @@ func (this *AVManager) NewSession(contact string, audioEnabled, videoEnabled boo
 	sess.onNewAudioFrame = onNewAudioFrame
 	sess.onNewVideoFrame = onNewVideoFrame
 	sess.btime = time.Now()
-	sess.audioPlayer = avhlp.NewPlayer()
+	if !gopp.IsAndroid() { // see upstream bug: #11
+		sess.audioPlayer = avhlp.NewPlayer()
+	}
 
 	if videoEnabled {
-		sess.onNewVideoFrame = sess.onNewVideoFrame
 		sess.videoPlayer = NewVideoPlayer()
 	}
 
 	if sess.onNewAudioFrame != nil && sess.audioEnabled {
-		// sess.audioRecorder = avhlp.NewAudioRecorderAuto(sess.onNewAudioFrame)
+		if !gopp.IsAndroid() {
+			sess.audioRecorder = avhlp.NewAudioRecorderAuto(sess.onNewAudioFrame)
+		}
 	}
 	if sess.onNewAudioFrame != nil && sess.videoEnabled {
-		sess.videoRecorder = avhlp.NewVideoRecorderAuto(sess.onNewVideoFrame)
+		if !gopp.IsAndroid() {
+			sess.videoRecorder = avhlp.NewVideoRecorderAuto(sess.onNewVideoFrame)
+		}
 	}
 
 	this.sesses[contact] = sess
-	sess.audioPlayer.Play()
+	if sess.audioPlayer != nil {
+		sess.audioPlayer.Play()
+	}
 
 	return nil
 }
@@ -119,8 +127,10 @@ func (this *AVManager) RemoveSession(contact string, name string) error {
 	}
 	if !sess.muteMixer {
 		log.Println("Stop audio player...", name)
-		sess.audioPlayer.Stop()
-		sess.audioPlayer = nil
+		if sess.audioPlayer != nil {
+			sess.audioPlayer.Stop()
+			sess.audioPlayer = nil
+		}
 	}
 
 	delete(this.sesses, contact)
@@ -142,7 +152,7 @@ func (this *AVManager) PutAudioFrame(contact string, frame []byte) error {
 	this.sessmu.RLock()
 	sess := this.sesses[contact]
 	this.sessmu.RUnlock()
-	if sess != nil {
+	if sess != nil && sess.audioPlayer != nil {
 		sess.audioPlayer.PutFrame(frame)
 	}
 	return nil

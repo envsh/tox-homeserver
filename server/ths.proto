@@ -3,8 +3,8 @@ package thspbs;
 
 
 service Toxhs {
-    rpc PollCallback(EmptyReq) returns(stream Event);
-    rpc GetBaseInfo(EmptyReq) returns(BaseInfo);
+    rpc PollCallback(Event) returns(stream Event);
+    rpc GetBaseInfo(Event) returns(BaseInfo);
     rpc RmtCall(Event) returns(Event);
     rpc Ping(EmptyReq) returns(EmptyReq);
 }
@@ -23,6 +23,7 @@ message Event {
     int64 SpanId = 10; // program module id for edge tracker
     int64 TimeStamp = 11; // used for event creation
     bytes Json = 12;
+    string DeviceUuid = 13;
 }
 
 // like a union struct. collect all possible arguments name

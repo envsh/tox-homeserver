@@ -18,7 +18,7 @@ type AppContext struct {
 	logFn func(s string)
 
 	store *Storage
-
+	devo  *store.Device
 	// logState *LogState
 }
 
@@ -38,6 +38,7 @@ func (this *AppContext) OpenStrorage() {
 		err := appctx.store.AddDevice()
 		gopp.ErrPrint(err)
 	}
+	appctx.devo = appctx.store.GetDevice()
 }
 
 // func GetAppCtx() *AppContext { return appctx }

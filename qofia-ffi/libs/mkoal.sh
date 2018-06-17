@@ -13,7 +13,7 @@ export CFLAGS="-fPIE -DANDROID -Wno-multichar -D__ANDROID_API__=16"
 cmake -DCMAKE_VERBOSE_MAKEFILE=on -DEXAMPLES=off -DCMAKE_INSTALL_PREFIX=/androidsys/ ..
 
 echo ""
-echo "configure done."
+echo "configure done. edit link.txt, change soname without version suffix libopenal.so"
 sleep 3
 make
 

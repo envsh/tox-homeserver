@@ -223,6 +223,7 @@ func (this *LigTox) GetBaseInfo() {
 	case *WebsocketTransport:
 		in := &thspbs.Event{}
 		in.Name = "GetBaseInfo"
+		in.DeviceUuid = appctx.devo.Uuid
 		rsp, err := this.rmtCall(in)
 		gopp.ErrPrint(err)
 
@@ -232,7 +233,7 @@ func (this *LigTox) GetBaseInfo() {
 		this.ParseBaseInfo(binfo)
 	case *GrpcTransport:
 		cli := thspbs.NewToxhsClient(tp.rpcli)
-		in := &thspbs.EmptyReq{}
+		in := &thspbs.Event{Name: "GetBaseInfo", DeviceUuid: appctx.devo.Uuid}
 		bi, err := cli.GetBaseInfo(context.Background(), in)
 		gopp.ErrPrint(err)
 		this.ParseBaseInfo(bi)

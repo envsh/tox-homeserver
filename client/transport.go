@@ -138,7 +138,8 @@ func (this *GrpcTransport) serveBackendEventGrpc() {
 
 func (this *GrpcTransport) serveBackendEventGrpcImpl() {
 	clio := thspbs.NewToxhsClient(this.rpcli)
-	stmc, err := clio.PollCallback(context.Background(), &thspbs.EmptyReq{})
+	stmc, err := clio.PollCallback(context.Background(),
+		&thspbs.Event{Name: "PollCallback", DeviceUuid: appctx.devo.Uuid})
 	gopp.ErrPrint(err)
 	if err != nil {
 		return

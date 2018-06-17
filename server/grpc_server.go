@@ -15,7 +15,7 @@ import (
 
 	"google.golang.org/grpc"
 
-	"tox-homeserver/common"
+	thscom "tox-homeserver/common"
 	"tox-homeserver/thspbs"
 )
 
@@ -26,11 +26,13 @@ type GrpcServer struct {
 
 	connsmu   sync.Mutex
 	grpcConns map[thspbs.Toxhs_PollCallbackServer]uint64
+	grpcUuids map[string]uint64 // uuid => uint64
 }
 
 func newGrpcServer() *GrpcServer {
 	this := &GrpcServer{}
 	this.grpcConns = make(map[thspbs.Toxhs_PollCallbackServer]uint64)
+	this.grpcUuids = make(map[string]uint64)
 
 	// TODO 压缩支持
 	this.srv = grpc.NewServer()
@@ -64,13 +66,14 @@ func (this *GrpcServer) Close() {
 type GrpcService struct {
 }
 
-func (this *GrpcService) GetBaseInfo(ctx context.Context, req *thspbs.EmptyReq) (*thspbs.BaseInfo, error) {
-	log.Println(req, appctx.tvm.t.SelfGetAddress())
+func (this *GrpcService) GetBaseInfo(ctx context.Context, req *thspbs.Event) (*thspbs.BaseInfo, error) {
+	log.Println(appctx.tvm.t.SelfGetAddress(), req)
+	log.Printf("ctx=%+v\n", ctx)
 	out, err := packBaseInfo(appctx.tvm.t)
 	gopp.ErrPrint(err)
 
-	common.BytesRecved(len(req.String()))
-	common.BytesSent(len(out.String()))
+	thscom.BytesRecved(len(req.String()))
+	thscom.BytesSent(len(out.String()))
 	return out, nil
 }
 
@@ -81,23 +84,25 @@ func (this *GrpcService) RmtCall(ctx context.Context, req *thspbs.Event) (*thspb
 
 func (this *GrpcService) Ping(ctx context.Context, req *thspbs.EmptyReq) (*thspbs.EmptyReq, error) {
 	out := &thspbs.EmptyReq{}
-	common.BytesRecved(len(req.String()))
-	common.BytesSent(len(out.String()))
+	thscom.BytesRecved(len(req.String()))
+	thscom.BytesSent(len(out.String()))
 	return out, nil
 }
 
 var grpcStreamConnNo uint64 = 0
 
-func (this *GrpcService) PollCallback(req *thspbs.EmptyReq, stm thspbs.Toxhs_PollCallbackServer) error {
+func (this *GrpcService) PollCallback(req *thspbs.Event, stm thspbs.Toxhs_PollCallbackServer) error {
 	nowt := time.Now()
 	conno := atomic.AddUint64(&grpcStreamConnNo, 1)
-	log.Println("New grpc stream poll connect.", len(appctx.rpcs.grpcConns), conno)
+	log.Println("New grpc stream poll connect.", len(appctx.rpcs.grpcConns), conno, req.DeviceUuid)
 	appctx.rpcs.connsmu.Lock()
 	appctx.rpcs.grpcConns[stm] = conno
+	appctx.rpcs.grpcUuids[req.DeviceUuid] = conno
 	appctx.rpcs.connsmu.Unlock()
 	defer func() {
 		appctx.rpcs.connsmu.Lock()
 		delete(appctx.rpcs.grpcConns, stm)
+		delete(appctx.rpcs.grpcUuids, req.DeviceUuid)
 		appctx.rpcs.connsmu.Unlock()
 	}()
 
@@ -105,7 +110,7 @@ func (this *GrpcService) PollCallback(req *thspbs.EmptyReq, stm thspbs.Toxhs_Pol
 	case <-stm.Context().Done():
 		break
 	}
-	log.Println("A stream done:", conno, time.Since(nowt))
+	log.Println("A stream done:", len(appctx.rpcs.grpcConns), conno, req.DeviceUuid, time.Since(nowt))
 	return nil
 }
 
@@ -142,19 +147,30 @@ func pubmsg2ws(ctx context.Context, evt *thspbs.Event) error {
 
 func pubmsg2grpc(ctx context.Context, evt *thspbs.Event) error {
 	var errtop error
-	var stms []thspbs.Toxhs_PollCallbackServer
+	var stms = map[uint64]thspbs.Toxhs_PollCallbackServer{}
+	var toconnid uint64
 	appctx.rpcs.connsmu.Lock()
-	for stm, _ := range appctx.rpcs.grpcConns {
-		stms = append(stms, stm)
+	for stm, connid := range appctx.rpcs.grpcConns {
+		stms[connid] = stm
+	}
+	if evt.DeviceUuid != "" {
+		toconnid, _ = appctx.rpcs.grpcUuids[evt.DeviceUuid]
 	}
 	appctx.rpcs.connsmu.Unlock()
 
-	for _, stm := range stms {
-		err := stm.Send(evt)
-		gopp.ErrPrint(err)
-		if err != nil {
-			errtop = err
+	// specific the connection to push this event, or push to all connections
+	for connid, stm := range stms {
+		if evt.DeviceUuid == "" || (evt.DeviceUuid != "" && connid == toconnid) {
+			err := stm.Send(evt)
+			gopp.ErrPrint(err)
+			if err != nil {
+				errtop = err
+			}
 		}
 	}
 	return errtop
+}
+
+func pubmsg2grpcbyconn(ctx context.Context, evt *thspbs.Event, connid uint64) error {
+	return nil
 }
