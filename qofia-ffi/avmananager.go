@@ -6,7 +6,10 @@ import (
 	"log"
 	"sync"
 	"time"
+
 	"tox-homeserver/avhlp"
+
+	"github.com/kitech/qt.go/qtandroidextras"
 )
 
 type AVSession struct {
@@ -39,6 +42,11 @@ var avmanOnce sync.Once
 func AVMan() *AVManager {
 	avmanOnce.Do(func() {
 		avman = NewAVManager()
+		if gopp.IsAndroid() {
+			jvm := qtandroidextras.QAndroidJniEnvironment_JavaVM()
+			actx := qtandroidextras.AndroidContext().Object()
+			avhlp.SetCurrentVM(jvm, actx)
+		}
 	})
 	return avman
 }
@@ -64,21 +72,19 @@ func (this *AVManager) NewSession(contact string, audioEnabled, videoEnabled boo
 	sess.onNewAudioFrame = onNewAudioFrame
 	sess.onNewVideoFrame = onNewVideoFrame
 	sess.btime = time.Now()
-	if !gopp.IsAndroid() { // see upstream bug: #11
-		sess.audioPlayer = avhlp.NewPlayer()
-	}
+	sess.audioPlayer = avhlp.NewPlayer()
 
 	if videoEnabled {
 		sess.videoPlayer = NewVideoPlayer()
 	}
 
 	if sess.onNewAudioFrame != nil && sess.audioEnabled {
-		if !gopp.IsAndroid() {
-			sess.audioRecorder = avhlp.NewAudioRecorderAuto(sess.onNewAudioFrame)
-		}
+		sess.audioRecorder = avhlp.NewAudioRecorderAuto(sess.onNewAudioFrame)
 	}
-	if sess.onNewAudioFrame != nil && sess.videoEnabled {
+	if sess.onNewVideoFrame != nil && sess.videoEnabled {
 		if !gopp.IsAndroid() {
+			// sess.videoRecorder = avhlp.NewVideoRecorderAuto(sess.onNewVideoFrame)
+		} else {
 			sess.videoRecorder = avhlp.NewVideoRecorderAuto(sess.onNewVideoFrame)
 		}
 	}

@@ -4,6 +4,8 @@ import org.qtproject.qt5.android.bindings.QtActivity;
 import android.os.*;
 import android.content.*;
 import android.app.*;
+import android.Manifest;
+import android.view.*;
 
 import java.lang.String;
 import android.content.Intent;
@@ -14,7 +16,7 @@ import android.content.ContentResolver;
 import android.webkit.MimeTypeMap;
 
 import java.util.*;
-import android.view.*;
+
 
 
 public class GolemActivity extends QtActivity
@@ -25,6 +27,9 @@ public class GolemActivity extends QtActivity
         Log.d("golemscorner", "onCreate GolemActivity");
         getAndCacheIntentData(getIntent());
         handleSendText(getIntent());
+
+        GolemActivity.requestPermission(this);
+        // VideoRecorder.startRec(0);
     }
 
     // if we are opened from other apps:
@@ -138,5 +143,9 @@ public class GolemActivity extends QtActivity
       Log.d("golemscorner Intent MimeType: ",mimeType);
     }
 
+    public static void requestPermission(QtActivity activity){
+        activity.requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                                                 Manifest.permission.CAMERA}, 1);
+    }
 
 }

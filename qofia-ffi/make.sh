@@ -8,7 +8,11 @@ set -x
 
 # test libav link
 export PKG_CONFIG_PATH=/androidsys/lib/pkgconfig  # this help some #cgo pkg-config link
-go install -p 1 -v -i -pkgdir ~/oss/pkg/android_arm tox-homeserver/avhlp
+# test compile suvcap, must name as libxxx.so. or it will not appear in app/lib/arm/ dir.
+# $CC -xc -g -fPIE -pie suvcap/suvcap.c -o libs/libsuvcapd.so \
+#    $CGO_CFLAGS $CGO_LDFLAGS `pkg-config --libs libavformat libavdevice libavfilter`
+
+go install -p 1 -v -i -x -pkgdir ~/oss/pkg/android_arm tox-homeserver/avhlp
 
 go install -v -i -pkgdir ~/oss/pkg/android_arm github.com/kitech/qt.go/qtqt
 go install -v -i -pkgdir ~/oss/pkg/android_arm github.com/kitech/qt.go/qtrt

@@ -2,7 +2,7 @@ rm -fr ./build ./build-debug
 mkdir -p ./build/libs/armeabi-v7a
 cp -v libgolem.so ./build/
 cp -v libgolem.so ./build/libs/armeabi-v7a/
-
+# cp -v libs/libsuvcapd.so ./build/libs/armeabi-v7a/
 
 mkdir -p ./build/java ./build/src/debug/java
 MYQTDIR=/home/me/Qt5.10.1/5.10.1/

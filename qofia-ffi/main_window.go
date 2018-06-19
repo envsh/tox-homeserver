@@ -11,12 +11,16 @@ import (
 
 	"github.com/kitech/qt.go/qtcore"
 	"github.com/kitech/qt.go/qtgui"
+	"github.com/kitech/qt.go/qtmultimedia"
 	"github.com/kitech/qt.go/qtrt"
 	"github.com/kitech/qt.go/qtwidgets"
 
+	"tox-homeserver/avhlp"
 	thscli "tox-homeserver/client"
 	thscom "tox-homeserver/common"
 	"tox-homeserver/thspbs"
+
+	"github.com/kitech/qt.go/qtandroidextras"
 )
 
 var appctx *thscli.AppContext
@@ -112,7 +116,22 @@ func (this *MainWindow) initFirstShow() {
 	// this.initOtherStorage()
 	go _CheckIntentMessage()
 	log.Println("Init first show ui done.")
+
+	// tstvcap = avhlp.NewVideoRecorder2Auto(func(d []byte, w uint16, h uint16) {
+	//	log.Println(len(d), w, h)
+	// })
+	if gopp.IsAndroid() {
+		jvm := qtandroidextras.QAndroidJniEnvironment_JavaVM()
+		actx := qtandroidextras.AndroidContext().Object()
+		avhlp.SetCurrentVM(jvm, actx)
+	}
+	cami := qtmultimedia.QCameraInfo_DefaultCamera()
+	log.Println(cami.DeviceName(), cami.IsNull())
+	camis := qtmultimedia.QCameraInfo_AvailableCameras(qtmultimedia.QCamera__BackFace)
+	log.Println(camis.Count_1())
 }
+
+var tstvcap *avhlp.VideoRecorder2Auto
 
 func setAppStyleSheet() {
 	bcc, err := []byte{}, error(nil)

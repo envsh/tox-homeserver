@@ -1,6 +1,11 @@
 package avhlp
 
+/*
+ */
+import "C"
+
 import (
+	"errors"
 	"fmt"
 	"gopp"
 	"log"
@@ -10,48 +15,54 @@ import (
 	"sync"
 	"sync/atomic"
 	"time"
+	"unsafe"
 
 	"github.com/3d0c/gmf"
 )
 
-func VideoRec() *VideoRecorder {
-	_VideoRecOnce.Do(func() {
-		_VideoRec = _NewVideoRecorder()
+func VideoRec2() *VideoRecorder2 {
+	_VideoRecOnce2.Do(func() {
+		_VideoRec2 = _NewVideoRecorder2()
 	})
-	return _VideoRec
+	return _VideoRec2
 }
 
-var _VideoRec *VideoRecorder
-var _VideoRecOnce sync.Once
+var _VideoRec2 *VideoRecorder2
+var _VideoRecOnce2 sync.Once
 
-var vrnoseq uint64
+var vrnoseq2 uint64
 
-type VideoRecorderAuto struct {
+type VideoRecorder2Auto struct {
 	vrno uint64
 }
 
-func NewVideoRecorderAuto(f func([]byte, uint16, uint16)) *VideoRecorderAuto {
-	this := &VideoRecorderAuto{}
+func NewVideoRecorder2Auto(f func([]byte, uint16, uint16)) *VideoRecorder2Auto {
+	this := &VideoRecorder2Auto{}
 	this.vrno = atomic.AddUint64(&vrnoseq, 1)
-	vro := VideoRec()
+	vro := VideoRec2()
 	vro.connect(this.vrno, f)
 
 	runtime.SetFinalizer(this, func(obj interface{}) {
-		vrao := obj.(*VideoRecorderAuto)
+		vrao := obj.(*VideoRecorder2Auto)
 		vro.disconnect(vrao.vrno)
 	})
 	return this
 }
 
-type VideoRecorder struct {
+type VideoRecorder2 struct {
 	devname  string
 	iptctx   *gmf.FmtCtx
 	onFrames map[uint64]func([]byte, uint16, uint16)
 	stop     bool
+
+	suvcap  *exec.Cmd
+	rawctxp *C.char
+	cretp   C.int
+	cstopp  C.int
 }
 
-func _NewVideoRecorder() *VideoRecorder {
-	this := &VideoRecorder{}
+func _NewVideoRecorder2() *VideoRecorder2 {
+	this := &VideoRecorder2{}
 	// x11grab#:0.0
 	this.devname = "/dev/video0"
 	// this.iptctx = gmf.NewCtx()
@@ -62,7 +73,7 @@ func _NewVideoRecorder() *VideoRecorder {
 }
 
 // can not hash a func type for map
-func (this *VideoRecorder) connect(arno uint64, f func([]byte, uint16, uint16)) {
+func (this *VideoRecorder2) connect(arno uint64, f func([]byte, uint16, uint16)) {
 	this.onFrames[arno] = f
 	if this.stop {
 		this.stop = false
@@ -70,7 +81,7 @@ func (this *VideoRecorder) connect(arno uint64, f func([]byte, uint16, uint16)) 
 	}
 }
 
-func (this *VideoRecorder) disconnect(vrno uint64) {
+func (this *VideoRecorder2) disconnect(vrno uint64) {
 	log.Println(vrno, this.onFrames)
 	if _, ok := this.onFrames[vrno]; ok {
 		delete(this.onFrames, vrno)
@@ -81,25 +92,71 @@ func (this *VideoRecorder) disconnect(vrno uint64) {
 	}
 }
 
-func (this *VideoRecorder) opencapdev() error {
-	this.trySudoPerm() // for android
-	this.iptctx = gmf.NewCtx()
-	err := this.iptctx.OpenInput(this.devname)
-	gopp.ErrPrint(err)
-	if err == nil {
-		log.Println("Open video capture device success:", this.devname)
+func (this *VideoRecorder2) opencapdev() error {
+	subprocstopped := false
+	go func() {
+		this.cstopp = 0
+		sucmd := findsupath()
+		suvcapexe := fmt.Sprintf("%s/libsuvcapd.so", getLibDirp())
+		realcmd := fmt.Sprintf("%s %d %d %d %s", suvcapexe,
+			uintptr(unsafe.Pointer(&this.rawctxp)), uintptr(unsafe.Pointer(&this.cretp)),
+			uintptr(unsafe.Pointer(&this.cstopp)), this.devname)
+		log.Println("Realcmd:", realcmd)
+		cmdo := exec.Command(sucmd, "-c", realcmd)
+		this.suvcap = cmdo
+		err := cmdo.Run()
+		gopp.ErrPrint(err)
+		output, err := cmdo.CombinedOutput()
+		log.Println("Subproc exited.", cmdo.ProcessState.String(), err, string(output))
+		subprocstopped = true
+	}()
+
+	btime := time.Now()
+	for {
+
+		time.Sleep(5 * time.Millisecond)
+		if subprocstopped {
+			log.Println("maybe subproc has error", this.cretp)
+			return errors.New("Unexcepted exit")
+		}
+		if this.cretp == 1 {
+			log.Println(this.rawctxp)
+			this.iptctx = gmf.NewOpenedInputCtxFromPointer(unsafe.Pointer(this.rawctxp))
+			break
+		}
+		if time.Since(btime).Seconds() > 10 {
+			log.Println("Wait subproc init timeout.")
+			return errors.New("Wait subproc")
+		}
+
 	}
 	log.Println("Stmcnt:", this.iptctx.StreamsCnt())
-	return err
+	/*
+		this.trySudoPerm() // for android
+		this.iptctx = gmf.NewCtx()
+		err := this.iptctx.OpenInput(this.devname)
+		gopp.ErrPrint(err)
+		if err == nil {
+			log.Println("Open video capture device success:", this.devname)
+		}
+		log.Println("Stmcnt:", this.iptctx.StreamsCnt())
+		return err
+	*/
+	return nil
 }
-func (this *VideoRecorder) closecapdev() {
-	this.iptctx.CloseInputAndRelease()
+func (this *VideoRecorder2) closecapdev() {
+	this.cstopp = 1
+	this.rawctxp = nil
 	this.iptctx = nil
+	/*
+		this.iptctx.CloseInputAndRelease()
+		this.iptctx = nil
+	*/
 	log.Println("Video capture device closed:", this.devname)
 }
 
-func (this *VideoRecorder) start() { go this.runCapture() }
-func (this *VideoRecorder) runCapture() {
+func (this *VideoRecorder2) start() { go this.runCapture() }
+func (this *VideoRecorder2) runCapture() {
 	btime := time.Now()
 	if err := this.opencapdev(); err != nil {
 		return
@@ -114,7 +171,7 @@ func (this *VideoRecorder) runCapture() {
 		iptstm.Type(), iptstm.IsCodecCtxSet())
 
 	iptcctx := iptstm.CodecCtx()
-	dstcctx, swsctx, dstFrame := makeRawFrame(iptstm)
+	dstcctx, swsctx, dstFrame := makeRawFrame2(iptstm)
 	// dstc, err := gmf.FindEncoder(gmf.AV_CODEC_ID_RAWVIDEO)
 	// gopp.ErrPrint(err, gmf.AV_CODEC_ID_RAWVIDEO)
 	// dstcctx := gmf.NewCodecCtx(dstc)
@@ -169,7 +226,7 @@ func (this *VideoRecorder) runCapture() {
 	log.Println("Video capture stoped:", this.stop, AUDIO_CAPTURE_BUFSIZE, time.Since(btime))
 }
 
-func makeRawFrame(srcVideoStream *gmf.Stream) (*gmf.CodecCtx, *gmf.SwsCtx, *gmf.Frame) {
+func makeRawFrame2(srcVideoStream *gmf.Stream) (*gmf.CodecCtx, *gmf.SwsCtx, *gmf.Frame) {
 	codec, err := gmf.FindEncoder(gmf.AV_CODEC_ID_RAWVIDEO)
 	if err != nil {
 		log.Fatal(err)
@@ -204,8 +261,8 @@ func makeRawFrame(srcVideoStream *gmf.Stream) (*gmf.CodecCtx, *gmf.SwsCtx, *gmf.
 	return cc, swsCtx, dstFrame
 }
 
-func (this *VideoRecorder) Close() {}
-func (this *VideoRecorder) trySudoPerm() {
+func (this *VideoRecorder2) Close() {}
+func (this *VideoRecorder2) trySudoPerm() {
 	if gopp.IsAndroid() {
 		findsu := func() string {
 			paths := []string{"/system/bin/su"}

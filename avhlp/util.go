@@ -1,7 +1,12 @@
 package avhlp
 
 import (
+	"bytes"
 	"fmt"
+	"gopp"
+	"io/ioutil"
+	"os"
+	"runtime"
 
 	"golang.org/x/mobile/exp/audio/al"
 )
@@ -50,4 +55,34 @@ func alerrstr(eno int32) string {
 
 	}
 	return fmt.Sprintf("Unknown error code: %d", eno)
+}
+
+func findsupath() string {
+	paths := []string{"/system/bin/su"}
+	for _, p := range paths {
+		if gopp.FileExist(p) {
+			return p
+		}
+	}
+	return "su"
+}
+
+func getLibDirp() string {
+	// go arch name => android lib name
+	archs := map[string]string{"386": "x86", "amd64": "x86_64", "arm": "arm", "mips": "mips"}
+
+	switch runtime.GOOS {
+	case "android":
+		bcc, err := ioutil.ReadFile(fmt.Sprintf("/proc/%d/cmdline", os.Getpid()))
+		gopp.ErrPrint(err)
+		appdir := string(bcc[:bytes.IndexByte(bcc, 0)])
+		for i := 0; i < 9; i++ {
+			d := fmt.Sprintf("/data/app/%s%s/lib/%s/", appdir,
+				gopp.IfElseStr(i == 0, "", fmt.Sprintf("-%d", i)), archs[runtime.GOARCH])
+			if gopp.FileExist(d) {
+				return d
+			}
+		}
+	}
+	return ""
 }

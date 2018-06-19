@@ -1,0 +1,28 @@
+diff --git a/exp/audio/al/al_android.go b/exp/audio/al/al_android.go
+index bce1f8d..dc85b8b 100644
+--- a/exp/audio/al/al_android.go
++++ b/exp/audio/al/al_android.go
+@@ -242,6 +242,9 @@ var (
+ 	alcDestroyContextFunc     C.LPALCDESTROYCONTEXT
+ )
+ 
++func GetCurrentVMAddr() unsafe.Pointer{return mobileinit.GetCurrentVMAddr()}
++func GetCurrentCtxAddr() unsafe.Pointer{return mobileinit.GetCurrentCtxAddr()}
++
+ func initAL() {
+ 	err := mobileinit.RunOnJVM(func(vm, env, ctx uintptr) error {
+ 		C.al_init(C.uintptr_t(vm), C.uintptr_t(env), C.jobject(ctx), &alHandle)
+diff --git a/internal/mobileinit/ctx_android.go b/internal/mobileinit/ctx_android.go
+index e0dc166..e0dea81 100644
+--- a/internal/mobileinit/ctx_android.go
++++ b/internal/mobileinit/ctx_android.go
+@@ -75,6 +75,9 @@ import (
+ 	"unsafe"
+ )
+ 
++func GetCurrentVMAddr() unsafe.Pointer{return unsafe.Pointer(&C.current_vm)}
++func GetCurrentCtxAddr() unsafe.Pointer{return unsafe.Pointer(&C.current_ctx)}
++
+ // SetCurrentContext populates the global Context object with the specified
+ // current JavaVM instance (vm) and android.context.Context object (ctx).
+ // The android.context.Context object must be a global reference.
