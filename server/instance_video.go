@@ -91,3 +91,26 @@ func (this *ToxVM) setupEventsForAV() {
 		this.pubmsg(evto)
 	}, nil)
 }
+
+func (this *ToxVM) onGroupAudioFrame(t *tox.Tox, groupNumber uint32, peerNumber uint32, pcm []byte, samples uint, channels uint8, sample_rate uint32, userData interface{}) {
+	groupTitle, _ := t.ConferenceGetTitle(groupNumber)
+	grouppk, _ := t.ConferenceGetIdentifier(groupNumber)
+	peerpk, _ := t.ConferencePeerGetPublicKey(groupNumber, peerNumber)
+	peerName, _ := t.ConferencePeerGetName(groupNumber, peerNumber)
+
+	evto := &thspbs.Event{Uargs: &thspbs.Argument{}, Name: "ConferenceAudioRecieiveFrame"}
+
+	evto.Uargs.GroupNumber = groupNumber
+	evto.Uargs.GroupTitle = groupTitle
+	evto.Uargs.GroupIdentity = grouppk
+	evto.Uargs.PeerNumber = peerNumber
+	evto.Uargs.PeerName = peerName
+	evto.Uargs.PeerPubkey = peerpk
+
+	evto.Uargs.Pcm = pcm
+	evto.Uargs.SampleCount = int32(samples)
+	evto.Uargs.Channels = int32(channels)
+	evto.Uargs.SamplingRate = int32(sample_rate)
+
+	this.pubmsg(evto)
+}

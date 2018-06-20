@@ -164,6 +164,7 @@ func (this *GrpcTransport) serveBackendEventGrpcImpl() {
 			// log.Println("grpcrecv:", "AudioReceiveFrame", len(jcc))
 		} else if strings.Contains(string(jcc), "VideoReceiveFrame") {
 			// log.Println("grpcrecv:", "VideoReceiveFrame", len(jcc))
+		} else if strings.Contains(string(jcc), "ConferenceAudioRecieiveFrame") {
 		} else {
 			log.Println("grpcrecv:", string(jcc))
 		}

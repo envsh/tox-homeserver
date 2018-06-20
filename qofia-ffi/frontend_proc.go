@@ -313,6 +313,19 @@ func dispatchEvent(evto *thspbs.Event) {
 			log.Println(evto.Uargs, len(vdfrm))
 		}
 		AVMan().PutVideoFrame(evto.Uargs.FriendPubkey, vdfrm, int(evto.Uargs.Width), int(evto.Uargs.Height))
+	case "ConferenceAudioRecieiveFrame":
+		uargs := evto.Uargs
+		pcm := uargs.Pcm
+		uargs.Pcm = nil
+		if !AVMan().HasSession(uargs.GroupIdentity) {
+			// delete session when delete group
+			// TODO or maybe create when join
+			AVMan().NewSession(uargs.GroupIdentity, true, false,
+				func(aframe []byte, sampleCount uint32, channels uint8, samplingRate uint32) {
+					vtcli.GroupSendAudio(uargs.GroupNumber, aframe, uint(sampleCount), channels, samplingRate)
+				}, nil)
+		}
+		AVMan().PutAudioFrame(uargs.GroupIdentity, pcm)
 	default:
 		log.Printf("Unimpled: %+v\n", evto)
 	}

@@ -212,7 +212,8 @@ func (this *MainWindow) onRoomContextTriggered(item *RoomListItem, checked bool,
 		uictx.mw.switchUiStack(UIST_MESSAGEUI)
 		uictx.msgwin.SetRoom(item)
 	} else if act == this.rcact1 {
-		log.Println(item.grpInfo.GetGnum())
+		log.Println(item.grpInfo.GetGnum(), item.GetName(), item.GetId())
+		AVMan().RemoveSession(item.GetId(), item.GetName())
 		vtcli.ConferenceDelete(item.grpInfo.GetGnum())
 		uictx.iteman.Delete(item)
 	} else if act == this.rcact2 {

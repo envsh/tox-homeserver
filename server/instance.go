@@ -239,7 +239,7 @@ func (this *ToxVM) setupEventsForMessage() {
 			gn, err = t.ConferenceJoin(friendNumber, cookie)
 			gopp.ErrPrint(err, fname, gn, len(cookie))
 		case tox.CONFERENCE_TYPE_AV:
-			gn_, err_ := t.JoinAVGroupChat(friendNumber, cookie, nil)
+			gn_, err_ := t.JoinAVGroupChat(friendNumber, cookie, this.onGroupAudioFrame)
 			gopp.ErrPrint(err_, fname, gn, len(cookie))
 			err = err_
 			gn = uint32(gn_)
