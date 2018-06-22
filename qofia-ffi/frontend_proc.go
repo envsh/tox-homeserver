@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"gopp"
 	"log"
+	"strings"
 
 	thscli "tox-homeserver/client"
 	thscom "tox-homeserver/common"
@@ -42,10 +43,15 @@ func dispatchEvent(evto *thspbs.Event) {
 
 		item := uictx.iteman.Get(pubkey)
 		if item == nil {
-			log.Println("wtf", fname, pubkey, msg)
+			log.Println("wtf friend item not found:", fname, pubkey, msg)
 		} else {
+			msgty := evto.Margs[4]
 			msgo := NewMessageForFriend(evto)
-			item.AddMessage(msgo, false)
+			if msgty == thscom.MSGTYPE_AVATAR {
+				item.SetAvatar(msgo, pubkey)
+			} else {
+				item.AddMessage(msgo, false)
+			}
 		}
 
 		///
@@ -438,7 +444,9 @@ func dispatchEventResp(evto *thspbs.Event) {
 	case "AudioReceiveFrame": // do nothing
 	case "VideoReceiveFrame": // do nothing
 	default:
-		log.Printf("Unimpled: %+v\n", evto)
+		if strings.HasSuffix(evto.Name, "Resp") {
+			log.Printf("Unimpled: %+v\n", evto)
+		}
 	}
 }
 

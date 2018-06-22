@@ -95,6 +95,14 @@ func (this *MessageListWin) ReloadMessages(oldItem *RoomListItem) {
 	// TODO too slow, 500ms+
 }
 
+func (this *MessageListWin) SetIconForItem(item *RoomListItem) {
+	if item != this.item {
+		return
+	}
+	mw := uictx.mw
+	mw.Label_4.SetPixmap(item.cticon.Pixmap_1_(32, 32))
+}
+
 ///////////
 func (this *MessageListWin) InitMessageListGesture() {
 	this.InitContextMenu()

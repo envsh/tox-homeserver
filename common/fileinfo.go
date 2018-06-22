@@ -22,6 +22,7 @@ type FileInfoLine struct {
 	Ext      string
 	OrigName string
 	Urlval   string
+	Avatar   bool
 }
 
 func ParseFileInfoLine(s string) *FileInfoLine {
@@ -34,7 +35,7 @@ func ParseFileInfoLine(s string) *FileInfoLine {
 		log.Println("fmt error:", s)
 		return nil
 	}
-	if len(parts) == 7 {
+	if len(parts) == 7 && strings.Contains(s, "?txc;") {
 		return NewFileInfoLineUrl(gopp.MustInt64(parts[3]), parts[2], parts[4], parts[5], parts[6], parts[0])
 	}
 	return NewFileInfoLine(gopp.MustInt64(parts[2]), parts[1], parts[3], parts[4], parts[5])
@@ -50,7 +51,9 @@ func (this *FileInfoLine) String() string {
 }
 
 func (this *FileInfoLine) ToType() string {
-	if strings.HasPrefix(this.Mime, "image/") {
+	if this.Avatar {
+		return MSGTYPE_AVATAR
+	} else if strings.HasPrefix(this.Mime, "image/") {
 		return MSGTYPE_IMAGE
 	} else if strings.HasPrefix(this.Mime, "audio/") {
 		return MSGTYPE_AUDIO

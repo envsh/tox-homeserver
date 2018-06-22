@@ -1,6 +1,7 @@
 package store
 
 import (
+	"fmt"
 	"gopp"
 	"io/ioutil"
 	"log"
@@ -8,6 +9,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 
@@ -34,19 +36,21 @@ var locfso *FileStorage
 var locfsonce sync.Once
 
 func GetFS() *FileStorage {
-	locfsonce.Do(func() { locfso = NewFileStorage() })
+	locfsonce.Do(func() { locfso = NewFileStorage(false) })
 	return locfso
 }
 
-func NewFileStorage() *FileStorage {
+func GetFSC() *FileStorage {
+	locfsonce.Do(func() { locfso = NewFileStorage(true) })
+	return locfso
+}
+
+func NewFileStorage(client bool) *FileStorage {
 	this := &FileStorage{}
 	this.osfs = afero.NewOsFs()
 	this.httpfs = afero.NewHttpFs(this.osfs)
 
-	reldir := "./toxhsfiles"
-	absdir, err := filepath.Abs(reldir)
-	gopp.ErrPrint(err)
-	this.dir = absdir
+	this.setBaseDir(client)
 
 	dvo := diskv.Options{}
 	dvo.BasePath = this.dir
@@ -55,16 +59,49 @@ func NewFileStorage() *FileStorage {
 	return this
 }
 
+func (this *FileStorage) setBaseDir(client bool) {
+	reldir := "./toxhsfiles"
+	if client {
+		reldir = gopp.IfElseStr(gopp.IsAndroid(), os.Getenv("EXTERNAL_STORAGE"), ".") + "/txcfiles"
+		reldir = gopp.IfElseStr(gopp.IsAndroid(), "/sdcard", ".") + "/txcfiles"
+		os.MkdirAll(reldir, 0744)
+		os.Chmod(reldir, 0744)
+	}
+
+	absdir, err := filepath.Abs(reldir)
+	gopp.ErrPrint(err)
+	this.dir = absdir
+}
+
 func (this *FileStorage) ReadFile(md5str string) (data []byte, err error) {
+	if !this.checkFileEscapeBaseDir(md5str) {
+		return nil, fmt.Errorf("Invalid filename: %s", md5str)
+	}
 	fname := this.dir + "/" + md5str
+	return afero.ReadFile(this.osfs, fname)
+}
+
+func (this *FileStorage) ReadFileWithName(name string) (data []byte, err error) {
+	fname := this.dir + "/" + name
 	return afero.ReadFile(this.osfs, fname)
 }
 
 func (this *FileStorage) SaveFile(data []byte, origName string) (string, error) {
 	md5str := gopp.Md5AsStr(data)
+	if !this.checkFileEscapeBaseDir(md5str) {
+		return "", fmt.Errorf("Invalid filename: %s", md5str)
+	}
 	fname := this.dir + "/" + md5str
 	this._SaveOrigName(md5str, origName)
 	return md5str, afero.WriteFile(this.osfs, fname, data, 0644)
+}
+
+// for avatar
+func (this *FileStorage) SaveFileWithName(name string, data []byte) error {
+	md5str := name
+	fname := this.dir + "/" + md5str
+	this._SaveOrigName(md5str, name)
+	return afero.WriteFile(this.osfs, fname, data, 0644)
 }
 
 func (this *FileStorage) _SaveOrigName(md5str, origName string) error {
@@ -87,7 +124,13 @@ func (this *FileStorage) SetupHttpServer(srvmux *http.ServeMux) {
 	srvmux.HandleFunc("/toxhsfs/", func(w http.ResponseWriter, r *http.Request) {
 		// log.Println("ohhhh", r.URL.String())
 		md5str := r.URL.String()[9:]
-		md5str = gopp.SubStr(md5str, 32)
+		pos := strings.Index(md5str, ".")
+		if pos == -1 {
+			// direct use, maybe avatar
+		} else {
+			md5str = gopp.SubStr(md5str, 32)
+		}
+
 		data, err := this.ReadFile(md5str)
 		gopp.ErrPrint(err, r.URL.String(), md5str)
 		w.Write(data)
@@ -181,6 +224,27 @@ func (this *FileStorage) DownloadToFileImpl(urltxt string, usepxy bool) (string,
 
 func (this *FileStorage) GetFilePath(md5str string) string {
 	return this.dir + "/" + md5str
+}
+
+// file://
+func (this *FileStorage) GetUrlDir() string { return fmt.Sprintf("file://%s", this.dir) }
+
+func (this *FileStorage) RemoveFile(md5str string) error {
+	if !this.checkFileEscapeBaseDir(md5str) {
+		return fmt.Errorf("Invalid filename: %s", md5str)
+	}
+	path := this.GetFilePath(md5str)
+	return this.osfs.Remove(path)
+}
+
+func (this *FileStorage) checkFileEscapeBaseDir(md5str string) bool {
+	path := this.GetFilePath(md5str)
+	abspath, err := filepath.Abs(path)
+	gopp.ErrPrint(err)
+	if strings.HasPrefix(abspath, this.dir) {
+		return true
+	}
+	return false
 }
 
 func (this *FileStorage) NewFileInfoLine4Md5(md5str string) *thscom.FileInfoLine {

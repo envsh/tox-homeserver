@@ -37,7 +37,7 @@ func newToxVM() *ToxVM {
 	gopp.ErrPrint(err)
 	this.tav = tav
 	this.autobotFeatures = xtox.FOTA_ADD_NET_HELP_BOTS | xtox.FOTA_REMOVE_ONLY_ME_ALL |
-		xtox.FOTA_ACCEPT_FRIEND_REQUEST | xtox.FOTA_ACCEPT_GROUP_INVITE
+		xtox.FOTA_ACCEPT_FRIEND_REQUEST // | xtox.FOTA_ACCEPT_GROUP_INVITE
 	xtox.SetAutoBotFeatures(this.t, this.autobotFeatures)
 	this.setupEvents()
 
@@ -233,17 +233,7 @@ func (this *ToxVM) setupEventsForMessage() {
 		gopp.ErrPrint(err)
 		evt.Margs = []string{fname, pubkey}
 
-		var gn uint32
-		switch itype {
-		case tox.CONFERENCE_TYPE_TEXT:
-			gn, err = t.ConferenceJoin(friendNumber, cookie)
-			gopp.ErrPrint(err, fname, gn, len(cookie))
-		case tox.CONFERENCE_TYPE_AV:
-			gn_, err_ := t.JoinAVGroupChat(friendNumber, cookie, this.onGroupAudioFrame)
-			gopp.ErrPrint(err_, fname, gn, len(cookie))
-			err = err_
-			gn = uint32(gn_)
-		}
+		gn, err := xtox.ConferenceJoin(t, friendNumber, itype, cookie, this.onGroupAudioFrame)
 		gopp.ErrPrint(err, fname, gn, len(cookie))
 		if err != nil {
 			if false {

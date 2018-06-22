@@ -81,6 +81,7 @@ func IsFixedSpecialContact(fnum uint32) bool {
 const (
 	MSGTYPE_TEXT     = "m.text"
 	MSGTYPE_IMAGE    = "m.image"
+	MSGTYPE_AVATAR   = "m.avatar"
 	MSGTYPE_AUDIO    = "m.audio"
 	MSGTYPE_VIDEO    = "m.video"
 	MSGTYPE_LOCATION = "m.location"

@@ -166,7 +166,7 @@ func (this *ToxVM) onFriendFileUploaded(md5str string, frndpk string, userCodeSt
 	// save
 	msgo, err := appctx.st.AddFriendMessage(evto.Args[1], frndpk, selfpk, 0, userCode)
 	gopp.ErrPrint(err, md5str, oname)
-	msgty, mimety := msgTypeFromFileData(data)
+	msgty, mimety := msgTypeFromFileData(data, false)
 	evto.Margs = gopp.ToStrs(0, 0, frndpk, msgty, mimety)
 	evto.EventId = msgo.EventId
 
@@ -216,7 +216,7 @@ func (this *ToxVM) onGroupFileUploaded(md5str string, frndpk string, userCodeStr
 		// save
 		msgo, err := appctx.st.AddGroupMessage(evto.Args[2], "0", frndpk, selfpk, 0, userCode)
 		gopp.ErrPrint(err, md5str, oname)
-		msgty, mimety := msgTypeFromFileData(data)
+		msgty, mimety := msgTypeFromFileData(data, false)
 		evto.EventId = msgo.EventId
 		peerName := this.t.SelfGetName()
 		peerPubkey := selfpk
@@ -263,8 +263,8 @@ func (this *ToxVM) startSendFileData(friendNumber uint32, fileName string, data 
 	this.startSendFile(friendNumber, tox.FILE_KIND_DATA, fileName, data, donefn)
 }
 
-func (this *ToxVM) startSendAvatar(friendNumber uint32) {
-
+func (this *ToxVM) startSendAvatar(friendNumber uint32, fileName string, data []byte, donefn func(error)) {
+	this.startSendFile(friendNumber, tox.FILE_KIND_AVATAR, fileName, data, donefn)
 }
 func (this *ToxVM) startSendFile(friendNumber uint32, kind uint32, fileName string, data []byte, donefn func(error)) {
 	t := this.t
@@ -289,6 +289,14 @@ func (this *ToxVM) startSendFile(friendNumber uint32, kind uint32, fileName stri
 }
 
 func (this *ToxVM) onFileRecvDone(fio *FileInfo) {
+	if fio.fkind == 1 {
+		this.onFileRecvDoneAvatar(fio)
+	} else {
+		this.onFileRecvDoneFile(fio)
+	}
+}
+
+func (this *ToxVM) onFileRecvDoneFile(fio *FileInfo) {
 	t := this.t
 	frndpk, _ := t.FriendGetPublicKey(fio.frndnum)
 	frndname, _ := t.FriendGetName(fio.frndnum)
@@ -305,6 +313,20 @@ func (this *ToxVM) onFileRecvDone(fio *FileInfo) {
 	evto.EventId = msgo.EventId
 	evto.Margs[2] = gopp.ToStr(msgo.EventId)
 
+	this.pubmsg(evto)
+}
+
+// don't save as a message
+func (this *ToxVM) onFileRecvDoneAvatar(fio *FileInfo) {
+	t := this.t
+	frndpk, _ := t.FriendGetPublicKey(fio.frndnum)
+	frndname, _ := t.FriendGetName(fio.frndnum)
+
+	log.Println("Recv avatar done:", fio.fname, humanize.Bytes(fio.fsize), "from", frndname)
+	err := store.GetFS().SaveFileWithName(frndpk, fio.fdata)
+	gopp.ErrPrint(err, fio, frndpk)
+
+	evto := NewEventFromFileInfo(fio, frndname, frndpk, -1)
 	this.pubmsg(evto)
 }
 
@@ -327,20 +349,23 @@ func NewEventFromFileInfo(fio *FileInfo, frndname, frndpk string, EventId int64)
 	evto := &thspbs.Event{}
 	evto.Name = "FriendMessage"
 	evto.Args = []string{fmt.Sprintf("%d", fio.frndnum), msg}
-	msgty, mimety := msgTypeFromFileData(fio.fdata)
+
+	msgty, mimety := msgTypeFromFileData(fio.fdata, fio.fkind == 1)
 	// for file, the sent is already 1. because we save it and then here
 	evto.Margs = []string{frndname, frndpk, gopp.ToStr(EventId), "1", msgty, mimety}
 	evto.EventId = EventId
 	return evto
 }
 
-func msgTypeFromFileData(data []byte) (msgty, mimety string) {
+func msgTypeFromFileData(data []byte, avatar bool) (msgty, mimety string) {
 	ftyo, err := filetype.Match(data)
 	gopp.ErrPrint(err)
 	mimety = ftyo.MIME.Value
 
 	msgty = thscom.MSGTYPE_FILE
-	if filetype.IsImage(data) {
+	if avatar {
+		msgty = thscom.MSGTYPE_AVATAR
+	} else if filetype.IsImage(data) {
 		msgty = thscom.MSGTYPE_IMAGE
 	} else if filetype.IsAudio(data) {
 		msgty = thscom.MSGTYPE_AUDIO

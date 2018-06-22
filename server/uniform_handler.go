@@ -16,6 +16,7 @@ import (
 
 	tox "github.com/TokTok/go-toxcore-c"
 	"github.com/envsh/go-toxcore/xtox"
+	"mvdan.cc/xurls"
 )
 
 //
@@ -459,28 +460,47 @@ func RmtCallResyncHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Event
 // and then try download to local and extract file info, and update client
 func detectGroupMessageMime(evt *thspbs.Event, message string) {
 	urlt := strings.TrimSpace(message)
-	urlo, err := url.Parse(urlt) // TODO regexp?
-	if err == nil && urlo != nil {
-		log.Println("Got a link message:", urlt)
-		switch strings.ToUpper(urlo.Scheme) {
-		case "HTTP", "HTTPS":
-			md5str, err := store.GetFS().DownloadToFile(urlt)
-			gopp.ErrPrint(err, urlt)
-			if err != nil {
-				break
-			}
+	urls := xurls.Strict().FindAllString(urlt, -1)
+	if len(urls) == 0 {
+		return
+	}
+	if !strings.HasPrefix(urlt, urls[0]) {
+		log.Println("Not a pure link, need TODO", urlt)
+		return
+	}
+	if len(urls) > 1 {
+		log.Println("How TODO multiple urls:", urls)
+		return
+	}
 
-			fil := store.GetFS().NewFileInfoLine4Md5(md5str)
-			if evt.Name != "ConferenceMessage" {
-				log.Println("Rename event:", evt.Name)
-			}
-			evt.Name = "ConferenceMessageReload" // TODO subcommand
-			evt.Args[3] = fil.String()
-			evt.Margs[6] = fil.ToType()
-			evt.Margs[7] = fil.Mime
-			appctx.tvm.pubmsg(evt)
-		default:
-			log.Println("Unsupported scheme:", urlo.Scheme)
+	urlo, err := url.Parse(urls[0]) // only 1
+	gopp.ErrPrint(err)
+	if err != nil || urlo == nil {
+		return
+	}
+
+	log.Println("Got a link message:", urls[0])
+	switch strings.ToUpper(urlo.Scheme) {
+	case "HTTP", "HTTPS":
+		md5str, err := store.GetFS().DownloadToFile(urls[0])
+		gopp.ErrPrint(err, urlt)
+		if err != nil {
+			break
 		}
+
+		fil := store.GetFS().NewFileInfoLine4Md5(md5str)
+		if evt.Name != "ConferenceMessage" {
+			log.Println("Rename event:", evt.Name)
+		}
+		evt.Name = "ConferenceMessageReload" // TODO subcommand
+		evt.Args[3] = fil.String()
+		evt.Margs[6] = fil.ToType()
+		evt.Margs[7] = fil.Mime
+		// TODO which type need reload?
+		if fil.ToType() == thscom.MSGTYPE_IMAGE {
+		}
+		appctx.tvm.pubmsg(evt)
+	default:
+		log.Println("Unsupported scheme:", urlo.Scheme)
 	}
 }

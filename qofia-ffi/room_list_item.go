@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"gopp"
 	"log"
-	"os"
 	"runtime"
 	"strings"
 	"time"
@@ -12,6 +11,7 @@ import (
 	"go-purple/msgflt-prpl/bridges"
 	thscli "tox-homeserver/client"
 	thscom "tox-homeserver/common"
+	store "tox-homeserver/store"
 	"tox-homeserver/thspbs"
 
 	"github.com/kitech/qt.go/qtcore"
@@ -337,7 +337,7 @@ func (this *RoomListItem) SetContactInfo(info interface{}) {
 		SetQLabelElideText(this.Label_2, name)
 		SetQLabelElideText(this.Label_4, ct.Stmsg)
 
-		avataricon := fmt.Sprintf("%s/.config/tox/avatars/%s.png", os.Getenv("HOME"), ct.GetPubkey())
+		avataricon := store.GetFSC().GetFilePath(ct.GetPubkey())
 		if gopp.FileExist(avataricon) {
 			this.cticon = qtgui.NewQIcon_2(avataricon)
 			this.ToolButton_2.SetIcon(this.cticon)
@@ -463,14 +463,11 @@ func (this *RoomListItem) UpdateMessageMimeContent(msgo *Message, msgiw *Message
 	if fil == nil {
 		return
 	}
-	locdir := gopp.IfElseStr(gopp.IsAndroid(), os.Getenv("EXTERNAL_STORAGE"), ".") + "/txcfiles"
-	locdir = gopp.IfElseStr(gopp.IsAndroid(), "/sdcard", ".") + "/txcfiles"
-	os.MkdirAll(locdir, 0744)
-	os.Chmod(locdir, 0744)
-	locsrcname := GetLocalPathByHash(fil.Md5str, locdir)
-	locfname := locsrcname[7:] // trim prefix file://
+
+	locfname := store.GetFSC().GetFilePath(fil.Md5str)
 	rmturl := thscli.HttpFsUrlFor(fil.Md5str)
 
+	locdir := store.GetFSC().GetUrlDir()
 	richtxt := Msg2FileText(fil, locdir)
 	log.Println(msgo.Msg, richtxt)
 	msgiw.Label_5.SetText(richtxt)
@@ -514,6 +511,43 @@ func (this *RoomListItem) UpdateMessageState(msgo *Message) {
 			break
 		}
 	}
+}
+
+func (this *RoomListItem) SetAvatar(msgo *Message, frndpk string) {
+	fil := msgo.GetFileInfoLine()
+	gopp.NilPrint(fil, msgo.Msg)
+	if fil == nil {
+		return
+	}
+
+	locfname := store.GetFSC().GetFilePath(frndpk)
+	rmturl := thscli.HttpFsUrlFor(frndpk)
+
+	setFriendIcon := func(thefname string) {
+		icon := qtgui.NewQIcon_2(thefname)
+		if icon != nil && !icon.IsNull() {
+			this.cticon = icon
+			this.ToolButton_2.SetIcon(this.cticon)
+			uictx.msgwin.SetIconForItem(this)
+		} else {
+			log.Println("Friend icon not supported:", locfname)
+		}
+	}
+	if fil.Length == 0 { // clear avatar
+		setFriendIcon(":/icons/icon_avatar_40.png")
+		err := store.GetFSC().RemoveFile(frndpk)
+		gopp.ErrPrint(err)
+		return
+	}
+	go func() {
+		ro := &grequests.RequestOptions{}
+		resp, err := grequests.Get(rmturl, ro)
+		gopp.ErrPrint(err, rmturl)
+		err = resp.DownloadToFile(locfname)
+		gopp.ErrPrint(err, rmturl)
+
+		runOnUiThread(func() { setFriendIcon(locfname) })
+	}()
 }
 
 func (this *RoomListItem) FindMessageByUserCode(userCode int64) *Message {
