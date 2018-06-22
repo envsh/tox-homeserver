@@ -313,7 +313,7 @@ func dispatchEvent(evto *thspbs.Event) {
 			log.Println(evto.Uargs, len(vdfrm))
 		}
 		AVMan().PutVideoFrame(evto.Uargs.FriendPubkey, vdfrm, int(evto.Uargs.Width), int(evto.Uargs.Height))
-	case "ConferenceAudioRecieiveFrame":
+	case "ConferenceAudioReceiveFrame":
 		uargs := evto.Uargs
 		pcm := uargs.Pcm
 		uargs.Pcm = nil

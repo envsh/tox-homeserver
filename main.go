@@ -16,6 +16,7 @@ func main() {
 	SetupSignal(func() {
 		StopProfile()
 		StopTrace()
+		server.Atexit()
 	})
 
 }

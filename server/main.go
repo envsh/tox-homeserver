@@ -63,6 +63,20 @@ func Main() {
 	rpcs.run()
 }
 
+func Atexit() {
+	tvm := appctx.tvm
+	if tvm != nil {
+		if tvm.tav != nil {
+			log.Println("Stop toxav...")
+			tvm.tav.Kill()
+		}
+		if tvm.t != nil {
+			log.Println("Stop tox...")
+			tvm.t.Kill()
+		}
+	}
+}
+
 func addFileHelperAsContact(st *store.Storage) {
 	st.AddFriend(thscom.FileHelperPk, thscom.FileHelperFnum, thscom.FileHelperName, "")
 }

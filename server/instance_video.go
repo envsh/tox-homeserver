@@ -98,7 +98,7 @@ func (this *ToxVM) onGroupAudioFrame(t *tox.Tox, groupNumber uint32, peerNumber 
 	peerpk, _ := t.ConferencePeerGetPublicKey(groupNumber, peerNumber)
 	peerName, _ := t.ConferencePeerGetName(groupNumber, peerNumber)
 
-	evto := &thspbs.Event{Uargs: &thspbs.Argument{}, Name: "ConferenceAudioRecieiveFrame"}
+	evto := &thspbs.Event{Uargs: &thspbs.Argument{}, Name: "ConferenceAudioReceiveFrame"}
 
 	evto.Uargs.GroupNumber = groupNumber
 	evto.Uargs.GroupTitle = groupTitle

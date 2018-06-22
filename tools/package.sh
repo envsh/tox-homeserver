@@ -55,11 +55,14 @@ function package_desktop_linux()
     cp -v /usr/lib/libffi.so.6 lib/
     # make sure keep GLIBC_2.14
     cp -a ../../libs/libsodium.so* lib/
+    cp -a ../../libs/libopenal.so* lib/
+    cp -a ../../libs/libav*.so* lib/
+    cp -a ../../libs/libsw*.so* lib/
 
     cd ..
     cp -a ../../tools/AppRun ./
     cp -v ../../tools/app.desktop qofia.desktop
-    cp -v ../../tools/qt.conf $pkgdir/usr/bin/
+    cp -v ../../tools/qt.conf usr/bin/
     touch qofia.png
     cd ..
 
@@ -83,7 +86,7 @@ function package_android()
 {
     cd $topdir/packages
     cp -v ../qofia-ffi/build/build/outputs/apk/build-debug.apk ./qofia-ffi.apk # test line
-    mv -v qofia-ffi.apk qofia-ffi-arm-$curver.apk
+    mv -v qofia-ffi.apk qofia-ffi-arm7-$curver.apk
     true;
 }
 
@@ -96,6 +99,7 @@ function build_desktop_windows()
         mv -v qofia-ffi-i386.exe.zip qofia-ffi-amd64.exe.zip ../packages/
     cd $topdir
 }
+winlibs="libsoxr.dll xvidcore.dll libx265.dll libwebpmux-3.dll libwebp-7.dll libvpx.dll.5.0.0 libvorbisenc-2.dll libvorbis-0.dll libtheora-0.dll libtheoraenc-1.dll libtheoradec-1.dll libspeex-1.dll libopenjp2-7.dll libopencore-amrwb-0.dll libopencore-amrnb-0.dll libmp3lame-0.dll liblzma-5.dll libgsm.dll.1.0.14 libfdk-aac-1.dll libxml2-2.dll libssh.dll libmodplug-1.dll libgnutls-30.dll libgmp-10.dll libbluray-2.dll libopus-0.dll libx264-152.dll libgcrypt-20.dll libgpg-error-0.dll libtasn1-6.dll libp11-kit-0.dll libnettle-6.dll libhogweed-4.dll libogg-0.dll SDL2.dll libass-9.dll libfontconfig-1.dll libfribidi-0.dll libvidstab.dll"
 function package_desktop_windows()
 {
     cd $topdir/packages
@@ -108,6 +112,19 @@ function package_desktop_windows()
     cp -a /home/me/oss/qt.inline/packages/qtenv_win64/bin/*.dll $pkgdir/
     #cp -a /home/me/oss/qt.inline/winx64bd/libQt5Inline.so $pkgdir/Qt5Inline.dll
     #x86_64-w64-mingw32-strip -v -g $pkgdir/Qt5Inline.dll
+    cp -a /usr/x86_64-w64-mingw32/bin/avcodec-58.dll $pkgdir/
+    cp -a /usr/x86_64-w64-mingw32/bin/avdevice-58.dll $pkgdir/
+    cp -a /usr/x86_64-w64-mingw32/bin/avformat-58.dll $pkgdir/
+    cp -a /usr/x86_64-w64-mingw32/bin/avutil-56.dll $pkgdir/
+    cp -a /usr/x86_64-w64-mingw32/bin/swresample-3.dll $pkgdir/
+    cp -a /usr/x86_64-w64-mingw32/bin/swscale-5.dll $pkgdir/
+    cp -a /usr/x86_64-w64-mingw32/bin/avfilter-7.dll $pkgdir/
+    cp -a /usr/x86_64-w64-mingw32/bin/avresample-4.dll $pkgdir/
+    cp -a /usr/x86_64-w64-mingw32/bin/postproc-55.dll $pkgdir/
+    cp -a /usr/x86_64-w64-mingw32/bin/libx264-152.dll $pkgdir/libx264-148.dll
+    for winlib in $winlibs; do
+        cp -va /usr/x86_64-w64-mingw32/bin/$winlib $pkgdir/
+    done
     tar jcvf $pkgdir.tar.bz2 $pkgdir/
     rm -rf $pkgdir
 
@@ -117,6 +134,19 @@ function package_desktop_windows()
     cp -a /home/me/oss/qt.inline/packages/qtenv_win32/bin/*.dll $pkgdir/
     #cp -a /home/me/oss/qt.inline/winx32bd/libQt5Inline.so $pkgdir/Qt5Inline.dll
     #i686-w64-mingw32-strip -v -g $pkgdir/Qt5Inline.dll
+    cp -a /usr/i686-w64-mingw32/bin/avcodec-58.dll $pkgdir/
+    cp -a /usr/i686-w64-mingw32/bin/avdevice-58.dll $pkgdir/
+    cp -a /usr/i686-w64-mingw32/bin/avformat-58.dll $pkgdir/
+    cp -a /usr/i686-w64-mingw32/bin/avutil-56.dll $pkgdir/
+    cp -a /usr/i686-w64-mingw32/bin/swresample-3.dll $pkgdir/
+    cp -a /usr/i686-w64-mingw32/bin/swscale-5.dll $pkgdir/
+    cp -a /usr/i686-w64-mingw32/bin/avfilter-7.dll $pkgdir/
+    cp -a /usr/i686-w64-mingw32/bin/avresample-4.dll $pkgdir/
+    cp -a /usr/i686-w64-mingw32/bin/postproc-55.dll $pkgdir/
+    cp -a /usr/i686-w64-mingw32/bin/libx264-152.dll $pkgdir/libx264-148.dll
+    for winlib in $winlibs; do
+        cp -va /usr/i686-w64-mingw32/bin/$winlib $pkgdir/
+    done
     tar jcvf $pkgdir.tar.bz2 $pkgdir/
     rm -rf $pkgdir
 
