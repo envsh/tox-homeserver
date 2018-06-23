@@ -116,6 +116,17 @@ func (this *FileStorage) GetOrigName(md5str string) (string, error) {
 	return string(data), nil
 }
 
+func (this *FileStorage) TempFile() afero.File {
+	fh, err := afero.TempFile(this.osfs, this.dir, "txfstmp.")
+	gopp.ErrPrint(err)
+	return fh
+}
+
+func (this *FileStorage) TempFileName() string {
+	name := fmt.Sprintf("%s/txfstmp.%s", this.dir, gopp.RandomStringAlphaMixed(7))
+	return name
+}
+
 // nil for default
 func (this *FileStorage) SetupHttpServer(srvmux *http.ServeMux) {
 	if srvmux == nil {

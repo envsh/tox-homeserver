@@ -341,6 +341,9 @@ func (this *RoomListItem) SetContactInfo(info interface{}) {
 		if gopp.FileExist(avataricon) {
 			this.cticon = qtgui.NewQIcon_2(avataricon)
 			this.ToolButton_2.SetIcon(this.cticon)
+		} else {
+			this.cticon = GetIdentIcon(ct.Pubkey)
+			this.ToolButton_2.SetIcon(this.cticon)
 		}
 		if ct.GetConnStatus() == 0 {
 			this.sticon = qtgui.NewQIcon_2(":/icons/offline_30.png")
@@ -360,7 +363,11 @@ func (this *RoomListItem) SetContactInfo(info interface{}) {
 
 		// this maybe call multiple times, so -20 -20 then, the item is 0 height.
 		// this.QWidget_PTR().SetFixedHeight(this.QWidget_PTR().Height() - 20)
-		this.cticon = qtgui.NewQIcon_2(":/icons/groupgray.png")
+		if false {
+			this.cticon = qtgui.NewQIcon_2(":/icons/groupgray.png")
+		} else {
+			this.cticon = GetInitAvatar(gopp.IfElseStr(ct.Title == "", ct.GroupId, ct.Title))
+		}
 		this.ToolButton_2.SetIcon(this.cticon)
 		this.peerCount = len(ct.Members)
 		if this.peerCount > 0 {
@@ -513,7 +520,25 @@ func (this *RoomListItem) UpdateMessageState(msgo *Message) {
 	}
 }
 
-func (this *RoomListItem) SetAvatar(msgo *Message, frndpk string) {
+func (this *RoomListItem) ClearAvatar(frndpk string) {
+	this.cticon = GetIdentIcon(frndpk)
+	this.ToolButton_2.SetIcon(this.cticon)
+	uictx.msgwin.SetIconForItem(this)
+}
+
+func (this *RoomListItem) SetAvatar(idico *qtgui.QIcon) {
+	this.cticon = idico
+	this.ToolButton_2.SetIcon(this.cticon)
+	uictx.msgwin.SetIconForItem(this)
+}
+
+func (this *RoomListItem) SetAvatarForId(frndpk string) {
+	locfname := store.GetFSC().GetFilePath(frndpk)
+	idico := qtgui.NewQIcon_2(locfname)
+	this.SetAvatar(idico)
+}
+
+func (this *RoomListItem) SetAvatarForMessage(msgo *Message, frndpk string) {
 	fil := msgo.GetFileInfoLine()
 	gopp.NilPrint(fil, msgo.Msg)
 	if fil == nil {
@@ -526,17 +551,13 @@ func (this *RoomListItem) SetAvatar(msgo *Message, frndpk string) {
 	setFriendIcon := func(thefname string) {
 		icon := qtgui.NewQIcon_2(thefname)
 		if icon != nil && !icon.IsNull() {
-			this.cticon = icon
-			this.ToolButton_2.SetIcon(this.cticon)
-			uictx.msgwin.SetIconForItem(this)
+			this.SetAvatar(icon)
 		} else {
 			log.Println("Friend icon not supported:", locfname)
 		}
 	}
 	if fil.Length == 0 { // clear avatar
-		setFriendIcon(":/icons/icon_avatar_40.png")
-		err := store.GetFSC().RemoveFile(frndpk)
-		gopp.ErrPrint(err)
+		this.ClearAvatar(frndpk)
 		return
 	}
 	go func() {

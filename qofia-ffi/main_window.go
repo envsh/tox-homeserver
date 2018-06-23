@@ -109,6 +109,8 @@ func (this *MainWindow) initStartup() {
 
 func (this *MainWindow) initFirstShow() {
 	log.Println("Init first show ui...")
+	// FindProperFontFile(this.LineEdit.QWidget_PTR())
+	PrepareFont()
 	this.loadStorage()
 
 	this.initProfileStorage()

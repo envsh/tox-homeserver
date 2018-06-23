@@ -66,5 +66,6 @@
     <file>icons/volum_40.png</file>
     <file>icons/MessageListSending@2x.png</file>
     <file>icons/filehelper.png</file>
+    <file>resource/fzlt.ttf</file>
   </qresource>
 </RCC>

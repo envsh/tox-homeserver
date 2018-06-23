@@ -11,7 +11,7 @@ import (
 
 	// tox "github.com/envsh/go-toxcore"
 
-	"atapi/dorpc/dyngrpc"
+	// "atapi/dorpc/dyngrpc"
 
 	"google.golang.org/grpc"
 
@@ -55,7 +55,7 @@ func (this *GrpcServer) run() {
 }
 
 func (this *GrpcServer) register() {
-	dyngrpc.RegisterService(demofn1, "thsdemo", "pasv")
+	// dyngrpc.RegisterService(demofn1, "thsdemo", "pasv")
 }
 
 // TODO

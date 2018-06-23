@@ -249,7 +249,7 @@ func (this *ToxVM) setupEventsForMessage() {
 		}
 		evt.Margs = append(evt.Margs, fmt.Sprintf("%d", gn))
 
-		cookie2, _ := t.ConferenceGetIdentifier(gn)
+		cookie2, _ := xtox.ConferenceGetIdentifier_s(t, gn)
 		log.Println(cookie2 == cookie, cookie, cookie2)
 		gopp.Assert(!xtox.ConferenceIdIsEmpty(cookie2), fname)
 
@@ -264,8 +264,7 @@ func (this *ToxVM) setupEventsForMessage() {
 	t.CallbackConferenceMessageAdd(func(_ *tox.Tox, groupNumber uint32, peerNumber uint32, message string, userData interface{}) {
 		evt := thspbs.Event{}
 		evt.Name = "ConferenceMessage"
-		evt.Args = []string{fmt.Sprintf("%d", groupNumber), fmt.Sprintf("%d", peerNumber),
-			fmt.Sprintf("%d", 0), message}
+		evt.Args = []string{fmt.Sprintf("%d", groupNumber), fmt.Sprintf("%d", peerNumber), "0", message}
 
 		peerPubkey, err := t.ConferencePeerGetPublicKey(groupNumber, peerNumber)
 		gopp.ErrPrint(err)
@@ -328,7 +327,18 @@ func (this *ToxVM) setupEventsForMessage() {
 			groupId, _ = t.ConferenceGetIdentifier(groupNumber)
 		}
 
-		evt.Margs = []string{peerName, peerPubkey, title, groupId}
+		// here only process peer that not me's message
+		msgo, err := appctx.st.AddGroupMessage(message, "0", groupId, peerPubkey, 0, 0)
+		gopp.ErrPrint(err)
+		if err == nil {
+			err := appctx.st.SetMessageSent(msgo.Id)
+			gopp.ErrPrint(err, msgo.Id)
+			msgo.Sent = 1
+		}
+		evt.EventId = msgo.EventId
+
+		evt.Margs = []string{peerName, peerPubkey, title, groupId, gopp.ToStr(msgo.EventId), "1",
+			thscom.MSGTYPE_TEXT, "text/plain"}
 
 		this.pubmsg(&evt)
 	}, nil)

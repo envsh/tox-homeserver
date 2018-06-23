@@ -48,7 +48,7 @@ func dispatchEvent(evto *thspbs.Event) {
 			msgty := evto.Margs[4]
 			msgo := NewMessageForFriend(evto)
 			if msgty == thscom.MSGTYPE_AVATAR {
-				item.SetAvatar(msgo, pubkey)
+				item.SetAvatarForMessage(msgo, pubkey)
 			} else {
 				item.AddMessage(msgo, false)
 			}

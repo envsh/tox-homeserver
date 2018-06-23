@@ -20,6 +20,7 @@ import (
 	"github.com/3d0c/gmf"
 )
 
+// TODO TODO test for android ffmpeg video record, but no lucky
 func VideoRec2() *VideoRecorder2 {
 	_VideoRecOnce2.Do(func() {
 		_VideoRec2 = _NewVideoRecorder2()
@@ -121,7 +122,7 @@ func (this *VideoRecorder2) opencapdev() error {
 		}
 		if this.cretp == 1 {
 			log.Println(this.rawctxp)
-			this.iptctx = gmf.NewOpenedInputCtxFromPointer(unsafe.Pointer(this.rawctxp))
+			// this.iptctx = gmf.NewOpenedInputCtxFromPointer(unsafe.Pointer(this.rawctxp))
 			break
 		}
 		if time.Since(btime).Seconds() > 10 {

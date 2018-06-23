@@ -1,13 +1,25 @@
 package main
 
 import (
+	"bytes"
 	"gopp"
+	"image/color"
+	"image/png"
+	"io/ioutil"
 	"log"
+	"math/rand"
+	"os"
+	"strings"
 	"unsafe"
+
+	store "tox-homeserver/store"
 
 	"github.com/kitech/qt.go/qtcore"
 	"github.com/kitech/qt.go/qtgui"
 	"github.com/kitech/qt.go/qtwidgets"
+
+	"github.com/holys/initials-avatar"
+	"github.com/issue9/identicon"
 )
 
 func Repolish(w qtwidgets.QWidget_ITF) {
@@ -79,4 +91,100 @@ func NewQPainter(w qtwidgets.QWidget_ITF) *qtgui.QPainter {
 	ptr := PointerStep(w.QWidget_PTR().GetCthis(), 2*unsafe.Sizeof(uintptr(0)))
 	ptdev := qtgui.NewQPaintDeviceFromPointer(ptr)
 	return qtgui.NewQPainter_1(ptdev)
+}
+
+// for friend
+func GetIdentIcon(s string) *qtgui.QIcon {
+	back := color.RGBA{240, 240, 240, 255}
+
+	// from github
+	fore1 := color.RGBA{228, 131, 172, 255} // pink, 255 no transpart
+	fore2 := color.RGBA{144, 181, 233, 255} // blue
+
+	fore := gopp.IfElse(rand.Int()%2 == 1, fore1, fore2).(color.RGBA)
+	imgo, err := identicon.Make(64, back, fore, []byte(s))
+
+	// fores := []color.Color{color.Black, color.RGBA{200, 2, 5, 100}, color.RGBA{2, 200, 5, 100}}
+	// ii, err := identicon.New(64, back, fores...)
+	// imgo := ii.Make([]byte(s))
+
+	gopp.ErrPrint(err, s)
+
+	w2 := store.GetFSC().TempFile()
+	err = png.Encode(w2, imgo)
+	gopp.ErrPrint(err)
+	gopp.ErrPrint(w2.Sync())
+	defer os.Remove(w2.Name())
+	defer w2.Close()
+
+	idico := qtgui.NewQIcon_2(w2.Name())
+	gopp.FalsePrint(!idico.IsNull(), "gen idico failed.")
+	// log.Println(w2.Name(), idico.IsNull(), s)
+
+	if false { // null result?
+		w := bytes.NewBuffer([]byte{})
+		err = png.Encode(w, imgo)
+		data := w.Bytes()
+		qimgo := qtgui.QImage_FromData(unsafe.Pointer(&data[0]), len(data), "PNG")
+		if qimgo.IsNull() {
+		}
+		idico := qtgui.NewQIcon_1(qtgui.QPixmap_FromImage(qimgo, 0))
+		log.Println(len(data), qimgo.IsNull(), idico.IsNull())
+	}
+
+	return idico
+}
+
+// for group
+func GetInitAvatar(name string) *qtgui.QIcon {
+	// fontFile := "./resource/Hiragino_Sans_GB_W3.ttf"
+
+	cfg := avatar.Config{}
+	cfg.FontFile = fontFile
+	cfg.MaxItems = 2
+	avto := avatar.NewWithConfig(cfg)
+	name = strings.TrimLeft(name, " ~!#$%^&*()_+`-={}[]\\|:\";'<>?,./")
+	data, err := avto.DrawToBytes(name, 64)
+	gopp.ErrPrint(err, name)
+
+	fname := store.GetFSC().TempFileName()
+	err = ioutil.WriteFile(fname, data, 0644)
+	gopp.ErrPrint(err, fname, len(data))
+	defer os.Remove(fname)
+
+	idico := qtgui.NewQIcon_2(fname)
+	gopp.FalsePrint(!idico.IsNull(), "gen idico failed.", name)
+	return idico
+}
+
+var fontFile = "./resource/fzlt.ttf"
+
+func PrepareFont() {
+	fp := qtcore.NewQFile_1(":/resource/fzlt.ttf")
+	fp.Open(qtcore.QIODevice__ReadOnly)
+	data := qtcore.NewQIODeviceFromPointer(fp.GetCthis()).ReadAll().Data_fix()
+	qtcore.NewQIODeviceFromPointer(fp.GetCthis()).Close()
+
+	fontFile = store.GetFSC().GetFilePath("fzlt.ttf")
+	err := ioutil.WriteFile(fontFile, []byte(data), 0644)
+	gopp.ErrPrint(err, fontFile)
+	log.Println(fontFile)
+}
+
+func FindProperFontFile(w *qtwidgets.QWidget) {
+	// qtgui.QFontDatabase__SimplifiedChinese
+	fi := w.FontInfo()
+	fnto := w.Font()
+	log.Println(fi, fnto)
+	log.Println(fnto.Family(), fnto.ToString(), fnto.RawName())
+	log.Println(fnto.StyleName())
+	log.Println(fnto.Key(), fnto.LastResortFamily())
+	if false { //failed
+		fnto2 := qtgui.NewQFont_1_(fnto.Family())
+		log.Println(fnto2.RawName())
+	}
+	fflst := qtgui.QFontDatabase_ApplicationFontFamilies(qtgui.QFontDatabase__Any)
+	fflstx := qtcore.NewQStringListxFromPointer(fflst.GetCthis())
+	log.Println(fflstx.Count_1())
+	log.Println(fflstx.ConvertToSlice())
 }
