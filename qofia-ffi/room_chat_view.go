@@ -85,7 +85,7 @@ func (this *MainWindow) initRoomChatEvents() {
 			for idx, urlo := range urlsx.ConvertToSlice() {
 				log.Println(idx, urlo.IsLocalFile(), urlo.Scheme(), urlo.Port__(), urlo.ToLocalFile())
 				if urlo.IsLocalFile() {
-					this.sendFile(urlo.ToLocalFile())
+					this.sendFileName(urlo.ToLocalFile(), nil)
 					accepted = true
 				} else {
 					// log.Println(urlo.ToPercentEncoding__("123??")) // crash

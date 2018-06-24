@@ -54,6 +54,7 @@ func (this *MainWindow) initAppBackend() {
 	}
 
 	uifnQueue <- func() { this.setConnStatus(gopp.IfElse(vtcli.Binfo.ConnStatus > 0, true, false).(bool)) }
+	uifnQueue <- func() { this.setCoreVersion(vtcli.Binfo.ToxVersion) }
 
 	log.Println("get base info done.")
 	baseInfoGot = true

@@ -239,6 +239,7 @@ func (this *FileStorage) GetFilePath(md5str string) string {
 
 // file://
 func (this *FileStorage) GetUrlDir() string { return fmt.Sprintf("file://%s", this.dir) }
+func (this *FileStorage) GetDir() string    { return fmt.Sprintf("%s", this.dir) }
 
 func (this *FileStorage) RemoveFile(md5str string) error {
 	if !this.checkFileEscapeBaseDir(md5str) {

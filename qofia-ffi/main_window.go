@@ -99,11 +99,14 @@ func (this *MainWindow) initStartup() {
 	this.initHeaderFooter()
 	this.initProfile()
 	this.initRoomChat()
+	this.initMessageListWin()
 	this.initInivteFriend()
 	this.initAddFriend()
 	this.initGroupMemberList()
+	this.initContactInfoPage()
 	this.initRoomFile()
 	this.initVideoCall()
+	this.initAboutPage()
 	log.Println("Init startup ui done.")
 }
 
@@ -177,6 +180,7 @@ const (
 	UIST_ADD_FRIEND
 	UIST_INVITE_FRIEND
 	UIST_MEMBERS
+	UIST_CONTACT_INFO
 	UIST_TESTUI
 	UIST_LOGUI
 	UIST_ABOUTUI
@@ -194,6 +198,14 @@ func (this *MainWindow) switchUiStackPop(x int) {
 	// _HeaderFooterState.viewStack.Pop()
 	uictx.uiw.ComboBox.SetCurrentIndex(x)
 	uictx.uiw.StackedWidget.SetCurrentIndex(x)
+}
+
+// pop
+func (this *MainWindow) switchUiStackPopBack() {
+	if _, ok := _HeaderFooterState.viewStack.Pop(); ok {
+		valx, _ := _HeaderFooterState.viewStack.Peek()
+		this.switchUiStackPop(valx.(int))
+	}
 }
 
 func (this *MainWindow) onRoomContextMenu(item *RoomListItem, w *qtwidgets.QWidget, pos *qtcore.QPoint) {
@@ -225,7 +237,9 @@ func (this *MainWindow) onRoomContextTriggered(item *RoomListItem, checked bool,
 			uictx.iteman.Delete(item)
 		}
 	} else if act == this.rcact3 {
-
+		this.switchUiStack(UIST_CONTACT_INFO)
+		this.fillConactInfo(item)
+		this.fillConactSetting(item)
 	}
 }
 

@@ -6,10 +6,10 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"strings"
 
 	thscli "tox-homeserver/client"
 	thscom "tox-homeserver/common"
+	store "tox-homeserver/store"
 
 	humanize "github.com/dustin/go-humanize"
 	"github.com/kitech/qt.go/qtrt"
@@ -32,7 +32,7 @@ func (this *MainWindow) initRoomFileSignals() {
 		fname := qtwidgets.QFileDialog_GetOpenFileName(this.QWidget_PTR(), "Select file", dir, "All Files (*)", "*.*", 0)
 		log.Println(fname)
 		if fname != "" {
-			this.sendFile(fname)
+			this.sendFileName(fname, nil)
 		}
 	})
 }
@@ -45,7 +45,12 @@ func (this *MainWindow) initRoomFileStorage() {
 
 }
 
-func (this *MainWindow) sendFile(fname string) {
+func (this *MainWindow) sendFileName(fname string, donefn func()) {
+	go this.sendFileName_(fname, donefn)
+}
+
+// should block
+func (this *MainWindow) sendFileName_(fname string, donefn func()) {
 	item := uictx.msgwin.item
 	if item == nil {
 		log.Println("Dont know send to who.")
@@ -64,14 +69,14 @@ func (this *MainWindow) sendFile(fname string) {
 	ftyo, err := filetype.MatchFile(fname)
 	gopp.ErrPrint(err, ftyo)
 
-	picw := gopp.IfElseInt(strings.HasPrefix(ftyo.MIME.Value, "image/"), 200, 50)
+	picw := previewWidth(ftyo.MIME.Value, fname)
 	itext := fmt.Sprintf("<a href='%s'><img width='%d' src='%s' alt='%s'/></a><br/>%s (%s; %s)",
 		fname,
 		picw, fname, fname, filepath.Base(fname), ftyo.MIME.Value, humanize.Bytes(uint64(fi.Size())))
 	userCode := thscli.NextUserCode(devInfo.Uuid)
 	msgo := NewMessageForMe(itext)
 	msgo.UserCode = userCode
-	item.AddMessage(msgo, false)
+	runOnUiThread(func() { item.AddMessage(msgo, false) })
 
 	ro := &grequests.RequestOptions{}
 	ro.Params = map[string]string{
@@ -87,5 +92,19 @@ func (this *MainWindow) sendFile(fname string) {
 	u := thscli.HttpFsUrlForUpload()
 	resp, err := grequests.Put(u, ro)
 	gopp.ErrPrint(err, u)
-	log.Println(resp)
+	gopp.ErrPrint(resp.Error, resp.StatusCode)
+
+	if donefn != nil {
+		donefn()
+	}
+}
+
+func (this *MainWindow) sendFileData(fdata []byte) {
+	md5str, err := store.GetFSC().SaveFile(fdata, gopp.ToStr(fdata))
+	gopp.ErrPrint(err)
+	tmpfname := store.GetFSC().GetFilePath(md5str)
+
+	this.sendFileName(tmpfname, func() {
+		// gopp.ErrPrint(os.Remove(tmpfname), len(fdata))
+	})
 }

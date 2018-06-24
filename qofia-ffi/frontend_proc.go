@@ -333,7 +333,10 @@ func dispatchEvent(evto *thspbs.Event) {
 		}
 		AVMan().PutAudioFrame(uargs.GroupIdentity, pcm)
 	default:
-		log.Printf("Unimpled: %+v\n", evto)
+		if !strings.HasSuffix(evto.Name, "Resp") &&
+			!strings.HasSuffix(evto.Name, "Reload") {
+			log.Printf("Unimpled: %+v\n", evto)
+		}
 	}
 }
 
@@ -444,7 +447,8 @@ func dispatchEventResp(evto *thspbs.Event) {
 	case "AudioReceiveFrame": // do nothing
 	case "VideoReceiveFrame": // do nothing
 	default:
-		if strings.HasSuffix(evto.Name, "Resp") {
+		if strings.HasSuffix(evto.Name, "Resp") ||
+			strings.HasSuffix(evto.Name, "Reload") {
 			log.Printf("Unimpled: %+v\n", evto)
 		}
 	}
@@ -465,6 +469,6 @@ func dispatchOtherEvent(evto *thspbs.Event) {
 		uictx.mw.switchUiStack(UIST_MESSAGEUI)
 		uictx.mw.sendMessageImpl(item, mtype+":"+mcontent, false, thscom.FileHelperFnum)
 	default:
-		log.Printf("Unimpled: %+v\n", evto)
+		// log.Printf("Unimpled: %+v\n", evto)
 	}
 }

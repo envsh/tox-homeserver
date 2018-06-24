@@ -14,6 +14,7 @@ import (
 	store "tox-homeserver/store"
 	"tox-homeserver/thspbs"
 
+	humanize "github.com/dustin/go-humanize"
 	"github.com/kitech/qt.go/qtcore"
 	"github.com/kitech/qt.go/qtgui"
 	"github.com/kitech/qt.go/qtwidgets"
@@ -474,14 +475,19 @@ func (this *RoomListItem) UpdateMessageMimeContent(msgo *Message, msgiw *Message
 	locfname := store.GetFSC().GetFilePath(fil.Md5str)
 	rmturl := thscli.HttpFsUrlFor(fil.Md5str)
 
-	locdir := store.GetFSC().GetUrlDir()
-	richtxt := Msg2FileText(fil, locdir)
-	log.Println(msgo.Msg, richtxt)
-	msgiw.Label_5.SetText(richtxt)
+	reloadMsgItem := func(txt string) { msgiw.Label_5.SetText(txt) }
 
-	go func() {
-		if ok, _ := afero.Exists(afero.NewOsFs(), locfname); ok {
-		} else {
+	locdir := store.GetFSC().GetDir()
+	if ok, _ := afero.Exists(afero.NewOsFs(), locfname); ok {
+		richtxt := Msg2FileText(fil, locdir)
+		log.Println(msgo.Msg, richtxt)
+		reloadMsgItem(richtxt)
+	} else {
+		richtxt := fmt.Sprintf("Loading... %s: %s", fil.Mime, humanize.Bytes(uint64(fil.Length)))
+		log.Println(msgo.Msg, richtxt)
+		reloadMsgItem(richtxt)
+
+		go func() {
 			time.Sleep(3 * time.Second)
 			ro := &grequests.RequestOptions{}
 			resp, err := grequests.Get(rmturl, ro)
@@ -489,12 +495,14 @@ func (this *RoomListItem) UpdateMessageMimeContent(msgo *Message, msgiw *Message
 			err = resp.DownloadToFile(locfname)
 			gopp.ErrPrint(err, rmturl)
 
-			runOnUiThread(func() { msgiw.Label_5.SetText("Switching...") })
+			runOnUiThread(func() { reloadMsgItem("Switching...") })
 			time.Sleep(3 * time.Second)
-			runOnUiThread(func() { msgiw.Label_5.SetText(richtxt) })
-		}
-	}()
+			richtxt := Msg2FileText(fil, locdir)
+			log.Println(msgo.Msg, richtxt)
+			runOnUiThread(func() { reloadMsgItem(richtxt) })
 
+		}()
+	}
 }
 
 func (this *RoomListItem) UpdateMessageState(msgo *Message) {

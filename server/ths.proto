@@ -80,6 +80,7 @@ message BaseInfo {
     map<uint32,GroupInfo> Groups = 6;
     int32 ConnStatus = 7;
     int64 NextBatch = 8;
+    string ToxVersion = 9;
 }
 
 message FriendInfo {

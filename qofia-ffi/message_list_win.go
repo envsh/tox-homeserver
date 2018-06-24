@@ -10,9 +10,67 @@ import (
 	thscom "tox-homeserver/common"
 
 	"github.com/kitech/qt.go/qtcore"
+	"github.com/kitech/qt.go/qtgui"
 	"github.com/kitech/qt.go/qtrt"
 	"github.com/kitech/qt.go/qtwidgets"
 )
+
+func (this *MainWindow) initMessageListWin() {
+	this.initMessageListUi()
+	this.initMessageListSignals()
+	this.initMessageListEvents()
+}
+
+func (this *MainWindow) initMessageListUi() {
+}
+
+func (this *MainWindow) initMessageListSignals() {
+}
+
+func (this *MainWindow) initMessageListEvents() {
+	le := this.LineEdit_2
+	le.InheritKeyPressEvent(func(arg0 *qtgui.QKeyEvent) {
+		arg0.Ignore()
+		// Ctrl+C
+		log.Println(arg0.Matches(qtgui.QKeySequence__Paste))
+		if arg0.Matches(qtgui.QKeySequence__Paste) {
+			this.checkClipboardImage()
+		}
+		le.KeyPressEvent(arg0)
+	})
+	le.InheritMousePressEvent(func(arg0 *qtgui.QMouseEvent) {
+		// middle button
+		if arg0.Button() == qtcore.Qt__MiddleButton {
+			this.checkClipboardImage()
+			arg0.Accept()
+		} else {
+			arg0.Ignore()
+			le.MousePressEvent(arg0)
+		}
+	})
+}
+
+func (this *MainWindow) checkClipboardImage() {
+	cb := uictx.qtapp.Clipboard()
+	md := cb.MimeData__()
+	fmtlst := md.Formats()
+	fmtlstx := qtcore.NewQStringListxFromPointer(fmtlst.GetCthis())
+	fmtnames := fmtlstx.ConvertToSlice()
+	log.Println(fmtnames)
+	if md.HasFormat("application/x-qt-image") {
+		imgv := md.ImageData()
+		log.Println(imgv.Type(), imgv.TypeName())
+		// since qtcore.QVariant has no ToImage wrapper
+		ba := md.Data("application/x-qt-image")
+		log.Println(ba.Length())
+		rawData := ba.Data_fix()
+		this.sendFileData([]byte(rawData))
+	}
+}
+
+func (this *MainWindow) checkExpandLineEditHeight() {
+
+}
 
 // for message list page usage
 type MessageListWin struct {

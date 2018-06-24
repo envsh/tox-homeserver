@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"gopp"
+	"image"
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -41,9 +43,11 @@ func (this *Message) GetFileInfoLine() *thscom.FileInfoLine {
 }
 
 // QLabel not support <img src='http://' />
+// locdir can not be prefix file://
 func Msg2FileText(fil *thscom.FileInfoLine, locdir string) string {
 	absdir, _ := filepath.Abs(locdir)
-	picw := gopp.IfElseInt(strings.HasPrefix(fil.Mime, "image/"), 200, 50)
+
+	picw := previewWidth(fil.Mime, fmt.Sprintf("%s/%s", absdir, fil.Md5str))
 	fsrc := fmt.Sprintf("%s", thscli.HttpFsUrlFor(fil.Md5str)) + "." + fil.Ext
 	itext := fmt.Sprintf("<a href='%s'><img width='%d' src='file://%s/%s' alt='%s'/></a><br/>%s (%s; %s)",
 		fsrc,
@@ -58,4 +62,27 @@ func GetUrlByHash(md5str string) string {
 func GetLocalPathByHash(md5str string, locdir string) string {
 	absdir, _ := filepath.Abs(locdir)
 	return fmt.Sprintf("file://%s/%s", absdir, md5str)
+}
+
+func previewWidth(mime_ string, fname string) int {
+	// picw := gopp.IfElseInt(strings.HasPrefix(fil.Mime, "image/"), 200, 50)
+	maxval := 150
+	if strings.HasPrefix(mime_, "image/") {
+		fp, err := os.Open(fname)
+		gopp.ErrPrint(err, fname)
+		defer fp.Close()
+		imgcfg, _, err := image.DecodeConfig(fp)
+		gopp.ErrPrint(err, fname)
+		if imgcfg.Width <= maxval && imgcfg.Height <= maxval {
+			return imgcfg.Width
+		}
+		if imgcfg.Height > imgcfg.Width {
+			// w/h = x/200
+			return imgcfg.Width * maxval / imgcfg.Height
+		} else {
+			return maxval
+		}
+	} else {
+		return 50
+	}
 }

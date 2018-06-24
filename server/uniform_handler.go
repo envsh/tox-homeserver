@@ -25,6 +25,7 @@ func packBaseInfo(t *tox.Tox) (*thspbs.BaseInfo, error) {
 
 	out := &thspbs.BaseInfo{}
 	out.ToxId = t.SelfGetAddress()
+	out.ToxVersion = xtox.VersionStr()
 	out.Name = t.SelfGetName()
 	out.Stmsg, _ = t.SelfGetStatusMessage()
 	out.Status = uint32(t.SelfGetStatus())
