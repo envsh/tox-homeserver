@@ -36,6 +36,7 @@ func Main() {
 		log.Fatalln(err)
 	}
 
+	GetConfig()
 	appctx.st = store.NewStorage()
 	thscom.SetLogMetrics()
 	addFileHelperAsContact(appctx.st)

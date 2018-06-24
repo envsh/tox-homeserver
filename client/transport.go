@@ -43,6 +43,8 @@ type _TransportBase struct {
 	disconncdbs []func(error)
 	connedcbs   []func()
 	closed      bool
+
+	retryer *gopp.Retryer
 }
 
 func newTransportBase() *_TransportBase {
@@ -131,8 +133,16 @@ func (this *GrpcTransport) Start() error {
 func (this *GrpcTransport) serveBackendEventGrpc() {
 	for !this.closed {
 		this.serveBackendEventGrpcImpl()
-		log.Println("Grpc maybe disconnect, retry 3 secs...")
-		time.Sleep(3 * time.Second)
+		if this.closed {
+			break
+		}
+
+		if this.retryer == nil {
+			this.retryer = gopp.NewRetry()
+		}
+		retryWait := 3*time.Second + this.retryer.NextWaitOnly()
+		log.Println("Grpc maybe disconnect, retry after:", retryWait)
+		time.Sleep(retryWait)
 	}
 }
 
@@ -144,6 +154,9 @@ func (this *GrpcTransport) serveBackendEventGrpcImpl() {
 	if err != nil {
 		return
 	}
+
+	// success reset
+	this.retryer = nil
 	cnter := uint64(0)
 	for !this.closed {
 		evto, err := stmc.Recv()
