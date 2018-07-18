@@ -221,15 +221,16 @@ func (this *MainWindow) onRoomContextMenu(item *RoomListItem, w *qtwidgets.QWidg
 }
 
 func (this *MainWindow) onRoomContextTriggered(item *RoomListItem, checked bool, act *qtwidgets.QAction) {
-	log.Println(item, checked, act.Text(), item.GetName(), item.GetId())
+	log.Println(checked, act.Text(), item.GetName(), item.GetId(), item)
 	if act == this.rcactOpen {
 		uictx.mw.switchUiStack(UIST_MESSAGEUI)
 		uictx.msgwin.SetRoom(item)
 	} else if act == this.rcact1 {
-		log.Println(item.grpInfo.GetGnum(), item.GetName(), item.GetId())
+		log.Println("quiting group...", item.grpInfo.GetGnum(), item.GetName(), item.GetId())
 		AVMan().RemoveSession(item.GetId(), item.GetName())
 		vtcli.ConferenceDelete(item.grpInfo.GetGnum())
 		uictx.iteman.Delete(item)
+		vtcli.Binfo.RemoveGroup(item.grpInfo.GetGnum())
 	} else if act == this.rcact2 {
 		_, err := vtcli.FriendDelete(item.frndInfo.GetFnum())
 		gopp.ErrPrint(err, item.frndInfo.GetFnum())

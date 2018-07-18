@@ -101,7 +101,7 @@ message GroupInfo {
     string Title = 4;
     string Stmsg = 5;
     bool Ours = 6;
-    map<uint32, MemberInfo> Members = 7;
+    map<string, MemberInfo> Members = 7;
 }
 
 // = ContactInfo

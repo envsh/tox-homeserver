@@ -124,12 +124,14 @@ func dispatchEvent(evto *thspbs.Event) {
 			}
 			item.timeline = thscli.TimeLine{NextBatch: vtcli.Binfo.NextBatch, PrevBatch: vtcli.Binfo.NextBatch - 1}
 			uictx.iteman.addRoomItem(item)
-			grpInfo := &thspbs.GroupInfo{}
-			grpInfo.GroupId = groupId
-			grpInfo.Gnum = gopp.MustUint32(groupNumber)
-			grpInfo.Title = fmt.Sprintf("Group #%s", groupNumber)
+			gopp.Assert(!vtcli.Binfo.HasGroup(gopp.MustUint32(groupNumber)),
+				"group already exist in BaseInfo", groupNumber)
+			vtcli.Binfo.AddGroup(gopp.MustUint32(groupNumber), groupId)
+			grpInfo := vtcli.Binfo.GetGroup(gopp.MustUint32(groupNumber))
+			grpInfo.Title = fmt.Sprintf("Group #%s.%s", groupNumber, groupId[:5])
 			item.SetContactInfo(grpInfo)
 			log.Println("New group contact item:", groupNumber, grpInfo.Title, groupId)
+			grpInfo.AddPeerInfo(evto.Margs[1], evto.Margs[0], gopp.MustUint32(evto.Args[1]))
 		} else {
 			log.Println("Reuse group contact item:", groupNumber, item.grpInfo.Title, groupId)
 			if gopp.MustUint32(groupNumber) != item.grpInfo.Gnum {
@@ -175,22 +177,19 @@ func dispatchEvent(evto *thspbs.Event) {
 		groupId := evto.Margs[3]
 		peerName := evto.Margs[0]
 		peerPubkey := evto.Margs[1]
+		oldPeerCount := len(vtcli.Binfo.GetGroupMembers(gnum))
 		vtcli.Binfo.UpdatePeerInfo(gnum, groupId, peerPubkey, peerName, pnum)
-		peeros := vtcli.Binfo.GetGroupMembers(gnum)
 		item := uictx.iteman.Get(groupId)
 		if item != nil {
-			if item.peerCount != len(peeros) {
-				// item.SetPeerCount(len(peeros))
+			newPeerCount := len(item.grpInfo.Members)
+			if newPeerCount == oldPeerCount+1 {
+				item.SetPeerCount(newPeerCount)
 			}
 		}
 	case "ConferencePeerListChange":
 		groupId := evto.Margs[1]
-		peerCount := gopp.MustInt(evto.Margs[2])
 		item := uictx.iteman.Get(groupId)
 		if item != nil {
-			if item.peerCount != peerCount {
-				item.SetPeerCount(peerCount)
-			}
 		}
 		// update deleted ones
 		gnum := gopp.MustUint32(evto.Args[0])
@@ -200,6 +199,17 @@ func dispatchEvent(evto *thspbs.Event) {
 		gopp.ErrPrint(err, deletedPeerPubkeysjs)
 		for _, pubkey := range deletedPeerPubkeys {
 			vtcli.Binfo.DeletePeerInfo(gnum, groupId, pubkey)
+		}
+		addedPeerPubkeysjs := evto.Margs[3]
+		addedPeerPubkeys := []string{}
+		err = json.Unmarshal([]byte(addedPeerPubkeysjs), &addedPeerPubkeys)
+		gopp.ErrPrint(err, addedPeerPubkeysjs)
+		for _, pubkey := range addedPeerPubkeys { // not know peer num, so can not update peer info here
+			// vtcli.Binfo.UpdatePeerInfo(gnum, groupId, pubkey, "", 0)
+			_ = pubkey
+		}
+		if len(deletedPeerPubkeys) > 0 || len(addedPeerPubkeys) > 0 {
+			item.SetPeerCount(len(item.grpInfo.Members))
 		}
 	case "ConferenceNameListChange": // depcreated
 		groupTitle := evto.Margs[2]

@@ -369,7 +369,7 @@ where ctroom.pubkey = ? and event_id <= ? order by message.event_id desc limit ?
 }
 
 func (this *Storage) AddDevice() error {
-	return this.AddDevice2(uuid.NewV4().String())
+	return this.AddDevice2(gopp.Retn(uuid.NewV4())[0].(string))
 }
 
 func (this *Storage) AddDevice2(name string) error {

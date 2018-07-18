@@ -835,6 +835,8 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.HorizontalLayout_4.SetObjectName("HorizontalLayout_4")                                                // 112
 	this.Label_6 = qtwidgets.NewQLabel(this.Widget_2, 0)                                                       // 111
 	this.Label_6.SetObjectName("Label_6")                                                                      // 112
+	this.SizePolicy1.SetHeightForWidth(this.Label_6.SizePolicy().HasHeightForWidth())                          // 114
+	this.Label_6.SetSizePolicy(this.SizePolicy1)                                                               // 114
 	this.Label_6.SetTextInteractionFlags(qtcore.Qt__LinksAccessibleByMouse | qtcore.Qt__TextSelectableByMouse) // 114
 
 	this.HorizontalLayout_4.Layout().AddWidget(this.Label_6) // 115
@@ -1332,7 +1334,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.ScrollArea_3.SetAlignment(qtcore.Qt__AlignLeading | qtcore.Qt__AlignLeft | qtcore.Qt__AlignTop) // 114
 	this.ScrollAreaWidgetContents_3 = qtwidgets.NewQWidget(nil, 0)                                       // 111
 	this.ScrollAreaWidgetContents_3.SetObjectName("ScrollAreaWidgetContents_3")                          // 112
-	this.ScrollAreaWidgetContents_3.SetGeometry(0, 0, 346, 18)                                           // 114
+	this.ScrollAreaWidgetContents_3.SetGeometry(0, 0, 98, 18)                                            // 114
 	this.SizePolicy.SetHeightForWidth(this.ScrollAreaWidgetContents_3.SizePolicy().HasHeightForWidth())  // 114
 	this.ScrollAreaWidgetContents_3.SetSizePolicy(this.SizePolicy)                                       // 114
 	this.VerticalLayout_17 = qtwidgets.NewQVBoxLayout_1(this.ScrollAreaWidgetContents_3)                 // 111

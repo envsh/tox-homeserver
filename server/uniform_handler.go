@@ -72,8 +72,7 @@ func packBaseInfo(t *tox.Tox) (*thspbs.BaseInfo, error) {
 
 		groupId, _ := xtox.ConferenceGetIdentifier(t, gn)
 
-		gi := &thspbs.GroupInfo{}
-		gi.Members = make(map[uint32]*thspbs.MemberInfo)
+		gi := thspbs.NewGroupInfo()
 		gi.Gnum = gn
 		gi.GroupId = groupId
 		gi.Title = title
@@ -95,7 +94,7 @@ func packBaseInfo(t *tox.Tox) (*thspbs.BaseInfo, error) {
 			mi.Pubkey = ppubkey
 			mi.Name = pname
 
-			gi.Members[i] = mi
+			gi.Members[ppubkey] = mi
 		}
 
 		out.Groups[gn] = gi

@@ -196,7 +196,6 @@ type RoomListItem struct {
 
 	unreadedCount int
 	totalCount    int
-	peerCount     int
 	timeline      thscli.TimeLine
 
 	WaitSyncStoreTimeLineCount int
@@ -370,9 +369,6 @@ func (this *RoomListItem) SetContactInfo(info interface{}) {
 			this.cticon = GetInitAvatar(gopp.IfElseStr(ct.Title == "", ct.GroupId, ct.Title))
 		}
 		this.ToolButton_2.SetIcon(this.cticon)
-		this.peerCount = len(ct.Members)
-		if this.peerCount > 0 {
-		}
 		this.setConnStatus(int32(thscli.CONN_STATUS_UDP))
 	default:
 		log.Fatalln("wtf")
@@ -818,7 +814,6 @@ func (this *RoomListItem) floatTextOverWidget(w qtwidgets.QWidget_ITF) *qtwidget
 }
 
 func (this *RoomListItem) SetPeerCount(n int) {
-	this.peerCount = n
 	if uictx.msgwin.item == this {
 		uictx.msgwin.SetPeerCount(n)
 	}

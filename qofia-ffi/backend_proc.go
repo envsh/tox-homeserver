@@ -65,7 +65,7 @@ func (this *MainWindow) initAppBackend() {
 	go func() {
 		btime := time.Now()
 		log.Println("Waiting contacts show on UI...") // about 31ms with 7 contacts
-		condWait(10, func() bool { return len(contactQueue) > 0 })
+		condWait(10, func() bool { return len(contactQueue) == 0 })
 		log.Println("Show base contacts on UI done.", time.Since(btime))
 		pullAllRoomsLatestMessages()
 	}()

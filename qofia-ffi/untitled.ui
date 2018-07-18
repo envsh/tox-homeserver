@@ -1080,6 +1080,12 @@
                </property>
                <item>
                 <widget class="QLabel" name="label_6">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
                  <property name="text">
                   <string>0 people</string>
                  </property>
@@ -2002,7 +2008,7 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>346</width>
+             <width>98</width>
              <height>18</height>
             </rect>
            </property>

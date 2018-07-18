@@ -112,11 +112,14 @@ func (this *MessageListWin) SetRoom(item *RoomListItem) {
 	if item.isgroup {
 		mw.Label_6.SetVisible(true)
 		mw.Label_7.SetVisible(false)
-		mw.Label_6.SetText(fmt.Sprintf("%d users in chat", item.peerCount))
+		cnt := len(item.grpInfo.Members)
+		mw.Label_6.SetText(fmt.Sprintf("%d users in chat", cnt))
 	} else {
 		mw.Label_6.SetVisible(false)
 		mw.Label_7.SetVisible(true)
-		mw.Label_7.SetText(gopp.StrSuf4ui(item.frndInfo.GetStmsg(), 32))
+		mw.Label_7.SetText(gopp.StrSuf4ui(item.frndInfo.GetStmsg(), 26))
+		mw.Label_7.SetToolTip(item.frndInfo.GetStmsg())
+		// SetQLabelElideText(mw.Label_7, item.frndInfo.GetStmsg()) // TODO
 	}
 	if item.cticon != nil {
 		mw.Label_4.SetPixmap(item.cticon.Pixmap_1_(32, 32))

@@ -14,6 +14,7 @@ func (this *MemberInfo) IsFriend() bool { return this.Mtype == MemberInfo_FRIEND
 func (this *MemberInfo) IsGroup() bool  { return this.Mtype == MemberInfo_GROUP }
 func (this *MemberInfo) IsPeer() bool   { return this.Mtype == MemberInfo_PEER }
 
+// TODO mutex
 func (this *BaseInfo) UpdatePeerInfo(grpnum uint32, groupId string, pubkey string, name string, rtnum uint32) {
 	if this.Groups == nil {
 		return
@@ -45,7 +46,7 @@ func (this *BaseInfo) DeletePeerInfo(gnum uint32, groupId, pubkey string) {
 
 func NewGroupInfo() *GroupInfo {
 	grpo := &GroupInfo{}
-	grpo.Members = make(map[uint32]*MemberInfo)
+	grpo.Members = make(map[string]*MemberInfo)
 	return grpo
 }
 func (this *GroupInfo) AddPeerInfo(pubkey string, name string, rtnum uint32) {
@@ -53,10 +54,10 @@ func (this *GroupInfo) AddPeerInfo(pubkey string, name string, rtnum uint32) {
 	peero.Name = name
 	peero.Pubkey = pubkey
 	peero.Pnum = rtnum
-	if peero, ok := this.Members[rtnum]; ok {
+	if peero, ok := this.Members[pubkey]; ok {
 		log.Println("Override peer info:", rtnum, name, peero.Pnum, peero.Name)
 	}
-	this.Members[rtnum] = peero
+	this.Members[pubkey] = peero
 }
 
 func (this *GroupInfo) UpdatePeerInfo(pubkey string, name string, rtnum uint32) {
@@ -81,18 +82,52 @@ func (this *GroupInfo) DeletePeerInfo(pubkey string) {
 }
 
 ///
-func (this *BaseInfo) GetGroupMembers(grpnum uint32) map[uint32]*MemberInfo {
+func (this *BaseInfo) GetGroupMembers(grpnum uint32) map[string]*MemberInfo {
 	if mis, ok := this.Groups[grpnum]; ok {
 		return mis.Members
 	}
 	return nil
 }
 
-func (this *BaseInfo) GetGroupMembersByPubkey(groupId string) map[uint32]*MemberInfo {
+func (this *BaseInfo) GetGroupMembersByPubkey(groupId string) map[string]*MemberInfo {
 	for _, grpo := range this.Groups {
 		if grpo.GroupId == groupId {
 			return grpo.Members
 		}
 	}
 	return nil
+}
+
+func (this *BaseInfo) GetGroup(grpnum uint32) *GroupInfo {
+	if this.HasGroup(grpnum) {
+		return this.Groups[grpnum]
+	}
+	return nil
+}
+
+func (this *BaseInfo) AddGroup(grpnum uint32, grpid string) bool {
+	if this.HasGroup(grpnum) {
+		log.Println("why group already exist:", grpnum, grpid)
+		return false
+	}
+	grpo := NewGroupInfo()
+	grpo.Gnum, grpo.GroupId = grpnum, grpid
+	this.Groups[grpnum] = grpo
+	return true
+}
+func (this *BaseInfo) HasGroup(grpnum uint32) bool {
+	_, ok := this.Groups[grpnum]
+	return ok
+}
+func (this *BaseInfo) RemoveGroup(grpnum uint32) bool {
+	if _, ok := this.Groups[grpnum]; ok {
+		delete(this.Groups, grpnum)
+	}
+	return true
+}
+func (this *BaseInfo) PeerCount(grpnum uint32) int {
+	if grpo, ok := this.Groups[grpnum]; ok {
+		return len(grpo.Members)
+	}
+	return 0
 }
