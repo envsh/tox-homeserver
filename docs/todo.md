@@ -8,3 +8,4 @@
 * [] rich content layout, text link inline preview
 * [] rich content layout, audio/video snapshot and privew
 * [] p2p file share as group file send like ipfs...
+* [] android serivce support.

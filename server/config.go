@@ -1,146 +1,69 @@
 package server
 
 import (
-	"fmt"
-	"gopp"
-	"log"
-	"net/http"
-	"reflect"
-	"sort"
+	"flag"
 	"sync"
+	"time"
 
-	"github.com/spf13/viper"
+	"mkuse/appcm"
+
+	"github.com/spf13/pflag"
 )
 
 type Config struct {
-	*viper.Viper
-
-	defvpr   *viper.Viper
-	rootPath string
+	*appcm.Config
 }
 
 var rtcfg *Config
 var rtcfgOnce sync.Once
 
-func GetConfig() *Config {
-	rtcfgOnce.Do(func() {
-		rtcfg = NewConfig()
-	})
+func GetCfg() *Config {
+	rtcfgOnce.Do(func() { rtcfg = NewConfig() })
 	return rtcfg
 }
 
 func NewConfig() *Config {
 	this := &Config{}
+	this.Config = appcm.GetConfig()
 	this.init()
 	return this
 }
 
 func (this *Config) init() {
-	defvpr := viper.New()
+	defvpr := this
+
+	defvpr.SetDefault("log_level", 0)
+	defvpr.SetDefault("log_file", "") // default stderr
+	defvpr.SetReadOnly("timezone", true)
 	defvpr.SetDefault("timezone", 8)
 	defvpr.SetDefault("auto_accept_friend_request", true)
 	defvpr.SetDefault("auto_accept_group_invite", true)
 	defvpr.SetDefault("auto_accept_recieve_file", true)
-	defvpr.SetDefault("file_server_port", 8099)
-	defvpr.SetDefault("rpc_server_port", 2080)
-	defvpr.SetDefault("listen_address", "0.0.0.0")
-	defvpr.SetDefault("transport_cert_pubkey", "")
-	defvpr.SetDefault("transport_cert_privkey", "")
+	defvpr.SetDefault("auto_follow_someone", true)
+	defvpr.SetDefault("file_server_port", 8099)     // ro
+	defvpr.SetDefault("rpc_server_port", 2080)      // ro
+	defvpr.SetDefault("listen_address", "0.0.0.0")  // ro
+	defvpr.SetDefault("transport_cert_pubkey", "")  // ro
+	defvpr.SetDefault("transport_cert_privkey", "") // ro
 
-	rtvip := Viper2Http(defvpr, "/rtcfg/")
-	this.defvpr = defvpr
-	this.Viper = rtvip
-}
+	defvpr.SetDefault("enable_ipv6", false)
+	defvpr.SetDefault("enable_udp", true)
+	defvpr.SetDefault("enable_tcp_relay", false)
+	defvpr.SetDefault("enable_lan_discovery", false)
+	defvpr.SetDefault("black_list", "")
 
-/////
-func Viper2Http(defvpr *viper.Viper, rootPath string) (rtvpr *viper.Viper) {
-	rtvpr = viper.New()
-	for key, valuex := range defvpr.AllSettings() {
-		rtvpr.SetDefault(key, valuex)
-	}
+	defvpr.SetDefault("proxy_uri", "") // http:// or socks5://
+	defvpr.SetDefault("reconnect", "change any char of this value to restart server.")
+	defvpr.SetDefault("use_ipfs_file_store", true)
 
-	// "/rtcfg/" // ?act=list, set,
-	http.HandleFunc(rootPath, (&Viper4Http{rootPath, defvpr, rtvpr}).adminHandler)
-	return
-}
+	defvpr.BindPFlag("enable_pprof", pflag.PFlagFromGoFlag(flag.Lookup("pprof")))
+	defvpr.BindPFlag("enable_trace", pflag.PFlagFromGoFlag(flag.Lookup("trace")))
+	defvpr.SetDefault("uptime", time.Now().String()) // ro
+	defvpr.SetDefault("toxcore_version", "0.0.0")
+	defvpr.SetDefault("toxhs_version", "0.0.0")
+	defvpr.SetDefault("build_info", "")
 
-type Viper4Http struct {
-	rootPath string
-	defvpr   *viper.Viper
-	rtvpr    *viper.Viper
-}
+	defvpr.SetDefault("test_strs1", []string{"1", "2"})
+	defvpr.SetDefault("test_ints1", []int{1, 2})
 
-func (this *Viper4Http) adminHandler(w http.ResponseWriter, r *http.Request) {
-	err := r.ParseForm()
-	gopp.ErrPrint(err)
-	log.Println(r.Form)
-	log.Println(r.FormValue("act"))
-	act := r.FormValue("act")
-	if act == "" {
-		this.showIndex(w, r)
-	} else if act == "reset" {
-		this.resetValue(w, r)
-	} else if act == "set" {
-		this.setValue(w, r)
-	}
-}
-
-func (this *Viper4Http) showIndex(w http.ResponseWriter, r *http.Request) {
-	wrout := func(format string, args ...interface{}) {
-		s := fmt.Sprintf(format, args...)
-		n, err := w.Write([]byte(s))
-		gopp.ErrPrint(err, n)
-	}
-
-	wrout("<html><head></head><body>")
-	allsets := this.rtvpr.AllSettings()
-	wrout("Total Count: %d<br/>", len(allsets))
-	keys := this.rtvpr.AllKeys()
-	sort.Slice(keys, func(i int, j int) bool { return keys[i] < keys[j] })
-
-	for _, key := range keys {
-		valx := this.rtvpr.Get(key)
-		wrout("<form method=post action=\"?\">")
-		wrout(fmt.Sprintf("%s<input type=hidden name=key value='%s'/> ", key, key))
-		wrout(fmt.Sprintf("= <input type=text name=value value='%v'>(default: %v, type: %s)",
-			valx, this.defvpr.Get(key), reflect.TypeOf(valx).String()))
-		wrout("<input type=submit name=act value='set'/>")
-		wrout("<input type=submit name=act value='reset'/>")
-		wrout("</form>")
-	}
-
-	wrout("</body></html>")
-}
-
-func (this *Viper4Http) setValue(w http.ResponseWriter, r *http.Request) {
-	log.Println(r.Form)
-	err := r.ParseForm()
-	gopp.ErrPrint(err)
-
-	key := r.FormValue("key")
-	value := r.FormValue("value")
-	this.rtvpr.Set(key, value)
-	log.Println(key, value)
-
-	err = this.rtvpr.WriteConfigAs("toxhs.toml")
-	gopp.ErrPrint(err)
-	this.redirectTo(this.rootPath+"?", w)
-}
-
-func (this *Viper4Http) resetValue(w http.ResponseWriter, r *http.Request) {
-	log.Println(r.Form)
-	err := r.ParseForm()
-	gopp.ErrPrint(err)
-
-	key := r.FormValue("key")
-	value := this.defvpr.Get(key)
-	this.rtvpr.Set(key, value)
-	log.Println(key, value)
-
-	this.redirectTo(this.rootPath+"?", w)
-}
-
-func (this *Viper4Http) redirectTo(link string, w http.ResponseWriter) {
-	w.Header().Set("Location", link)
-	w.WriteHeader(301)
 }

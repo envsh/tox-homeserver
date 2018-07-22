@@ -7,7 +7,6 @@ import (
 	"log"
 	"net/http"
 	_ "net/http/pprof"
-	"strings"
 	"time"
 	thscom "tox-homeserver/common"
 	"tox-homeserver/store"
@@ -30,13 +29,16 @@ type appContext struct {
 var appctx = &appContext{}
 
 func Main() {
-	printBuildInfo(true)
+	log.Println(BuildInfo)
 	flag.Parse()
+	vcfg := GetCfg()
+	vcfg.Set("toxcore_version", xtox.VersionStr())
+	vcfg.Set("toxhs_version", Version)
+	vcfg.Set("build_info", BuildInfo)
 	if err := agent.Listen(agent.Options{}); err != nil {
 		log.Fatalln(err)
 	}
 
-	GetConfig()
 	appctx.st = store.NewStorage()
 	thscom.SetLogMetrics()
 	addFileHelperAsContact(appctx.st)
@@ -82,27 +84,8 @@ func addFileHelperAsContact(st *store.Storage) {
 	st.AddFriend(thscom.FileHelperPk, thscom.FileHelperFnum, thscom.FileHelperName, "")
 }
 
-// build info
-var GitCommit, GitBranch, GitState, GitSummary, BuildDate, Version string
+///// build info
+var Version string
+var BuildInfo string
 
-func printBuildInfo(full bool) { log.Println(getBuildInfo(full)) }
-func getBuildInfo(full bool) string {
-	trim := func(s string) string {
-		if strings.HasPrefix(s, "GOVVV-") {
-			return s[6:]
-		}
-		return s
-	}
-	commit := trim(GitCommit)
-	branch := trim(GitBranch)
-	// state := trim(GitState)
-	summary := trim(GitSummary)
-	date := trim(BuildDate)
-	version := trim(Version)
-
-	if full {
-		return fmt.Sprintf("govvv: v%s branch:%s git:%s build:%s summary:%s, ",
-			version, branch, commit, date, summary)
-	}
-	return fmt.Sprintf("govvv: v%s git:%s build:%s", version, commit, date)
-}
+func SetBuildInfo(version, info string) { Version, BuildInfo = version, info }

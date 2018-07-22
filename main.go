@@ -11,6 +11,7 @@ func main() {
 	SetupProfile()
 	SetupTrace()
 
+	server.SetBuildInfo(trimGOVVV(Version), getBuildInfo(true))
 	go server.Main()
 
 	SetupSignal(func() {
