@@ -16,10 +16,11 @@ gen:
 
 	go-rcc ./rcc.qrc
 
+# need min 1.2G memory with GOGC=5 and minqt
 bd:
 	echo -e "package main\nconst btversion = \"${GOVVV2}\"\n" > btversion.go
 	echo -e "const isandroid = true\n" >> btversion.go
-	go build -p 1 -v -i -gcflags="-c 1"  -ldflags "${GOVVV}"
+	GOGC=5 go build -p 1 -v -i -gcflags="-c 1"  -ldflags "${GOVVV}"
 
 droid: droidso droidapk
 

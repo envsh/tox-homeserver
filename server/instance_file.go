@@ -6,6 +6,7 @@ import (
 	"gopp"
 	"io/ioutil"
 	"log"
+	"strings"
 	"time"
 
 	thscom "tox-homeserver/common"
@@ -166,7 +167,7 @@ func (this *ToxVM) onFriendFileUploaded(md5str string, frndpk string, userCodeSt
 	// save
 	msgo, err := appctx.st.AddFriendMessage(evto.Args[1], frndpk, selfpk, 0, userCode)
 	gopp.ErrPrint(err, md5str, oname)
-	msgty, mimety := msgTypeFromFileData(data, false)
+	msgty, mimety, _ := msgTypeFromFileData(data, false)
 	evto.Margs = gopp.ToStrs(0, 0, frndpk, msgty, mimety)
 	evto.EventId = msgo.EventId
 
@@ -216,7 +217,7 @@ func (this *ToxVM) onGroupFileUploaded(md5str string, frndpk string, userCodeStr
 		// save
 		msgo, err := appctx.st.AddGroupMessage(evto.Args[2], "0", frndpk, selfpk, 0, userCode)
 		gopp.ErrPrint(err, md5str, oname)
-		msgty, mimety := msgTypeFromFileData(data, false)
+		msgty, mimety, mimeext := msgTypeFromFileData(data, false)
 		evto.EventId = msgo.EventId
 		peerName := this.t.SelfGetName()
 		peerPubkey := selfpk
@@ -231,7 +232,10 @@ func (this *ToxVM) onGroupFileUploaded(md5str string, frndpk string, userCodeStr
 		// db store full FileInfoLine.String(), but send message don't
 		// this.t.ConferenceSendMessage(frndnum, 0, evto.Args[1])
 		b58str := thscom.Base58EncodeFromHex(md5str)
-		this.t.ConferenceSendMessage(frndnum, 0, urlval+"?"+b58str)
+		urlmsg := gopp.IfElseStr(mimeext != "" && !strings.HasSuffix(urlval, "."+mimeext),
+			fmt.Sprintf("%s.%s?%s", urlval, mimeext, b58str), urlval+"?"+b58str)
+		this.t.ConferenceSendMessage(frndnum, 0, urlmsg)
+		log.Println("|", urlmsg, "|")
 
 		// publish to other client
 		this.pubmsg(evto)
@@ -350,17 +354,18 @@ func NewEventFromFileInfo(fio *FileInfo, frndname, frndpk string, EventId int64)
 	evto.Name = "FriendMessage"
 	evto.Args = []string{fmt.Sprintf("%d", fio.frndnum), msg}
 
-	msgty, mimety := msgTypeFromFileData(fio.fdata, fio.fkind == 1)
+	msgty, mimety, _ := msgTypeFromFileData(fio.fdata, fio.fkind == 1)
 	// for file, the sent is already 1. because we save it and then here
 	evto.Margs = []string{frndname, frndpk, gopp.ToStr(EventId), "1", msgty, mimety}
 	evto.EventId = EventId
 	return evto
 }
 
-func msgTypeFromFileData(data []byte, avatar bool) (msgty, mimety string) {
+func msgTypeFromFileData(data []byte, avatar bool) (msgty, mimety, ext string) {
 	ftyo, err := filetype.Match(data)
 	gopp.ErrPrint(err)
 	mimety = ftyo.MIME.Value
+	ext = ftyo.Extension
 
 	msgty = thscom.MSGTYPE_FILE
 	if avatar {
