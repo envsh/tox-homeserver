@@ -6,12 +6,14 @@ import "github.com/kitech/qt.go/qtgui"
 import "github.com/kitech/qt.go/qtwidgets"
 import "github.com/kitech/qt.go/qtquickwidgets"
 import "github.com/kitech/qt.go/qtmock"
+import "github.com/kitech/qt.go/qtrt"
 
 func init() { qtcore.KeepMe() }
 func init() { qtgui.KeepMe() }
 func init() { qtwidgets.KeepMe() }
 func init() { qtquickwidgets.KeepMe() }
 func init() { qtmock.KeepMe() }
+func init() { qtrt.KeepMe() }
 
 //  header block end
 
@@ -75,6 +77,7 @@ func (this *Ui_ContactItemView) SetupUi(ContactItemView *qtwidgets.QWidget) {
 	this.VerticalLayout_3.SetObjectName("VerticalLayout_3")                                  // 112
 	this.VerticalLayout_3.SetContentsMargins(-1, 0, -1, 0)                                   // 114
 	this.VerticalSpacer_3 = qtwidgets.NewQSpacerItem(20, 3, qtwidgets.QSizePolicy__Minimum, qtwidgets.QSizePolicy__Expanding)
+	qtrt.ReleaseOwnerToQt(this.VerticalSpacer_3)
 
 	this.VerticalLayout_3.AddItem(this.VerticalSpacer_3) // 115
 
@@ -91,6 +94,7 @@ func (this *Ui_ContactItemView) SetupUi(ContactItemView *qtwidgets.QWidget) {
 	this.VerticalLayout_3.Layout().AddWidget(this.ToolButton_2) // 115
 
 	this.VerticalSpacer_4 = qtwidgets.NewQSpacerItem(20, 3, qtwidgets.QSizePolicy__Minimum, qtwidgets.QSizePolicy__Expanding)
+	qtrt.ReleaseOwnerToQt(this.VerticalSpacer_4)
 
 	this.VerticalLayout_3.AddItem(this.VerticalSpacer_4) // 115
 
@@ -119,6 +123,7 @@ func (this *Ui_ContactItemView) SetupUi(ContactItemView *qtwidgets.QWidget) {
 	this.HorizontalLayout.Layout().AddWidget(this.Label_2) // 115
 
 	this.HorizontalSpacer = qtwidgets.NewQSpacerItem(3, 20, qtwidgets.QSizePolicy__Preferred, qtwidgets.QSizePolicy__Minimum)
+	qtrt.ReleaseOwnerToQt(this.HorizontalSpacer)
 
 	this.HorizontalLayout.AddItem(this.HorizontalSpacer) // 115
 
@@ -150,6 +155,7 @@ func (this *Ui_ContactItemView) SetupUi(ContactItemView *qtwidgets.QWidget) {
 	this.HorizontalLayout_2.Layout().AddWidget(this.Label_3) // 115
 
 	this.HorizontalSpacer_2 = qtwidgets.NewQSpacerItem(3, 20, qtwidgets.QSizePolicy__Preferred, qtwidgets.QSizePolicy__Minimum)
+	qtrt.ReleaseOwnerToQt(this.HorizontalSpacer_2)
 
 	this.HorizontalLayout_2.AddItem(this.HorizontalSpacer_2) // 115
 
@@ -171,6 +177,7 @@ func (this *Ui_ContactItemView) SetupUi(ContactItemView *qtwidgets.QWidget) {
 	this.VerticalLayout_2.SetObjectName("VerticalLayout_2")                    // 112
 	this.VerticalLayout_2.SetSizeConstraint(qtwidgets.QLayout__SetMinimumSize) // 114
 	this.VerticalSpacer = qtwidgets.NewQSpacerItem(20, 3, qtwidgets.QSizePolicy__Minimum, qtwidgets.QSizePolicy__Expanding)
+	qtrt.ReleaseOwnerToQt(this.VerticalSpacer)
 
 	this.VerticalLayout_2.AddItem(this.VerticalSpacer) // 115
 
@@ -189,6 +196,7 @@ func (this *Ui_ContactItemView) SetupUi(ContactItemView *qtwidgets.QWidget) {
 	this.VerticalLayout_2.Layout().AddWidget(this.ToolButton) // 115
 
 	this.VerticalSpacer_2 = qtwidgets.NewQSpacerItem(20, 3, qtwidgets.QSizePolicy__Minimum, qtwidgets.QSizePolicy__Expanding)
+	qtrt.ReleaseOwnerToQt(this.VerticalSpacer_2)
 
 	this.VerticalLayout_2.AddItem(this.VerticalSpacer_2) // 115
 

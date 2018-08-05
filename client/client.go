@@ -109,7 +109,8 @@ func (this *LigTox) Connect() error {
 	return nil
 }
 
-func (this *LigTox) start() { this.srvtp.Start() }
+func (this *LigTox) start() { gopp.ErrPrint(this.srvtp.Start()) }
+func (this *LigTox) stop()  { gopp.ErrPrint(this.srvtp.Close()) }
 
 func (this *LigTox) initCbmap() {
 	this.cb_friend_requests = make(map[unsafe.Pointer]interface{})

@@ -96,7 +96,10 @@ func NewGrpcTransport() *GrpcTransport {
 
 func (this *GrpcTransport) Close() error {
 	this.closed = true
-	return this.rpcli.Close()
+	this.connedcbs = nil
+	rpcli := this.rpcli
+	this.rpcli = nil
+	return rpcli.Close()
 }
 
 // addr: host:port
@@ -131,6 +134,7 @@ func (this *GrpcTransport) Start() error {
 
 // should block
 func (this *GrpcTransport) serveBackendEventGrpc() {
+	nowt := time.Now()
 	for !this.closed {
 		this.serveBackendEventGrpcImpl()
 		if this.closed {
@@ -144,6 +148,7 @@ func (this *GrpcTransport) serveBackendEventGrpc() {
 		log.Println("Grpc maybe disconnect, retry after:", retryWait)
 		time.Sleep(retryWait)
 	}
+	log.Println("Grpc serve proc done:", this.closed, time.Since(nowt))
 }
 
 func (this *GrpcTransport) serveBackendEventGrpcImpl() {

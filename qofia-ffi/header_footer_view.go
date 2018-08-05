@@ -3,6 +3,7 @@ package main
 import (
 	"gopp"
 	"log"
+	"runtime"
 	"strings"
 	"time"
 
@@ -51,6 +52,13 @@ func (this *MainWindow) initHeaderFooterState() {
 
 	act = hfs.ctrlMenu.AddAction("Placeholder1")
 	act.SetCheckable(true)
+	hfs.acts = append(hfs.acts, act)
+
+	act = hfs.ctrlMenu.AddSeparator()
+	hfs.acts = append(hfs.acts, act)
+
+	act = hfs.ctrlMenu.AddAction("Run Go GC")
+	qtrt.Connect(act, "triggered(bool)", func(bool) { runtime.GC() })
 	hfs.acts = append(hfs.acts, act)
 }
 func (this *MainWindow) initHeaderFooterUi() {}

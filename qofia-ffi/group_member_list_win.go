@@ -1,6 +1,7 @@
 package main
 
 import (
+	"sort"
 	"tox-homeserver/thspbs"
 
 	"github.com/kitech/qt.go/qtrt"
@@ -41,7 +42,13 @@ func (this *MainWindow) LoadGroupMemberList(pubkey string) {
 	vtcli := appctx.GetLigTox()
 	binfo := vtcli.Binfo
 	peers := binfo.GetGroupMembersByPubkey(pubkey)
-	for _, peero := range peers {
+	grpids := []string{}
+	for grpid, _ := range peers {
+		grpids = append(grpids, grpid)
+	}
+	sort.Strings(grpids)
+	for _, grpid := range grpids {
+		peero := peers[grpid]
 		this.AddGroupMember(peero)
 	}
 }

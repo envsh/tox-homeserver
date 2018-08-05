@@ -159,7 +159,7 @@ func (this *RoomListMan) Delete(item *RoomListItem) {
 	}
 
 	uictx.uiw.VerticalLayout_9.RemoveWidget(item.QWidget_PTR())
-	item.QWidget_PTR().SetVisible(false)
+	// item.QWidget_PTR().SetVisible(false)
 	// TODO really destroy
 }
 
@@ -170,6 +170,54 @@ func (this *RoomListMan) onClicked(item *RoomListItem, pos *qtcore.QPoint) {
 }
 func (this *RoomListMan) onLongTouched(item *RoomListItem, gpos *qtcore.QPoint) {
 	item.OnContextMenu2(gpos)
+}
+
+// cleanup funcs
+func (this *RoomListMan) ClearRoomList() {
+	items := uictx.ctitmdl
+	log.Println(len(uictx.ctitmdl))
+	uictx.ctitmdl = uictx.ctitmdl[0:0]
+
+	uictx.msgwin.ClearAll()
+	curitm := uictx.msgwin.item
+	uictx.msgwin.item = nil
+	_ = curitm
+
+	for i, item := range items {
+		log.Println(i, len(item.msgitmdl), len(item.msgos))
+		this.Delete(item)
+		// item.QWidget_PTR().DeleteLater()
+		qtwidgets.DeleteQWidget(item.QWidget_PTR())
+	}
+	log.Println(len(uictx.ctitmdl))
+
+	for i, item := range items {
+		log.Println(i, len(item.msgitmdl), len(item.msgos))
+		for i := len(item.msgitmdl) - 1; i >= 0; i-- {
+			msgv := item.msgitmdl[i]
+			if msgv.Icon != nil {
+				qtgui.DeleteQIcon(msgv.Icon)
+			}
+			msgv.Icon = nil
+			qtwidgets.DeleteQWidget(msgv.QWidget_PTR())
+		}
+		if item.menu != nil {
+			qtwidgets.DeleteQMenu(item.menu)
+		}
+		item.menu = nil
+		if item.cticon != nil {
+			qtgui.DeleteQIcon(item.cticon)
+		}
+		item.cticon = nil
+		if item.sticon != nil {
+			qtgui.DeleteQIcon(item.sticon)
+		}
+		item.sticon = nil
+		item.OnConextMenu = nil
+		item.subws = nil
+		item.msgitmdl = nil
+		item.msgos = nil
+	}
 }
 
 /////////////////

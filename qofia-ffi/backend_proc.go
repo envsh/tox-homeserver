@@ -62,12 +62,14 @@ func (this *MainWindow) initAppBackend() {
 	mech.Trigger()
 
 	// 加载每个房间的最新消息, force schedue, or contact maybe not show in ui
-	go func() {
+	/*go*/
+	func() {
+		this.loginDone(true)
 		btime := time.Now()
 		log.Println("Waiting contacts show on UI...") // about 31ms with 7 contacts
 		condWait(10, func() bool { return len(contactQueue) == 0 })
 		log.Println("Show base contacts on UI done.", time.Since(btime))
 		pullAllRoomsLatestMessages()
 	}()
-	select {}
+	// select {}
 }

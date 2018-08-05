@@ -12,7 +12,6 @@ import (
 	"github.com/kitech/qt.go/qtcore"
 	"github.com/kitech/qt.go/qtgui"
 	"github.com/kitech/qt.go/qtmultimedia"
-	"github.com/kitech/qt.go/qtrt"
 	"github.com/kitech/qt.go/qtwidgets"
 
 	"tox-homeserver/avhlp"
@@ -83,7 +82,7 @@ type MainWindow struct {
 }
 
 func NewMainWindow() *MainWindow {
-	qtrt.SetDebugFFICall(false)
+	// qtrt.SetDebugFFICall(false)
 	this := &MainWindow{}
 	this.Ui_MainWindow = NewUi_MainWindow2()
 	uictx.uiw = this.Ui_MainWindow

@@ -77,9 +77,12 @@ const (
 	SK_HOMESERVER_URL = "homeserver_url" // it's really last
 	SK_SHOW_SQL_INLOG = "show_sql_inlog"
 	SK_DEBUG_LEVEL    = "debug_level"
+	SK_LAST_LOGINED   = "last_logined"
+	SK_EMBED_SERVER   = "embed_server"
 )
 
-var SettingKeys = []string{"device_name", "homeserver_url", "show_sql", "debug_level"}
+var SettingKeys = []string{"device_name", "homeserver_url", "show_sql", "debug_level",
+	"last_logined", "embed_server"}
 
 // for client
 type Setting struct {

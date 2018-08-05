@@ -6,12 +6,14 @@ import "github.com/kitech/qt.go/qtgui"
 import "github.com/kitech/qt.go/qtwidgets"
 import "github.com/kitech/qt.go/qtquickwidgets"
 import "github.com/kitech/qt.go/qtmock"
+import "github.com/kitech/qt.go/qtrt"
 
 func init() { qtcore.KeepMe() }
 func init() { qtgui.KeepMe() }
 func init() { qtwidgets.KeepMe() }
 func init() { qtquickwidgets.KeepMe() }
 func init() { qtmock.KeepMe() }
+func init() { qtrt.KeepMe() }
 
 //  header block end
 
@@ -78,6 +80,7 @@ func (this *Ui_MessageItemView) SetupUi(MessageItemView *qtwidgets.QWidget) {
 	this.VerticalLayout_3.Layout().AddWidget(this.ToolButton_2) // 115
 
 	this.VerticalSpacer = qtwidgets.NewQSpacerItem(36, 10, qtwidgets.QSizePolicy__Minimum, qtwidgets.QSizePolicy__Expanding)
+	qtrt.ReleaseOwnerToQt(this.VerticalSpacer)
 
 	this.VerticalLayout_3.AddItem(this.VerticalSpacer) // 115
 
@@ -98,6 +101,7 @@ func (this *Ui_MessageItemView) SetupUi(MessageItemView *qtwidgets.QWidget) {
 	this.HorizontalLayout.Layout().AddWidget(this.LabelUserName4MessageItem) // 115
 
 	this.HorizontalSpacer = qtwidgets.NewQSpacerItem(10, 20, qtwidgets.QSizePolicy__Expanding, qtwidgets.QSizePolicy__Minimum)
+	qtrt.ReleaseOwnerToQt(this.HorizontalSpacer)
 
 	this.HorizontalLayout.AddItem(this.HorizontalSpacer) // 115
 
@@ -151,6 +155,7 @@ func (this *Ui_MessageItemView) SetupUi(MessageItemView *qtwidgets.QWidget) {
 	this.VerticalLayout_2.Layout().AddWidget(this.ToolButton_3) // 115
 
 	this.VerticalSpacer_2 = qtwidgets.NewQSpacerItem(36, 10, qtwidgets.QSizePolicy__Minimum, qtwidgets.QSizePolicy__Expanding)
+	qtrt.ReleaseOwnerToQt(this.VerticalSpacer_2)
 
 	this.VerticalLayout_2.AddItem(this.VerticalSpacer_2) // 115
 

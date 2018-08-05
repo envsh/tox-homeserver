@@ -85,6 +85,11 @@ func (this *Storage) initTables() {
 	}
 }
 
+func (this *Storage) Close() error {
+	return this.dbh.Close()
+}
+
+/////
 func (this *Storage) AddFriend(pubkey string, rtnum uint32, name, stmsg string) (int64, error) {
 	c := &Contact{}
 	c.Pubkey = pubkey

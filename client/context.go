@@ -72,6 +72,18 @@ func AppConnect(srvurl string) error {
 	return nil
 }
 
+func AppDestroy() {
+	appctx.srvtp.OnData(nil)
+	log.Println("stop vtcli...")
+	appctx.vtcli.stop()
+	appctx.vtcli = nil
+	log.Println("stop storage...")
+	gopp.ErrPrint(appctx.store.Close())
+	appctx.store = nil
+	appctx = nil
+	log.Println("stop pprof http server...")
+}
+
 func _AppOnCreate() {
 	appctxOnce.Do(func() {
 		// printBuildInfo(true)

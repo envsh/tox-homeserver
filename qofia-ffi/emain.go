@@ -21,6 +21,9 @@ func init() { gomain2c.Set(main) }
 func main() {
 	log.Println("Enter main...")
 
+	if runtime.GOOS == "linux" {
+		SetupGops()
+	}
 	// Create application
 	if runtime.GOOS == "android" {
 		os.Setenv("QT_AUTO_SCREEN_SCALE_FACTOR ", "1.5")
@@ -28,8 +31,9 @@ func main() {
 	} else {
 		// qtrt.SetFinalizerObjectFilter(finalizerFilter)
 	}
-	// qtrt.SetDebugFFICall(true)
+	qtrt.SetDebugFFICall(false)
 	app := qtwidgets.NewQApplication(len(os.Args), os.Args, 0)
+	setupFinalizerOnUi()
 	if false {
 		app.SetAttribute(qtcore.Qt__AA_EnableHighDpiScaling, true) // for android
 	}
@@ -82,4 +86,24 @@ func finalizerFilter(ov reflect.Value) bool {
 		log.Println(ov.Type().String(), ov)
 	}
 	return insure
+}
+
+var finalMech *Notifier
+
+func setupFinalizerOnUi() {
+	// usually finalizer run on go's seperate thread, cause crash often. so fix it.
+	uiqc := make(chan func(), 1)
+	mech := NewNotifier(func() {
+		for len(uiqc) > 0 {
+			remfn := <-uiqc
+			remfn()
+		}
+	})
+
+	qtrt.FinalProxyFn = func(f func()) {
+		uiqc <- f
+		mech.Trigger()
+		// f()
+	}
+	finalMech = mech
 }

@@ -164,6 +164,50 @@ func (this *MessageListWin) SetIconForItem(item *RoomListItem) {
 	mw.Label_4.SetPixmap(item.cticon.Pixmap_1_(32, 32))
 }
 
+func (this *MessageListWin) ClearAll() {
+	this.ClearItemInfos()
+	this.ClearMessages()
+}
+func (this *MessageListWin) ClearItemInfos() {
+	item := this.item
+	if item == nil {
+		return
+	}
+	mw := uictx.mw
+	mw.Label_5.Clear()
+	mw.Label_5.SetToolTip("")
+	mw.Label_6.Clear()
+	mw.Label_6.SetToolTip("")
+	mw.Label_7.Clear()
+	mw.Label_7.SetToolTip("")
+	mw.LabelMsgCount.Clear()
+	mw.LabelMsgCount.SetToolTip("")
+	mw.LabelMsgCount2.Clear()
+	mw.LabelMsgCount2.SetToolTip("")
+	mw.Label_4.Clear()
+	mw.Label_4.SetToolTip("")
+}
+func (this *MessageListWin) ClearMessages() {
+	item := this.item
+	if item == nil {
+		return
+	}
+
+	vlo8 := uictx.uiw.VerticalLayout_3
+
+	btime := time.Now()
+	elemcnt := vlo8.Count()
+	// i > 0 leave the QSpacerItem there // not need QSpacerItem anymore
+	for i := elemcnt - 1; i >= 0; i-- {
+		itemv := vlo8.TakeAt(i)
+		_ = itemv
+		// itemv.Widget().SetVisible(t)
+		// itemv.Widget().DeleteLater()
+		// qtwidgets.DeleteQWidget(itemv.Widget())
+	}
+	log.Println("Clean done, used:", time.Since(btime), vlo8.Count(), elemcnt, item.GetName())
+}
+
 ///////////
 func (this *MessageListWin) InitMessageListGesture() {
 	this.InitContextMenu()

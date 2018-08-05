@@ -6,12 +6,14 @@ import "github.com/kitech/qt.go/qtgui"
 import "github.com/kitech/qt.go/qtwidgets"
 import "github.com/kitech/qt.go/qtquickwidgets"
 import "github.com/kitech/qt.go/qtmock"
+import "github.com/kitech/qt.go/qtrt"
 
 func init() { qtcore.KeepMe() }
 func init() { qtgui.KeepMe() }
 func init() { qtwidgets.KeepMe() }
 func init() { qtquickwidgets.KeepMe() }
 func init() { qtmock.KeepMe() }
+func init() { qtrt.KeepMe() }
 
 //  header block end
 
@@ -96,6 +98,7 @@ func (this *Ui_Dialog) SetupUi(Dialog *qtwidgets.QDialog) {
 	this.HorizontalLayout = qtwidgets.NewQHBoxLayout()      // 111
 	this.HorizontalLayout.SetObjectName("HorizontalLayout") // 112
 	this.HorizontalSpacer = qtwidgets.NewQSpacerItem(40, 20, qtwidgets.QSizePolicy__Expanding, qtwidgets.QSizePolicy__Minimum)
+	qtrt.ReleaseOwnerToQt(this.HorizontalSpacer)
 
 	this.HorizontalLayout.AddItem(this.HorizontalSpacer) // 115
 

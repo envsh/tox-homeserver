@@ -6,12 +6,14 @@ import "github.com/kitech/qt.go/qtgui"
 import "github.com/kitech/qt.go/qtwidgets"
 import "github.com/kitech/qt.go/qtquickwidgets"
 import "github.com/kitech/qt.go/qtmock"
+import "github.com/kitech/qt.go/qtrt"
 
 func init() { qtcore.KeepMe() }
 func init() { qtgui.KeepMe() }
 func init() { qtwidgets.KeepMe() }
 func init() { qtquickwidgets.KeepMe() }
 func init() { qtmock.KeepMe() }
+func init() { qtrt.KeepMe() }
 
 //  header block end
 
@@ -343,6 +345,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.HorizontalLayout_7.Layout().AddWidget(this.ToolButton_11) // 115
 
 	this.HorizontalSpacer = qtwidgets.NewQSpacerItem(3, 20, qtwidgets.QSizePolicy__Expanding, qtwidgets.QSizePolicy__Minimum)
+	qtrt.ReleaseOwnerToQt(this.HorizontalSpacer)
 
 	this.HorizontalLayout_7.AddItem(this.HorizontalSpacer) // 115
 
@@ -521,6 +524,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.VerticalLayout_15.Layout().AddWidget(this.GroupBox_2) // 115
 
 	this.VerticalSpacer_3 = qtwidgets.NewQSpacerItem(20, 287, qtwidgets.QSizePolicy__Minimum, qtwidgets.QSizePolicy__Expanding)
+	qtrt.ReleaseOwnerToQt(this.VerticalSpacer_3)
 
 	this.VerticalLayout_15.AddItem(this.VerticalSpacer_3) // 115
 
@@ -531,6 +535,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.VerticalLayout_8.SetSpacing(22)                            // 114
 	this.VerticalLayout_8.SetObjectName("VerticalLayout_8")         // 112
 	this.VerticalSpacer = qtwidgets.NewQSpacerItem(20, 168, qtwidgets.QSizePolicy__Minimum, qtwidgets.QSizePolicy__Expanding)
+	qtrt.ReleaseOwnerToQt(this.VerticalSpacer)
 
 	this.VerticalLayout_8.AddItem(this.VerticalSpacer) // 115
 
@@ -543,6 +548,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.HorizontalLayout_15.Layout().AddWidget(this.Label_22) // 115
 
 	this.HorizontalSpacer_3 = qtwidgets.NewQSpacerItem(40, 20, qtwidgets.QSizePolicy__Expanding, qtwidgets.QSizePolicy__Minimum)
+	qtrt.ReleaseOwnerToQt(this.HorizontalSpacer_3)
 
 	this.HorizontalLayout_15.AddItem(this.HorizontalSpacer_3) // 115
 
@@ -565,6 +571,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.HorizontalLayout_20 = qtwidgets.NewQHBoxLayout()         // 111
 	this.HorizontalLayout_20.SetObjectName("HorizontalLayout_20") // 112
 	this.HorizontalSpacer_4 = qtwidgets.NewQSpacerItem(40, 20, qtwidgets.QSizePolicy__Expanding, qtwidgets.QSizePolicy__Minimum)
+	qtrt.ReleaseOwnerToQt(this.HorizontalSpacer_4)
 
 	this.HorizontalLayout_20.AddItem(this.HorizontalSpacer_4) // 115
 
@@ -575,6 +582,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.HorizontalLayout_20.Layout().AddWidget(this.RadioButton_3) // 115
 
 	this.HorizontalSpacer_6 = qtwidgets.NewQSpacerItem(40, 20, qtwidgets.QSizePolicy__Expanding, qtwidgets.QSizePolicy__Minimum)
+	qtrt.ReleaseOwnerToQt(this.HorizontalSpacer_6)
 
 	this.HorizontalLayout_20.AddItem(this.HorizontalSpacer_6) // 115
 
@@ -585,6 +593,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.HorizontalLayout_20.Layout().AddWidget(this.RadioButton_4) // 115
 
 	this.HorizontalSpacer_5 = qtwidgets.NewQSpacerItem(40, 20, qtwidgets.QSizePolicy__Expanding, qtwidgets.QSizePolicy__Minimum)
+	qtrt.ReleaseOwnerToQt(this.HorizontalSpacer_5)
 
 	this.HorizontalLayout_20.AddItem(this.HorizontalSpacer_5) // 115
 
@@ -604,6 +613,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.VerticalLayout_8.Layout().AddWidget(this.Label_24) // 115
 
 	this.VerticalSpacer_2 = qtwidgets.NewQSpacerItem(20, 238, qtwidgets.QSizePolicy__Minimum, qtwidgets.QSizePolicy__Expanding)
+	qtrt.ReleaseOwnerToQt(this.VerticalSpacer_2)
 
 	this.VerticalLayout_8.AddItem(this.VerticalSpacer_2) // 115
 
@@ -1099,6 +1109,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.HorizontalLayout_21 = qtwidgets.NewQHBoxLayout()             // 111
 	this.HorizontalLayout_21.SetObjectName("HorizontalLayout_21")     // 112
 	this.HorizontalSpacer_2 = qtwidgets.NewQSpacerItem(40, 20, qtwidgets.QSizePolicy__Expanding, qtwidgets.QSizePolicy__Minimum)
+	qtrt.ReleaseOwnerToQt(this.HorizontalSpacer_2)
 
 	this.HorizontalLayout_21.AddItem(this.HorizontalSpacer_2) // 115
 
@@ -1121,6 +1132,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.HorizontalLayout_21.Layout().AddWidget(this.Label_29) // 115
 
 	this.HorizontalSpacer_7 = qtwidgets.NewQSpacerItem(40, 20, qtwidgets.QSizePolicy__Expanding, qtwidgets.QSizePolicy__Minimum)
+	qtrt.ReleaseOwnerToQt(this.HorizontalSpacer_7)
 
 	this.HorizontalLayout_21.AddItem(this.HorizontalSpacer_7) // 115
 
@@ -1136,6 +1148,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.HorizontalLayout_22 = qtwidgets.NewQHBoxLayout()         // 111
 	this.HorizontalLayout_22.SetObjectName("HorizontalLayout_22") // 112
 	this.HorizontalSpacer_8 = qtwidgets.NewQSpacerItem(40, 20, qtwidgets.QSizePolicy__Expanding, qtwidgets.QSizePolicy__Minimum)
+	qtrt.ReleaseOwnerToQt(this.HorizontalSpacer_8)
 
 	this.HorizontalLayout_22.AddItem(this.HorizontalSpacer_8) // 115
 
@@ -1147,6 +1160,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.HorizontalLayout_22.Layout().AddWidget(this.ToolButton_20) // 115
 
 	this.HorizontalSpacer_10 = qtwidgets.NewQSpacerItem(40, 20, qtwidgets.QSizePolicy__Expanding, qtwidgets.QSizePolicy__Minimum)
+	qtrt.ReleaseOwnerToQt(this.HorizontalSpacer_10)
 
 	this.HorizontalLayout_22.AddItem(this.HorizontalSpacer_10) // 115
 
@@ -1157,6 +1171,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.HorizontalLayout_22.Layout().AddWidget(this.ToolButton_21) // 115
 
 	this.HorizontalSpacer_11 = qtwidgets.NewQSpacerItem(40, 20, qtwidgets.QSizePolicy__Expanding, qtwidgets.QSizePolicy__Minimum)
+	qtrt.ReleaseOwnerToQt(this.HorizontalSpacer_11)
 
 	this.HorizontalLayout_22.AddItem(this.HorizontalSpacer_11) // 115
 
@@ -1168,6 +1183,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.HorizontalLayout_22.Layout().AddWidget(this.ToolButton_30) // 115
 
 	this.HorizontalSpacer_9 = qtwidgets.NewQSpacerItem(40, 20, qtwidgets.QSizePolicy__Expanding, qtwidgets.QSizePolicy__Minimum)
+	qtrt.ReleaseOwnerToQt(this.HorizontalSpacer_9)
 
 	this.HorizontalLayout_22.AddItem(this.HorizontalSpacer_9) // 115
 
@@ -1240,6 +1256,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.VerticalLayout_21.AddLayout(this.HorizontalLayout_14, 0) // 115
 
 	this.VerticalSpacer_6 = qtwidgets.NewQSpacerItem(20, 369, qtwidgets.QSizePolicy__Minimum, qtwidgets.QSizePolicy__Expanding)
+	qtrt.ReleaseOwnerToQt(this.VerticalSpacer_6)
 
 	this.VerticalLayout_21.AddItem(this.VerticalSpacer_6) // 115
 
@@ -1298,6 +1315,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.VerticalLayout_20.AddLayout(this.VerticalLayout_19, 0) // 115
 
 	this.VerticalSpacer_5 = qtwidgets.NewQSpacerItem(20, 209, qtwidgets.QSizePolicy__Minimum, qtwidgets.QSizePolicy__Expanding)
+	qtrt.ReleaseOwnerToQt(this.VerticalSpacer_5)
 
 	this.VerticalLayout_20.AddItem(this.VerticalSpacer_5) // 115
 
@@ -1716,6 +1734,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.VerticalLayout_28.Layout().AddWidget(this.GroupBox_7) // 115
 
 	this.VerticalSpacer_4 = qtwidgets.NewQSpacerItem(20, 158, qtwidgets.QSizePolicy__Minimum, qtwidgets.QSizePolicy__Expanding)
+	qtrt.ReleaseOwnerToQt(this.VerticalSpacer_4)
 
 	this.VerticalLayout_28.AddItem(this.VerticalSpacer_4) // 115
 
