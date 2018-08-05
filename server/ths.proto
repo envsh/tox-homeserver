@@ -112,6 +112,8 @@ message MemberInfo {
     string Name = 3;
     enum MemType { UNKNOWN = 0; FRIEND = 1; GROUP = 2; PEER = 3;}
     MemType Mtype = 4; // member type, friend, group, peer
+    // extra
+    int64 Joints = 5;
 }
 
 message Message 

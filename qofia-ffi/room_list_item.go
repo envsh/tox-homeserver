@@ -334,8 +334,8 @@ func (this *RoomListItem) SetContactInfo(info interface{}) {
 		this.Label_2.SetToolTip(nametip)
 		this.Label_4.SetText(trtxt(ct.GetStmsg(), 36))
 		this.Label_4.SetToolTip(ct.GetStmsg())
-		SetQLabelElideText(this.Label_2, name)
-		SetQLabelElideText(this.Label_4, ct.Stmsg)
+		SetQLabelElideText(this.Label_2, name, "")
+		SetQLabelElideText(this.Label_4, ct.Stmsg, "")
 
 		avataricon := store.GetFSC().GetFilePath(ct.GetPubkey())
 		if gopp.FileExist(avataricon) {
@@ -359,7 +359,8 @@ func (this *RoomListItem) SetContactInfo(info interface{}) {
 		this.Label_4.SetHidden(true)
 		this.Label_2.SetText(trtxt(ct.GetTitle(), 26))
 		this.Label_2.SetToolTip(ct.GetTitle())
-		SetQLabelElideText(this.Label_2, ct.Title)
+		suff := fmt.Sprintf(" %s%d", NameNumSep(), len(ct.Members))
+		SetQLabelElideText(this.Label_2, ct.Title, suff)
 
 		// this maybe call multiple times, so -20 -20 then, the item is 0 height.
 		// this.QWidget_PTR().SetFixedHeight(this.QWidget_PTR().Height() - 20)
@@ -657,6 +658,7 @@ func (this *RoomListItem) UpdateStatusMessage(statusText string) {
 			this.frndInfo.Stmsg = statusText
 			this.SetContactInfo(this.frndInfo)
 		}
+	} else {
 	}
 }
 
@@ -698,7 +700,7 @@ func (this *RoomListItem) SetLastMsg(msg string, tm time.Time, eventId int64) {
 	cmsg := refmter(msg)
 	this.Label_3.SetText(cmsg)
 	this.Label_3.SetToolTip(msg)
-	SetQLabelElideText(this.Label_3, cmsg)
+	SetQLabelElideText(this.Label_3, cmsg, "")
 	this.LabelLastMsgTime.SetText(Time2TodayMinute(tm))
 	this.LabelLastMsgTime.SetToolTip(gopp.TimeToFmt1(tm))
 }
@@ -814,6 +816,7 @@ func (this *RoomListItem) floatTextOverWidget(w qtwidgets.QWidget_ITF) *qtwidget
 }
 
 func (this *RoomListItem) SetPeerCount(n int) {
+	this.SetContactInfo(this.grpInfo)
 	if uictx.msgwin.item == this {
 		uictx.msgwin.SetPeerCount(n)
 	}

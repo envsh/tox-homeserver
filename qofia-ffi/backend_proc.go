@@ -30,11 +30,11 @@ func (this *MainWindow) initAppBackend() {
 
 	uiw.Label_2.SetText(gopp.StrSuf4ui(vtcli.SelfGetName(), thscom.UiNameLen))
 	uiw.Label_2.SetToolTip(vtcli.SelfGetName())
-	runOnUiThread(func() { SetQLabelElideText(uiw.Label_2, vtcli.SelfGetName()) })
+	runOnUiThread(func() { SetQLabelElideText(uiw.Label_2, vtcli.SelfGetName(), "") })
 	stmsg, _ := vtcli.SelfGetStatusMessage()
 	uiw.Label_3.SetText(gopp.StrSuf4ui(stmsg, thscom.UiStmsgLen))
 	uiw.Label_3.SetToolTip(stmsg)
-	runOnUiThread(func() { SetQLabelElideText(uiw.Label_3, stmsg) })
+	runOnUiThread(func() { SetQLabelElideText(uiw.Label_3, stmsg, "") })
 	uiw.ToolButton_17.SetToolTip(vtcli.SelfGetAddress())
 
 	listw := uiw.ListWidget_2

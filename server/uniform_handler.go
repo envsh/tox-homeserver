@@ -10,6 +10,7 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
+	"time"
 	thscom "tox-homeserver/common"
 	"tox-homeserver/store"
 	"tox-homeserver/thspbs"
@@ -62,6 +63,7 @@ func packBaseInfo(t *tox.Tox) (*thspbs.BaseInfo, error) {
 		out.Friends[fn] = fi
 	}
 
+	nowt := time.Now()
 	gns := t.ConferenceGetChatlist()
 	for _, gn := range gns {
 		title, err := t.ConferenceGetTitle(gn)
@@ -93,6 +95,7 @@ func packBaseInfo(t *tox.Tox) (*thspbs.BaseInfo, error) {
 			mi.Pnum = i
 			mi.Pubkey = ppubkey
 			mi.Name = pname
+			mi.Joints = nowt.Unix()
 
 			gi.Members[ppubkey] = mi
 		}

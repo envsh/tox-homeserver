@@ -44,7 +44,7 @@ func SetScrollContentTrackerSize(sa *qtwidgets.QScrollArea) {
 	})
 }
 
-func SetQLabelElideText(lab *qtwidgets.QLabel, txt string, skipTooltip ...bool) {
+func SetQLabelElideText(lab *qtwidgets.QLabel, txt string, suff string, skipTooltip ...bool) {
 	// font := lab.PaintEngine().Painter().Font()
 	font := lab.Font()
 	rect := lab.Rect()
@@ -62,14 +62,15 @@ func SetQLabelElideText(lab *qtwidgets.QLabel, txt string, skipTooltip ...bool) 
 	}
 
 	fm := qtgui.NewQFontMetrics(font)
+	elwidth -= gopp.IfElseInt(elwidth < 150, 0, fm.Width__(suff))
 	etxt := fm.ElidedText__(txt, qtcore.Qt__ElideRight, elwidth)
 	if false {
-		log.Println(len(txt), len(etxt))
+		log.Println(len(txt), len(etxt), elwidth, fm.Width__(suff), len(suff), suff)
 	}
 
-	lab.SetText(etxt)
+	lab.SetText(etxt + suff)
 	if len(skipTooltip) == 0 {
-		lab.SetToolTip(txt)
+		lab.SetToolTip(txt + suff)
 	}
 }
 

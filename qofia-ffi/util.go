@@ -62,3 +62,22 @@ func CallStateString(state uint32) string {
 	}
 	return "Unknown"
 }
+
+// more special symbols: http://www.fhdq.net/
+func NameNumSep() string {
+	// fmt.Sprintf(" (%d)", len(ct.Members)),
+	// fmt.Sprintf(" [%d]", len(ct.Members)),
+	// fmt.Sprintf(" <%d>", len(ct.Members)),
+	// fmt.Sprintf(" -%d", len(ct.Members)),
+	// fmt.Sprintf(" +%d", len(ct.Members)),
+	// fmt.Sprintf(" | %d", len(ct.Members)),
+	// fmt.Sprintf(" %%%d", len(ct.Members)),
+	// fmt.Sprintf(" Σ%d", len(ct.Members)),
+	// fmt.Sprintf(" √%d", len(ct.Members)),
+	// fmt.Sprintf(" ·%d", len(ct.Members)),
+	// fmt.Sprintf(" •%d", len(ct.Members)),
+	// fmt.Sprintf(" ●%d", len(ct.Members)),
+	// fmt.Sprintf(" ◦%d", len(ct.Members)),
+	// fmt.Sprintf(" ○%d", len(ct.Members)),
+	return "◦"
+}

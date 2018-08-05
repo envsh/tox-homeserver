@@ -265,7 +265,7 @@ func (this *MainWindow) initMainWindowSignals() {
 		if txt != "" && txt != uiw.Label_3.ToolTip() {
 			uiw.Label_2.SetText(gopp.StrSuf4ui(txt, thscom.UiNameLen))
 			uiw.Label_2.SetToolTip(txt)
-			SetQLabelElideText(uiw.Label_2, txt)
+			SetQLabelElideText(uiw.Label_2, txt, "")
 			vtcli.SelfSetName(txt)
 		}
 	})
@@ -281,7 +281,7 @@ func (this *MainWindow) initMainWindowSignals() {
 		if txt != "" && txt != uiw.Label_3.ToolTip() {
 			uiw.Label_3.SetText(gopp.StrSuf4ui(txt, thscom.UiStmsgLen))
 			uiw.Label_3.SetToolTip(txt)
-			SetQLabelElideText(uiw.Label_3, txt)
+			SetQLabelElideText(uiw.Label_3, txt, "")
 			vtcli.SelfSetStatusMessage(txt)
 		}
 	})

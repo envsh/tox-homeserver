@@ -147,15 +147,18 @@ func dispatchEvent(evto *thspbs.Event) {
 	case "ConferenceTitle":
 		groupNumber := evto.Args[1]
 		groupTitle := evto.Args[2]
+		groupStmsg := evto.Args[3]
 		groupId := evto.Margs[0]
 		if thscli.ConferenceIdIsEmpty(groupId) {
 			break
 		}
 		_ = groupTitle
+		_ = groupStmsg
 
 		item := uictx.iteman.Get(groupId)
 		if item != nil {
 			item.UpdateName(groupTitle)
+			item.UpdateStatusMessage(groupStmsg)
 			log.Println("Reuse item and update group contact title:", groupNumber, groupId, groupTitle)
 		} else {
 			item = NewRoomListItem()
@@ -168,6 +171,7 @@ func dispatchEvent(evto *thspbs.Event) {
 			grpInfo.GroupId = groupId
 			grpInfo.Gnum = gopp.MustUint32(groupNumber)
 			grpInfo.Title = groupTitle
+			grpInfo.Stmsg = groupStmsg
 			item.SetContactInfo(grpInfo)
 			log.Println("New group contact item:", groupNumber, groupId, groupTitle)
 		}

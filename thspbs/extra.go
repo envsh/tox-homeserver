@@ -1,6 +1,9 @@
 package thspbs
 
-import "log"
+import (
+	"log"
+	"time"
+)
 
 // extra for proto auto generated
 type ContactInfo = MemberInfo
@@ -54,8 +57,9 @@ func (this *GroupInfo) AddPeerInfo(pubkey string, name string, rtnum uint32) {
 	peero.Name = name
 	peero.Pubkey = pubkey
 	peero.Pnum = rtnum
-	if peero, ok := this.Members[pubkey]; ok {
-		log.Println("Override peer info:", rtnum, name, peero.Pnum, peero.Name)
+	peero.Joints = time.Now().Unix()
+	if peero2, ok := this.Members[pubkey]; ok {
+		log.Println("Override peer info:", rtnum, name, peero.Pnum, peero.Name, peero2.Pnum, peero2.Name)
 	}
 	this.Members[pubkey] = peero
 }

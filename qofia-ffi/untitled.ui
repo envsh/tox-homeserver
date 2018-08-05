@@ -814,6 +814,35 @@
              </property>
             </widget>
            </item>
+           <item>
+            <widget class="QToolButton" name="toolButton_32">
+             <property name="focusPolicy">
+              <enum>Qt::NoFocus</enum>
+             </property>
+             <property name="toolTip">
+              <string>logout</string>
+             </property>
+             <property name="text">
+              <string>...</string>
+             </property>
+             <property name="icon">
+              <iconset resource="rcc.qrc">
+               <normaloff>:/icons/power-button-off.png</normaloff>:/icons/power-button-off.png</iconset>
+             </property>
+             <property name="iconSize">
+              <size>
+               <width>28</width>
+               <height>28</height>
+              </size>
+             </property>
+             <property name="toolButtonStyle">
+              <enum>Qt::ToolButtonIconOnly</enum>
+             </property>
+             <property name="autoRaise">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
           </layout>
          </widget>
         </item>
@@ -843,6 +872,9 @@
             <property name="focusPolicy">
              <enum>Qt::NoFocus</enum>
             </property>
+            <property name="toolTip">
+             <string>filter and order</string>
+            </property>
             <property name="text">
              <string>...</string>
             </property>
@@ -855,6 +887,9 @@
            <widget class="QToolButton" name="toolButton_3">
             <property name="focusPolicy">
              <enum>Qt::NoFocus</enum>
+            </property>
+            <property name="toolTip">
+             <string>remove only me groups</string>
             </property>
             <property name="text">
              <string>...</string>
@@ -1430,8 +1465,8 @@
            <property name="geometry">
             <rect>
              <x>0</x>
-             <y>408</y>
-             <width>346</width>
+             <y>0</y>
+             <width>80</width>
              <height>16</height>
             </rect>
            </property>
@@ -2008,7 +2043,7 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>98</width>
+             <width>80</width>
              <height>18</height>
             </rect>
            </property>

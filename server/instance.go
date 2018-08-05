@@ -6,6 +6,7 @@ import (
 	"gopp"
 	"log"
 	"math"
+	"strings"
 	"time"
 
 	thscom "tox-homeserver/common"
@@ -428,8 +429,13 @@ func (this *ToxVM) setupEventsForMessage() {
 	t.CallbackConferenceTitleAdd(func(_ *tox.Tox, groupNumber uint32, peerNumber uint32, title string, userData interface{}) {
 		evt := thspbs.Event{}
 		evt.Name = "ConferenceTitle"
+		stmsg := "" // fake group status message
+		if pos := strings.Index(title, thscom.GroupTitleSep); pos > 0 {
+			stmsg = title[pos+len(thscom.GroupTitleSep):]
+			title = title[:pos]
+		}
 		evt.Args = []string{fmt.Sprintf("%d", groupNumber),
-			fmt.Sprintf("%d", peerNumber), title}
+			fmt.Sprintf("%d", peerNumber), title, stms}
 
 		groupId, _ := xtox.ConferenceGetIdentifier(t, groupNumber)
 		if xtox.ConferenceIdIsEmpty(groupId) {

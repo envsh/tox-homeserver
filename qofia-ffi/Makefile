@@ -20,7 +20,7 @@ gen:
 bd:
 	echo -e "package main\nconst btversion = \"${GOVVV2}\"\n" > btversion.go
 	echo -e "const isandroid = true\n" >> btversion.go
-	GOGC=5 go build -p 1 -v -i -gcflags="-c 1"  -ldflags "${GOVVV}"
+	GOGC=10 go build -p 1 -v -i -gcflags="-c 1"  -ldflags "${GOVVV}"
 
 droid: droidso droidapk
 
