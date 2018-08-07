@@ -4,7 +4,7 @@ GOVVV2=`govvv -flags -version ${VERSION}|sed 's/=/=GOVVV-/g'|sed 's/main./gofia.
 CPWD=$(shell pwd)
 
 all:
-
+	usage="make < gen bd clean >"
 
 gen:
 	# go-uic scroll_widget.ui

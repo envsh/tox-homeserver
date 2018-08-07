@@ -27,6 +27,8 @@ func (this *MainWindow) initProfileSignals() {
 	uiw := uictx.uiw
 	qtrt.Connect(uiw.PushButton_7, "clicked(bool)", this.login)
 	qtrt.Connect(uiw.ToolButton_32, "clicked(bool)", this.logout)
+
+	// test
 }
 
 func (this *MainWindow) initProfileEvents() {

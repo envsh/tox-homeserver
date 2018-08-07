@@ -94,6 +94,8 @@ func NewQPainter(w qtwidgets.QWidget_ITF) *qtgui.QPainter {
 	return qtgui.NewQPainter_1(ptdev)
 }
 
+// TODO need margin of sides
+// TODO how get round background mask?
 // for friend
 func GetIdentIcon(s string) *qtgui.QIcon {
 	back := color.RGBA{240, 240, 240, 255}

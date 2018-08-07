@@ -607,7 +607,7 @@
              <string>For this one, not need a seperate server, this program has embeded one, and auto start it. Preview purpose.</string>
             </property>
             <property name="text">
-             <string>Self &amp;Contains</string>
+             <string>E&amp;mbed Server</string>
             </property>
            </widget>
           </item>
@@ -831,8 +831,8 @@
              </property>
              <property name="iconSize">
               <size>
-               <width>28</width>
-               <height>28</height>
+               <width>22</width>
+               <height>22</height>
               </size>
              </property>
              <property name="toolButtonStyle">
@@ -1465,8 +1465,8 @@
            <property name="geometry">
             <rect>
              <x>0</x>
-             <y>0</y>
-             <width>80</width>
+             <y>347</y>
+             <width>346</width>
              <height>16</height>
             </rect>
            </property>
@@ -1497,11 +1497,8 @@
          </widget>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_6">
-          <property name="spacing">
-           <number>0</number>
-          </property>
-          <item>
+         <layout class="QGridLayout" name="gridLayout_3">
+          <item row="1" column="0">
            <widget class="QToolButton" name="toolButton_8">
             <property name="focusPolicy">
              <enum>Qt::NoFocus</enum>
@@ -1527,7 +1524,87 @@
             </property>
            </widget>
           </item>
-          <item>
+          <item row="1" column="4">
+           <widget class="QToolButton" name="toolButton_10">
+            <property name="focusPolicy">
+             <enum>Qt::NoFocus</enum>
+            </property>
+            <property name="toolTip">
+             <string>Emoji. Mouse over for show.</string>
+            </property>
+            <property name="text">
+             <string>...</string>
+            </property>
+            <property name="icon">
+             <iconset resource="rcc.qrc">
+              <normaloff>:/icons/smile_gray64.png</normaloff>:/icons/smile_gray64.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>22</width>
+              <height>22</height>
+             </size>
+            </property>
+            <property name="autoRaise">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="5">
+           <widget class="QToolButton" name="toolButton_18">
+            <property name="focusPolicy">
+             <enum>Qt::NoFocus</enum>
+            </property>
+            <property name="text">
+             <string>&amp;Send</string>
+            </property>
+            <property name="icon">
+             <iconset resource="rcc.qrc">
+              <normaloff>:/icons/cursor_gray64.png</normaloff>:/icons/cursor_gray64.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>22</width>
+              <height>22</height>
+             </size>
+            </property>
+            <property name="toolButtonStyle">
+             <enum>Qt::ToolButtonTextBesideIcon</enum>
+            </property>
+            <property name="autoRaise">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <widget class="QTextEdit" name="textEdit_3">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>60</height>
+             </size>
+            </property>
+            <property name="mouseTracking">
+             <bool>true</bool>
+            </property>
+            <property name="horizontalScrollBarPolicy">
+             <enum>Qt::ScrollBarAlwaysOff</enum>
+            </property>
+            <property name="acceptRichText">
+             <bool>false</bool>
+            </property>
+            <property name="placeholderText">
+             <string>Write a message...</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
            <widget class="QToolButton" name="toolButton_9">
             <property name="focusPolicy">
              <enum>Qt::NoFocus</enum>
@@ -1553,62 +1630,10 @@
             </property>
            </widget>
           </item>
-          <item>
-           <widget class="QToolButton" name="toolButton_10">
-            <property name="focusPolicy">
-             <enum>Qt::NoFocus</enum>
-            </property>
-            <property name="toolTip">
-             <string>Emoji</string>
-            </property>
-            <property name="text">
-             <string>...</string>
-            </property>
-            <property name="icon">
-             <iconset resource="rcc.qrc">
-              <normaloff>:/icons/smile_gray64.png</normaloff>:/icons/smile_gray64.png</iconset>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>22</width>
-              <height>22</height>
-             </size>
-            </property>
-            <property name="autoRaise">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
+          <item row="2" column="2">
            <widget class="QLineEdit" name="lineEdit_2">
             <property name="placeholderText">
              <string>Write a message...</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QToolButton" name="toolButton_18">
-            <property name="focusPolicy">
-             <enum>Qt::NoFocus</enum>
-            </property>
-            <property name="text">
-             <string>&amp;Send</string>
-            </property>
-            <property name="icon">
-             <iconset resource="rcc.qrc">
-              <normaloff>:/icons/cursor_gray64.png</normaloff>:/icons/cursor_gray64.png</iconset>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>22</width>
-              <height>22</height>
-             </size>
-            </property>
-            <property name="toolButtonStyle">
-             <enum>Qt::ToolButtonTextBesideIcon</enum>
-            </property>
-            <property name="autoRaise">
-             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -2043,7 +2068,7 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>80</width>
+             <width>66</width>
              <height>18</height>
             </rect>
            </property>

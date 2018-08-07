@@ -68,6 +68,9 @@ func (this *MainWindow) checkClipboardImage() {
 	}
 }
 
+// 聊天输入框显示规则，默认显示一行，当输入超过一行时自动扩展输入框高度。最多显示3-5行，然后出现滚动条。
+// 使用Enter发送消息，使用Shift+Entry换行。
+// 在回退的时候，也需要减小高度，直到默认高度
 func (this *MainWindow) checkExpandLineEditHeight() {
 
 }
