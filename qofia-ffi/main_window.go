@@ -8,6 +8,7 @@ import (
 	"gopp"
 	"io/ioutil"
 	"log"
+	"strings"
 
 	"github.com/kitech/qt.go/qtcore"
 	"github.com/kitech/qt.go/qtgui"
@@ -257,17 +258,22 @@ func (this *MainWindow) setConnStatus(on bool) {
 
 func (this *MainWindow) sendMessage() {
 	uiw := uictx.uiw
-	itext := uiw.LineEdit_2.Text()
+	itext := uiw.TextEdit_3.Document().ToPlainText()
+	itext = strings.Trim(itext, " ")
 	if len(itext) > thscom.MaxMessageLen {
 		ShowToast("Message too long", 1)
 		return
 	}
+	if len(itext) == 0 {
+		ShowToast("Empty message", 1)
+		return
+	}
 	item := uictx.msgwin.item
-	if item != nil && len(itext) > 0 {
+	if item != nil {
 		this.sendMessageImpl(item, itext, item.isgroup, item.GetNum())
-		uiw.LineEdit_2.Clear()
+		uiw.TextEdit_3.Clear()
 	} else {
-		log.Println("not send:", len(itext), item)
+		log.Println("Message not send:", len(itext), item == nil)
 	}
 }
 

@@ -18,7 +18,10 @@ func (this *MainWindow) initAppBackend() {
 	err := thscli.AppConnect(srvurl)
 	gopp.ErrPrint(err, srvurl)
 	if err != nil {
-		runOnUiThread(func() { this.Label_24.SetText("connect error:" + err.Error()) })
+		runOnUiThread(func() {
+			this.Label_24.SetText("connect error:" + err.Error())
+			this.PushButton_7.SetEnabled(true)
+		})
 		return
 	}
 	vtcli = appctx.GetLigTox()

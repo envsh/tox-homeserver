@@ -167,7 +167,7 @@ func (this *MainWindow) initMainWindowSignals() {
 	qtrt.Connect(uiw.ToolButton_18, "clicked(bool)", func(checked bool) {
 		this.sendMessage()
 	})
-	qtrt.Connect(uiw.LineEdit_2, "returnPressed()", this.sendMessage)
+	// qtrt.Connect(uiw.LineEdit_2, "returnPressed()", this.sendMessage) // TODO Ctrl+Enter
 
 	// switch theme
 	qtrt.Connect(uiw.ComboBox_2, "currentIndexChanged(int)", func(index int) {

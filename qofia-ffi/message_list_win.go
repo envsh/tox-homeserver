@@ -29,24 +29,45 @@ func (this *MainWindow) initMessageListSignals() {
 }
 
 func (this *MainWindow) initMessageListEvents() {
-	le := this.LineEdit_2
-	le.InheritKeyPressEvent(func(arg0 *qtgui.QKeyEvent) {
+	te := this.TextEdit_3
+	te.InheritKeyPressEvent(func(arg0 *qtgui.QKeyEvent) {
 		arg0.Ignore()
 		// Ctrl+C
-		log.Println(arg0.Matches(qtgui.QKeySequence__Paste))
+		// log.Println(arg0.Matches(qtgui.QKeySequence__Paste))
+		srckeys := qtgui.NewQKeySequence_2_1(arg0.Modifiers(), arg0.Key())
+		sendkeys := qtgui.NewQKeySequence_2_1(qtcore.Qt__Key_Shift, qtcore.Qt__Key_Enter)
 		if arg0.Matches(qtgui.QKeySequence__Paste) {
 			this.checkClipboardImage()
+		} else if arg0.Matches(qtgui.QKeySequence__InsertLineSeparator) {
+			// Shift+Enter
+			log.Println("catch insert line sep keys:", srckeys.ToString__(), arg0.Key(), arg0.Text())
+		} else if arg0.Matches(qtgui.QKeySequence__InsertParagraphSeparator) {
+			// Enter
+			log.Println("catch insert para sep keys:", srckeys.ToString__(), arg0.Key(), arg0.Text())
+			if gopp.IsAndroid() {
+				// nothing to do
+			} else { // PC
+				arg0.Accept()
+				runOnUiThread(this.sendMessage)
+				return
+			}
+		} else if arg0.Key() == qtcore.Qt__Key_Tab { // for complete nick name
+		} else if arg0.Key() == qtcore.Qt__Key_Up { // prev history message
+		} else if arg0.Key() == qtcore.Qt__Key_Down { // next history message
+		} else if srckeys.Matches(sendkeys) == qtgui.QKeySequence__ExactMatch {
+			log.Println("catch hotkeys:", sendkeys.ToString__())
 		}
-		le.KeyPressEvent(arg0)
+
+		te.KeyPressEvent(arg0)
 	})
-	le.InheritMousePressEvent(func(arg0 *qtgui.QMouseEvent) {
+	te.InheritMousePressEvent(func(arg0 *qtgui.QMouseEvent) {
 		// middle button
 		if arg0.Button() == qtcore.Qt__MiddleButton {
 			this.checkClipboardImage()
 			arg0.Accept()
 		} else {
 			arg0.Ignore()
-			le.MousePressEvent(arg0)
+			te.MousePressEvent(arg0)
 		}
 	})
 }
@@ -224,6 +245,7 @@ func (this *MessageListWin) InitMessageListGesture() {
 	this.gesto = NewMessageListGesture(w)
 	this.gesto.OnLongTouch = this.OnSCWLongTouch
 	this.initEvents()
+	setAutoHeightForTextEdit(uictx.mw.TextEdit_3)
 }
 
 func (this *MessageListWin) InitContextMenu() {
@@ -277,7 +299,7 @@ func (this *MessageListWin) ProcessActionClear() {
 }
 
 func (this *MessageListWin) ProcessActionQuote() {
-	uictx.mw.LineEdit_2.SetText(fmt.Sprintf("> %s\n", this.selinfo.text))
+	uictx.mw.TextEdit_3.SetPlainText(fmt.Sprintf("> %s\n", this.selinfo.text))
 }
 
 // when
@@ -331,7 +353,6 @@ func (this *MessageListWin) showEmojiPanel(bool) {
 		this.emojiPanel = NewEmojiPanel()
 		this.emojiPanel.OnEmojiSelected = func(emoji, shrtname string) {
 			uiw := uictx.uiw
-			uiw.LineEdit_2.SetText(uiw.LineEdit_2.Text() + emoji)
 			uiw.TextEdit_3.InsertPlainText(emoji)
 			// this.emojiPanel.QWidget_PTR().Hide()
 		}

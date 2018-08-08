@@ -16,6 +16,7 @@ import (
 
 	"github.com/kitech/qt.go/qtcore"
 	"github.com/kitech/qt.go/qtgui"
+	"github.com/kitech/qt.go/qtrt"
 	"github.com/kitech/qt.go/qtwidgets"
 
 	"github.com/holys/initials-avatar"
@@ -190,4 +191,25 @@ func FindProperFontFile(w *qtwidgets.QWidget) {
 	fflstx := qtcore.NewQStringListxFromPointer(fflst.GetCthis())
 	log.Println(fflstx.Count_1())
 	log.Println(fflstx.ConvertToSlice())
+}
+
+func setAutoHeightForTextEdit(te *qtwidgets.QTextEdit) {
+	font := te.Font()
+	fm := qtgui.NewQFontMetrics(font)
+
+	minh := 24
+	avgh := (fm.Height() + minh) / 2
+	maxh := avgh * 4
+
+	qtrt.Connect(te.Document().DocumentLayout(),
+		"documentSizeChanged(const QSizeF &)", func(sz *qtcore.QSizeF) {
+			newh := int(sz.Height())
+			if newh >= minh && newh <= maxh {
+				// te.UpdateGeometry()
+				te.SetFixedHeight(int(sz.Height()) + 2)
+			}
+		})
+}
+func unsetAutoHeightForTextEdit(te *qtwidgets.QTextEdit) {
+	qtrt.Disconnect(te.Document().DocumentLayout(), "documentSizeChanged(const QSizeF &)")
 }

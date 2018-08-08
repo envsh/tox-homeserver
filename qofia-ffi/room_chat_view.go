@@ -68,10 +68,10 @@ func (this *MainWindow) initRoomChatSignals() {
 func (this *MainWindow) initRoomChatEvents() {
 	// for long content on QLabel, this will truncate can not wrap part
 	SetScrollContentTrackerSize(this.ScrollArea_2)
-	this.LineEdit_2.InheritDragEnterEvent(func(arg0 *qtgui.QDragEnterEvent) {
+	this.TextEdit_3.InheritDragEnterEvent(func(arg0 *qtgui.QDragEnterEvent) {
 		arg0.AcceptProposedAction()
 	})
-	this.LineEdit_2.InheritDropEvent(func(arg0 *qtgui.QDropEvent) {
+	this.TextEdit_3.InheritDropEvent(func(arg0 *qtgui.QDropEvent) {
 		mmdt := arg0.MimeData()
 		lst := mmdt.Formats()
 		fmts := qtcore.NewQStringListxFromPointer(lst.GetCthis())
@@ -97,7 +97,7 @@ func (this *MainWindow) initRoomChatEvents() {
 			txt := mmdt.Text()
 			gopp.FalsePrint(txt != "", "Why no text value?")
 			if txt != "" {
-				this.LineEdit_2.SetText(txt)
+				this.TextEdit_3.SetPlainText(txt)
 				accepted = true
 			}
 		} else if !accepted && mmdt.HasFormat("application/x-qt-image") {

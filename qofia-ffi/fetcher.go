@@ -91,7 +91,7 @@ func (this *Fetcher) RefreshPrevStorageTimeLine(itemtl *thscli.TimeLine, pubkey 
 	// TODO 删除与添加事务起来
 	// 删除合并掉的
 	if mrgcnt > 0 {
-		log.Println("mrgsome:", mrgcnt, rtl, tls[mrgcnt:])
+		log.Println("mrgsome:", mrgcnt, rtl, "left:", len(tls[mrgcnt:]))
 		for i := 0; i < mrgcnt; i++ {
 			err := st.DeleteSyncInfoById(sis[i].Id)
 			gopp.ErrPrint(err, sis[i])

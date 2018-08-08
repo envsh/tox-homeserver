@@ -1465,7 +1465,7 @@
            <property name="geometry">
             <rect>
              <x>0</x>
-             <y>347</y>
+             <y>408</y>
              <width>346</width>
              <height>16</height>
             </rect>
@@ -1498,32 +1498,6 @@
         </item>
         <item>
          <layout class="QGridLayout" name="gridLayout_3">
-          <item row="1" column="0">
-           <widget class="QToolButton" name="toolButton_8">
-            <property name="focusPolicy">
-             <enum>Qt::NoFocus</enum>
-            </property>
-            <property name="toolTip">
-             <string>Send File</string>
-            </property>
-            <property name="text">
-             <string>...</string>
-            </property>
-            <property name="icon">
-             <iconset resource="rcc.qrc">
-              <normaloff>:/icons/paper-clip-outline_gray64.png</normaloff>:/icons/paper-clip-outline_gray64.png</iconset>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>22</width>
-              <height>22</height>
-             </size>
-            </property>
-            <property name="autoRaise">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
           <item row="1" column="4">
            <widget class="QToolButton" name="toolButton_10">
             <property name="focusPolicy">
@@ -1587,7 +1561,7 @@
             <property name="maximumSize">
              <size>
               <width>16777215</width>
-              <height>60</height>
+              <height>26</height>
              </size>
             </property>
             <property name="mouseTracking">
@@ -1630,10 +1604,29 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="2">
-           <widget class="QLineEdit" name="lineEdit_2">
-            <property name="placeholderText">
-             <string>Write a message...</string>
+          <item row="1" column="0">
+           <widget class="QToolButton" name="toolButton_8">
+            <property name="focusPolicy">
+             <enum>Qt::NoFocus</enum>
+            </property>
+            <property name="toolTip">
+             <string>Send File</string>
+            </property>
+            <property name="text">
+             <string>...</string>
+            </property>
+            <property name="icon">
+             <iconset resource="rcc.qrc">
+              <normaloff>:/icons/paper-clip-outline_gray64.png</normaloff>:/icons/paper-clip-outline_gray64.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>22</width>
+              <height>22</height>
+             </size>
+            </property>
+            <property name="autoRaise">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
