@@ -49,7 +49,7 @@ Goto [release page][rel-page] and download client binary suite for your environm
 | Linux x64        | qofia-x86_64.AppImage           |
 | Linux x64(tared) | qofia-linux-amd64-0.4.0.tar.bz2 |
 
-To running on Windows or Linux, you should download suitable Qt runtime from https://github.com/qtchina/, put them into `bin` directory manually:
+To running on Windows or Linux(Except AppImage package), you should download suitable Qt runtime from https://github.com/qtchina/, put them into `bin` directory manually:
 
 * https://github.com/qtchina/qtenv_win64
 * https://github.com/qtchina/qtenv_win32

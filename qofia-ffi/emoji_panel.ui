@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>EmojiPanel</class>
+ <widget class="QWidget" name="EmojiPanel">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>371</width>
+    <height>355</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>EmojiPanel</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="QWidget" name="MainWidget" native="true">
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <property name="spacing">
+       <number>3</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>3</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>3</number>
+      </property>
+      <item>
+       <widget class="QScrollArea" name="scrollArea">
+        <property name="horizontalScrollBarPolicy">
+         <enum>Qt::ScrollBarAlwaysOff</enum>
+        </property>
+        <property name="widgetResizable">
+         <bool>true</bool>
+        </property>
+        <widget class="QWidget" name="scrollAreaWidgetContents">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>0</y>
+           <width>369</width>
+           <height>315</height>
+          </rect>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_3"/>
+        </widget>
+       </widget>
+      </item>
+      <item>
+       <layout class="QGridLayout" name="gridLayout">
+        <item row="0" column="0">
+         <widget class="QToolButton" name="toolButton_33">
+          <property name="toolTip">
+           <string>people</string>
+          </property>
+          <property name="statusTip">
+           <string>Back by logic order.(Android Back)</string>
+          </property>
+          <property name="text">
+           <string>◁ </string>
+          </property>
+          <property name="icon">
+           <iconset resource="rcc.qrc">
+            <normaloff>:/icons/emoji-categories/people.png</normaloff>:/icons/emoji-categories/people.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>20</width>
+            <height>20</height>
+           </size>
+          </property>
+          <property name="autoRaise">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QToolButton" name="toolButton_34">
+          <property name="toolTip">
+           <string>nature</string>
+          </property>
+          <property name="statusTip">
+           <string>Back by logic order.(Android Back)</string>
+          </property>
+          <property name="text">
+           <string>◁ </string>
+          </property>
+          <property name="icon">
+           <iconset resource="rcc.qrc">
+            <normaloff>:/icons/emoji-categories/nature.png</normaloff>:/icons/emoji-categories/nature.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>20</width>
+            <height>20</height>
+           </size>
+          </property>
+          <property name="autoRaise">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2">
+         <widget class="QToolButton" name="toolButton_35">
+          <property name="toolTip">
+           <string>food</string>
+          </property>
+          <property name="statusTip">
+           <string>Back by logic order.(Android Back)</string>
+          </property>
+          <property name="text">
+           <string>◁ </string>
+          </property>
+          <property name="icon">
+           <iconset resource="rcc.qrc">
+            <normaloff>:/icons/emoji-categories/foods.png</normaloff>:/icons/emoji-categories/foods.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>20</width>
+            <height>20</height>
+           </size>
+          </property>
+          <property name="autoRaise">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="3">
+         <widget class="QToolButton" name="toolButton_36">
+          <property name="toolTip">
+           <string>activity</string>
+          </property>
+          <property name="statusTip">
+           <string>Back by logic order.(Android Back)</string>
+          </property>
+          <property name="text">
+           <string>◁ </string>
+          </property>
+          <property name="icon">
+           <iconset resource="rcc.qrc">
+            <normaloff>:/icons/emoji-categories/activity.png</normaloff>:/icons/emoji-categories/activity.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>20</width>
+            <height>20</height>
+           </size>
+          </property>
+          <property name="autoRaise">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="4">
+         <widget class="QToolButton" name="toolButton_37">
+          <property name="toolTip">
+           <string>travel</string>
+          </property>
+          <property name="statusTip">
+           <string>Back by logic order.(Android Back)</string>
+          </property>
+          <property name="text">
+           <string>◁ </string>
+          </property>
+          <property name="icon">
+           <iconset resource="rcc.qrc">
+            <normaloff>:/icons/emoji-categories/travel.png</normaloff>:/icons/emoji-categories/travel.png</iconset>
+          </property>
+          <property name="autoRaise">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="5">
+         <widget class="QToolButton" name="toolButton_38">
+          <property name="toolTip">
+           <string>objects</string>
+          </property>
+          <property name="statusTip">
+           <string>Back by logic order.(Android Back)</string>
+          </property>
+          <property name="text">
+           <string>◁ </string>
+          </property>
+          <property name="icon">
+           <iconset resource="rcc.qrc">
+            <normaloff>:/icons/emoji-categories/objects.png</normaloff>:/icons/emoji-categories/objects.png</iconset>
+          </property>
+          <property name="autoRaise">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="6">
+         <widget class="QToolButton" name="toolButton_39">
+          <property name="toolTip">
+           <string>symbols</string>
+          </property>
+          <property name="statusTip">
+           <string>Back by logic order.(Android Back)</string>
+          </property>
+          <property name="text">
+           <string>◁ </string>
+          </property>
+          <property name="icon">
+           <iconset resource="rcc.qrc">
+            <normaloff>:/icons/emoji-categories/symbols.png</normaloff>:/icons/emoji-categories/symbols.png</iconset>
+          </property>
+          <property name="autoRaise">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="7">
+         <widget class="QToolButton" name="toolButton_40">
+          <property name="toolTip">
+           <string>flags</string>
+          </property>
+          <property name="statusTip">
+           <string>Back by logic order.(Android Back)</string>
+          </property>
+          <property name="text">
+           <string>◁ </string>
+          </property>
+          <property name="icon">
+           <iconset resource="rcc.qrc">
+            <normaloff>:/icons/emoji-categories/flags.png</normaloff>:/icons/emoji-categories/flags.png</iconset>
+          </property>
+          <property name="autoRaise">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources>
+  <include location="rcc.qrc"/>
+ </resources>
+ <connections/>
+</ui>

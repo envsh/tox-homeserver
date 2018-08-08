@@ -13,6 +13,8 @@ gen:
 	go-uic untitled.ui
 	go-uic create_room.ui
 	go-uic add_friend.ui
+	go-uic emoji_panel.ui
+	go-uic emoji_category.ui
 
 	go-rcc ./rcc.qrc
 

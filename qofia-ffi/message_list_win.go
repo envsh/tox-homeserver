@@ -25,6 +25,7 @@ func (this *MainWindow) initMessageListUi() {
 }
 
 func (this *MainWindow) initMessageListSignals() {
+	qtrt.Connect(this.ToolButton_10, "clicked(bool)", uictx.msgwin.showEmojiPanel)
 }
 
 func (this *MainWindow) initMessageListEvents() {
@@ -96,10 +97,14 @@ type MessageListWin struct {
 	actsep1    *qtwidgets.QAction
 	actclear   *qtwidgets.QAction
 	actquote   *qtwidgets.QAction
+
+	emojiPanel *EmojiPanel
+	hideTimer  *qtcore.QTimer
 }
 
 func NewMessageListWin() *MessageListWin {
 	this := &MessageListWin{}
+
 	return this
 }
 
@@ -218,6 +223,7 @@ func (this *MessageListWin) InitMessageListGesture() {
 	// w.SetAttribute__(qtcore.Qt__WA_AcceptTouchEvents)
 	this.gesto = NewMessageListGesture(w)
 	this.gesto.OnLongTouch = this.OnSCWLongTouch
+	this.initEvents()
 }
 
 func (this *MessageListWin) InitContextMenu() {
@@ -235,7 +241,19 @@ func (this *MessageListWin) InitContextMenu() {
 	qtrt.Connect(this.actclear, "triggered(bool)", this.ProcessActionClear)
 	qtrt.Connect(this.actquote, "triggered(bool)", this.ProcessActionQuote)
 }
-
+func (this *MessageListWin) initEvents() {
+	btn := uictx.uiw.ToolButton_10
+	btn.InheritEnterEvent(func(arg0 *qtcore.QEvent) {
+		arg0.Ignore()
+		this.showEmojiPanel(false)
+	})
+	btn.InheritLeaveEvent(func(arg0 *qtcore.QEvent) {
+		arg0.Ignore()
+		if this.hideTimer != nil && !this.hideTimer.IsActive() {
+			this.hideTimer.Start(300)
+		}
+	})
+}
 func (this *MessageListWin) ProcessActionCopy() {
 	uictx.qtapp.Clipboard().SetText__(this.selinfo.text)
 }
@@ -306,4 +324,64 @@ func (this *MessageListWin) SetPeerCount(n int) {
 	mw := uictx.mw
 	mw.Label_6.SetText(fmt.Sprintf("%d users in chat", n))
 	// QObject::tr("ccc", "dummy123")
+}
+
+func (this *MessageListWin) showEmojiPanel(bool) {
+	if this.emojiPanel == nil {
+		this.emojiPanel = NewEmojiPanel()
+		this.emojiPanel.OnEmojiSelected = func(emoji, shrtname string) {
+			uiw := uictx.uiw
+			uiw.LineEdit_2.SetText(uiw.LineEdit_2.Text() + emoji)
+			uiw.TextEdit_3.InsertPlainText(emoji)
+			// this.emojiPanel.QWidget_PTR().Hide()
+		}
+		this.hideTimer = qtcore.NewQTimer__()
+		qtrt.Connect(this.hideTimer, "timeout()", func() {
+			if this.emojiPanel != nil && !this.emojiPanel.QWidget_PTR().UnderMouse() {
+				this.hideTimer.Stop()
+				this.emojiPanel.QWidget_PTR().Hide()
+			}
+		})
+
+	}
+
+	epw := this.emojiPanel.QWidget_PTR()
+	var posx, posy int
+	if gopp.IsAndroid() {
+		posx, posy = this.mvEmojiPanelAndroid()
+	} else {
+		posx, posy = this.mvEmojiPanelPC()
+	}
+	// log.Println("mvto:", posx, posy)
+	epw.Move(posx, posy)
+
+	if epw.IsVisible() {
+		epw.Hide()
+	}
+	epw.Show()
+	if !this.hideTimer.IsActive() {
+		// this.hideTimer.Start(300)
+	}
+}
+
+func (this *MessageListWin) mvEmojiPanelPC() (posx, posy int) {
+	btn := uictx.uiw.ToolButton_10
+	emojiPanel := this.emojiPanel
+
+	rect := btn.Rect()
+	pos := btn.MapToGlobal(qtcore.NewQPoint_1(rect.X(), rect.Y()))
+	pansz := emojiPanel.QWidget_PTR().SizeHint()
+
+	dstx := pos.X() - pansz.Width() + 70
+	dsty := pos.Y() - pansz.Height() + 50
+
+	return dstx, dsty
+}
+func (this *MessageListWin) mvEmojiPanelAndroid() (int, int) {
+	dstx, dsty := this.mvEmojiPanelPC()
+	dstx = 0
+	dsty += 65 // TODO maybe use resolution to calc it, android screen height*50/768. 50 is base offset
+	// another way, look at Qt's QMenu popup position calculate
+
+	return dstx, dsty
 }
