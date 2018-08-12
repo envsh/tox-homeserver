@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/kitech/qt.go/qtcore"
+	"github.com/kitech/qt.go/qtgui"
 	"github.com/kitech/qt.go/qtrt"
 	"github.com/kitech/qt.go/qtwidgets"
 
@@ -38,6 +39,8 @@ func main() {
 		app.SetAttribute(qtcore.Qt__AA_EnableHighDpiScaling, true) // for android
 	}
 	uictx.qtapp = app
+	qtgui.QFontDatabase_AddApplicationFont("resource/fzlt.ttf")
+	qtgui.QFontDatabase_AddApplicationFont("resource/emojione-android.ttf") // "Emoji One"
 
 	setAppStyleSheet()
 	// Create main window

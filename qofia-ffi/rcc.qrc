@@ -1,5 +1,6 @@
 <RCC>
   <qresource>
+    <file>resource/emojione-android.ttf</file>
     <file>icons/emoji-categories/activity.png</file>
     <file>icons/emoji-categories/activity@2x.png</file>
     <file>icons/emoji-categories/flags.png</file>

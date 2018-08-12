@@ -25,6 +25,12 @@ func NewEmojiPanel() *EmojiPanel {
 	w.SetAttribute(qtcore.Qt__WA_ShowWithoutActivating, true)
 	w.SetWindowFlags(qtcore.Qt__Tool | qtcore.Qt__FramelessWindowHint | qtcore.Qt__NoDropShadowWindowHint)
 
+	SetScrollContentTrackerSize(this.ScrollArea)
+	vsbar := this.ScrollArea.VerticalScrollBar()
+	vsbar.SetSingleStep(vsbar.SingleStep() * 2)
+	vsbar.SetPageStep(vsbar.PageStep() * 2)
+	qtwidgets.QScroller_GrabGesture(this.ScrollArea, qtwidgets.QScroller__LeftMouseButtonGesture)
+
 	innames, emojivecs := EmojiProvider.ToVec()
 	shownames := EmojiProvider.ShowNames()
 	for i := 0; i < len(innames); i++ {

@@ -29,6 +29,7 @@ func Repolish(w qtwidgets.QWidget_ITF) {
 	syl.Polish(w)
 }
 
+// let QScrollArea with QScroller installed can only vertical scroll
 func SetScrollContentTrackerSize(sa *qtwidgets.QScrollArea) {
 	wgt := sa.Widget()
 	sa.InheritResizeEvent(func(arg0 *qtgui.QResizeEvent) {
@@ -161,6 +162,7 @@ func GetInitAvatar(name string) *qtgui.QIcon {
 	return idico
 }
 
+// fontforge: font name: FZLTHJW--GB1-0,  family: FZLanTingHeiS-R-GB
 var fontFile = "./resource/fzlt.ttf"
 
 func PrepareFont() {

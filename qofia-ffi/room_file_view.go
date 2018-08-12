@@ -28,6 +28,10 @@ func (this *MainWindow) initRoomFileUi() {
 }
 func (this *MainWindow) initRoomFileSignals() {
 	qtrt.Connect(this.ToolButton_8, "clicked(bool)", func(bool) {
+		if this.QWidget_PTR() == nil {
+			log.Println("wtf")
+			return
+		}
 		dir := gopp.IfElseStr(gopp.IsAndroid(), os.Getenv("EXTERNAL_STORAGE"), os.Getenv("HOME"))
 		fname := qtwidgets.QFileDialog_GetOpenFileName(this.QWidget_PTR(), "Select file", dir, "All Files (*)", "*.*", 0)
 		log.Println(fname)

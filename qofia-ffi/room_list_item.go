@@ -48,6 +48,7 @@ func NewMessageForGroup(evto *thspbs.Event) *Message {
 	message := evto.Args[3]
 	peerName := evto.Margs[0]
 	groupTitle := evto.Margs[2]
+	peerId := evto.Margs[1]
 	_ = groupTitle
 	eventId := gopp.MustInt64(evto.Margs[4])
 
@@ -57,6 +58,9 @@ func NewMessageForGroup(evto *thspbs.Event) *Message {
 	this.Time = time.Now()
 	this.EventId = eventId
 
+	if peerName == "" {
+		this.PeerName = peerId[:8]
+	}
 	this.refmtmsg()
 	return this
 }

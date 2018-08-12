@@ -1075,7 +1075,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.TextEdit_3.SetObjectName("TextEdit_3")                                          // 112
 	this.SizePolicy1.SetHeightForWidth(this.TextEdit_3.SizePolicy().HasHeightForWidth()) // 114
 	this.TextEdit_3.SetSizePolicy(this.SizePolicy1)                                      // 114
-	this.TextEdit_3.SetMaximumSize_1(16777215, 26)                                       // 113
+	this.TextEdit_3.SetMaximumSize_1(16777215, 28)                                       // 113
 	this.TextEdit_3.SetMouseTracking(true)                                               // 114
 	this.TextEdit_3.SetHorizontalScrollBarPolicy(qtcore.Qt__ScrollBarAlwaysOff)          // 114
 	this.TextEdit_3.SetAcceptRichText(false)                                             // 114

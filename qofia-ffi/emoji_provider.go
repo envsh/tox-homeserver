@@ -82,6 +82,7 @@ func NewEmojiCategory(category string, emojivec []EmojiElem) *EmojiCategory {
 		this.TableWidget.SetRowHeight(i, 50)
 	}
 
+	var emafnt = qtgui.NewQFont_1_("Emoji One")
 	var itmfnt *qtgui.QFont
 	for i, e := range emojivec {
 		col := i % cols
@@ -94,8 +95,16 @@ func NewEmojiCategory(category string, emojivec []EmojiElem) *EmojiCategory {
 			itmfnt = witem.Font()
 			pxsz := itmfnt.PixelSize()
 			itmfnt.SetPixelSize(gopp.IfElseInt(pxsz <= 0, 29, pxsz*3))
+			emafnt.SetPixelSize(gopp.IfElseInt(pxsz <= 0, 29, pxsz*3))
+			if gopp.IsAndroid() {
+				itmfnt.SetPixelSize(gopp.IfElseInt(pxsz <= 0, 29, pxsz*3) - 8)
+				emafnt.SetPixelSize(gopp.IfElseInt(pxsz <= 0, 29, pxsz*3) - 8)
+			}
 		}
 		witem.SetFont(itmfnt)
+		if emafnt.ExactMatch() {
+			witem.SetFont(emafnt)
+		}
 		witem.SetToolTip(e.Shortname)
 		this.TableWidget.SetItem(row, col, witem)
 		this.items = append(this.items, witem)

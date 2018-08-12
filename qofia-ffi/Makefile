@@ -16,7 +16,7 @@ gen:
 	go-uic emoji_panel.ui
 	go-uic emoji_category.ui
 
-	go-rcc ./rcc.qrc
+	cgo-rcc ./rcc.qrc
 
 # need min 1.2G memory with GOGC=5 and minqt
 bd:
