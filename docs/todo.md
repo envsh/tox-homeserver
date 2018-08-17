@@ -16,4 +16,5 @@
 * [] @ user color hint.
 * [] omit user icon/name info when continue two message for one user
 * [] server transport with cert
+* [] switchable dual ui engine: widgets/qml
 

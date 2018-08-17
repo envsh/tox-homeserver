@@ -1,5 +1,5 @@
-import QtQuick 2.0
-import QtQuick.Controls 2.0
+import QtQuick 2.10
+import QtQuick.Controls 2.3
 import QtQuick.Layouts 1.0
 
 ColumnLayout {
@@ -80,8 +80,40 @@ ColumnLayout {
         HSpacerItem{}
     }
 
+        ListModel {
+            id: lstmdl1
+            objectName: "lstmdl1"
+
+            ListElement { name: "Mercury"; surfaceColor: "gray" }
+            ListElement { name: "Venus"; surfaceColor: "yellow" }
+            ListElement { name: "Earth"; surfaceColor: "blue" }
+            ListElement { name: "Mars"; surfaceColor: "orange" }
+            ListElement { name: "Jupiter"; surfaceColor: "orange" }
+            ListElement { name: "Saturn"; surfaceColor: "yellow" }
+            ListElement { name: "Uranus"; surfaceColor: "lightBlue" }
+            ListElement { name: "Neptune"; surfaceColor: "lightBlue" }
+        }
+
+      ScrollView   {
+
+          clip: true
+          ScrollBar.vertical.minimumSize: 0.03
+    ScrollBar.vertical.interactive: true
+    ScrollBar.horizontal.interactive: false
+    ScrollBar.vertical.policy: ScrollBar.AlwaysOn
+    ScrollBar.horizontal.policy: ScrollBar.AlwaysOn
+    Layout.fillHeight: true
+    Layout.fillWidth: true
+
+            ListView {
+            model:lstmdl1
+                    //             delegate: MessageItem{}
+                                     delegate: ContactItem{seqno:index}
+            }
+    }
+
     RowLayout{
-        Layout.fillHeight: true
+        Layout.fillHeight: false
         Rectangle{
             Layout.fillHeight: true
             Layout.fillWidth: true
@@ -114,4 +146,9 @@ ColumnLayout {
         }
     }
 
+    id: _PageMessages1
+    objectName: "_PageMessages1"
+    function msgmdl_add() {console.log("called...")}
+    function msgmdl_delete() {print("called...")}
+    function msgmdl_update() {print("called...")}
 }
