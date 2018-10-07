@@ -15,6 +15,7 @@ import (
 	"github.com/gorilla/websocket"
 	"google.golang.org/grpc"
 	_ "google.golang.org/grpc/encoding/gzip"
+	"google.golang.org/grpc/keepalive"
 )
 
 func assert_interface() {
@@ -108,7 +109,12 @@ func (this *GrpcTransport) Connect(addr string) error {
 	this.srvurl = addr
 	srvurl := addr
 	log.Println("connecting grpc:", srvurl)
-	rpcli, err := grpc.Dial(srvurl, grpc.WithInsecure(), grpc.WithTimeout(5*time.Second))
+	kaopt := grpc.WithKeepaliveParams(keepalive.ClientParameters{
+		Time:                75 * time.Second,
+		Timeout:             20 * time.Second,
+		PermitWithoutStream: true,
+	})
+	rpcli, err := grpc.Dial(srvurl, grpc.WithInsecure(), grpc.WithTimeout(5*time.Second), kaopt)
 	gopp.ErrPrint(err, rpcli)
 	if err != nil {
 		return err
