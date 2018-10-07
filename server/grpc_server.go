@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"encoding/json"
 	"gopp"
 	"log"
 	"net"
@@ -14,6 +15,7 @@ import (
 	// "atapi/dorpc/dyngrpc"
 
 	"google.golang.org/grpc"
+	_ "google.golang.org/grpc/encoding/gzip"
 
 	thscom "tox-homeserver/common"
 	"tox-homeserver/thspbs"
@@ -27,6 +29,11 @@ type GrpcServer struct {
 	connsmu   sync.Mutex
 	grpcConns map[thspbs.Toxhs_PollCallbackServer]uint64
 	grpcUuids map[string]uint64 // uuid => uint64
+
+	grpcConns2 map[string]struct {
+		stm   thspbs.Toxhs_PollCallbackServer
+		conno uint64
+	}
 }
 
 func newGrpcServer() *GrpcServer {
@@ -96,13 +103,26 @@ func (this *GrpcService) PollCallback(req *thspbs.Event, stm thspbs.Toxhs_PollCa
 	conno := atomic.AddUint64(&grpcStreamConnNo, 1)
 	log.Println("New grpc stream poll connect.", len(appctx.rpcs.grpcConns), conno, req.DeviceUuid)
 	appctx.rpcs.connsmu.Lock()
+	if oldconno, ok := appctx.rpcs.grpcUuids[req.DeviceUuid]; ok {
+		log.Println("already connected device:", req.DeviceUuid, oldconno)
+		for stm, tconno := range appctx.rpcs.grpcConns {
+			if tconno == oldconno {
+				delete(appctx.rpcs.grpcConns, stm)
+				// stm.Close() // ???
+				break
+			}
+		}
+		delete(appctx.rpcs.grpcUuids, req.DeviceUuid)
+	}
 	appctx.rpcs.grpcConns[stm] = conno
 	appctx.rpcs.grpcUuids[req.DeviceUuid] = conno
 	appctx.rpcs.connsmu.Unlock()
 	defer func() {
 		appctx.rpcs.connsmu.Lock()
 		delete(appctx.rpcs.grpcConns, stm)
-		delete(appctx.rpcs.grpcUuids, req.DeviceUuid)
+		if oldconno, ok := appctx.rpcs.grpcUuids[req.DeviceUuid]; ok && oldconno == conno {
+			delete(appctx.rpcs.grpcUuids, req.DeviceUuid)
+		}
 		appctx.rpcs.connsmu.Unlock()
 	}()
 
@@ -160,12 +180,15 @@ func pubmsg2grpc(ctx context.Context, evt *thspbs.Event) error {
 
 	// specific the connection to push this event, or push to all connections
 	for connid, stm := range stms {
+		log.Println(connid, toconnid, evt.DeviceUuid, evt.Name)
 		if evt.DeviceUuid == "" || (evt.DeviceUuid != "" && connid == toconnid) {
 			err := stm.Send(evt)
 			gopp.ErrPrint(err)
 			if err != nil {
 				errtop = err
 			}
+			jcc, _ := json.Marshal(evt)
+			log.Println(err == nil, connid, toconnid, evt.DeviceUuid, evt.Name, len(jcc))
 		}
 	}
 	return errtop

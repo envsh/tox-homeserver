@@ -14,6 +14,7 @@ import (
 	"github.com/kitech/qt.go/qtwidgets"
 
 	"tox-homeserver/gomain2c"
+	_ "tox-homeserver/qofia-ffi/qrcin"
 )
 
 // for android, but other OS still ok
@@ -103,7 +104,7 @@ func setupFinalizerOnUi() {
 		}
 	})
 
-	qtrt.FinalProxyFn = func(f func()) {
+	qtrt.FinalizeProxyFn = func(f func()) {
 		uiqc <- f
 		mech.Trigger()
 		// f()

@@ -10,6 +10,14 @@ import (
 	"github.com/spf13/pflag"
 )
 
+var metrics_server = ""
+var log_level int = 0
+
+func init() {
+	flag.StringVar(&metrics_server, "metrics-server", metrics_server, "like: localhost:8086")
+	flag.IntVar(&log_level, "log-level", log_level, "[0-5]")
+}
+
 type Config struct {
 	*appcm.Config
 }
@@ -32,6 +40,8 @@ func NewConfig() *Config {
 func (this *Config) init() {
 	defvpr := this
 
+	defvpr.BindPFlag("metrics_server", pflag.PFlagFromGoFlag(flag.Lookup("metrics-server")))
+	defvpr.BindPFlag("log_level", pflag.PFlagFromGoFlag(flag.Lookup("log-level")))
 	defvpr.SetDefault("log_level", 0)
 	defvpr.SetDefault("log_file", "") // default stderr
 	defvpr.SetReadOnly("timezone", true)

@@ -47,16 +47,26 @@ type Ui_MainWindow struct {
 	VerticalLayout_15          *qtwidgets.QVBoxLayout
 	GroupBox                   *qtwidgets.QGroupBox
 	GridLayout                 *qtwidgets.QGridLayout
+	CheckBox_2                 *qtwidgets.QCheckBox
+	CheckBox                   *qtwidgets.QCheckBox
+	CheckBox_3                 *qtwidgets.QCheckBox
+	Label_49                   *qtwidgets.QLabel
+	Label_9                    *qtwidgets.QLabel
 	Label_13                   *qtwidgets.QLabel
+	ComboBox_3                 *qtwidgets.QComboBox
+	Label_10                   *qtwidgets.QLabel
 	Label_8                    *qtwidgets.QLabel
 	ComboBox_2                 *qtwidgets.QComboBox
-	Label_9                    *qtwidgets.QLabel
-	Label_10                   *qtwidgets.QLabel
-	CheckBox_2                 *qtwidgets.QCheckBox
 	Label_11                   *qtwidgets.QLabel
-	CheckBox_3                 *qtwidgets.QCheckBox
-	ComboBox_3                 *qtwidgets.QComboBox
-	CheckBox                   *qtwidgets.QCheckBox
+	FontComboBox               *qtwidgets.QFontComboBox
+	Label_51                   *qtwidgets.QLabel
+	SpinBox                    *qtwidgets.QSpinBox
+	GroupBox_8                 *qtwidgets.QGroupBox
+	GridLayout_6               *qtwidgets.QGridLayout
+	Label_60                   *qtwidgets.QLabel
+	CheckBox_10                *qtwidgets.QCheckBox
+	ComboBox_7                 *qtwidgets.QComboBox
+	Label_59                   *qtwidgets.QLabel
 	GroupBox_2                 *qtwidgets.QGroupBox
 	VerticalLayout_16          *qtwidgets.QVBoxLayout
 	Label_12                   *qtwidgets.QLabel
@@ -446,13 +456,60 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.GridLayout.SetSpacing(12)                                   // 114
 	this.GridLayout.SetObjectName("GridLayout")                      // 112
 	this.GridLayout.SetContentsMargins(12, 12, 12, 12)               // 114
-	this.Label_13 = qtwidgets.NewQLabel(this.GroupBox, 0)            // 111
-	this.Label_13.SetObjectName("Label_13")                          // 112
+	this.CheckBox_2 = qtwidgets.NewQCheckBox(this.GroupBox)          // 111
+	this.CheckBox_2.SetObjectName("CheckBox_2")                      // 112
+	this.CheckBox_2.SetChecked(true)                                 // 114
 
-	this.GridLayout.AddWidget_2(this.Label_13, 4, 0, 1, 1, 0) // 115
+	this.GridLayout.AddWidget_2(this.CheckBox_2, 2, 1, 1, 1, 0) // 115
 
-	this.Label_8 = qtwidgets.NewQLabel(this.GroupBox, 0) // 111
-	this.Label_8.SetObjectName("Label_8")                // 112
+	this.CheckBox = qtwidgets.NewQCheckBox(this.GroupBox) // 111
+	this.CheckBox.SetObjectName("CheckBox")               // 112
+	this.CheckBox.SetChecked(true)                        // 114
+
+	this.GridLayout.AddWidget_2(this.CheckBox, 6, 1, 1, 1, 0) // 115
+
+	this.CheckBox_3 = qtwidgets.NewQCheckBox(this.GroupBox) // 111
+	this.CheckBox_3.SetObjectName("CheckBox_3")             // 112
+	this.CheckBox_3.SetChecked(true)                        // 114
+
+	this.GridLayout.AddWidget_2(this.CheckBox_3, 3, 1, 1, 1, 0) // 115
+
+	this.Label_49 = qtwidgets.NewQLabel(this.GroupBox, 0)                    // 111
+	this.Label_49.SetObjectName("Label_49")                                  // 112
+	this.Label_49.SetTextInteractionFlags(qtcore.Qt__TextBrowserInteraction) // 114
+
+	this.GridLayout.AddWidget_2(this.Label_49, 4, 0, 1, 1, 0) // 115
+
+	this.Label_9 = qtwidgets.NewQLabel(this.GroupBox, 0)                    // 111
+	this.Label_9.SetObjectName("Label_9")                                   // 112
+	this.Label_9.SetTextInteractionFlags(qtcore.Qt__TextBrowserInteraction) // 114
+
+	this.GridLayout.AddWidget_2(this.Label_9, 1, 0, 1, 1, 0) // 115
+
+	this.Label_13 = qtwidgets.NewQLabel(this.GroupBox, 0)                    // 111
+	this.Label_13.SetObjectName("Label_13")                                  // 112
+	this.Label_13.SetTextInteractionFlags(qtcore.Qt__TextBrowserInteraction) // 114
+
+	this.GridLayout.AddWidget_2(this.Label_13, 6, 0, 1, 1, 0) // 115
+
+	this.ComboBox_3 = qtwidgets.NewQComboBox(this.GroupBox)   // 111
+	this.ComboBox_3.AddItem("", qtcore.NewQVariant_12("wtf")) // 115
+	this.ComboBox_3.AddItem("", qtcore.NewQVariant_12("wtf")) // 115
+	this.ComboBox_3.AddItem("", qtcore.NewQVariant_12("wtf")) // 115
+	this.ComboBox_3.SetObjectName("ComboBox_3")               // 112
+	this.ComboBox_3.SetEditable(true)                         // 114
+
+	this.GridLayout.AddWidget_2(this.ComboBox_3, 1, 1, 1, 1, 0) // 115
+
+	this.Label_10 = qtwidgets.NewQLabel(this.GroupBox, 0)                    // 111
+	this.Label_10.SetObjectName("Label_10")                                  // 112
+	this.Label_10.SetTextInteractionFlags(qtcore.Qt__TextBrowserInteraction) // 114
+
+	this.GridLayout.AddWidget_2(this.Label_10, 2, 0, 1, 1, 0) // 115
+
+	this.Label_8 = qtwidgets.NewQLabel(this.GroupBox, 0)                    // 111
+	this.Label_8.SetObjectName("Label_8")                                   // 112
+	this.Label_8.SetTextInteractionFlags(qtcore.Qt__TextBrowserInteraction) // 114
 
 	this.GridLayout.AddWidget_2(this.Label_8, 0, 0, 1, 1, 0) // 115
 
@@ -465,59 +522,73 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 
 	this.GridLayout.AddWidget_2(this.ComboBox_2, 0, 1, 1, 1, 0) // 115
 
-	this.Label_9 = qtwidgets.NewQLabel(this.GroupBox, 0) // 111
-	this.Label_9.SetObjectName("Label_9")                // 112
-
-	this.GridLayout.AddWidget_2(this.Label_9, 1, 0, 1, 1, 0) // 115
-
-	this.Label_10 = qtwidgets.NewQLabel(this.GroupBox, 0) // 111
-	this.Label_10.SetObjectName("Label_10")               // 112
-
-	this.GridLayout.AddWidget_2(this.Label_10, 2, 0, 1, 1, 0) // 115
-
-	this.CheckBox_2 = qtwidgets.NewQCheckBox(this.GroupBox) // 111
-	this.CheckBox_2.SetObjectName("CheckBox_2")             // 112
-	this.CheckBox_2.SetChecked(true)                        // 114
-
-	this.GridLayout.AddWidget_2(this.CheckBox_2, 2, 1, 1, 1, 0) // 115
-
-	this.Label_11 = qtwidgets.NewQLabel(this.GroupBox, 0) // 111
-	this.Label_11.SetObjectName("Label_11")               // 112
+	this.Label_11 = qtwidgets.NewQLabel(this.GroupBox, 0)                    // 111
+	this.Label_11.SetObjectName("Label_11")                                  // 112
+	this.Label_11.SetTextInteractionFlags(qtcore.Qt__TextBrowserInteraction) // 114
 
 	this.GridLayout.AddWidget_2(this.Label_11, 3, 0, 1, 1, 0) // 115
 
-	this.CheckBox_3 = qtwidgets.NewQCheckBox(this.GroupBox) // 111
-	this.CheckBox_3.SetObjectName("CheckBox_3")             // 112
-	this.CheckBox_3.SetChecked(true)                        // 114
+	this.FontComboBox = qtwidgets.NewQFontComboBox(this.GroupBox) // 111
+	this.FontComboBox.SetObjectName("FontComboBox")               // 112
 
-	this.GridLayout.AddWidget_2(this.CheckBox_3, 3, 1, 1, 1, 0) // 115
+	this.GridLayout.AddWidget_2(this.FontComboBox, 4, 1, 1, 1, 0) // 115
 
-	this.ComboBox_3 = qtwidgets.NewQComboBox(this.GroupBox)   // 111
-	this.ComboBox_3.AddItem("", qtcore.NewQVariant_12("wtf")) // 115
-	this.ComboBox_3.AddItem("", qtcore.NewQVariant_12("wtf")) // 115
-	this.ComboBox_3.AddItem("", qtcore.NewQVariant_12("wtf")) // 115
-	this.ComboBox_3.SetObjectName("ComboBox_3")               // 112
-	this.ComboBox_3.SetEditable(true)                         // 114
+	this.Label_51 = qtwidgets.NewQLabel(this.GroupBox, 0)                    // 111
+	this.Label_51.SetObjectName("Label_51")                                  // 112
+	this.Label_51.SetTextInteractionFlags(qtcore.Qt__TextBrowserInteraction) // 114
 
-	this.GridLayout.AddWidget_2(this.ComboBox_3, 1, 1, 1, 1, 0) // 115
+	this.GridLayout.AddWidget_2(this.Label_51, 5, 0, 1, 1, 0) // 115
 
-	this.CheckBox = qtwidgets.NewQCheckBox(this.GroupBox) // 111
-	this.CheckBox.SetObjectName("CheckBox")               // 112
-	this.CheckBox.SetChecked(true)                        // 114
+	this.SpinBox = qtwidgets.NewQSpinBox(this.GroupBox) // 111
+	this.SpinBox.SetObjectName("SpinBox")               // 112
 
-	this.GridLayout.AddWidget_2(this.CheckBox, 4, 1, 1, 1, 0) // 115
+	this.GridLayout.AddWidget_2(this.SpinBox, 5, 1, 1, 1, 0) // 115
 
 	this.VerticalLayout_15.Layout().AddWidget(this.GroupBox) // 115
 
-	this.GroupBox_2 = qtwidgets.NewQGroupBox(this.Page_7)                // 111
-	this.GroupBox_2.SetObjectName("GroupBox_2")                          // 112
-	this.GroupBox_2.SetFlat(true)                                        // 114
-	this.VerticalLayout_16 = qtwidgets.NewQVBoxLayout_1(this.GroupBox_2) // 111
-	this.VerticalLayout_16.SetSpacing(12)                                // 114
-	this.VerticalLayout_16.SetObjectName("VerticalLayout_16")            // 112
-	this.VerticalLayout_16.SetContentsMargins(12, 12, 12, 12)            // 114
-	this.Label_12 = qtwidgets.NewQLabel(this.GroupBox_2, 0)              // 111
-	this.Label_12.SetObjectName("Label_12")                              // 112
+	this.GroupBox_8 = qtwidgets.NewQGroupBox(this.Page_7)                    // 111
+	this.GroupBox_8.SetObjectName("GroupBox_8")                              // 112
+	this.GridLayout_6 = qtwidgets.NewQGridLayout(this.GroupBox_8)            // 111
+	this.GridLayout_6.SetObjectName("GridLayout_6")                          // 112
+	this.Label_60 = qtwidgets.NewQLabel(this.GroupBox_8, 0)                  // 111
+	this.Label_60.SetObjectName("Label_60")                                  // 112
+	this.Label_60.SetTextInteractionFlags(qtcore.Qt__TextBrowserInteraction) // 114
+
+	this.GridLayout_6.AddWidget_2(this.Label_60, 1, 0, 1, 1, 0) // 115
+
+	this.CheckBox_10 = qtwidgets.NewQCheckBox(this.GroupBox_8) // 111
+	this.CheckBox_10.SetObjectName("CheckBox_10")              // 112
+
+	this.GridLayout_6.AddWidget_2(this.CheckBox_10, 1, 1, 1, 1, 0) // 115
+
+	this.ComboBox_7 = qtwidgets.NewQComboBox(this.GroupBox_8) // 111
+	this.ComboBox_7.AddItem("", qtcore.NewQVariant_12("wtf")) // 115
+	this.ComboBox_7.AddItem("", qtcore.NewQVariant_12("wtf")) // 115
+	this.ComboBox_7.AddItem("", qtcore.NewQVariant_12("wtf")) // 115
+	this.ComboBox_7.AddItem("", qtcore.NewQVariant_12("wtf")) // 115
+	this.ComboBox_7.AddItem("", qtcore.NewQVariant_12("wtf")) // 115
+	this.ComboBox_7.AddItem("", qtcore.NewQVariant_12("wtf")) // 115
+	this.ComboBox_7.SetObjectName("ComboBox_7")               // 112
+
+	this.GridLayout_6.AddWidget_2(this.ComboBox_7, 0, 1, 1, 1, 0) // 115
+
+	this.Label_59 = qtwidgets.NewQLabel(this.GroupBox_8, 0) // 111
+	this.Label_59.SetObjectName("Label_59")                 // 112
+
+	this.GridLayout_6.AddWidget_2(this.Label_59, 0, 0, 1, 1, 0) // 115
+
+	this.VerticalLayout_15.Layout().AddWidget(this.GroupBox_8) // 115
+
+	this.GroupBox_2 = qtwidgets.NewQGroupBox(this.Page_7)                    // 111
+	this.GroupBox_2.SetObjectName("GroupBox_2")                              // 112
+	this.GroupBox_2.SetFlat(true)                                            // 114
+	this.VerticalLayout_16 = qtwidgets.NewQVBoxLayout_1(this.GroupBox_2)     // 111
+	this.VerticalLayout_16.SetSpacing(12)                                    // 114
+	this.VerticalLayout_16.SetObjectName("VerticalLayout_16")                // 112
+	this.VerticalLayout_16.SetContentsMargins(12, 12, 12, 12)                // 114
+	this.Label_12 = qtwidgets.NewQLabel(this.GroupBox_2, 0)                  // 111
+	this.Label_12.SetObjectName("Label_12")                                  // 112
+	this.Label_12.SetTextInteractionFlags(qtcore.Qt__TextBrowserInteraction) // 114
 
 	this.VerticalLayout_16.Layout().AddWidget(this.Label_12) // 115
 
@@ -758,7 +829,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.ScrollArea.SetAlignment(qtcore.Qt__AlignLeading | qtcore.Qt__AlignLeft | qtcore.Qt__AlignTop) // 114
 	this.ScrollAreaWidgetContents = qtwidgets.NewQWidget(nil, 0)                                       // 111
 	this.ScrollAreaWidgetContents.SetObjectName("ScrollAreaWidgetContents")                            // 112
-	this.ScrollAreaWidgetContents.SetGeometry(0, 0, 364, 16)                                           // 114
+	this.ScrollAreaWidgetContents.SetGeometry(0, 0, 84, 16)                                            // 114
 	this.SizePolicy.SetHeightForWidth(this.ScrollAreaWidgetContents.SizePolicy().HasHeightForWidth())  // 114
 	this.ScrollAreaWidgetContents.SetSizePolicy(this.SizePolicy)                                       // 114
 	this.VerticalLayout_9 = qtwidgets.NewQVBoxLayout_1(this.ScrollAreaWidgetContents)                  // 111
@@ -1035,7 +1106,7 @@ func (this *Ui_MainWindow) SetupUi(MainWindow *qtwidgets.QMainWindow) {
 	this.ScrollArea_2.SetAlignment(qtcore.Qt__AlignBottom | qtcore.Qt__AlignLeading | qtcore.Qt__AlignLeft) // 114
 	this.ScrollAreaWidgetContents_2 = qtwidgets.NewQWidget(nil, 0)                                          // 111
 	this.ScrollAreaWidgetContents_2.SetObjectName("ScrollAreaWidgetContents_2")                             // 112
-	this.ScrollAreaWidgetContents_2.SetGeometry(0, 408, 346, 16)                                            // 114
+	this.ScrollAreaWidgetContents_2.SetGeometry(0, 0, 66, 16)                                               // 114
 	this.SizePolicy.SetHeightForWidth(this.ScrollAreaWidgetContents_2.SizePolicy().HasHeightForWidth())     // 114
 	this.ScrollAreaWidgetContents_2.SetSizePolicy(this.SizePolicy)                                          // 114
 	this.VerticalLayout_3 = qtwidgets.NewQVBoxLayout_1(this.ScrollAreaWidgetContents_2)                     // 111
@@ -1800,22 +1871,35 @@ func (this *Ui_MainWindow) RetranslateUi(MainWindow *qtwidgets.QMainWindow) {
 	this.ToolButton_19.SetText(qtcore.QCoreApplication_Translate("MainWindow", " &Tool ", "dummy123", 0))
 	this.ToolButton_12.SetText(qtcore.QCoreApplication_Translate("MainWindow", "...", "dummy123", 0))
 	this.GroupBox.SetTitle(qtcore.QCoreApplication_Translate("MainWindow", "General", "dummy123", 0))
+	// noimpl: checkBox_2->setText(QString());
+	// noimpl: checkBox->setText(QString());
+	// noimpl: checkBox_3->setText(QString());
+	this.Label_49.SetText(qtcore.QCoreApplication_Translate("MainWindow", "Font Name", "dummy123", 0))
+	this.Label_9.SetText(qtcore.QCoreApplication_Translate("MainWindow", "ToxHS IP:", "dummy123", 0))
 	this.Label_13.SetText(qtcore.QCoreApplication_Translate("MainWindow", "PlaceHolder...", "dummy123", 0))
+	this.ComboBox_3.SetItemText(0, qtcore.QCoreApplication_Translate("MainWindow", "txhs.duckdns.org", "dummy123", 0))
+	this.ComboBox_3.SetItemText(1, qtcore.QCoreApplication_Translate("MainWindow", "10.0.0.31", "dummy123", 0))
+	this.ComboBox_3.SetItemText(2, qtcore.QCoreApplication_Translate("MainWindow", "127.0.0.1", "dummy123", 0))
+	// noimpl:
+	this.Label_10.SetText(qtcore.QCoreApplication_Translate("MainWindow", "Use HS", "dummy123", 0))
 	this.Label_8.SetText(qtcore.QCoreApplication_Translate("MainWindow", "Theme", "dummy123", 0))
 	this.ComboBox_2.SetItemText(0, qtcore.QCoreApplication_Translate("MainWindow", "Light", "dummy123", 0))
 	this.ComboBox_2.SetItemText(1, qtcore.QCoreApplication_Translate("MainWindow", "Dark", "dummy123", 0))
 	this.ComboBox_2.SetItemText(2, qtcore.QCoreApplication_Translate("MainWindow", "System", "dummy123", 0))
 	// noimpl:
-	this.Label_9.SetText(qtcore.QCoreApplication_Translate("MainWindow", "ToxHS IP:", "dummy123", 0))
-	this.Label_10.SetText(qtcore.QCoreApplication_Translate("MainWindow", "Use HS", "dummy123", 0))
-	// noimpl: checkBox_2->setText(QString());
 	this.Label_11.SetText(qtcore.QCoreApplication_Translate("MainWindow", "Theme", "dummy123", 0))
-	// noimpl: checkBox_3->setText(QString());
-	this.ComboBox_3.SetItemText(0, qtcore.QCoreApplication_Translate("MainWindow", "txhs.duckdns.org", "dummy123", 0))
-	this.ComboBox_3.SetItemText(1, qtcore.QCoreApplication_Translate("MainWindow", "10.0.0.31", "dummy123", 0))
-	this.ComboBox_3.SetItemText(2, qtcore.QCoreApplication_Translate("MainWindow", "127.0.0.1", "dummy123", 0))
+	this.Label_51.SetText(qtcore.QCoreApplication_Translate("MainWindow", "Font Size", "dummy123", 0))
+	this.GroupBox_8.SetTitle(qtcore.QCoreApplication_Translate("MainWindow", "Developer", "dummy123", 0))
+	this.Label_60.SetText(qtcore.QCoreApplication_Translate("MainWindow", "PlaceHolder...", "dummy123", 0))
+	// noimpl: checkBox_10->setText(QString());
+	this.ComboBox_7.SetItemText(0, qtcore.QCoreApplication_Translate("MainWindow", "TRACE", "dummy123", 0))
+	this.ComboBox_7.SetItemText(1, qtcore.QCoreApplication_Translate("MainWindow", "DEBUG", "dummy123", 0))
+	this.ComboBox_7.SetItemText(2, qtcore.QCoreApplication_Translate("MainWindow", "WARNING", "dummy123", 0))
+	this.ComboBox_7.SetItemText(3, qtcore.QCoreApplication_Translate("MainWindow", "INFO", "dummy123", 0))
+	this.ComboBox_7.SetItemText(4, qtcore.QCoreApplication_Translate("MainWindow", "ERROR", "dummy123", 0))
+	this.ComboBox_7.SetItemText(5, qtcore.QCoreApplication_Translate("MainWindow", "FATAL", "dummy123", 0))
 	// noimpl:
-	// noimpl: checkBox->setText(QString());
+	this.Label_59.SetText(qtcore.QCoreApplication_Translate("MainWindow", "Debug Level", "dummy123", 0))
 	this.GroupBox_2.SetTitle(qtcore.QCoreApplication_Translate("MainWindow", "PlaceHolder...", "dummy123", 0))
 	this.Label_12.SetText(qtcore.QCoreApplication_Translate("MainWindow", "PlaceHolder...", "dummy123", 0))
 	this.Label_22.SetText(qtcore.QCoreApplication_Translate("MainWindow", "Home server URL", "dummy123", 0))

@@ -52,10 +52,15 @@ func (this *Fetcher) PullPrevHistoryById(pubkey string, prev_batch int64) {
 		item.timeline.PrevBatch = 0 // 该room同步结束
 	}
 
+	log.Println()
 	this.RefreshPrevRealtime(item, msgos)
+	log.Println()
 	this.NotifyUiPrevHistory(item, msgos)
+	log.Println()
 	this.SavePrevHistory(msgos)
+	log.Println()
 	this.RefreshPrevStorageByItem(item, pubkey)
+	log.Println()
 }
 
 func (this *Fetcher) RefreshPrevRealtime(item *RoomListItem, msgos []store.MessageJoined) {
@@ -153,12 +158,16 @@ func pullAllRoomsLatestMessages() {
 	log.Println("Loading all rooms's latest messages....", len(vtcli.Binfo.Friends), len(vtcli.Binfo.Groups))
 	btime := time.Now()
 	time.Sleep(time.Duration(rand.Int()%50+20) * time.Millisecond)
-	for _, frnd := range vtcli.Binfo.Friends {
+	for idx, frnd := range vtcli.Binfo.Friends {
+		log.Println("pulling...", idx)
 		hisfet.PullPrevHistoryById(frnd.Pubkey, vtcli.Binfo.NextBatch)
+		log.Println("pulled", idx)
 	}
 
-	for _, grp := range vtcli.Binfo.Groups {
+	for idx, grp := range vtcli.Binfo.Groups {
+		log.Println("pulling...", idx)
 		hisfet.PullPrevHistoryById(grp.GroupId, vtcli.Binfo.NextBatch)
+		log.Println("pulled", idx)
 	}
 	log.Println("Load all rooms's latest messages done.", len(vtcli.Binfo.Friends),
 		len(vtcli.Binfo.Groups), time.Since(btime))

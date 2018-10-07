@@ -323,56 +323,6 @@
            <property name="spacing">
             <number>12</number>
            </property>
-           <item row="4" column="0">
-            <widget class="QLabel" name="label_13">
-             <property name="text">
-              <string>PlaceHolder...</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <widget class="QLabel" name="label_8">
-             <property name="text">
-              <string>Theme</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QComboBox" name="comboBox_2">
-             <property name="frame">
-              <bool>false</bool>
-             </property>
-             <item>
-              <property name="text">
-               <string>Light</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Dark</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>System</string>
-              </property>
-             </item>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="label_9">
-             <property name="text">
-              <string>ToxHS IP:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="0">
-            <widget class="QLabel" name="label_10">
-             <property name="text">
-              <string>Use HS</string>
-             </property>
-            </widget>
-           </item>
            <item row="2" column="1">
             <widget class="QCheckBox" name="checkBox_2">
              <property name="text">
@@ -383,10 +333,13 @@
              </property>
             </widget>
            </item>
-           <item row="3" column="0">
-            <widget class="QLabel" name="label_11">
+           <item row="6" column="1">
+            <widget class="QCheckBox" name="checkBox">
              <property name="text">
-              <string>Theme</string>
+              <string/>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -397,6 +350,36 @@
              </property>
              <property name="checked">
               <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="0">
+            <widget class="QLabel" name="label_49">
+             <property name="text">
+              <string>Font Name</string>
+             </property>
+             <property name="textInteractionFlags">
+              <set>Qt::TextBrowserInteraction</set>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_9">
+             <property name="text">
+              <string>ToxHS IP:</string>
+             </property>
+             <property name="textInteractionFlags">
+              <set>Qt::TextBrowserInteraction</set>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="0">
+            <widget class="QLabel" name="label_13">
+             <property name="text">
+              <string>PlaceHolder...</string>
+             </property>
+             <property name="textInteractionFlags">
+              <set>Qt::TextBrowserInteraction</set>
              </property>
             </widget>
            </item>
@@ -422,13 +405,138 @@
              </item>
             </widget>
            </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="label_10">
+             <property name="text">
+              <string>Use HS</string>
+             </property>
+             <property name="textInteractionFlags">
+              <set>Qt::TextBrowserInteraction</set>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_8">
+             <property name="text">
+              <string>Theme</string>
+             </property>
+             <property name="textInteractionFlags">
+              <set>Qt::TextBrowserInteraction</set>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QComboBox" name="comboBox_2">
+             <property name="frame">
+              <bool>false</bool>
+             </property>
+             <item>
+              <property name="text">
+               <string>Light</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Dark</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>System</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="label_11">
+             <property name="text">
+              <string>Theme</string>
+             </property>
+             <property name="textInteractionFlags">
+              <set>Qt::TextBrowserInteraction</set>
+             </property>
+            </widget>
+           </item>
            <item row="4" column="1">
-            <widget class="QCheckBox" name="checkBox">
+            <widget class="QFontComboBox" name="fontComboBox"/>
+           </item>
+           <item row="5" column="0">
+            <widget class="QLabel" name="label_51">
+             <property name="text">
+              <string>Font Size</string>
+             </property>
+             <property name="textInteractionFlags">
+              <set>Qt::TextBrowserInteraction</set>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="1">
+            <widget class="QSpinBox" name="spinBox"/>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="groupBox_8">
+          <property name="title">
+           <string>Developer</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_6">
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_60">
+             <property name="text">
+              <string>PlaceHolder...</string>
+             </property>
+             <property name="textInteractionFlags">
+              <set>Qt::TextBrowserInteraction</set>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QCheckBox" name="checkBox_10">
              <property name="text">
               <string/>
              </property>
-             <property name="checked">
-              <bool>true</bool>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QComboBox" name="comboBox_7">
+             <item>
+              <property name="text">
+               <string>TRACE</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>DEBUG</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>WARNING</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>INFO</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>ERROR</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>FATAL</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_59">
+             <property name="text">
+              <string>Debug Level</string>
              </property>
             </widget>
            </item>
@@ -463,6 +571,9 @@
             <widget class="QLabel" name="label_12">
              <property name="text">
               <string>PlaceHolder...</string>
+             </property>
+             <property name="textInteractionFlags">
+              <set>Qt::TextBrowserInteraction</set>
              </property>
             </widget>
            </item>
@@ -930,7 +1041,7 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>364</width>
+             <width>84</width>
              <height>16</height>
             </rect>
            </property>
@@ -1465,8 +1576,8 @@
            <property name="geometry">
             <rect>
              <x>0</x>
-             <y>408</y>
-             <width>346</width>
+             <y>0</y>
+             <width>66</width>
              <height>16</height>
             </rect>
            </property>

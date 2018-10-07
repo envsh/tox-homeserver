@@ -47,6 +47,7 @@ func (this *MainWindow) initAppBackend() {
 		_ = itext
 		listw.AddItem(itext)
 		contactQueue <- frnd
+		contactQueue <- nil
 	}
 
 	for gn, grp := range vtcli.Binfo.Groups {
@@ -54,6 +55,7 @@ func (this *MainWindow) initAppBackend() {
 		_ = itext
 		listw.AddItem(itext)
 		contactQueue <- grp
+		contactQueue <- nil
 	}
 
 	uifnQueue <- func() { this.setConnStatus(gopp.IfElse(vtcli.Binfo.ConnStatus > 0, true, false).(bool)) }
@@ -70,7 +72,9 @@ func (this *MainWindow) initAppBackend() {
 		this.loginDone(true)
 		btime := time.Now()
 		log.Println("Waiting contacts show on UI...") // about 31ms with 7 contacts
+		// TODO 这种方式不太准确
 		condWait(10, func() bool { return len(contactQueue) == 0 })
+		time.Sleep(10 * time.Millisecond)
 		log.Println("Show base contacts on UI done.", time.Since(btime))
 		pullAllRoomsLatestMessages()
 	}()

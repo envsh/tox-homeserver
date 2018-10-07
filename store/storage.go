@@ -52,6 +52,8 @@ func (this *Storage) SetWAL(enable bool) {
 	gopp.ErrPrint(err)
 	_, err = this.dbh.Exec(fmt.Sprintf("PRAGMA journal_size_limit=%d;", 3*1000*1000)) // 3MB
 	gopp.ErrPrint(err)
+	_, err = this.dbh.Exec(fmt.Sprintf("PRAGMA auto_vacuum=FULL;"))
+	gopp.ErrPrint(err)
 	// others: wal_checkpoint, wal_autocheckpoint, synchronous, cache_size
 	if true {
 		return

@@ -435,7 +435,7 @@ func (this *ToxVM) setupEventsForMessage() {
 			title = title[:pos]
 		}
 		evt.Args = []string{fmt.Sprintf("%d", groupNumber),
-			fmt.Sprintf("%d", peerNumber), title, stms}
+			fmt.Sprintf("%d", peerNumber), title, stmsg}
 
 		groupId, _ := xtox.ConferenceGetIdentifier(t, groupNumber)
 		if xtox.ConferenceIdIsEmpty(groupId) {

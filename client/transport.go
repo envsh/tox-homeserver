@@ -14,6 +14,7 @@ import (
 	simplejson "github.com/bitly/go-simplejson"
 	"github.com/gorilla/websocket"
 	"google.golang.org/grpc"
+	_ "google.golang.org/grpc/encoding/gzip"
 )
 
 func assert_interface() {
@@ -107,7 +108,7 @@ func (this *GrpcTransport) Connect(addr string) error {
 	this.srvurl = addr
 	srvurl := addr
 	log.Println("connecting grpc:", srvurl)
-	rpcli, err := grpc.Dial(srvurl, grpc.WithInsecure())
+	rpcli, err := grpc.Dial(srvurl, grpc.WithInsecure(), grpc.WithTimeout(5*time.Second))
 	gopp.ErrPrint(err, rpcli)
 	if err != nil {
 		return err
@@ -193,7 +194,7 @@ func (this *GrpcTransport) serveBackendEventGrpcImpl() {
 
 func (this *GrpcTransport) rmtCall(args *thspbs.Event) (*thspbs.Event, error) {
 	cli := thspbs.NewToxhsClient(this.rpcli)
-	rsp, err := cli.RmtCall(context.Background(), args)
+	rsp, err := cli.RmtCall(context.Background(), args, grpc.UseCompressor("gzip"))
 	return rsp, err
 }
 

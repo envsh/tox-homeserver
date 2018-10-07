@@ -392,6 +392,7 @@ func RmtCallExecuteHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Even
 
 	thscom.BytesRecved(len(req.String()))
 	thscom.BytesSent(len(out.String()))
+	log.Println("respose: ", req.Name, len(out.String()))
 	return out, nil
 }
 

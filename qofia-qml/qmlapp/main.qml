@@ -11,8 +11,8 @@ ApplicationWindow {
     height: 580
     visible: true
 
-    signal aaaaa(int v)
-    function testb123(v) {print("called...", v)}
+    signal testsig123(int v)
+    function testb123(v) {print("called...", v); return 567;}
 
     header: ToolBar {
         // ...

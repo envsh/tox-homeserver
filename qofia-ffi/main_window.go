@@ -339,6 +339,7 @@ func tryReadContactEvent() bool {
 		ctv := NewRoomListItem()
 		if uictx.iteman.Get(ctv.GetId()) != nil {
 			log.Println("Already in list:", ctv.GetName(), ctv.GetId())
+			<-contactQueue // a nil placeholder
 			continue
 		}
 		uictx.iteman.addRoomItem(ctv)
@@ -354,6 +355,7 @@ func tryReadContactEvent() bool {
 			// ctv.SetPressState(true)
 		}
 		procn++
+		<-contactQueue // a nil placeholder
 	}
 	return len(contactQueue) == 0
 }

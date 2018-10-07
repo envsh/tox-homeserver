@@ -79,10 +79,13 @@ const (
 	SK_DEBUG_LEVEL    = "debug_level"
 	SK_LAST_LOGINED   = "last_logined"
 	SK_EMBED_SERVER   = "embed_server"
+	SK_FONT_NAME      = "font_name"
+	SK_FONT_SIZE      = "font_size"
+	SK_THEME_NAME     = "theme_name"
 )
 
 var SettingKeys = []string{"device_name", "homeserver_url", "show_sql", "debug_level",
-	"last_logined", "embed_server"}
+	"last_logined", "embed_server", "font_name", "font_size", "theme_name"}
 
 // for client
 type Setting struct {

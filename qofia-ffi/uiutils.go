@@ -150,15 +150,15 @@ func GetInitAvatar(name string) *qtgui.QIcon {
 	avto := avatar.NewWithConfig(cfg)
 	name = strings.TrimLeft(name, " ~!#$%^&*()_+`-={}[]\\|:\";'<>?,./")
 	data, err := avto.DrawToBytes(name, 64)
-	gopp.ErrPrint(err, name)
+	gopp.ErrPrint(err, len(name), name)
 
 	fname := store.GetFSC().TempFileName()
 	err = ioutil.WriteFile(fname, data, 0644)
-	gopp.ErrPrint(err, fname, len(data))
+	gopp.ErrPrint(err, len(fname), fname, len(data))
 	defer os.Remove(fname)
 
 	idico := qtgui.NewQIcon_2(fname)
-	gopp.FalsePrint(!idico.IsNull(), "gen idico failed.", name)
+	gopp.FalsePrint(!idico.IsNull(), "gen idico failed.", len(name), name)
 	return idico
 }
 
@@ -166,14 +166,26 @@ func GetInitAvatar(name string) *qtgui.QIcon {
 var fontFile = "./resource/fzlt.ttf"
 
 func PrepareFont() {
-	fp := qtcore.NewQFile_1(":/resource/fzlt.ttf")
-	fp.Open(qtcore.QIODevice__ReadOnly)
-	data := qtcore.NewQIODeviceFromPointer(fp.GetCthis()).ReadAll().Data_fix()
-	qtcore.NewQIODeviceFromPointer(fp.GetCthis()).Close()
+	rcfile := ":/resource/fzlt.ttf"
 
-	fontFile = store.GetFSC().GetFilePath("fzlt.ttf")
-	err := ioutil.WriteFile(fontFile, []byte(data), 0644)
-	gopp.ErrPrint(err, fontFile)
+	locFile := store.GetFSC().GetFilePath("fzlt.ttf")
+	fi, err := os.Stat(locFile)
+	if err != nil || fi.Size() == 0 /*|| crc1 != crc2 */ {
+		fp := qtcore.NewQFile_1(rcfile)
+		fp.Open(qtcore.QIODevice__ReadOnly)
+		data := qtcore.NewQIODeviceFromPointer(fp.GetCthis()).ReadAll().Data_fix()
+		qtcore.NewQIODeviceFromPointer(fp.GetCthis()).Close()
+
+		if len(data) > 0 {
+			fontFile = locFile
+			err := ioutil.WriteFile(fontFile, []byte(data), 0644)
+			gopp.ErrPrint(err, fontFile)
+		} else {
+			log.Println("maybe read font rc file error.", len(data), rcfile)
+		}
+	} else {
+		fontFile = locFile
+	}
 	log.Println(fontFile)
 }
 
