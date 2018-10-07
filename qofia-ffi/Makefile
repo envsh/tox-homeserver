@@ -26,7 +26,8 @@ bd:
 	echo -e "package main\nconst btversion = \"${GOVVV2}\"\n" > btversion.go
 	echo -e "const isandroid = true\n" >> btversion.go
 	# why CC=clang CXX=clang++ can not build. got: must specify -pkgdir
-	CC=/usr/bin/clang CXX=/usr/bin/clang++ GOGC=10 go build -p 1 -v -i  -gcflags="-c 1"  -ldflags "${GOVVV}" -pkgdir ~/oss/pkg/linux_amd64_clang
+	CC=/usr/bin/clang CXX=/usr/bin/clang++ GOGC=10 \
+		go build -p 1 -v -i  -gcflags="-c 1"  -ldflags "${GOVVV}" -pkgdir ~/oss/pkg/linux_amd64_clang
 	# GOGC=10 go build -p 1 -v -i -gcflags="-c 1"  -ldflags "${GOVVV}"
 
 droid: droidso droidapk

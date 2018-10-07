@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"crypto/x509"
 	"encoding/json"
 	"fmt"
 	"gopp"
@@ -14,6 +15,7 @@ import (
 	simplejson "github.com/bitly/go-simplejson"
 	"github.com/gorilla/websocket"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 	_ "google.golang.org/grpc/encoding/gzip"
 	"google.golang.org/grpc/keepalive"
 )
@@ -83,6 +85,8 @@ func (this *_TransportBase) runOnConnected() {
 	}
 }
 
+const sock_csr = "data/server.csr"
+
 /////
 type GrpcTransport struct {
 	*_TransportBase
@@ -109,12 +113,23 @@ func (this *GrpcTransport) Connect(addr string) error {
 	this.srvurl = addr
 	srvurl := addr
 	log.Println("connecting grpc:", srvurl)
+
 	kaopt := grpc.WithKeepaliveParams(keepalive.ClientParameters{
 		Time:                75 * time.Second,
 		Timeout:             20 * time.Second,
 		PermitWithoutStream: true,
 	})
-	rpcli, err := grpc.Dial(srvurl, grpc.WithInsecure(), grpc.WithTimeout(5*time.Second), kaopt)
+
+	certPEMBlock, err := Asset("data/server.csr")
+	gopp.ErrPrint(err)
+	certo, err := x509.ParseCertificate(certPEMBlock)
+	gopp.ErrPrint(err, len(certPEMBlock))
+	certp := x509.NewCertPool()
+	certp.AddCert(certo)
+	credo := credentials.NewClientTLSFromCert(certp, "")
+	certopt := grpc.WithTransportCredentials(credo)
+
+	rpcli, err := grpc.Dial(srvurl, grpc.WithInsecure(), grpc.WithTimeout(5*time.Second), kaopt, certopt)
 	gopp.ErrPrint(err, rpcli)
 	if err != nil {
 		return err

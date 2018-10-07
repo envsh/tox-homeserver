@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"crypto/tls"
 	"encoding/json"
 	"gopp"
 	"log"
@@ -15,11 +16,16 @@ import (
 	// "atapi/dorpc/dyngrpc"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 	_ "google.golang.org/grpc/encoding/gzip"
+	"google.golang.org/grpc/keepalive"
 
 	thscom "tox-homeserver/common"
 	"tox-homeserver/thspbs"
 )
+
+const sock_crt = "data/server.crt"
+const sock_key = "data/server.key"
 
 type GrpcServer struct {
 	srv   *grpc.Server
@@ -42,7 +48,16 @@ func newGrpcServer() *GrpcServer {
 	this.grpcUuids = make(map[string]uint64)
 
 	// TODO 压缩支持
-	this.srv = grpc.NewServer()
+	kaopt := keepalive.ServerParameters{} // TODO
+	_ = kaopt
+
+	certPEMBlock, err := Asset(sock_crt)
+	keyPEMBlock, err := Asset(sock_key)
+	gopp.ErrPrint(err)
+	certo, err := tls.X509KeyPair(certPEMBlock, keyPEMBlock)
+	gopp.ErrPrint(err)
+	credo := credentials.NewServerTLSFromCert(&certo)
+	this.srv = grpc.NewServer(grpc.Creds(credo))
 
 	this.svc = &GrpcService{}
 	thspbs.RegisterToxhsServer(this.srv, this.svc)

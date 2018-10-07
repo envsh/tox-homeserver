@@ -6,9 +6,10 @@ CPWD=$(shell pwd)
 all: bd
 
 bd: com
-	go-bindata -nocompress -pkg server -o server/webdui_bindata.go webdui/
+	go-bindata -nocompress -pkg server -o server/webdui_bindata.go webdui/ data/server.crt data/server.key
 	PKG_CONFIG_PATH=/opt/toxcore-static2/lib64/pkgconfig/ CGO_LDFLAGS="-lopus -lsodium" \
-		go build -i -v -o bin/toxhs -ldflags "${GOVVV}" .
+	CC=/usr/bin/clang CXX=/usr/bin/clang++ \
+		go build -p 1 -i -v -o bin/toxhs -ldflags "${GOVVV}" -pkgdir ~/oss/pkg/linux_amd64_clang .
 	tar zcvf bin/toxhs.tar.gz bin/toxhs
 
 democ: com
@@ -16,6 +17,7 @@ democ: com
 
 com:
 	protoc -I./server ./server/ths.proto --go_out=plugins=grpc:./thspbs/
+	go-bindata -nocompress -pkg client -o client/certs_bindata.go data/server.csr
 	# cd ${HOME}/golib/src/github.com/go-xorm/cmd/xorm && xorm reverse -s sqlite3 "${CPWD}/data/toxhs.sqlite" templates/goxorm "${CPWD}/gofia/"
 	go install -v ./thspbs/ ./common/ ./client/ ./store/ ./gomain2c/ ./avhlp/
 
