@@ -172,6 +172,8 @@ func (this *GrpcTransport) serveBackendEventGrpc() {
 			this.retryer = gopp.NewRetry()
 		}
 		retryWait := 3*time.Second + this.retryer.NextWaitOnly()
+		maxWait := 51 * time.Second
+		retryWait = gopp.IfElse(retryWait > maxWait, maxWait, retryWait).(time.Duration)
 		log.Println("Grpc maybe disconnected, retry after", retryWait)
 		// TODO for android, 需要在从休眠中醒来时通知并取消该sleep
 		// TODO for android, 也许需要监听wifi状态
