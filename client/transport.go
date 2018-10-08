@@ -167,7 +167,9 @@ func (this *GrpcTransport) serveBackendEventGrpc() {
 			this.retryer = gopp.NewRetry()
 		}
 		retryWait := 3*time.Second + this.retryer.NextWaitOnly()
-		log.Println("Grpc maybe disconnect, retry after:", retryWait)
+		log.Println("Grpc maybe disconnected, retry after", retryWait)
+		// TODO for android, 需要在从休眠中醒来时通知并取消该sleep
+		// TODO for android, 也许需要监听wifi状态
 		time.Sleep(retryWait)
 	}
 	log.Println("Grpc serve proc done:", this.closed, time.Since(nowt))

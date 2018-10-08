@@ -17,10 +17,10 @@ func hello() {
 }
 
 func testRunOnAndroidThread() {
-	qtandroidextras.RunOnAndroidThread(func() {
+	qtandroidextras.RunOnAndroidThread_(func() {
 		log.Println("this is run on android thread.")
 	})
-	qtandroidextras.RunOnAndroidThread(func() { _ExceptionCheckAndClear() })
+	qtandroidextras.RunOnAndroidThread_(func() { _ExceptionCheckAndClear() })
 }
 
 func ShowToast(message string, duration uint64) {
