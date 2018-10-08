@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"crypto/tls"
 	"crypto/x509"
 	"encoding/json"
 	"fmt"
@@ -85,7 +86,7 @@ func (this *_TransportBase) runOnConnected() {
 	}
 }
 
-const sock_csr = "data/server.csr"
+const sock_crt = "data/server.crt"
 
 /////
 type GrpcTransport struct {
@@ -120,16 +121,20 @@ func (this *GrpcTransport) Connect(addr string) error {
 		PermitWithoutStream: true,
 	})
 
-	certPEMBlock, err := Asset("data/server.csr")
+	// TODO optional tls flag
+	certPEMBlock, err := Asset(sock_crt)
 	gopp.ErrPrint(err)
-	certo, err := x509.ParseCertificate(certPEMBlock)
-	gopp.ErrPrint(err, len(certPEMBlock))
+
 	certp := x509.NewCertPool()
-	certp.AddCert(certo)
-	credo := credentials.NewClientTLSFromCert(certp, "")
+	if ok := certp.AppendCertsFromPEM(certPEMBlock); !ok {
+		gopp.FalsePrint(ok, "cert pool add pem csr error", ok, len(certPEMBlock))
+	}
+	// credo := credentials.NewClientTLSFromCert(certp, strings.Split(addr, ":")[0])
+	// credo := credentials.NewClientTLSFromCert(certp, "")
+	credo := credentials.NewTLS(&tls.Config{ServerName: "", RootCAs: certp, InsecureSkipVerify: true})
 	certopt := grpc.WithTransportCredentials(credo)
 
-	rpcli, err := grpc.Dial(srvurl, grpc.WithInsecure(), grpc.WithTimeout(5*time.Second), kaopt, certopt)
+	rpcli, err := grpc.Dial(srvurl /*grpc.WithInsecure(),*/, grpc.WithTimeout(5*time.Second), kaopt, certopt)
 	gopp.ErrPrint(err, rpcli)
 	if err != nil {
 		return err

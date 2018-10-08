@@ -51,12 +51,19 @@ func newGrpcServer() *GrpcServer {
 	kaopt := keepalive.ServerParameters{} // TODO
 	_ = kaopt
 
+	// TODO optional tls flag
 	certPEMBlock, err := Asset(sock_crt)
 	keyPEMBlock, err := Asset(sock_key)
 	gopp.ErrPrint(err)
 	certo, err := tls.X509KeyPair(certPEMBlock, keyPEMBlock)
 	gopp.ErrPrint(err)
 	credo := credentials.NewServerTLSFromCert(&certo)
+	credentials.NewTLS(&tls.Config{
+		// ServerName:   addr, // NOTE: this is required!
+		Certificates: []tls.Certificate{certo},
+		// RootCAs:      certPool,
+		InsecureSkipVerify: true,
+	})
 	this.srv = grpc.NewServer(grpc.Creds(credo))
 
 	this.svc = &GrpcService{}
