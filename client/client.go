@@ -220,6 +220,7 @@ func (this *LigTox) rmtCall(args *thspbs.Event) (*thspbs.Event, error) {
 }
 
 func (this *LigTox) GetBaseInfo() {
+	var binfo *thspbs.BaseInfo
 	switch tp := this.srvtp.(type) {
 	case *WebsocketTransport:
 		in := &thspbs.Event{}
@@ -228,16 +229,25 @@ func (this *LigTox) GetBaseInfo() {
 		rsp, err := this.rmtCall(in)
 		gopp.ErrPrint(err)
 
-		binfo := &thspbs.BaseInfo{}
+		binfo = &thspbs.BaseInfo{}
 		err = json.Unmarshal([]byte(rsp.Args[0]), binfo)
 		gopp.ErrPrint(err)
-		this.ParseBaseInfo(binfo)
+
 	case *GrpcTransport:
 		cli := thspbs.NewToxhsClient(tp.rpcli)
 		in := &thspbs.Event{Name: "GetBaseInfo", DeviceUuid: appctx.devo.Uuid}
 		bi, err := cli.GetBaseInfo(context.Background(), in)
 		gopp.ErrPrint(err)
-		this.ParseBaseInfo(bi)
+		binfo = bi
+	}
+	if binfo != nil {
+		if binfo.Groups == nil {
+			binfo.Groups = map[uint32]*thspbs.GroupInfo{}
+		}
+		if binfo.Friends == nil {
+			binfo.Friends = map[uint32]*thspbs.FriendInfo{}
+		}
+		this.ParseBaseInfo(binfo)
 	}
 }
 

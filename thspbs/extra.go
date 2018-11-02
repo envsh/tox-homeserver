@@ -114,6 +114,9 @@ func (this *BaseInfo) AddGroup(grpnum uint32, grpid string) bool {
 		log.Println("why group already exist:", grpnum, grpid)
 		return false
 	}
+	if this.Groups == nil {
+		this.Groups = map[uint32]*GroupInfo{}
+	}
 	grpo := NewGroupInfo()
 	grpo.Gnum, grpo.GroupId = grpnum, grpid
 	this.Groups[grpnum] = grpo
