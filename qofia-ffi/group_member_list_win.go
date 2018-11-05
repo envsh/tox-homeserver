@@ -60,11 +60,13 @@ func (this *MainWindow) AddGroupMember(peero *thspbs.MemberInfo) {
 	cell := qtwidgets.NewQTableWidgetItem_1(peero.Name, 0)
 	tabwgt.SetItem(0, 1, cell)
 	this.tblItems = append(this.tblItems, cell)
+	qtrt.ReleaseOwnerToQt(cell)
 
 	cell = qtwidgets.NewQTableWidgetItem_1(peero.Pubkey, 0)
 	tabwgt.SetItem(0, 2, cell)
 	ste := stateGroupMemberList
 	ste.tblItems = append(ste.tblItems, cell)
+	qtrt.ReleaseOwnerToQt(cell)
 }
 
 func (this *MainWindow) ClearGroupMemberList() {
