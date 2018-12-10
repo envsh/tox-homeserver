@@ -34,16 +34,16 @@ func (this *MainWindow) initMessageListEvents() {
 		arg0.Ignore()
 		// Ctrl+C
 		// log.Println(arg0.Matches(qtgui.QKeySequence__Paste))
-		srckeys := qtgui.NewQKeySequence_2_1(arg0.Modifiers(), arg0.Key())
-		sendkeys := qtgui.NewQKeySequence_2_1(qtcore.Qt__Key_Shift, qtcore.Qt__Key_Enter)
+		srckeys := qtgui.NewQKeySequence2p1(arg0.Modifiers(), arg0.Key())
+		sendkeys := qtgui.NewQKeySequence2p1(qtcore.Qt__Key_Shift, qtcore.Qt__Key_Enter)
 		if arg0.Matches(qtgui.QKeySequence__Paste) {
 			this.checkClipboardImage()
 		} else if arg0.Matches(qtgui.QKeySequence__InsertLineSeparator) {
 			// Shift+Enter
-			log.Println("catch insert line sep keys:", srckeys.ToString__(), arg0.Key(), arg0.Text())
+			log.Println("catch insert line sep keys:", srckeys.ToStringp(), arg0.Key(), arg0.Text())
 		} else if arg0.Matches(qtgui.QKeySequence__InsertParagraphSeparator) {
 			// Enter
-			log.Println("catch insert para sep keys:", srckeys.ToString__(), arg0.Key(), arg0.Text())
+			log.Println("catch insert para sep keys:", srckeys.ToStringp(), arg0.Key(), arg0.Text())
 			if gopp.IsAndroid() {
 				// nothing to do
 			} else { // PC
@@ -55,7 +55,7 @@ func (this *MainWindow) initMessageListEvents() {
 		} else if arg0.Key() == qtcore.Qt__Key_Up { // prev history message
 		} else if arg0.Key() == qtcore.Qt__Key_Down { // next history message
 		} else if srckeys.Matches(sendkeys) == qtgui.QKeySequence__ExactMatch {
-			log.Println("catch hotkeys:", sendkeys.ToString__())
+			log.Println("catch hotkeys:", sendkeys.ToStringp())
 		}
 
 		te.KeyPressEvent(arg0)
@@ -74,7 +74,7 @@ func (this *MainWindow) initMessageListEvents() {
 
 func (this *MainWindow) checkClipboardImage() {
 	cb := uictx.qtapp.Clipboard()
-	md := cb.MimeData__()
+	md := cb.MimeDatap()
 	fmtlst := md.Formats()
 	fmtlstx := qtcore.NewQStringListxFromPointer(fmtlst.GetCthis())
 	fmtnames := fmtlstx.ConvertToSlice()
@@ -151,7 +151,7 @@ func (this *MessageListWin) SetRoom(item *RoomListItem) {
 		// SetQLabelElideText(mw.Label_7, item.frndInfo.GetStmsg()) // TODO
 	}
 	if item.cticon != nil {
-		mw.Label_4.SetPixmap(item.cticon.Pixmap_1_(32, 32))
+		mw.Label_4.SetPixmap(item.cticon.Pixmap1p(32, 32))
 	}
 	enableFriend := !item.isgroup && !thscom.IsFixedSpecialContact(item.GetNum())
 	mw.updateRoomOpMenu(enableFriend)
@@ -190,7 +190,7 @@ func (this *MessageListWin) SetIconForItem(item *RoomListItem) {
 		return
 	}
 	mw := uictx.mw
-	mw.Label_4.SetPixmap(item.cticon.Pixmap_1_(32, 32))
+	mw.Label_4.SetPixmap(item.cticon.Pixmap1p(32, 32))
 }
 
 func (this *MessageListWin) ClearAll() {
@@ -249,7 +249,7 @@ func (this *MessageListWin) InitMessageListGesture() {
 }
 
 func (this *MessageListWin) InitContextMenu() {
-	this.ctxmenu = qtwidgets.NewQMenu__()
+	this.ctxmenu = qtwidgets.NewQMenup()
 	this.actcopy = this.ctxmenu.AddAction("&Copy Text")
 	this.actcopyone = this.ctxmenu.AddAction("Copy &Message")
 	this.actselall = this.ctxmenu.AddAction("Select &All")
@@ -277,7 +277,7 @@ func (this *MessageListWin) initEvents() {
 	})
 }
 func (this *MessageListWin) ProcessActionCopy() {
-	uictx.qtapp.Clipboard().SetText__(this.selinfo.text)
+	uictx.qtapp.Clipboard().SetTextp(this.selinfo.text)
 }
 
 func (this *MessageListWin) ProcessActionCopyOne() {
@@ -312,7 +312,7 @@ func (this *MessageListWin) ClearSelectInfo() {
 func (this *MessageListWin) OnSCWLongTouch(pos *qtcore.QPointF) {
 	ctw := uictx.mw.ScrollAreaWidgetContents_2
 	mypos := ctw.MapFromGlobal(pos.ToPoint()) // ctw's cordinate pos
-	chw := ctw.ChildAt_1(mypos)
+	chw := ctw.ChildAt1(mypos)
 
 	if chw != nil {
 		log.Println(chw.ObjectName(), chw.MetaObject().ClassName(), mypos.X(), mypos.Y())
@@ -337,7 +337,7 @@ func (this *MessageListWin) ShowSCWContextMenu(pos *qtcore.QPoint) {
 	this.actcopy.SetEnabled(this.selinfo.has)
 	this.actquote.SetEnabled(this.selinfo.has)
 	gpos := pos
-	this.ctxmenu.Popup__(gpos)
+	this.ctxmenu.Popupp(gpos)
 }
 
 func tr(string, string) {}
@@ -356,7 +356,7 @@ func (this *MessageListWin) showEmojiPanel(bool) {
 			uiw.TextEdit_3.InsertPlainText(emoji)
 			// this.emojiPanel.QWidget_PTR().Hide()
 		}
-		this.hideTimer = qtcore.NewQTimer__()
+		this.hideTimer = qtcore.NewQTimerp()
 		qtrt.Connect(this.hideTimer, "timeout()", func() {
 			if this.emojiPanel != nil && !this.emojiPanel.QWidget_PTR().UnderMouse() {
 				this.hideTimer.Stop()
@@ -390,7 +390,7 @@ func (this *MessageListWin) mvEmojiPanelPC() (posx, posy int) {
 	emojiPanel := this.emojiPanel
 
 	rect := btn.Rect()
-	pos := btn.MapToGlobal(qtcore.NewQPoint_1(rect.X(), rect.Y()))
+	pos := btn.MapToGlobal(qtcore.NewQPoint1(rect.X(), rect.Y()))
 	pansz := emojiPanel.QWidget_PTR().SizeHint()
 
 	dstx := pos.X() - pansz.Width() + 70

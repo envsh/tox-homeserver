@@ -48,7 +48,7 @@ func (this *Notifier) Close() {
 
 func (this *Notifier) Trigger() {
 	this.rbmu.Lock()
-	n := this.rb.Write_1(".")
+	n := this.rb.Write1(".")
 	this.rbmu.Unlock()
 	if n != 1 {
 		log.Println("error trigger:", n)

@@ -72,7 +72,7 @@ func NewEmojiCategory(category string, emojivec []EmojiElem) *EmojiCategory {
 
 	this.TableWidget.HorizontalHeader().SetVisible(false)
 	this.TableWidget.VerticalHeader().SetVisible(false)
-	this.TableWidget.SetFixedSize_1(cols*50+20, rows*50+20)
+	this.TableWidget.SetFixedSize1(cols*50+20, rows*50+20)
 	this.TableWidget.SetRowCount(rows)
 	this.TableWidget.SetColumnCount(cols)
 	for i := 0; i < cols; i++ {
@@ -82,14 +82,14 @@ func NewEmojiCategory(category string, emojivec []EmojiElem) *EmojiCategory {
 		this.TableWidget.SetRowHeight(i, 50)
 	}
 
-	var emafnt = qtgui.NewQFont_1_("Emoji One")
+	var emafnt = qtgui.NewQFont1p("Emoji One")
 	var itmfnt *qtgui.QFont
 	for i, e := range emojivec {
 		col := i % cols
 		row := i / cols
 
-		witem := qtwidgets.NewQTableWidgetItem_1_(e.Unicode)
-		witem.SetSizeHint(qtcore.NewQSize_1(42, 42))
+		witem := qtwidgets.NewQTableWidgetItem1p(e.Unicode)
+		witem.SetSizeHint(qtcore.NewQSize1(42, 42))
 		witem.SetTextAlignment(qtcore.Qt__AlignCenter | qtcore.Qt__AlignHCenter)
 		if itmfnt == nil {
 			itmfnt = witem.Font()

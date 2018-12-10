@@ -48,12 +48,12 @@ func (this *Ui_EmojiCategory) SetupUi(EmojiCategory *qtwidgets.QWidget) {
 		EmojiCategory.SetObjectName("EmojiCategory")
 	}
 	EmojiCategory.Resize(400, 300)
-	this.SizePolicy = qtwidgets.NewQSizePolicy_1(qtwidgets.QSizePolicy__Preferred, qtwidgets.QSizePolicy__Expanding, 1)
+	this.SizePolicy = qtwidgets.NewQSizePolicy1(qtwidgets.QSizePolicy__Preferred, qtwidgets.QSizePolicy__Expanding, 1)
 	this.SizePolicy.SetHorizontalStretch(0)                                                // 114
 	this.SizePolicy.SetVerticalStretch(0)                                                  // 114
 	this.SizePolicy.SetHeightForWidth(this.EmojiCategory.SizePolicy().HasHeightForWidth()) // 114
 	this.EmojiCategory.SetSizePolicy(this.SizePolicy)                                      // 114
-	this.VerticalLayout = qtwidgets.NewQVBoxLayout_1(this.EmojiCategory)                   // 111
+	this.VerticalLayout = qtwidgets.NewQVBoxLayout1(this.EmojiCategory)                    // 111
 	this.VerticalLayout.SetSpacing(6)                                                      // 114
 	this.VerticalLayout.SetObjectName("VerticalLayout")                                    // 112
 	this.VerticalLayout.SetContentsMargins(0, 0, 0, 0)                                     // 114
@@ -77,21 +77,21 @@ func (this *Ui_EmojiCategory) SetupUi(EmojiCategory *qtwidgets.QWidget) {
 	this.__qtablewidgetitem2 = qtwidgets.NewQTableWidgetItem(0)           // 111
 	this.TableWidget.SetHorizontalHeaderItem(2, this.__qtablewidgetitem2) // 114
 	// if this.TableWidget.RowCount() > 3 // 119
-	this.TableWidget.SetRowCount(3)                                                // 114
-	this.__qtablewidgetitem3 = qtwidgets.NewQTableWidgetItem(0)                    // 111
-	this.TableWidget.SetVerticalHeaderItem(0, this.__qtablewidgetitem3)            // 114
-	this.__qtablewidgetitem4 = qtwidgets.NewQTableWidgetItem(0)                    // 111
-	this.TableWidget.SetVerticalHeaderItem(1, this.__qtablewidgetitem4)            // 114
-	this.__qtablewidgetitem5 = qtwidgets.NewQTableWidgetItem(0)                    // 111
-	this.TableWidget.SetVerticalHeaderItem(2, this.__qtablewidgetitem5)            // 114
-	this.TableWidget.SetObjectName("TableWidget")                                  // 112
-	this.TableWidget.SetVerticalScrollBarPolicy(qtcore.Qt__ScrollBarAlwaysOff)     // 114
-	this.TableWidget.SetHorizontalScrollBarPolicy(qtcore.Qt__ScrollBarAlwaysOff)   // 114
-	this.TableWidget.SetEditTriggers(qtwidgets.QAbstractItemView__NoEditTriggers)  // 114
-	this.TableWidget.SetProperty("showDropIndicator", qtcore.NewQVariant_9(false)) // 114
-	this.TableWidget.SetDragDropOverwriteMode(false)                               // 114
-	this.TableWidget.SetAlternatingRowColors(true)                                 // 114
-	this.TableWidget.SetSelectionMode(qtwidgets.QAbstractItemView__NoSelection)    // 114
+	this.TableWidget.SetRowCount(3)                                               // 114
+	this.__qtablewidgetitem3 = qtwidgets.NewQTableWidgetItem(0)                   // 111
+	this.TableWidget.SetVerticalHeaderItem(0, this.__qtablewidgetitem3)           // 114
+	this.__qtablewidgetitem4 = qtwidgets.NewQTableWidgetItem(0)                   // 111
+	this.TableWidget.SetVerticalHeaderItem(1, this.__qtablewidgetitem4)           // 114
+	this.__qtablewidgetitem5 = qtwidgets.NewQTableWidgetItem(0)                   // 111
+	this.TableWidget.SetVerticalHeaderItem(2, this.__qtablewidgetitem5)           // 114
+	this.TableWidget.SetObjectName("TableWidget")                                 // 112
+	this.TableWidget.SetVerticalScrollBarPolicy(qtcore.Qt__ScrollBarAlwaysOff)    // 114
+	this.TableWidget.SetHorizontalScrollBarPolicy(qtcore.Qt__ScrollBarAlwaysOff)  // 114
+	this.TableWidget.SetEditTriggers(qtwidgets.QAbstractItemView__NoEditTriggers) // 114
+	this.TableWidget.SetProperty("showDropIndicator", qtcore.NewQVariant9(false)) // 114
+	this.TableWidget.SetDragDropOverwriteMode(false)                              // 114
+	this.TableWidget.SetAlternatingRowColors(true)                                // 114
+	this.TableWidget.SetSelectionMode(qtwidgets.QAbstractItemView__NoSelection)   // 114
 
 	this.VerticalLayout.Layout().AddWidget(this.TableWidget) // 115
 

@@ -100,7 +100,7 @@ func _CheckIntentMessage() {
 	for {
 		time.Sleep(3 * time.Second)
 
-		cnt := qtandroidextras.QAndroidJniObject__callStaticMethod_6(
+		cnt := qtandroidextras.QAndroidJniObject__callStaticMethod6(
 			className, "GetPendingCount", "()I")
 		if cnt > 0 {
 			log.Println("PendingIntents count:", cnt)

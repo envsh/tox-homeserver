@@ -79,7 +79,7 @@ func NewMessageListGesture(w qtwidgets.QWidget_ITF) *MessageListGesture {
 	this := &MessageListGesture{}
 	this.w = w
 
-	w.QWidget_PTR().GrabGesture__(qtcore.Qt__TapAndHoldGesture)
+	w.QWidget_PTR().GrabGesturep(qtcore.Qt__TapAndHoldGesture)
 	w.QWidget_PTR().InheritEvent(this.OnEvent)
 	return this
 }

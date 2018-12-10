@@ -46,7 +46,7 @@ func (this *Ui_AddFriendDialog) SetupUi(AddFriendDialog *qtwidgets.QDialog) {
 		AddFriendDialog.SetObjectName("AddFriendDialog")
 	}
 	AddFriendDialog.Resize(606, 246)
-	this.VerticalLayout_2 = qtwidgets.NewQVBoxLayout_1(this.AddFriendDialog)                                 // 111
+	this.VerticalLayout_2 = qtwidgets.NewQVBoxLayout1(this.AddFriendDialog)                                  // 111
 	this.VerticalLayout_2.SetObjectName("VerticalLayout_2")                                                  // 112
 	this.VerticalLayout = qtwidgets.NewQVBoxLayout()                                                         // 111
 	this.VerticalLayout.SetObjectName("VerticalLayout")                                                      // 112

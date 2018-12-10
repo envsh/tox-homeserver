@@ -64,10 +64,10 @@ func SetQLabelElideText(lab *qtwidgets.QLabel, txt string, suff string, skipTool
 	}
 
 	fm := qtgui.NewQFontMetrics(font)
-	elwidth -= gopp.IfElseInt(elwidth < 150, 0, fm.Width__(suff))
-	etxt := fm.ElidedText__(txt, qtcore.Qt__ElideRight, elwidth)
+	elwidth -= gopp.IfElseInt(elwidth < 150, 0, fm.Widthp(suff))
+	etxt := fm.ElidedTextp(txt, qtcore.Qt__ElideRight, elwidth)
 	if false {
-		log.Println(len(txt), len(etxt), elwidth, fm.Width__(suff), len(suff), suff)
+		log.Println(len(txt), len(etxt), elwidth, fm.Widthp(suff), len(suff), suff)
 	}
 
 	lab.SetText(etxt + suff)
@@ -93,7 +93,7 @@ func PointerStep(p unsafe.Pointer, offset uintptr) unsafe.Pointer {
 func NewQPainter(w qtwidgets.QWidget_ITF) *qtgui.QPainter {
 	ptr := PointerStep(w.QWidget_PTR().GetCthis(), 2*unsafe.Sizeof(uintptr(0)))
 	ptdev := qtgui.NewQPaintDeviceFromPointer(ptr)
-	return qtgui.NewQPainter_1(ptdev)
+	return qtgui.NewQPainter1(ptdev)
 }
 
 // TODO need margin of sides
@@ -122,7 +122,7 @@ func GetIdentIcon(s string) *qtgui.QIcon {
 	defer os.Remove(w2.Name())
 	defer w2.Close()
 
-	idico := qtgui.NewQIcon_2(w2.Name())
+	idico := qtgui.NewQIcon2(w2.Name())
 	gopp.FalsePrint(!idico.IsNull(), "gen idico failed.")
 	// log.Println(w2.Name(), idico.IsNull(), s)
 
@@ -133,7 +133,7 @@ func GetIdentIcon(s string) *qtgui.QIcon {
 		qimgo := qtgui.QImage_FromData(unsafe.Pointer(&data[0]), len(data), "PNG")
 		if qimgo.IsNull() {
 		}
-		idico := qtgui.NewQIcon_1(qtgui.QPixmap_FromImage(qimgo, 0))
+		idico := qtgui.NewQIcon1(qtgui.QPixmap_FromImage(qimgo, 0))
 		log.Println(len(data), qimgo.IsNull(), idico.IsNull())
 	}
 
@@ -157,7 +157,7 @@ func GetInitAvatar(name string) *qtgui.QIcon {
 	gopp.ErrPrint(err, len(fname), fname, len(data))
 	defer os.Remove(fname)
 
-	idico := qtgui.NewQIcon_2(fname)
+	idico := qtgui.NewQIcon2(fname)
 	gopp.FalsePrint(!idico.IsNull(), "gen idico failed.", len(name), name)
 	return idico
 }
@@ -171,7 +171,7 @@ func PrepareFont() {
 	locFile := store.GetFSC().GetFilePath("fzlt.ttf")
 	fi, err := os.Stat(locFile)
 	if err != nil || fi.Size() == 0 /*|| crc1 != crc2 */ {
-		fp := qtcore.NewQFile_1(rcfile)
+		fp := qtcore.NewQFile1(rcfile)
 		fp.Open(qtcore.QIODevice__ReadOnly)
 		data := qtcore.NewQIODeviceFromPointer(fp.GetCthis()).ReadAll().Data_fix()
 		qtcore.NewQIODeviceFromPointer(fp.GetCthis()).Close()
@@ -198,12 +198,12 @@ func FindProperFontFile(w *qtwidgets.QWidget) {
 	log.Println(fnto.StyleName())
 	log.Println(fnto.Key(), fnto.LastResortFamily())
 	if false { //failed
-		fnto2 := qtgui.NewQFont_1_(fnto.Family())
+		fnto2 := qtgui.NewQFont1p(fnto.Family())
 		log.Println(fnto2.RawName())
 	}
 	fflst := qtgui.QFontDatabase_ApplicationFontFamilies(qtgui.QFontDatabase__Any)
 	fflstx := qtcore.NewQStringListxFromPointer(fflst.GetCthis())
-	log.Println(fflstx.Count_1())
+	log.Println(fflstx.Count1())
 	log.Println(fflstx.ConvertToSlice())
 }
 

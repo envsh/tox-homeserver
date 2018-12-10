@@ -9,6 +9,7 @@ all:
 	usage="make < gen bd clean >"
 
 gen:
+	# PATH=/home/me/Qt5.10.1/5.10.1/gcc_64/bin:$PATH
 	# go-uic scroll_widget.ui
 	go-uic ./contact_item_view.ui
 	go-uic ./message_item_view.ui

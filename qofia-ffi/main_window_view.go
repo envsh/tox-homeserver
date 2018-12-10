@@ -47,7 +47,7 @@ func (this *MainWindow) initMainWindowSignals1() {
 	this.rcact4 = this.roomCtxMenu.AddAction("PlaceHolder3")
 
 	if runtime.GOOS == "android" {
-		sz := qtcore.NewQSize_1(32, 32)
+		sz := qtcore.NewQSize1(32, 32)
 		this.ToolButton_11.SetIconSize(sz)
 		this.ToolButton_12.SetIconSize(sz)
 		this.ToolButton_19.SetIconSize(sz)
@@ -111,27 +111,27 @@ func (this *MainWindow) initMainWindowSignals() {
 
 	qtrt.Connect(uiw.ToolButton_24, "clicked(bool)", func(checked bool) {
 		log.Println(checked)
-		uiw.ScrollAreaWidgetContents_2.SetSizePolicy_1(qtwidgets.QSizePolicy__Fixed, qtwidgets.QSizePolicy__Fixed)
+		uiw.ScrollAreaWidgetContents_2.SetSizePolicy1(qtwidgets.QSizePolicy__Fixed, qtwidgets.QSizePolicy__Fixed)
 	})
 	qtrt.Connect(uiw.ToolButton_25, "clicked(bool)", func(checked bool) {
 		log.Println(checked)
-		uiw.ScrollAreaWidgetContents_2.SetSizePolicy_1(qtwidgets.QSizePolicy__Maximum, qtwidgets.QSizePolicy__Fixed)
+		uiw.ScrollAreaWidgetContents_2.SetSizePolicy1(qtwidgets.QSizePolicy__Maximum, qtwidgets.QSizePolicy__Fixed)
 	})
 	qtrt.Connect(uiw.ToolButton_26, "clicked(bool)", func(checked bool) {
 		log.Println(checked)
-		uiw.ScrollAreaWidgetContents_2.SetSizePolicy_1(qtwidgets.QSizePolicy__Minimum, qtwidgets.QSizePolicy__Fixed)
+		uiw.ScrollAreaWidgetContents_2.SetSizePolicy1(qtwidgets.QSizePolicy__Minimum, qtwidgets.QSizePolicy__Fixed)
 	})
 	qtrt.Connect(uiw.ToolButton_27, "clicked(bool)", func(checked bool) {
 		log.Println(checked)
-		uiw.ScrollAreaWidgetContents_2.SetSizePolicy_1(qtwidgets.QSizePolicy__Preferred, qtwidgets.QSizePolicy__Fixed)
+		uiw.ScrollAreaWidgetContents_2.SetSizePolicy1(qtwidgets.QSizePolicy__Preferred, qtwidgets.QSizePolicy__Fixed)
 	})
 	qtrt.Connect(uiw.ToolButton_28, "clicked(bool)", func(checked bool) {
 		log.Println(checked)
-		uiw.ScrollAreaWidgetContents_2.SetSizePolicy_1(qtwidgets.QSizePolicy__Expanding, qtwidgets.QSizePolicy__Fixed)
+		uiw.ScrollAreaWidgetContents_2.SetSizePolicy1(qtwidgets.QSizePolicy__Expanding, qtwidgets.QSizePolicy__Fixed)
 	})
 	qtrt.Connect(uiw.ToolButton_29, "clicked(bool)", func(checked bool) {
 		log.Println(checked)
-		uiw.ScrollAreaWidgetContents_2.SetSizePolicy_1(qtwidgets.QSizePolicy__MinimumExpanding, qtwidgets.QSizePolicy__Fixed)
+		uiw.ScrollAreaWidgetContents_2.SetSizePolicy1(qtwidgets.QSizePolicy__MinimumExpanding, qtwidgets.QSizePolicy__Fixed)
 	})
 
 	stkw := uiw.StackedWidget
@@ -181,12 +181,12 @@ func (this *MainWindow) initMainWindowSignals() {
 	qtrt.Connect(uiw.ToolButton_4, "clicked(bool)", func(bool) {
 		this.switchUiStack(UIST_ADD_FRIEND)
 		cb := uictx.qtapp.Clipboard()
-		log.Println(cb.Text__())
-		toxid := cb.Text__()
+		log.Println(cb.Textp())
+		toxid := cb.Textp()
 		if toxid != "" {
 			this.LineEdit_4.SetText(toxid)
 		}
-		addmsg := qtcore.NewQString_5(this.TextEdit.PlaceholderText()).Arg_11_(appctx.GetLigTox().SelfGetName())
+		addmsg := qtcore.NewQString5(this.TextEdit.PlaceholderText()).Arg11p(appctx.GetLigTox().SelfGetName())
 		this.TextEdit.SetPlainText(addmsg)
 
 		/*
@@ -292,7 +292,7 @@ func (this *MainWindow) initMainWindowQml() {
 	qw := uictx.uiw.QuickWidget
 	// qw.Engine().AddImportPath(":/qmlsys")
 	qw.Engine().AddImportPath(":/qmlapp")
-	qw.SetSource(qtcore.NewQUrl_1("qrc:/qmlapp/area.qml", 0))
+	qw.SetSource(qtcore.NewQUrl1("qrc:/qmlapp/area.qml", 0))
 	proot := qw.RootObject()
 	gopp.NilPrint(proot, "qml root object nil")
 }

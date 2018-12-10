@@ -49,14 +49,14 @@ func (this *Ui_Dialog) SetupUi(Dialog *qtwidgets.QDialog) {
 		Dialog.SetObjectName("Dialog")
 	}
 	Dialog.Resize(400, 190)
-	this.VerticalLayout_2 = qtwidgets.NewQVBoxLayout_1(this.Dialog) // 111
-	this.VerticalLayout_2.SetObjectName("VerticalLayout_2")         // 112
-	this.VerticalLayout = qtwidgets.NewQVBoxLayout()                // 111
-	this.VerticalLayout.SetSpacing(16)                              // 114
-	this.VerticalLayout.SetObjectName("VerticalLayout")             // 112
-	this.VerticalLayout.SetContentsMargins(20, -1, 20, -1)          // 114
-	this.Label = qtwidgets.NewQLabel(this.Dialog, 0)                // 111
-	this.Label.SetObjectName("Label")                               // 112
+	this.VerticalLayout_2 = qtwidgets.NewQVBoxLayout1(this.Dialog) // 111
+	this.VerticalLayout_2.SetObjectName("VerticalLayout_2")        // 112
+	this.VerticalLayout = qtwidgets.NewQVBoxLayout()               // 111
+	this.VerticalLayout.SetSpacing(16)                             // 114
+	this.VerticalLayout.SetObjectName("VerticalLayout")            // 112
+	this.VerticalLayout.SetContentsMargins(20, -1, 20, -1)         // 114
+	this.Label = qtwidgets.NewQLabel(this.Dialog, 0)               // 111
+	this.Label.SetObjectName("Label")                              // 112
 
 	this.VerticalLayout.Layout().AddWidget(this.Label) // 115
 
@@ -83,11 +83,11 @@ func (this *Ui_Dialog) SetupUi(Dialog *qtwidgets.QDialog) {
 
 	this.HorizontalLayout_2.Layout().AddWidget(this.RadioButton_2) // 115
 
-	this.ComboBox = qtwidgets.NewQComboBox(this.Dialog)     // 111
-	this.ComboBox.AddItem("", qtcore.NewQVariant_12("wtf")) // 115
-	this.ComboBox.AddItem("", qtcore.NewQVariant_12("wtf")) // 115
-	this.ComboBox.SetObjectName("ComboBox")                 // 112
-	this.ComboBox.SetFrame(false)                           // 114
+	this.ComboBox = qtwidgets.NewQComboBox(this.Dialog)    // 111
+	this.ComboBox.AddItem("", qtcore.NewQVariant12("wtf")) // 115
+	this.ComboBox.AddItem("", qtcore.NewQVariant12("wtf")) // 115
+	this.ComboBox.SetObjectName("ComboBox")                // 112
+	this.ComboBox.SetFrame(false)                          // 114
 
 	this.HorizontalLayout_2.Layout().AddWidget(this.ComboBox) // 115
 

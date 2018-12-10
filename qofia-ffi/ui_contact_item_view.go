@@ -61,14 +61,14 @@ func (this *Ui_ContactItemView) SetupUi(ContactItemView *qtwidgets.QWidget) {
 		ContactItemView.SetObjectName("ContactItemView")
 	}
 	ContactItemView.Resize(419, 64)
-	this.SizePolicy = qtwidgets.NewQSizePolicy_1(qtwidgets.QSizePolicy__Preferred, qtwidgets.QSizePolicy__Fixed, 1)
+	this.SizePolicy = qtwidgets.NewQSizePolicy1(qtwidgets.QSizePolicy__Preferred, qtwidgets.QSizePolicy__Fixed, 1)
 	this.SizePolicy.SetHorizontalStretch(0)                                                  // 114
 	this.SizePolicy.SetVerticalStretch(0)                                                    // 114
 	this.SizePolicy.SetHeightForWidth(this.ContactItemView.SizePolicy().HasHeightForWidth()) // 114
 	this.ContactItemView.SetSizePolicy(this.SizePolicy)                                      // 114
 	this.ContactItemView.SetFocusPolicy(qtcore.Qt__ClickFocus)                               // 114
 	this.ContactItemView.SetContextMenuPolicy(qtcore.Qt__DefaultContextMenu)                 // 114
-	this.HorizontalLayout_3 = qtwidgets.NewQHBoxLayout_1(this.ContactItemView)               // 111
+	this.HorizontalLayout_3 = qtwidgets.NewQHBoxLayout1(this.ContactItemView)                // 111
 	this.HorizontalLayout_3.SetSpacing(1)                                                    // 114
 	this.HorizontalLayout_3.SetObjectName("HorizontalLayout_3")                              // 112
 	this.HorizontalLayout_3.SetContentsMargins(0, 1, 0, 0)                                   // 114
@@ -88,7 +88,7 @@ func (this *Ui_ContactItemView) SetupUi(ContactItemView *qtwidgets.QWidget) {
 	this.Icon = qtgui.NewQIcon()
 	this.Icon.AddFile(":/icons/icon_avatar_40.png", qtcore.NewQSize(), qtgui.QIcon__Normal, qtgui.QIcon__Off) // 115
 	this.ToolButton_2.SetIcon(this.Icon)                                                                      // 114
-	this.ToolButton_2.SetIconSize(qtcore.NewQSize_1(32, 32))                                                  // 113
+	this.ToolButton_2.SetIconSize(qtcore.NewQSize1(32, 32))                                                   // 113
 	this.ToolButton_2.SetAutoRaise(true)                                                                      // 114
 
 	this.VerticalLayout_3.Layout().AddWidget(this.ToolButton_2) // 115
@@ -108,7 +108,7 @@ func (this *Ui_ContactItemView) SetupUi(ContactItemView *qtwidgets.QWidget) {
 	this.HorizontalLayout.SetObjectName("HorizontalLayout")     // 112
 	this.Label_2 = qtwidgets.NewQLabel(this.ContactItemView, 0) // 111
 	this.Label_2.SetObjectName("Label_2")                       // 112
-	this.SizePolicy1 = qtwidgets.NewQSizePolicy_1(qtwidgets.QSizePolicy__Expanding, qtwidgets.QSizePolicy__Preferred, 1)
+	this.SizePolicy1 = qtwidgets.NewQSizePolicy1(qtwidgets.QSizePolicy__Expanding, qtwidgets.QSizePolicy__Preferred, 1)
 	this.SizePolicy1.SetHorizontalStretch(0)                                          // 114
 	this.SizePolicy1.SetVerticalStretch(0)                                            // 114
 	this.SizePolicy1.SetHeightForWidth(this.Label_2.SizePolicy().HasHeightForWidth()) // 114
@@ -129,7 +129,7 @@ func (this *Ui_ContactItemView) SetupUi(ContactItemView *qtwidgets.QWidget) {
 
 	this.LabelLastMsgTime = qtwidgets.NewQLabel(this.ContactItemView, 0) // 111
 	this.LabelLastMsgTime.SetObjectName("LabelLastMsgTime")              // 112
-	this.SizePolicy2 = qtwidgets.NewQSizePolicy_1(qtwidgets.QSizePolicy__Preferred, qtwidgets.QSizePolicy__Preferred, 1)
+	this.SizePolicy2 = qtwidgets.NewQSizePolicy1(qtwidgets.QSizePolicy__Preferred, qtwidgets.QSizePolicy__Preferred, 1)
 	this.SizePolicy2.SetHorizontalStretch(0)                                                                       // 114
 	this.SizePolicy2.SetVerticalStretch(0)                                                                         // 114
 	this.SizePolicy2.SetHeightForWidth(this.LabelLastMsgTime.SizePolicy().HasHeightForWidth())                     // 114

@@ -56,13 +56,13 @@ func (this *Ui_MessageItemView) SetupUi(MessageItemView *qtwidgets.QWidget) {
 		MessageItemView.SetObjectName("MessageItemView")
 	}
 	MessageItemView.Resize(399, 62)
-	this.SizePolicy = qtwidgets.NewQSizePolicy_1(qtwidgets.QSizePolicy__Preferred, qtwidgets.QSizePolicy__Fixed, 1)
+	this.SizePolicy = qtwidgets.NewQSizePolicy1(qtwidgets.QSizePolicy__Preferred, qtwidgets.QSizePolicy__Fixed, 1)
 	this.SizePolicy.SetHorizontalStretch(0)                                                  // 114
 	this.SizePolicy.SetVerticalStretch(0)                                                    // 114
 	this.SizePolicy.SetHeightForWidth(this.MessageItemView.SizePolicy().HasHeightForWidth()) // 114
 	this.MessageItemView.SetSizePolicy(this.SizePolicy)                                      // 114
 	this.MessageItemView.SetFocusPolicy(qtcore.Qt__ClickFocus)                               // 114
-	this.HorizontalLayout_2 = qtwidgets.NewQHBoxLayout_1(this.MessageItemView)               // 111
+	this.HorizontalLayout_2 = qtwidgets.NewQHBoxLayout1(this.MessageItemView)                // 111
 	this.HorizontalLayout_2.SetSpacing(0)                                                    // 114
 	this.HorizontalLayout_2.SetObjectName("HorizontalLayout_2")                              // 112
 	this.HorizontalLayout_2.SetContentsMargins(0, 0, 0, 0)                                   // 114
@@ -74,7 +74,7 @@ func (this *Ui_MessageItemView) SetupUi(MessageItemView *qtwidgets.QWidget) {
 	this.Icon = qtgui.NewQIcon()
 	this.Icon.AddFile(":/icons/icon_avatar_40.png", qtcore.NewQSize(), qtgui.QIcon__Normal, qtgui.QIcon__Off) // 115
 	this.ToolButton_2.SetIcon(this.Icon)                                                                      // 114
-	this.ToolButton_2.SetIconSize(qtcore.NewQSize_1(26, 26))                                                  // 113
+	this.ToolButton_2.SetIconSize(qtcore.NewQSize1(26, 26))                                                   // 113
 	this.ToolButton_2.SetAutoRaise(true)                                                                      // 114
 
 	this.VerticalLayout_3.Layout().AddWidget(this.ToolButton_2) // 115
@@ -129,7 +129,7 @@ func (this *Ui_MessageItemView) SetupUi(MessageItemView *qtwidgets.QWidget) {
 
 	this.Label_5 = qtwidgets.NewQLabel(this.MessageItemView, 0) // 111
 	this.Label_5.SetObjectName("Label_5")                       // 112
-	this.SizePolicy1 = qtwidgets.NewQSizePolicy_1(qtwidgets.QSizePolicy__Expanding, qtwidgets.QSizePolicy__Preferred, 1)
+	this.SizePolicy1 = qtwidgets.NewQSizePolicy1(qtwidgets.QSizePolicy__Expanding, qtwidgets.QSizePolicy__Preferred, 1)
 	this.SizePolicy1.SetHorizontalStretch(0)                                          // 114
 	this.SizePolicy1.SetVerticalStretch(0)                                            // 114
 	this.SizePolicy1.SetHeightForWidth(this.Label_5.SizePolicy().HasHeightForWidth()) // 114
@@ -149,7 +149,7 @@ func (this *Ui_MessageItemView) SetupUi(MessageItemView *qtwidgets.QWidget) {
 	this.ToolButton_3.SetObjectName("ToolButton_3")                    // 112
 	this.ToolButton_3.SetFocusPolicy(qtcore.Qt__NoFocus)               // 114
 	this.ToolButton_3.SetIcon(this.Icon)                               // 114
-	this.ToolButton_3.SetIconSize(qtcore.NewQSize_1(28, 28))           // 113
+	this.ToolButton_3.SetIconSize(qtcore.NewQSize1(28, 28))            // 113
 	this.ToolButton_3.SetAutoRaise(true)                               // 114
 
 	this.VerticalLayout_2.Layout().AddWidget(this.ToolButton_3) // 115

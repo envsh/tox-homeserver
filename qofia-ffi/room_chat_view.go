@@ -83,7 +83,7 @@ func (this *MainWindow) initRoomChatEvents() {
 		accepted := false
 		if mmdt.HasFormat("text/uri-list") {
 			for idx, urlo := range urlsx.ConvertToSlice() {
-				log.Println(idx, urlo.IsLocalFile(), urlo.Scheme(), urlo.Port__(), urlo.ToLocalFile())
+				log.Println(idx, urlo.IsLocalFile(), urlo.Scheme(), urlo.Portp(), urlo.ToLocalFile())
 				if urlo.IsLocalFile() {
 					this.sendFileName(urlo.ToLocalFile(), nil)
 					accepted = true
@@ -120,16 +120,16 @@ func (this *MainWindow) updateInviteFriendPage() {
 	for fn, fo := range appctx.GetLigTox().Binfo.GetFriends() {
 		log.Println(fn, fo.Name)
 		this.TableWidget.InsertRow(0)
-		cell := qtwidgets.NewQTableWidgetItem_1(fo.Name, 0)
+		cell := qtwidgets.NewQTableWidgetItem1(fo.Name, 0)
 		log.Println(cell)
 		this.TableWidget.SetItem(0, 0, cell)
 		this.tblItems = append(this.tblItems, cell)
 
-		cell = qtwidgets.NewQTableWidgetItem__()
+		cell = qtwidgets.NewQTableWidgetItemp()
 		cell.SetCheckState(qtcore.Qt__Unchecked)
 		this.TableWidget.SetItem(0, 1, cell)
 
-		cell = qtwidgets.NewQTableWidgetItem_1(fo.GetPubkey(), 0)
+		cell = qtwidgets.NewQTableWidgetItem1(fo.GetPubkey(), 0)
 		this.TableWidget.SetItem(0, 2, cell)
 		this.tblItems = append(this.tblItems, cell)
 	}
@@ -230,7 +230,7 @@ func (this *MainWindow) addFriendByToxId(toxid, addmsg string, phmsg string) (ui
 	if true {
 		t := appctx.GetLigTox()
 		if addmsg == phmsg {
-			addmsg = qtcore.NewQString_5(phmsg).Arg_11_(t.SelfGetName())
+			addmsg = qtcore.NewQString5(phmsg).Arg11p(t.SelfGetName())
 		}
 		frndno, err := t.FriendAdd(toxid, phmsg)
 		return frndno, err

@@ -60,26 +60,26 @@ func (this *Ui_EmojiPanel) SetupUi(EmojiPanel *qtwidgets.QWidget) {
 		EmojiPanel.SetObjectName("EmojiPanel")
 	}
 	EmojiPanel.Resize(371, 355)
-	this.VerticalLayout = qtwidgets.NewQVBoxLayout_1(this.EmojiPanel)                 // 111
-	this.VerticalLayout.SetSpacing(0)                                                 // 114
-	this.VerticalLayout.SetObjectName("VerticalLayout")                               // 112
-	this.VerticalLayout.SetContentsMargins(0, 0, 0, 0)                                // 114
-	this.MainWidget = qtwidgets.NewQWidget(this.EmojiPanel, 0)                        // 111
-	this.MainWidget.SetObjectName("MainWidget")                                       // 112
-	this.VerticalLayout_2 = qtwidgets.NewQVBoxLayout_1(this.MainWidget)               // 111
-	this.VerticalLayout_2.SetSpacing(3)                                               // 114
-	this.VerticalLayout_2.SetObjectName("VerticalLayout_2")                           // 112
-	this.VerticalLayout_2.SetContentsMargins(0, 3, 0, 3)                              // 114
-	this.ScrollArea = qtwidgets.NewQScrollArea(this.MainWidget)                       // 111
-	this.ScrollArea.SetObjectName("ScrollArea")                                       // 112
-	this.ScrollArea.SetHorizontalScrollBarPolicy(qtcore.Qt__ScrollBarAlwaysOff)       // 114
-	this.ScrollArea.SetWidgetResizable(true)                                          // 114
-	this.ScrollAreaWidgetContents = qtwidgets.NewQWidget(nil, 0)                      // 111
-	this.ScrollAreaWidgetContents.SetObjectName("ScrollAreaWidgetContents")           // 112
-	this.ScrollAreaWidgetContents.SetGeometry(0, 0, 369, 315)                         // 114
-	this.VerticalLayout_3 = qtwidgets.NewQVBoxLayout_1(this.ScrollAreaWidgetContents) // 111
-	this.VerticalLayout_3.SetObjectName("VerticalLayout_3")                           // 112
-	this.ScrollArea.SetWidget(this.ScrollAreaWidgetContents)                          // 114
+	this.VerticalLayout = qtwidgets.NewQVBoxLayout1(this.EmojiPanel)                 // 111
+	this.VerticalLayout.SetSpacing(0)                                                // 114
+	this.VerticalLayout.SetObjectName("VerticalLayout")                              // 112
+	this.VerticalLayout.SetContentsMargins(0, 0, 0, 0)                               // 114
+	this.MainWidget = qtwidgets.NewQWidget(this.EmojiPanel, 0)                       // 111
+	this.MainWidget.SetObjectName("MainWidget")                                      // 112
+	this.VerticalLayout_2 = qtwidgets.NewQVBoxLayout1(this.MainWidget)               // 111
+	this.VerticalLayout_2.SetSpacing(3)                                              // 114
+	this.VerticalLayout_2.SetObjectName("VerticalLayout_2")                          // 112
+	this.VerticalLayout_2.SetContentsMargins(0, 3, 0, 3)                             // 114
+	this.ScrollArea = qtwidgets.NewQScrollArea(this.MainWidget)                      // 111
+	this.ScrollArea.SetObjectName("ScrollArea")                                      // 112
+	this.ScrollArea.SetHorizontalScrollBarPolicy(qtcore.Qt__ScrollBarAlwaysOff)      // 114
+	this.ScrollArea.SetWidgetResizable(true)                                         // 114
+	this.ScrollAreaWidgetContents = qtwidgets.NewQWidget(nil, 0)                     // 111
+	this.ScrollAreaWidgetContents.SetObjectName("ScrollAreaWidgetContents")          // 112
+	this.ScrollAreaWidgetContents.SetGeometry(0, 0, 369, 315)                        // 114
+	this.VerticalLayout_3 = qtwidgets.NewQVBoxLayout1(this.ScrollAreaWidgetContents) // 111
+	this.VerticalLayout_3.SetObjectName("VerticalLayout_3")                          // 112
+	this.ScrollArea.SetWidget(this.ScrollAreaWidgetContents)                         // 114
 
 	this.VerticalLayout_2.Layout().AddWidget(this.ScrollArea) // 115
 
@@ -90,40 +90,40 @@ func (this *Ui_EmojiPanel) SetupUi(EmojiPanel *qtwidgets.QWidget) {
 	this.Icon = qtgui.NewQIcon()
 	this.Icon.AddFile(":/icons/emoji-categories/people.png", qtcore.NewQSize(), qtgui.QIcon__Normal, qtgui.QIcon__Off) // 115
 	this.ToolButton_33.SetIcon(this.Icon)                                                                              // 114
-	this.ToolButton_33.SetIconSize(qtcore.NewQSize_1(20, 20))                                                          // 113
+	this.ToolButton_33.SetIconSize(qtcore.NewQSize1(20, 20))                                                           // 113
 	this.ToolButton_33.SetAutoRaise(true)                                                                              // 114
 
-	this.GridLayout.AddWidget_2(this.ToolButton_33, 0, 0, 1, 1, 0) // 115
+	this.GridLayout.AddWidget2(this.ToolButton_33, 0, 0, 1, 1, 0) // 115
 
 	this.ToolButton_34 = qtwidgets.NewQToolButton(this.MainWidget) // 111
 	this.ToolButton_34.SetObjectName("ToolButton_34")              // 112
 	this.Icon1 = qtgui.NewQIcon()
 	this.Icon1.AddFile(":/icons/emoji-categories/nature.png", qtcore.NewQSize(), qtgui.QIcon__Normal, qtgui.QIcon__Off) // 115
 	this.ToolButton_34.SetIcon(this.Icon1)                                                                              // 114
-	this.ToolButton_34.SetIconSize(qtcore.NewQSize_1(20, 20))                                                           // 113
+	this.ToolButton_34.SetIconSize(qtcore.NewQSize1(20, 20))                                                            // 113
 	this.ToolButton_34.SetAutoRaise(true)                                                                               // 114
 
-	this.GridLayout.AddWidget_2(this.ToolButton_34, 0, 1, 1, 1, 0) // 115
+	this.GridLayout.AddWidget2(this.ToolButton_34, 0, 1, 1, 1, 0) // 115
 
 	this.ToolButton_35 = qtwidgets.NewQToolButton(this.MainWidget) // 111
 	this.ToolButton_35.SetObjectName("ToolButton_35")              // 112
 	this.Icon2 = qtgui.NewQIcon()
 	this.Icon2.AddFile(":/icons/emoji-categories/foods.png", qtcore.NewQSize(), qtgui.QIcon__Normal, qtgui.QIcon__Off) // 115
 	this.ToolButton_35.SetIcon(this.Icon2)                                                                             // 114
-	this.ToolButton_35.SetIconSize(qtcore.NewQSize_1(20, 20))                                                          // 113
+	this.ToolButton_35.SetIconSize(qtcore.NewQSize1(20, 20))                                                           // 113
 	this.ToolButton_35.SetAutoRaise(true)                                                                              // 114
 
-	this.GridLayout.AddWidget_2(this.ToolButton_35, 0, 2, 1, 1, 0) // 115
+	this.GridLayout.AddWidget2(this.ToolButton_35, 0, 2, 1, 1, 0) // 115
 
 	this.ToolButton_36 = qtwidgets.NewQToolButton(this.MainWidget) // 111
 	this.ToolButton_36.SetObjectName("ToolButton_36")              // 112
 	this.Icon3 = qtgui.NewQIcon()
 	this.Icon3.AddFile(":/icons/emoji-categories/activity.png", qtcore.NewQSize(), qtgui.QIcon__Normal, qtgui.QIcon__Off) // 115
 	this.ToolButton_36.SetIcon(this.Icon3)                                                                                // 114
-	this.ToolButton_36.SetIconSize(qtcore.NewQSize_1(20, 20))                                                             // 113
+	this.ToolButton_36.SetIconSize(qtcore.NewQSize1(20, 20))                                                              // 113
 	this.ToolButton_36.SetAutoRaise(true)                                                                                 // 114
 
-	this.GridLayout.AddWidget_2(this.ToolButton_36, 0, 3, 1, 1, 0) // 115
+	this.GridLayout.AddWidget2(this.ToolButton_36, 0, 3, 1, 1, 0) // 115
 
 	this.ToolButton_37 = qtwidgets.NewQToolButton(this.MainWidget) // 111
 	this.ToolButton_37.SetObjectName("ToolButton_37")              // 112
@@ -132,7 +132,7 @@ func (this *Ui_EmojiPanel) SetupUi(EmojiPanel *qtwidgets.QWidget) {
 	this.ToolButton_37.SetIcon(this.Icon4)                                                                              // 114
 	this.ToolButton_37.SetAutoRaise(true)                                                                               // 114
 
-	this.GridLayout.AddWidget_2(this.ToolButton_37, 0, 4, 1, 1, 0) // 115
+	this.GridLayout.AddWidget2(this.ToolButton_37, 0, 4, 1, 1, 0) // 115
 
 	this.ToolButton_38 = qtwidgets.NewQToolButton(this.MainWidget) // 111
 	this.ToolButton_38.SetObjectName("ToolButton_38")              // 112
@@ -141,7 +141,7 @@ func (this *Ui_EmojiPanel) SetupUi(EmojiPanel *qtwidgets.QWidget) {
 	this.ToolButton_38.SetIcon(this.Icon5)                                                                               // 114
 	this.ToolButton_38.SetAutoRaise(true)                                                                                // 114
 
-	this.GridLayout.AddWidget_2(this.ToolButton_38, 0, 5, 1, 1, 0) // 115
+	this.GridLayout.AddWidget2(this.ToolButton_38, 0, 5, 1, 1, 0) // 115
 
 	this.ToolButton_39 = qtwidgets.NewQToolButton(this.MainWidget) // 111
 	this.ToolButton_39.SetObjectName("ToolButton_39")              // 112
@@ -150,7 +150,7 @@ func (this *Ui_EmojiPanel) SetupUi(EmojiPanel *qtwidgets.QWidget) {
 	this.ToolButton_39.SetIcon(this.Icon6)                                                                               // 114
 	this.ToolButton_39.SetAutoRaise(true)                                                                                // 114
 
-	this.GridLayout.AddWidget_2(this.ToolButton_39, 0, 6, 1, 1, 0) // 115
+	this.GridLayout.AddWidget2(this.ToolButton_39, 0, 6, 1, 1, 0) // 115
 
 	this.ToolButton_40 = qtwidgets.NewQToolButton(this.MainWidget) // 111
 	this.ToolButton_40.SetObjectName("ToolButton_40")              // 112
@@ -159,7 +159,7 @@ func (this *Ui_EmojiPanel) SetupUi(EmojiPanel *qtwidgets.QWidget) {
 	this.ToolButton_40.SetIcon(this.Icon7)                                                                             // 114
 	this.ToolButton_40.SetAutoRaise(true)                                                                              // 114
 
-	this.GridLayout.AddWidget_2(this.ToolButton_40, 0, 7, 1, 1, 0) // 115
+	this.GridLayout.AddWidget2(this.ToolButton_40, 0, 7, 1, 1, 0) // 115
 
 	this.VerticalLayout_2.AddLayout(this.GridLayout, 0) // 115
 

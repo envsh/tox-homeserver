@@ -43,7 +43,7 @@ func NewEmojiPanel() *EmojiPanel {
 				this.OnEmojiSelected(emoji, shtname)
 			}
 		}
-		this.VerticalLayout_3.AddWidget__(catwin.QWidget_PTR())
+		this.VerticalLayout_3.AddWidgetp(catwin.QWidget_PTR())
 	}
 
 	catbtnsz := 20
@@ -51,7 +51,7 @@ func NewEmojiPanel() *EmojiPanel {
 		this.ToolButton_33, this.ToolButton_34, this.ToolButton_35, this.ToolButton_36,
 		this.ToolButton_37, this.ToolButton_38, this.ToolButton_39, this.ToolButton_40}
 	for i, btn := range catbtns {
-		btn.SetIconSize(qtcore.NewQSize_1(catbtnsz, catbtnsz))
+		btn.SetIconSize(qtcore.NewQSize1(catbtnsz, catbtnsz))
 		btn.SetToolTip(shownames[i])
 		tmpi := i
 		qtrt.Connect(btn, "clicked(bool)", func(bool) {
@@ -78,5 +78,5 @@ func (this *EmojiPanel) clear() {
 }
 
 func (this *EmojiPanel) showCategory(category *EmojiCategory) {
-	this.ScrollArea.EnsureWidgetVisible__(category.Label)
+	this.ScrollArea.EnsureWidgetVisiblep(category.Label)
 }

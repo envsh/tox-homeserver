@@ -133,7 +133,7 @@ func (this *MainWindow) initFirstShow() {
 	cami := qtmultimedia.QCameraInfo_DefaultCamera()
 	log.Println(cami.DeviceName(), cami.IsNull())
 	camis := qtmultimedia.QCameraInfo_AvailableCameras(qtmultimedia.QCamera__BackFace)
-	log.Println(camis.Count_1())
+	log.Println(camis.Count1())
 }
 
 var tstvcap *avhlp.VideoRecorder2Auto
@@ -147,7 +147,7 @@ func setAppStyleSheet() {
 	}
 	gopp.ErrPrint(err)
 	if err != nil {
-		fp := qtcore.NewQFile_1(":/theme/apptst.css")
+		fp := qtcore.NewQFile1(":/theme/apptst.css")
 		fp.Open(qtcore.QIODevice__ReadOnly)
 		bcc = []byte(qtcore.NewQIODeviceFromPointer(fp.GetCthis()).ReadAll().Data())
 		qtcore.NewQIODeviceFromPointer(fp.GetCthis()).Close()
@@ -156,7 +156,7 @@ func setAppStyleSheet() {
 }
 
 func setAppStyleSheetTheme(index int) {
-	fp := qtcore.NewQFile_1(fmt.Sprintf(":/theme/%s.css", styleSheets[index]))
+	fp := qtcore.NewQFile1(fmt.Sprintf(":/theme/%s.css", styleSheets[index]))
 	fp.Open(qtcore.QIODevice__ReadOnly)
 	bcc := []byte(qtcore.NewQIODeviceFromPointer(fp.GetCthis()).ReadAll().Data())
 	qtcore.NewQIODeviceFromPointer(fp.GetCthis()).Close()
@@ -246,11 +246,11 @@ func (this *MainWindow) onRoomContextTriggered(item *RoomListItem, checked bool,
 
 func (this *MainWindow) setConnStatus(on bool) {
 	if on {
-		this.sticon = qtgui.NewQIcon_2(":/icons/online_30.png")
+		this.sticon = qtgui.NewQIcon2(":/icons/online_30.png")
 		this.ToolButton.SetIcon(this.sticon)
 		this.ToolButton.SetToolTip("online")
 	} else {
-		this.sticon = qtgui.NewQIcon_2(":/icons/offline_30.png")
+		this.sticon = qtgui.NewQIcon2(":/icons/offline_30.png")
 		this.ToolButton.SetIcon(this.sticon)
 		this.ToolButton.SetToolTip("offline")
 	}

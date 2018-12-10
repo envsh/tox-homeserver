@@ -7,7 +7,7 @@ env | grep CGO_
 set -x
 
 # test libav link
-export PKG_CONFIG_PATH=/androidsys/lib/pkgconfig  # this help some #cgo pkg-config link
+export PKG_CONFIG_PATH=/opt/androidsys/lib/pkgconfig  # this help some #cgo pkg-config link
 # test compile suvcap, must name as libxxx.so. or it will not appear in app/lib/arm/ dir.
 # $CC -xc -g -fPIE -pie suvcap/suvcap.c -o libs/libsuvcapd.so \
 #    $CGO_CFLAGS $CGO_LDFLAGS `pkg-config --libs libavformat libavdevice libavfilter`

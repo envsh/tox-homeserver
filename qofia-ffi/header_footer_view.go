@@ -32,7 +32,7 @@ func (this *MainWindow) initHeaderFooter() {
 
 func (this *MainWindow) initHeaderFooterState() {
 	hfs := _HeaderFooterState
-	hfs.ctrlMenu = qtwidgets.NewQMenu__()
+	hfs.ctrlMenu = qtwidgets.NewQMenup()
 
 	var act *qtwidgets.QAction
 	act = hfs.ctrlMenu.AddAction("Load css for test")
@@ -72,7 +72,7 @@ func (this *MainWindow) initHeaderFooterSignals() {
 		pos := this.ToolButton_19.Pos()
 		pos.SetY(pos.Y() + this.ToolButton_19.Height())
 		pos = this.MainWindow.MapToGlobal(pos)
-		_HeaderFooterState.ctrlMenu.Popup__(pos)
+		_HeaderFooterState.ctrlMenu.Popupp(pos)
 	})
 }
 

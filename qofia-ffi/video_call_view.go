@@ -49,7 +49,7 @@ func (this *MainWindow) initVideoCallEvents() {
 		for len(_vcs.imgch) > 0 {
 			imgd := <-_vcs.imgch
 			if imgd == nil {
-				p.FillRect_2(p.Viewport(), qtgui.NewQBrush_1(0))
+				p.FillRect2(p.Viewport(), qtgui.NewQBrush1(0))
 				break
 			}
 			idptr := unsafe.Pointer(&imgd.data[0])
@@ -58,8 +58,8 @@ func (this *MainWindow) initVideoCallEvents() {
 			// imgo := qtgui.NewQImage_3_(idptr, width, height, qtgui.QImage__Format_RGB32) // why ok?
 			// OK format: QImage__Format_RGB888
 			// strange format: QImage__Format_RGB666
-			imgo := qtgui.NewQImage_3_(idptr, width, height, qtgui.QImage__Format_RGB888) // why ok?
-			p.DrawImage_5(p.Viewport(), imgo)
+			imgo := qtgui.NewQImage3p(idptr, width, height, qtgui.QImage__Format_RGB888) // why ok?
+			p.DrawImage5(p.Viewport(), imgo)
 		}
 		qtgui.DeleteQPainter(p)
 	})

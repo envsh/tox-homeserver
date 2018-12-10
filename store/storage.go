@@ -36,11 +36,12 @@ func NewStorage() *Storage {
 		log.Println("PING DATABASE OK:", dsn)
 	}
 	this.dbh = dbh
-	this.SetWAL(true)
 
 	logger := xorm.NewSimpleLogger2(os.Stdout, thscom.LogPrefix, 0)
 	dbh.SetLogger(logger)
 	dbh.ShowSQL(false)
+	this.SetWAL(true)
+
 	this.initTables()
 	return this
 }
@@ -55,6 +56,10 @@ func (this *Storage) SetWAL(enable bool) {
 	_, err = this.dbh.Exec(fmt.Sprintf("PRAGMA auto_vacuum=FULL;"))
 	gopp.ErrPrint(err)
 	// others: wal_checkpoint, wal_autocheckpoint, synchronous, cache_size
+	_, err = this.dbh.Exec("PRAGMA synchronous=NORMAL;") // OFF/NORMAL/FULL
+	gopp.ErrPrint(err)
+	_, err = this.dbh.Exec("PRAGMA cache_size=5000;")
+	gopp.ErrPrint(err)
 	if true {
 		return
 	}

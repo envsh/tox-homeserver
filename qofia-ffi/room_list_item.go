@@ -282,7 +282,7 @@ func NewRoomListItem3(info *thspbs.GroupInfo) *RoomListItem {
 
 func (this *RoomListItem) initUis() {
 	if !gopp.IsAndroid() {
-		this.ToolButton.SetIconSize(qtcore.NewQSize_1(12, 12))
+		this.ToolButton.SetIconSize(qtcore.NewQSize1(12, 12))
 	}
 	this.floatUnreadCountLabel = this.floatTextOverWidget(this.ToolButton)
 	// this.Ui_ContactItemView.ContactItemView.SetMinimumHeight(20 * 2)
@@ -391,18 +391,18 @@ func (this *RoomListItem) SetContactInfo(info interface{}) {
 
 		avataricon := store.GetFSC().GetFilePath(ct.GetPubkey())
 		if gopp.FileExist(avataricon) {
-			this.cticon = qtgui.NewQIcon_2(avataricon)
+			this.cticon = qtgui.NewQIcon2(avataricon)
 			this.ToolButton_2.SetIcon(this.cticon)
 		} else {
 			this.cticon = GetIdentIcon(ct.Pubkey)
 			this.ToolButton_2.SetIcon(this.cticon)
 		}
 		if ct.GetConnStatus() == 0 {
-			this.sticon = qtgui.NewQIcon_2(":/icons/offline_30.png")
+			this.sticon = qtgui.NewQIcon2(":/icons/offline_30.png")
 			this.ToolButton.SetIcon(this.sticon)
 		}
 		if ct.Fnum == thscom.FileHelperFnum {
-			this.cticon = qtgui.NewQIcon_2(":/icons/filehelper.png")
+			this.cticon = qtgui.NewQIcon2(":/icons/filehelper.png")
 			this.ToolButton_2.SetIcon(this.cticon)
 		}
 	case *thspbs.GroupInfo:
@@ -417,7 +417,7 @@ func (this *RoomListItem) SetContactInfo(info interface{}) {
 		// this maybe call multiple times, so -20 -20 then, the item is 0 height.
 		// this.QWidget_PTR().SetFixedHeight(this.QWidget_PTR().Height() - 20)
 		if false {
-			this.cticon = qtgui.NewQIcon_2(":/icons/groupgray.png")
+			this.cticon = qtgui.NewQIcon2(":/icons/groupgray.png")
 		} else {
 			this.cticon = GetInitAvatar(gopp.IfElseStr(ct.Title == "", ct.GroupId, ct.Title))
 		}
@@ -481,7 +481,7 @@ func (this *RoomListItem) AddMessageImpl(msgo *Message, msgiw *MessageItem, prev
 	msgiw.LabelUserName4MessageItem.SetVisible(showName)
 	msgiw.ToolButton.SetVisible(false)
 	if msgo.Me && !msgo.Sent {
-		msgiw.LabelSendState.SetPixmap(qtgui.NewQPixmap_3_(":/icons/MessageListSending@2x.png"))
+		msgiw.LabelSendState.SetPixmap(qtgui.NewQPixmap3p(":/icons/MessageListSending@2x.png"))
 	}
 	if msgo.Me {
 		msgiw.LabelSendState.SetToolTip(gopp.ToStr(gopp.ToStrs(msgo.Sent, msgo.UserCode)))
@@ -492,7 +492,7 @@ func (this *RoomListItem) AddMessageImpl(msgo *Message, msgiw *MessageItem, prev
 	if uictx.msgwin.item == this {
 		vlo3 := uictx.uiw.VerticalLayout_3
 		if prev {
-			vlo3.InsertWidget__(0, msgiw.QWidget_PTR())
+			vlo3.InsertWidgetp(0, msgiw.QWidget_PTR())
 		} else {
 			vlo3.Layout().AddWidget(msgiw.QWidget_PTR())
 		}
@@ -591,7 +591,7 @@ func (this *RoomListItem) SetAvatar(idico *qtgui.QIcon) {
 
 func (this *RoomListItem) SetAvatarForId(frndpk string) {
 	locfname := store.GetFSC().GetFilePath(frndpk)
-	idico := qtgui.NewQIcon_2(locfname)
+	idico := qtgui.NewQIcon2(locfname)
 	this.SetAvatar(idico)
 }
 
@@ -606,7 +606,7 @@ func (this *RoomListItem) SetAvatarForMessage(msgo *Message, frndpk string) {
 	rmturl := thscli.HttpFsUrlFor(frndpk)
 
 	setFriendIcon := func(thefname string) {
-		icon := qtgui.NewQIcon_2(thefname)
+		icon := qtgui.NewQIcon2(thefname)
 		if icon != nil && !icon.IsNull() {
 			this.SetAvatar(icon)
 		} else {
@@ -798,7 +798,7 @@ func (this *RoomListItem) SetBgColor(p string) {
 		log.Println("wtf", p)
 	}
 	// log.Println("set color:", p, css)
-	po := qtcore.NewQVariant_15(p)
+	po := qtcore.NewQVariant15(p)
 	this.ContactItemView.SetProperty("istate", po)
 	syl := this.ContactItemView.Style()
 	syl.Unpolish(this.ContactItemView)
@@ -829,40 +829,40 @@ func (this *RoomListItem) setConnStatus(st int32) {
 	if this.isgroup {
 		if false {
 			// android not run svg well now???
-			pxm := qtgui.NewQPixmap_3_(iconNames["group"][0]).Scaled__(9, 9)
-			this.sticon = qtgui.NewQIcon_1(pxm)
+			pxm := qtgui.NewQPixmap3p(iconNames["group"][0]).Scaledp(9, 9)
+			this.sticon = qtgui.NewQIcon1(pxm)
 		} else { // backup method
-			this.sticon = qtgui.NewQIcon_2(iconNames["group"][0])
+			this.sticon = qtgui.NewQIcon2(iconNames["group"][0])
 		}
 	} else {
-		this.sticon = qtgui.NewQIcon_2(iconNames["friend"][int(st)])
+		this.sticon = qtgui.NewQIcon2(iconNames["friend"][int(st)])
 	}
 	this.ToolButton.SetIcon(this.sticon)
 }
 
 func (this *RoomListItem) setUserStatus(st int) {
-	clricon := qtgui.NewQIcon_2(":/icons/offline_30.png")
+	clricon := qtgui.NewQIcon2(":/icons/offline_30.png")
 	switch st {
 	case thscli.USER_STATUS_NONE:
 		if !this.isgroup {
 			this.setConnStatus(this.frndInfo.ConnStatus)
 		}
 	case thscli.USER_STATUS_AWAY:
-		this.sticon = qtgui.NewQIcon_2(":/icons/dot_away.png")
+		this.sticon = qtgui.NewQIcon2(":/icons/dot_away.png")
 		this.ToolButton.SetIcon(clricon)
 		this.ToolButton.SetIcon(this.sticon)
 	case thscli.USER_STATUS_BUSY:
-		this.sticon = qtgui.NewQIcon_2(":/icons/dot_busy.png")
+		this.sticon = qtgui.NewQIcon2(":/icons/dot_busy.png")
 		this.ToolButton.SetIcon(clricon)
 		this.ToolButton.SetIcon(this.sticon)
 	}
 }
 
 func (this *RoomListItem) floatTextOverWidget(w qtwidgets.QWidget_ITF) *qtwidgets.QLabel {
-	lo := qtwidgets.NewQVBoxLayout_1(w)
+	lo := qtwidgets.NewQVBoxLayout1(w)
 	lo.SetContentsMargins(0, 0, 0, 0)
-	lo.AddStretch__()
-	lab := qtwidgets.NewQLabel__()
+	lo.AddStretchp()
+	lab := qtwidgets.NewQLabelp()
 	lo.AddWidget(lab, 0, qtcore.Qt__AlignCenter)
 	return lab
 }
