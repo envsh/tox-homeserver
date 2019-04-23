@@ -2,8 +2,10 @@ package main
 
 import (
 	"fmt"
+	"gopp"
 	"log"
 	"sort"
+	"sync/atomic"
 	"tox-homeserver/thspbs"
 
 	nk "mkuse/nuklear"
@@ -22,14 +24,18 @@ func (this *MyinfoView) render() func(ctx *nk.Context) {
 	return func(ctx *nk.Context) {
 		err := ctx.Begin("我的信息", nk.NewRect(0, 0, 250, 120), nk.WINDOW_BORDER)
 		if err != nil {
-			ctx.LayoutRowStatic(30, 100, 2)
-			// ctx.Label("名字", 10)
-			ctx.Label(this.name, 10)
-			// ctx.Label("连接状态", 10)
+			ctx.LayoutRowBegin(nk.STATIC, 30, 2)
+			name := gopp.IfElseStr(len(this.name) == 0, " ", this.name)
+			sel0 := len(name)
+			ctx.LayoutRowPush(200)
+			ctx.SelectableLabel(name, 10, &sel0)
+			ctx.LayoutRowPush(20)
 			ctx.Label(this.sttxt, 10)
-			ctx.LayoutRowStatic(30, 100, 1)
-			// ctx.Label("状态文本", 10)
-			ctx.Label(this.stmsg, 10)
+			ctx.LayoutRowEnd()
+			ctx.LayoutRowDynamic(30, 1)
+			stmsg := gopp.IfElseStr(len(this.stmsg) == 0, " ", this.stmsg)
+			sel1 := len(stmsg)
+			ctx.SelectableLabel(stmsg, 10, &sel1)
 			ctx.LayoutRowStatic(30, 100, 2)
 			ctx.Label("搜索框", 10)
 			ctx.Label("排列过滤", 10)
@@ -104,20 +110,27 @@ func (this *FriendInfoView) render() func(*nk.Context) {
 		err := ctx.Begin("好友状态视图123", nk.NewRect(250, 0, 550, 90), nk.WINDOW_BORDER)
 		if err != nil {
 			this.mu.RLock()
-			ctx.LayoutRowBegin(nk.STATIC, 30, 3)
+			ctx.LayoutRowBegin(nk.STATIC, 30, 4)
 			ctx.LayoutRowPush(30)
-			ctx.Label("空格", 10)
+			ctx.ButtonLabel("空格")
 
-			ctx.LayoutRowPush(400)
-			ctx.Label(this.name, 10)
+			ctx.LayoutRowPush(360)
+			name := gopp.IfElseStr(len(this.name) == 0, " ", this.name)
+			sel0 := len(name)
+			ctx.SelectableLabel(name, 5, &sel0)
 
-			ctx.LayoutRowPush(60)
+			ctx.LayoutRowPush(80)
+			if ctx.ButtonLabel("成员列表") != nil {
+			}
+			ctx.LayoutRowPush(40)
 			if ctx.ButtonLabel("选项") != nil {
 			}
 			ctx.LayoutRowEnd()
 
 			ctx.LayoutRowDynamic(30, 1)
-			ctx.Label(this.stmsg, 10)
+			stmsg := gopp.IfElseStr(len(this.stmsg) == 0, " ", this.stmsg)
+			sel1 := len(stmsg)
+			ctx.SelectableLabel(stmsg, 10, &sel1)
 			this.mu.RUnlock()
 		}
 		ctx.End()
@@ -190,6 +203,7 @@ func (this *ContectView) render() func(ctx *nk.Context) {
 					log.Println("group clicked", v.GetGnum(), name)
 					uictx.fiview.setGroupInfo(v)
 					uictx.chatform.switchto(v.GetGroupId())
+					uictx.sendv.setcontact(CTTYPE_GROUP, v.GetGnum())
 				}
 				ctx.LayoutRowPush(30)
 				ctx.Label(statxt, 10)
@@ -205,6 +219,7 @@ func (this *ContectView) render() func(ctx *nk.Context) {
 					log.Println("friend clicked", v.GetFnum(), name)
 					uictx.fiview.setFriendInfo(v)
 					uictx.chatform.switchto(v.GetPubkey())
+					uictx.sendv.setcontact(CTTYPE_FRIEND, v.GetFnum())
 				}
 				ctx.LayoutRowPush(30)
 				ctx.Label(statxt, 10)
@@ -276,21 +291,34 @@ func (this *ChatForm) render() func(ctx *nk.Context) {
 
 			this.mu.RLock()
 			// draw newest n msgs
-			const maxlen = 10
+			const maxlen = 30
 			msgs := this.msgs[this.uniqid]
 			if len(msgs) > maxlen {
-				msgs = msgs[len(msgs)-10:]
+				msgs = msgs[len(msgs)-30:]
 			}
+
 			for idx, msg := range msgs {
 				tmsg := fmt.Sprintf("%d %s", idx, msg)
-				ctx.LayoutRowBegin(nk.STATIC, 39, 3)
-				ctx.LayoutRowPush(30)
-				ctx.ButtonLabel("|")
-				ctx.LayoutRowPush(430)
-				ctx.Label(tmsg, 10)
-				ctx.LayoutRowPush(30)
-				ctx.ButtonLabel("|")
-				ctx.LayoutRowEnd()
+				wraped := gopp.Splitrnui(tmsg, 60)
+				for idx, line := range wraped {
+					ctx.LayoutRowBegin(nk.STATIC, 39, 3)
+					ctx.LayoutRowPush(30)
+					if idx == 0 {
+						ctx.ButtonLabel("|")
+					} else {
+						ctx.Label(" ", 1)
+					}
+					ctx.LayoutRowPush(450)
+					seln := len(line)
+					ctx.SelectableLabel(line, gopp.IfElseInt(idx == 0, 1, 5), &seln)
+					ctx.LayoutRowPush(30)
+					if idx == 0 {
+						ctx.ButtonLabel("|")
+					} else {
+						ctx.Label(" ", 1)
+					}
+					ctx.LayoutRowEnd()
+				}
 			}
 			this.mu.RUnlock()
 
@@ -316,17 +344,34 @@ func (this *ChatForm) render() func(ctx *nk.Context) {
 	}
 }
 
+const CTTYPE_FRIEND = 1
+const CTTYPE_GROUP = 2
+
 type SendForm struct {
-	iptbuf  []byte
-	iptblen int
-	iptres  []byte
+	cttype   int // contact type, group or friend
+	ctnum    uint32
+	mu       deadlock.RWMutex
+	msgrspid int64 // 用于发送结果回执
+	iptbuf   []byte
+	iptblen  int
+	iptres   []byte
 }
 
 func NewSendForm() *SendForm {
 	this := &SendForm{}
-	this.iptbuf = make([]byte, 32)
+	this.iptbuf = make([]byte, 320)
+	this.msgrspid = 10000
 	return this
 }
+
+func (this *SendForm) setcontact(cttype int, ctnum uint32) {
+	this.mu.Lock()
+	defer this.mu.Unlock()
+	this.cttype = cttype
+	this.ctnum = ctnum
+}
+
+func (this *SendForm) nextrspid() int64 { return atomic.AddInt64(&this.msgrspid, 1) }
 
 func (this *SendForm) render() func(ctx *nk.Context) {
 	return func(ctx *nk.Context) {
@@ -344,14 +389,40 @@ func (this *SendForm) render() func(ctx *nk.Context) {
 
 			ctx.LayoutRowBegin(nk.STATIC, 30, 2)
 			ctx.LayoutRowPush(500 - 80)
+			cjkiptxt := uictx.app.PeekCJKInputString()
 			newlen := this.iptblen
-			ctx.EditString(nk.EDIT_FIELD, this.iptbuf, &newlen, len(this.iptbuf))
+			active := ctx.EditString(nk.EDIT_FIELD, this.iptbuf, &newlen, len(this.iptbuf))
+			// log.Println(active, len(cjkiptxt), cjkiptxt)
 			if this.iptblen != newlen {
 				this.iptblen = newlen
 				log.Println("text", string(this.iptbuf[:newlen]), newlen)
+			} else if active == 1 && len(cjkiptxt) > 0 {
+				// copy(this.iptbuf[this.iptblen:], []byte(cjkiptxt))
+				// this.iptblen += len(cjkiptxt)
 			}
 			ctx.LayoutRowPush(80)
 			if ctx.ButtonLabel("发送按钮") != nil {
+				if this.iptblen > 0 {
+					this.mu.RLock()
+					cttype := this.cttype
+					ctnum := this.ctnum
+					this.mu.RUnlock()
+					rspid := this.nextrspid()
+					msg := string(this.iptbuf[:this.iptblen])
+					var err error
+					switch cttype {
+					case CTTYPE_FRIEND:
+						_, err = vtcli.FriendSendMessage(ctnum, msg, rspid)
+					case CTTYPE_GROUP:
+						err = vtcli.ConferenceSendMessage(ctnum, 0, msg, rspid)
+					default:
+						err = fmt.Errorf("Unseted cttype %d %d", cttype, ctnum)
+					}
+					gopp.ErrPrint(err, cttype, ctnum)
+					if err == nil {
+						this.iptblen = 0
+					}
+				}
 			}
 			ctx.LayoutRowEnd()
 

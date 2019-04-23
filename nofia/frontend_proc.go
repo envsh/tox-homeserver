@@ -30,6 +30,7 @@ func dispatchEvent(evto *thspbs.Event) {
 		fname := evto.Margs[0]
 		pubkey := evto.Margs[1]
 		_, _, _ = msg, fname, pubkey
+		uictx.chatform.newmsg(pubkey, msg)
 
 		/*
 			itext := fmt.Sprintf("%s: %s", fname, msg)
