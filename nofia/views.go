@@ -389,16 +389,12 @@ func (this *SendForm) render() func(ctx *nk.Context) {
 
 			ctx.LayoutRowBegin(nk.STATIC, 30, 2)
 			ctx.LayoutRowPush(500 - 80)
-			cjkiptxt := uictx.app.PeekCJKInputString()
 			newlen := this.iptblen
 			active := ctx.EditString(nk.EDIT_FIELD, this.iptbuf, &newlen, len(this.iptbuf))
-			// log.Println(active, len(cjkiptxt), cjkiptxt)
 			if this.iptblen != newlen {
 				this.iptblen = newlen
 				log.Println("text", string(this.iptbuf[:newlen]), newlen)
-			} else if active == 1 && len(cjkiptxt) > 0 {
-				// copy(this.iptbuf[this.iptblen:], []byte(cjkiptxt))
-				// this.iptblen += len(cjkiptxt)
+			} else if active == 1 {
 			}
 			ctx.LayoutRowPush(80)
 			if ctx.ButtonLabel("发送按钮") != nil {
