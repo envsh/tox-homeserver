@@ -3,20 +3,47 @@ package main
 import (
 	"fmt"
 	"gopp"
+	"io/ioutil"
 	"log"
+	"sync"
+	"time"
+	"unsafe"
 
 	nk "mkuse/nuklear"
 
 	thscli "tox-homeserver/client"
 )
 
+type IconPool struct {
+	tstico       *nk.Image
+	loadiconOnce sync.Once
+}
+
+func (this *IconPool) render() func(ctx *nk.Context) {
+	return func(ctx *nk.Context) {
+		this.loadiconOnce.Do(func() {
+			if true {
+				img := nk.XsurfLoadImageFromFile("/home/me/Pictures/2019-04-18_20-31.png")
+				this.tstico = img
+			} else { // 不行的方式
+				bcc, err := ioutil.ReadFile("/home/me/Pictures/2019-04-18_20-31.png")
+				gopp.ErrPrint(err)
+				this.tstico = nk.NewImage(unsafe.Pointer(&bcc[0]))
+			}
+		})
+	}
+}
+
 type MyinfoView struct {
 	w *nk.Window2
 }
 
+func (this *MyinfoView) loadicons() {
+}
+
 func (this *MyinfoView) render() func(ctx *nk.Context) {
 	w := &nk.Window2{}
-	w.Name = "我的信息"
+	w.Name = "我的信息窗口"
 	w.Rect = nk.NewRect(0, 0, 250, 120)
 	w.Flags = nk.WINDOW_BORDER
 	this.w = w
@@ -28,8 +55,12 @@ func (this *MyinfoView) render() func(ctx *nk.Context) {
 			name = gopp.IfElseStr(len(name) == 0, " ", name)
 			sel0 := len(name)
 			sttxt := uictx.mdl.Mysttxt
-			ctx.LayoutRowBegin(nk.STATIC, 30, 2)
-			ctx.LayoutRowPush(200)
+			ctx.LayoutRowBegin(nk.STATIC, 30, 3)
+			ctx.LayoutRowPush(30)
+			// ctx.ButtonLabel("我")
+			// ctx.ButtonImage(img)
+			ctx.ButtonImage(uictx.icop.tstico)
+			ctx.LayoutRowPush(160)
 			ctx.SelectableLabel(name, 10, &sel0)
 			ctx.LayoutRowPush(20)
 			ctx.Label(sttxt, 10)
@@ -42,8 +73,8 @@ func (this *MyinfoView) render() func(ctx *nk.Context) {
 			ctx.LayoutRowDynamic(30, 1)
 			ctx.SelectableLabel(stmsg, 10, &sel1)
 			ctx.LayoutRowStatic(30, 100, 2)
-			ctx.Label("搜索框", 10)
-			ctx.Label("排列过滤", 10)
+			ctx.Label("搜索框👉", 10)
+			ctx.Label("排列过滤 ", 10)
 
 		}
 		ctx.End()
@@ -70,16 +101,17 @@ func (this *MyactionView) render() func(ctx *nk.Context) {
 
 			ctx.LayoutRowBegin(nk.STATIC, 30, 4)
 			ctx.LayoutRowPush(50)
-			if ctx.ButtonLabel("操作1") != nil {
+			if ctx.ButtonLabel("加好友") != nil {
 			}
 			ctx.LayoutRowPush(50)
-			if ctx.ButtonLabel("操作2") != nil {
+			if ctx.ButtonLabel("加群组") != nil {
 			}
 			ctx.LayoutRowPush(50)
-			if ctx.ButtonLabel("操作3") != nil {
+			if ctx.ButtonLabel("文件") != nil {
 			}
 			ctx.LayoutRowPush(50)
-			if ctx.ButtonLabel("操作4") != nil {
+			if ctx.ButtonLabel("设置") != nil {
+				uictx.setfmv.show = true
 			}
 			ctx.LayoutRowEnd()
 		}
@@ -96,7 +128,7 @@ type FriendInfoView struct {
 
 func (this *FriendInfoView) render() func(*nk.Context) {
 	w := &nk.Window2{}
-	w.Name = "好友状态视图123"
+	w.Name = "当前群/友状态视图"
 	w.Rect = nk.NewRect(250, 0, 550, 85)
 	w.Flags = nk.WINDOW_NO_SCROLLBR
 	this.w = w
@@ -106,19 +138,35 @@ func (this *FriendInfoView) render() func(*nk.Context) {
 		if err != nil {
 			ctx.LayoutRowBegin(nk.STATIC, 30, 4)
 			ctx.LayoutRowPush(40)
-			ctx.ButtonLabel("空格")
+			ctx.ButtonLabel(gopp.IfElseStr(uictx.mdl.Cttype == thscli.CTTYPE_FRIEND, "好友", "群组"))
 
 			name := uictx.mdl.Ctname
 			name = gopp.IfElseStr(len(name) == 0, " ", name)
 			sel0 := len(name)
-			ctx.LayoutRowPush(360)
+			ctx.LayoutRowPush(320)
 			ctx.SelectableLabel(name, 5, &sel0)
 
 			ctx.LayoutRowPush(80)
 			if ctx.ButtonLabel("成员列表") != nil {
+				uictx.mblstv.show = true
 			}
-			ctx.LayoutRowPush(40)
-			if ctx.ButtonLabel("选项") != nil {
+			ctx.LayoutRowPush(80)
+			totheight := float32(3 * 40)
+			if ctx.MenuBeginLabel("  选项  ", nk.TEXT_LEFT, nk.NewVec2(120, totheight)) != nil {
+				ctx.LayoutRowDynamic(30, 1)
+				if ctx.MenuItemLabel("hehe1", nk.TEXT_LEFT) != nil {
+					log.Println("action1")
+				}
+				ctx.LayoutRowDynamic(30, 1)
+				if ctx.MenuItemLabel("hehe2", nk.TEXT_LEFT) != nil {
+					log.Println("action2")
+				}
+				ctx.LayoutRowDynamic(30, 1)
+				if ctx.MenuItemLabel("hehe3", nk.TEXT_LEFT) != nil {
+					log.Println("action3")
+				}
+
+				ctx.MenuEnd()
 			}
 			ctx.LayoutRowEnd()
 
@@ -155,7 +203,7 @@ func NewcontactView() *ContectView {
 
 func (this *ContectView) render() func(ctx *nk.Context) {
 	w := &nk.Window2{}
-	w.Name = "Hel呵呵lo"
+	w.Name = "联系人列表"
 	w.Rect = nk.NewRect(0, 120, 250, 600-160)
 	w.Flags = nk.WINDOW_BORDER | nk.WINDOW_SCROLL_AUTO_HIDE
 	this.w = w
@@ -164,13 +212,13 @@ func (this *ContectView) render() func(ctx *nk.Context) {
 		err := ctx.Begin(w.Name, w.Rect, w.Flags)
 		if err != nil {
 			for _, v := range uictx.mdl.GroupList() {
-				name := fmt.Sprintf("群 %s", v.GetTitle())
+				name := fmt.Sprintf("%s・%d", v.GetTitle(), len(v.GetMembers()))
 				statxt := fmt.Sprintf("%d", uictx.mdl.NewMsgcount(v.GetGroupId()))
 				tiptxt := fmt.Sprintf("未读=%d, 所有=%d",
 					uictx.mdl.NewMsgcount(v.GetGroupId()), uictx.mdl.Msgcount(v.GetGroupId()))
 				ctx.LayoutRowBegin(nk.STATIC, 30, 3)
 				ctx.LayoutRowPush(30)
-				ctx.ButtonLabel("III")
+				ctx.ButtonLabel("群")
 				ctx.LayoutRowPush(150)
 				if ctx.ButtonLabel(name) != nil {
 					log.Println("group clicked", v.GetGnum(), name)
@@ -182,7 +230,7 @@ func (this *ContectView) render() func(ctx *nk.Context) {
 				ctx.LayoutRowEnd()
 			}
 			for _, v := range uictx.mdl.FriendList() {
-				name := fmt.Sprintf("友 %s", v.GetName())
+				name := fmt.Sprintf("%s", v.GetName())
 				statxt := fmt.Sprintf("%s %d",
 					thscli.Conno2str1(int(v.Status)), uictx.mdl.NewMsgcount(v.GetPubkey()))
 				tiptxt := fmt.Sprintf("%s %s, 未读=%d, 所有=%d",
@@ -190,7 +238,7 @@ func (this *ContectView) render() func(ctx *nk.Context) {
 					uictx.mdl.NewMsgcount(v.GetPubkey()), uictx.mdl.Msgcount(v.GetPubkey()))
 				ctx.LayoutRowBegin(nk.STATIC, 30, 3)
 				ctx.LayoutRowPush(30)
-				ctx.ButtonLabel("III")
+				ctx.ButtonLabel("友")
 				ctx.LayoutRowPush(150)
 				if ctx.ButtonLabel(name) != nil {
 					log.Println("friend clicked", v.GetFnum(), name)
@@ -233,7 +281,7 @@ func NewChatForm() *ChatForm {
 
 func (this *ChatForm) render() func(ctx *nk.Context) {
 	w := &nk.Window2{}
-	w.Name = "Hel呵呵lo2"
+	w.Name = "聊天消息列表窗口"
 	w.Rect = nk.NewRect(250, 80, 550, 600-160)
 	w.Flags = nk.WINDOW_BORDER | nk.WINDOW_MOVABLE
 	this.w = w
@@ -360,14 +408,17 @@ func (this *SendForm) render() func(ctx *nk.Context) {
 				if this.iptblen > 0 {
 					cttype := uictx.mdl.Cttype
 					ctnum := uictx.mdl.Ctnum
+					uniqid := uictx.mdl.Ctuniqid
 					rptid := uictx.mdl.Nxtreceiptid()
 					msg := string(this.iptbuf[:this.iptblen])
 					var err error
 					switch cttype {
 					case thscli.CTTYPE_FRIEND:
 						_, err = vtcli.FriendSendMessage(ctnum, msg, rptid)
+						uictx.mdl.Newmsg(uniqid, msg)
 					case thscli.CTTYPE_GROUP:
 						err = vtcli.ConferenceSendMessage(ctnum, 0, msg, rptid)
+						uictx.mdl.Newmsg(uniqid, msg)
 					default:
 						err = fmt.Errorf("Unseted cttype %d %d", cttype, ctnum)
 					}
@@ -384,5 +435,233 @@ func (this *SendForm) render() func(ctx *nk.Context) {
 		if ctx.WindowIsHidden("Hello") {
 			return
 		}
+	}
+}
+
+type MemberListForm struct {
+	w *nk.Window2
+
+	show bool
+}
+
+func NewMemberListForm() *MemberListForm {
+	this := &MemberListForm{}
+	return this
+}
+
+func (this *MemberListForm) render() func(ctx *nk.Context) {
+	w := &nk.Window2{}
+	w.Name = "群成员列表窗口"
+	w.Rect = nk.NewRect(260, 60, 500, 600-100)
+	w.Flags = nk.WINDOW_BORDER | nk.WINDOW_CLOSABLE | nk.WINDOW_MOVABLE | nk.WINDOW_TITLE
+	this.w = w
+
+	return func(ctx *nk.Context) {
+		if !this.show {
+			return
+		}
+
+		err := ctx.Begin(w.Name, w.Rect, w.Flags)
+		if err != nil {
+			/*
+				err := ctx.PopupBegin(nk.POPUP_STATIC, w.Name, w.Flags, w.Rect)
+				if err != nil {
+					ctx.PopupEnd()
+				}
+			*/
+
+			mbs := uictx.mdl.CurMembers()
+			ctx.LayoutRowDynamic(30, 2)
+			ctx.ButtonLabel(uictx.mdl.Ctname)
+			ctx.ButtonLabel(fmt.Sprintf("%d 个成员", len(mbs)))
+
+			for _, v := range mbs {
+				ctx.LayoutRowBegin(nk.STATIC, 30, 3)
+				ctx.LayoutRowPush(160)
+				ctx.Label(v.GetName(), 3)
+				ctx.LayoutRowPush(160)
+				ctx.Label(v.GetPubkey(), 3)
+				ctx.LayoutRowPush(130)
+				ctx.Label(gopp.TimeToFmt1(time.Unix(v.GetJoints(), 0)), 3)
+				ctx.LayoutRowEnd()
+			}
+		}
+		ctx.End()
+		this.show = !ctx.WindowIsClosed(w.Name) && !ctx.WindowIsHidden(w.Name)
+	}
+}
+
+type SettingForm struct {
+	w *nk.Window2
+
+	show bool
+}
+
+func NewSettingForm() *SettingForm {
+	this := &SettingForm{}
+	return this
+}
+
+func (this *SettingForm) render() func(ctx *nk.Context) {
+	w := &nk.Window2{}
+	w.Name = "设置窗口"
+	w.Rect = nk.NewRect(220, 60, 500, 600-100)
+	w.Flags = nk.WINDOW_BORDER | nk.WINDOW_CLOSABLE | nk.WINDOW_MOVABLE | nk.WINDOW_TITLE
+	this.w = w
+
+	setidx := 0
+	return func(ctx *nk.Context) {
+		if !this.show {
+			return
+		}
+
+		err := ctx.Begin(w.Name, w.Rect, w.Flags)
+		if err != nil {
+			/*
+				err := ctx.PopupBegin(nk.POPUP_STATIC, w.Name, w.Flags, w.Rect)
+				if err != nil {
+					ctx.PopupEnd()
+				}
+			*/
+
+			ctx.LayoutRowDynamic(30, 5)
+			if ctx.ButtonLabel("基本设置") != nil {
+				setidx = 0
+			}
+			if ctx.ButtonLabel("设置2") != nil {
+				setidx = 1
+			}
+			if ctx.ButtonLabel("高级") != nil {
+				setidx = 2
+			}
+			if ctx.ButtonLabel("关于") != nil {
+				setidx = 3
+			}
+			if ctx.ButtonLabel("开发") != nil {
+				setidx = 4
+			}
+
+			if setidx < 0 || setidx > 4 {
+			} else if setidx == 0 {
+				ctx.LayoutRowBegin(nk.STATIC, 30, 2)
+				ctx.LayoutRowPush(100)
+				ctx.Label("界面风格", nk.TEXT_LEFT)
+				ctx.LayoutRowPush(200)
+				sel0 := "hehehehe"
+				if ctx.ComboBeginLabel(sel0, nk.NewVec2(150, 150)) != nil {
+					ctx.LayoutRowDynamic(30, 1)
+					ctx.Label("默认", nk.TEXT_LEFT)
+					ctx.Label("黑色", nk.TEXT_LEFT)
+					ctx.Label("白色", nk.TEXT_LEFT)
+					ctx.Label("蓝色", nk.TEXT_LEFT)
+					ctx.Label("红色", nk.TEXT_LEFT)
+					ctx.ComboEnd()
+				}
+				ctx.LayoutRowEnd()
+
+				ctx.LayoutRowBegin(nk.STATIC, 30, 2)
+				ctx.LayoutRowPush(100)
+				ctx.Label("Use HS", nk.TEXT_LEFT)
+				ctx.LayoutRowPush(200)
+				actived1 := 0
+				ctx.CheckboxLabel("cb1", &actived1)
+				ctx.LayoutRowEnd()
+
+				ctx.LayoutRowBegin(nk.STATIC, 30, 2)
+				ctx.LayoutRowPush(100)
+				ctx.Label("开启皮肤", nk.TEXT_LEFT)
+				ctx.LayoutRowPush(200)
+				actived2 := 0
+				ctx.CheckboxLabel("cb2", &actived2)
+				ctx.LayoutRowEnd()
+
+				ctx.LayoutRowBegin(nk.STATIC, 30, 2)
+				ctx.LayoutRowPush(100)
+				ctx.Label("ToxHS地址", nk.TEXT_LEFT)
+				ctx.LayoutRowPush(200)
+				sel1 := "hehehehe"
+				if ctx.ComboBeginLabel(sel1, nk.NewVec2(150, 150)) != nil {
+					ctx.LayoutRowDynamic(30, 1)
+					ctx.Label("txhs.duckdns.org", nk.TEXT_LEFT)
+					ctx.Label("10.0.0.31", nk.TEXT_LEFT)
+					ctx.Label("127.0.0.1", nk.TEXT_LEFT)
+					ctx.ComboEnd()
+				}
+				ctx.LayoutRowEnd()
+
+				ctx.LayoutRowBegin(nk.STATIC, 30, 2)
+				ctx.LayoutRowPush(100)
+				ctx.Label("字体名称", nk.TEXT_LEFT)
+				ctx.LayoutRowPush(200)
+				sel2 := "hehehehe"
+				if ctx.ComboBeginLabel(sel2, nk.NewVec2(150, 150)) != nil {
+					ctx.LayoutRowDynamic(30, 1)
+					ctx.Label("font1", nk.TEXT_LEFT)
+					ctx.Label("font2", nk.TEXT_LEFT)
+					ctx.Label("font3", nk.TEXT_LEFT)
+					ctx.Label("font4", nk.TEXT_LEFT)
+					ctx.Label("font5", nk.TEXT_LEFT)
+					ctx.ComboEnd()
+				}
+				ctx.LayoutRowEnd()
+
+				ctx.LayoutRowBegin(nk.STATIC, 30, 2)
+				ctx.LayoutRowPush(100)
+				ctx.Label("字体大小", nk.TEXT_LEFT)
+				ctx.LayoutRowPush(200)
+				ftsz := ctx.SliderInt(5, 14, 50, 1)
+				_ = ftsz
+				ctx.LayoutRowEnd()
+			} else if setidx == 1 {
+				ctx.LayoutRowBegin(nk.STATIC, 30, 2)
+				ctx.LayoutRowPush(100)
+				ctx.Label("PlaceHolder3", nk.TEXT_LEFT)
+				ctx.LayoutRowPush(200)
+				ctx.Label("PlaceHolder3", nk.TEXT_LEFT)
+				ctx.LayoutRowEnd()
+
+			} else if setidx == 2 {
+				ctx.LayoutRowBegin(nk.STATIC, 30, 2)
+				ctx.LayoutRowPush(100)
+				ctx.Label("PlaceHolder3", nk.TEXT_LEFT)
+				ctx.LayoutRowPush(200)
+				ctx.Label("PlaceHolder3", nk.TEXT_LEFT)
+				ctx.LayoutRowEnd()
+
+			} else if setidx == 3 {
+				ctx.LayoutRowBegin(nk.STATIC, 30, 2)
+				ctx.LayoutRowPush(100)
+				ctx.Label("PlaceHolder3", nk.TEXT_LEFT)
+				ctx.LayoutRowPush(200)
+				ctx.Label("PlaceHolder3", nk.TEXT_LEFT)
+				ctx.LayoutRowEnd()
+			} else if setidx == 4 {
+				ctx.LayoutRowBegin(nk.STATIC, 30, 2)
+				ctx.LayoutRowPush(100)
+				ctx.Label("日志级别", nk.TEXT_LEFT)
+				ctx.LayoutRowPush(200)
+				sel2 := "hehehehe"
+				if ctx.ComboBeginLabel(sel2, nk.NewVec2(150, 250)) != nil {
+					ctx.LayoutRowDynamic(30, 1)
+					ctx.Label("TRACE", nk.TEXT_LEFT)
+					ctx.Label("DEBUG", nk.TEXT_LEFT)
+					ctx.Label("INFO", nk.TEXT_LEFT)
+					ctx.Label("WARNING", nk.TEXT_LEFT)
+					ctx.Label("ERROR", nk.TEXT_LEFT)
+					ctx.Label("FATAL", nk.TEXT_LEFT)
+					ctx.ComboEnd()
+				}
+				ctx.LayoutRowEnd()
+
+				ctx.LayoutRowBegin(nk.STATIC, 30, 2)
+				ctx.LayoutRowPush(100)
+				ctx.Label("PlaceHolder3", nk.TEXT_LEFT)
+				ctx.LayoutRowPush(200)
+				ctx.Label("PlaceHolder3", nk.TEXT_LEFT)
+				ctx.LayoutRowEnd()
+			}
+		}
+		ctx.End()
+		this.show = !ctx.WindowIsClosed(w.Name) && !ctx.WindowIsHidden(w.Name)
 	}
 }

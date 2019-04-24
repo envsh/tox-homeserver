@@ -1,7 +1,6 @@
 package client
 
 import (
-	"fmt"
 	"gopp"
 	"sort"
 	"sync/atomic"
@@ -146,6 +145,17 @@ func (this *DataModel) GroupList() (rets []*thspbs.GroupInfo) {
 	}
 	return
 }
+func (this *DataModel) CurMembers() (rets []*thspbs.MemberInfo) {
+	this.mu.RLock()
+	defer this.mu.RUnlock()
+
+	for _, v := range this.Grpinfo.GetMembers() {
+		t := *v
+		rets = append(rets, &t)
+	}
+	sort.Slice(rets, func(i int, j int) bool { return rets[i].GetPubkey() > rets[j].GetPubkey() })
+	return
+}
 
 // current
 func (this *DataModel) setFriendInfo(fi *thspbs.FriendInfo) {
@@ -153,7 +163,7 @@ func (this *DataModel) setFriendInfo(fi *thspbs.FriendInfo) {
 	// defer this.mu.Unlock()
 	this.Frndinfo = *fi
 	this.Cttype = CTTYPE_FRIEND
-	this.Ctname = fmt.Sprintf("友 %s", fi.Name)
+	this.Ctname = fi.Name
 	this.Ctstmsg = fi.Stmsg
 	this.Ctnum = fi.GetFnum()
 }
@@ -164,7 +174,7 @@ func (this *DataModel) setGroupInfo(fi *thspbs.GroupInfo) {
 	// defer this.mu.Unlock()
 	this.Grpinfo = *fi
 	this.Cttype = CTTYPE_GROUP
-	this.Ctname = fmt.Sprintf("群 %s", fi.GetTitle())
+	this.Ctname = fi.GetTitle()
 	this.Ctstmsg = fi.GetStmsg()
 	this.Ctnum = fi.GetGnum()
 }

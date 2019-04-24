@@ -20,12 +20,16 @@ func main() {
 	uictx.app = app
 
 	app.Exec(
+		uictx.icop.render(),
+
 		uictx.minfov.render(),
 		uictx.ctview.render(),
 		uictx.myactv.render(),
 		uictx.fiview.render(),
 		uictx.chatform.render(),
 		uictx.sendv.render(),
+		uictx.mblstv.render(),
+		uictx.setfmv.render(),
 	)
 }
 
@@ -44,6 +48,10 @@ type UiContext struct {
 	fiview   *FriendInfoView
 	chatform *ChatForm
 	sendv    *SendForm
+	mblstv   *MemberListForm
+	setfmv   *SettingForm
+
+	icop *IconPool //
 
 	themeNo int
 }
@@ -59,6 +67,10 @@ func NewUiContext() *UiContext {
 	this.fiview = &FriendInfoView{}
 	this.chatform = NewChatForm()
 	this.sendv = NewSendForm()
+	this.mblstv = NewMemberListForm()
+	this.setfmv = NewSettingForm()
+
+	this.icop = &IconPool{}
 
 	// this.themeNo = _STL_SYSTEM
 	return this
