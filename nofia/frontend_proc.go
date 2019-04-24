@@ -246,7 +246,7 @@ func dispatchEvent(evto *thspbs.Event) {
 		peerName := evto.Margs[0]
 		groupTitle := evto.Margs[2]
 		_, _, _ = message, peerName, groupTitle
-		uictx.chatform.newmsg(groupId, message)
+		uictx.chatform.newmsg(groupId, peerName+": "+message)
 
 		// raw message show area
 		// itext := fmt.Sprintf("%s@%s: %s", peerName, groupTitle, message)

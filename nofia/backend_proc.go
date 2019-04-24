@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"gopp"
 	"log"
@@ -39,7 +40,8 @@ func loadDataForProfileUi() {
 	gopp.ErrPrint(err)
 	if setting != nil {
 		// this.ComboBox_6.SetCurrentText(setting.Value)
-		log.Println(setting.Value)
+		log.Println("Profile db", setting.Value)
+		srvurl = gopp.IfElseStr(srvurl == "", setting.Value, srvurl)
 	}
 
 	setting, err = st.GetSetting(store.SK_LAST_LOGINED)
@@ -56,10 +58,15 @@ func loadDataForProfileUi() {
 	}
 }
 
+var srvurl = "" //  "127.0.0.1:2080"
+
+func init() {
+	flag.StringVar(&srvurl, "srvurl", srvurl, "toxhs daemon server address, like: 127.0.0.1:2080")
+}
+
 // should block
 func initAppBackend() {
 	// TODO maybe do not read/write ui in goroutine
-	srvurl := "s2.natfrp.org:22080"
 	err := thscli.AppConnect(srvurl)
 	gopp.ErrPrint(err, srvurl)
 	if err != nil {

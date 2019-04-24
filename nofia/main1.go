@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	nk "mkuse/nuklear"
 	thscli "tox-homeserver/client"
 )
@@ -10,6 +11,8 @@ type Render interface {
 }
 
 func main() {
+	flag.Parse()
+
 	appctx = thscli.NewAppContext()
 	go runbkdproc()
 
@@ -34,6 +37,7 @@ var uictx = NewUiContext()
 
 type UiContext struct {
 	app      *nk.NkApp
+	mdl      *thscli.DataModel
 	minfov   *MyinfoView
 	ctview   *ContectView
 	myactv   *MyactionView
@@ -46,6 +50,8 @@ type UiContext struct {
 
 func NewUiContext() *UiContext {
 	this := &UiContext{}
+
+	this.mdl = thscli.NewDataModel()
 
 	this.minfov = &MyinfoView{}
 	this.ctview = NewcontactView()

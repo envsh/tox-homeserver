@@ -6,11 +6,13 @@ import (
 	"log"
 	"sort"
 	"sync/atomic"
-	"tox-homeserver/thspbs"
+
+	"github.com/sasha-s/go-deadlock"
 
 	nk "mkuse/nuklear"
 
-	"github.com/sasha-s/go-deadlock"
+	thscli "tox-homeserver/client"
+	"tox-homeserver/thspbs"
 )
 
 type MyinfoView struct {
@@ -107,11 +109,11 @@ func (this *FriendInfoView) setGroupInfo(fi *thspbs.GroupInfo) {
 
 func (this *FriendInfoView) render() func(*nk.Context) {
 	return func(ctx *nk.Context) {
-		err := ctx.Begin("好友状态视图123", nk.NewRect(250, 0, 550, 90), nk.WINDOW_BORDER)
+		err := ctx.Begin("好友状态视图123", nk.NewRect(250, 0, 550, 85), nk.WINDOW_NO_SCROLLBR)
 		if err != nil {
 			this.mu.RLock()
 			ctx.LayoutRowBegin(nk.STATIC, 30, 4)
-			ctx.LayoutRowPush(30)
+			ctx.LayoutRowPush(40)
 			ctx.ButtonLabel("空格")
 
 			ctx.LayoutRowPush(360)
@@ -203,7 +205,7 @@ func (this *ContectView) render() func(ctx *nk.Context) {
 					log.Println("group clicked", v.GetGnum(), name)
 					uictx.fiview.setGroupInfo(v)
 					uictx.chatform.switchto(v.GetGroupId())
-					uictx.sendv.setcontact(CTTYPE_GROUP, v.GetGnum())
+					uictx.sendv.setcontact(thscli.CTTYPE_GROUP, v.GetGnum())
 				}
 				ctx.LayoutRowPush(30)
 				ctx.Label(statxt, 10)
@@ -219,7 +221,7 @@ func (this *ContectView) render() func(ctx *nk.Context) {
 					log.Println("friend clicked", v.GetFnum(), name)
 					uictx.fiview.setFriendInfo(v)
 					uictx.chatform.switchto(v.GetPubkey())
-					uictx.sendv.setcontact(CTTYPE_FRIEND, v.GetFnum())
+					uictx.sendv.setcontact(thscli.CTTYPE_FRIEND, v.GetFnum())
 				}
 				ctx.LayoutRowPush(30)
 				ctx.Label(statxt, 10)
@@ -246,9 +248,10 @@ func (this *ContectView) render() func(ctx *nk.Context) {
 
 /////
 type ChatForm struct {
-	msgs   map[string][]string
-	uniqid string // current active contact identifier
-	mu     deadlock.RWMutex
+	msgs    map[string][]string
+	hasnews map[string]bool
+	uniqid  string // current active contact identifier
+	mu      deadlock.RWMutex
 }
 
 func (this *ChatForm) switchto(uniqid string) {
@@ -261,6 +264,7 @@ func (this *ChatForm) newmsg(uniqid string, msg string) {
 	defer this.mu.Unlock()
 	// this.which = which
 	this.msgs[uniqid] = append(this.msgs[uniqid], msg)
+	this.hasnews[uniqid] = true
 }
 
 func NewChatForm() *ChatForm {
@@ -271,13 +275,14 @@ func NewChatForm() *ChatForm {
 		"消息444", "消息555", "消息666",
 	},
 	}
+	this.hasnews = map[string]bool{}
 
 	return this
 }
 
 func (this *ChatForm) render() func(ctx *nk.Context) {
 	return func(ctx *nk.Context) {
-		err := ctx.Begin("Hel呵呵lo2", nk.NewRect(250, 90, 550, 600-170), nk.WINDOW_BORDER)
+		err := ctx.Begin("Hel呵呵lo2", nk.NewRect(250, 80, 550, 600-160), nk.WINDOW_BORDER)
 		if err != nil {
 
 			ctx.LayoutRowDynamic(30, 1)
@@ -291,10 +296,12 @@ func (this *ChatForm) render() func(ctx *nk.Context) {
 
 			this.mu.RLock()
 			// draw newest n msgs
-			const maxlen = 30
+			const maxlen = 50
+			hasnew := this.hasnews[this.uniqid]
+			this.hasnews[this.uniqid] = false
 			msgs := this.msgs[this.uniqid]
 			if len(msgs) > maxlen {
-				msgs = msgs[len(msgs)-30:]
+				msgs = msgs[len(msgs)-maxlen:]
 			}
 
 			for idx, msg := range msgs {
@@ -324,18 +331,23 @@ func (this *ChatForm) render() func(ctx *nk.Context) {
 
 			// 1w条的时候内存倒没有问题，CPU上去了 10+%
 			// 3k条以下比较好，滚动的时候使用3%上下的CPU
-			for i := 1000; i < 3000; i++ {
+			for i := 1000; i < 300; i++ {
 				tmsg := fmt.Sprintf("聊天消息%d\x00", i)
 				ctx.LayoutRowDynamic(30, 1)
 				ctx.Label(tmsg, 10)
 			}
 
-			emptylen := 410 - float32(len(msgs)+4)*30
+			emptylen := 410 - float32(len(msgs)+10)*30
 			if emptylen > 0 {
 				ctx.LayoutRowDynamic(emptylen, 1)
 				ctx.Label("空白区域", 10)
 			}
 
+			if hasnew {
+				// seem no any useful affect
+				// ctx.InputScroll(nk.NewVec2(100000, 10000))
+				ctx.ForceScroll(100000, 100000) // seem ok
+			}
 		}
 		ctx.End()
 		if ctx.WindowIsHidden("Hello") {
@@ -343,9 +355,6 @@ func (this *ChatForm) render() func(ctx *nk.Context) {
 		}
 	}
 }
-
-const CTTYPE_FRIEND = 1
-const CTTYPE_GROUP = 2
 
 type SendForm struct {
 	cttype   int // contact type, group or friend
@@ -388,7 +397,7 @@ func (this *SendForm) render() func(ctx *nk.Context) {
 			ctx.LayoutRowEnd()
 
 			ctx.LayoutRowBegin(nk.STATIC, 30, 2)
-			ctx.LayoutRowPush(500 - 80)
+			ctx.LayoutRowPush(530 - 80)
 			newlen := this.iptblen
 			active := ctx.EditString(nk.EDIT_FIELD, this.iptbuf, &newlen, len(this.iptbuf))
 			if this.iptblen != newlen {
@@ -407,9 +416,9 @@ func (this *SendForm) render() func(ctx *nk.Context) {
 					msg := string(this.iptbuf[:this.iptblen])
 					var err error
 					switch cttype {
-					case CTTYPE_FRIEND:
+					case thscli.CTTYPE_FRIEND:
 						_, err = vtcli.FriendSendMessage(ctnum, msg, rspid)
-					case CTTYPE_GROUP:
+					case thscli.CTTYPE_GROUP:
 						err = vtcli.ConferenceSendMessage(ctnum, 0, msg, rspid)
 					default:
 						err = fmt.Errorf("Unseted cttype %d %d", cttype, ctnum)
