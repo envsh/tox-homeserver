@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"gopp"
 	"log"
 	"strings"
@@ -15,9 +14,8 @@ func dispatchEvent(evto *thspbs.Event) {
 
 	switch evto.Name {
 	case "SelfConnectionStatus": // {"Name":"SelfConnectionStatus","Args":["2"],"Margs":["CONNECTION_UDP"]}
-		status := gopp.MustUint32(evto.Args[0])
-		// uictx.mw.setConnStatus(status > 0)
-		uictx.minfov.sttxt = fmt.Sprintf("%d", status)
+		status := gopp.MustInt(evto.Args[0])
+		uictx.mdl.SetMyConnStatus(status)
 	case "FriendRequest":
 		///
 		// pubkey := jso.Get("Args").GetIndex(0).MustString()
@@ -30,7 +28,7 @@ func dispatchEvent(evto *thspbs.Event) {
 		fname := evto.Margs[0]
 		pubkey := evto.Margs[1]
 		_, _, _ = msg, fname, pubkey
-		uictx.chatform.newmsg(pubkey, msg)
+		uictx.mdl.Newmsg(pubkey, msg)
 
 		/*
 			itext := fmt.Sprintf("%s: %s", fname, msg)
@@ -246,7 +244,7 @@ func dispatchEvent(evto *thspbs.Event) {
 		peerName := evto.Margs[0]
 		groupTitle := evto.Margs[2]
 		_, _, _ = message, peerName, groupTitle
-		uictx.chatform.newmsg(groupId, peerName+": "+message)
+		uictx.mdl.Newmsg(groupId, peerName+": "+message)
 
 		// raw message show area
 		// itext := fmt.Sprintf("%s@%s: %s", peerName, groupTitle, message)

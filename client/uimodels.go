@@ -2,6 +2,7 @@ package client
 
 import (
 	"fmt"
+	"gopp"
 	"sort"
 	"sync/atomic"
 	"tox-homeserver/thspbs"
@@ -51,6 +52,8 @@ type DataModel struct {
 
 func NewDataModel() *DataModel {
 	this := &DataModel{}
+	this.Mysttxt = Conno2str(0)
+	this.receiptid = 10000
 	this.Scrollbarys = map[string]int{}
 
 	this.Friendsm = map[uint32]*thspbs.FriendInfo{}
@@ -93,6 +96,7 @@ func Conno2str(stno int) string {
 		return "UNK"
 	}
 }
+func Conno2str1(stno int) string { return Conno2str(stno)[:1] }
 
 func (this *DataModel) SetFriendInfos(friends map[uint32]*thspbs.FriendInfo) {
 	newedm := map[uint32]*thspbs.FriendInfo{}
@@ -124,44 +128,75 @@ func (this *DataModel) SetGroupInfos(groups map[uint32]*thspbs.GroupInfo) {
 	this.Groupsv = newedv
 }
 
+func (this *DataModel) FriendList() (rets []*thspbs.FriendInfo) {
+	this.mu.RLock()
+	defer this.mu.RUnlock()
+	for _, e := range this.Friendsv {
+		t := *e
+		rets = append(rets, &t)
+	}
+	return
+}
+func (this *DataModel) GroupList() (rets []*thspbs.GroupInfo) {
+	this.mu.RLock()
+	defer this.mu.RUnlock()
+	for _, e := range this.Groupsv {
+		t := *e
+		rets = append(rets, &t)
+	}
+	return
+}
+
 // current
-func (this *DataModel) SetFriendInfo(fi *thspbs.FriendInfo) {
-	this.mu.Lock()
-	defer this.mu.Unlock()
+func (this *DataModel) setFriendInfo(fi *thspbs.FriendInfo) {
+	// this.mu.Lock()
+	// defer this.mu.Unlock()
 	this.Frndinfo = *fi
 	this.Cttype = CTTYPE_FRIEND
 	this.Ctname = fmt.Sprintf("友 %s", fi.Name)
 	this.Ctstmsg = fi.Stmsg
+	this.Ctnum = fi.GetFnum()
 }
 
 // current
-func (this *DataModel) SetGroupInfo(fi *thspbs.GroupInfo) {
-	this.mu.Lock()
-	defer this.mu.Unlock()
+func (this *DataModel) setGroupInfo(fi *thspbs.GroupInfo) {
+	// this.mu.Lock()
+	// defer this.mu.Unlock()
 	this.Grpinfo = *fi
 	this.Cttype = CTTYPE_GROUP
 	this.Ctname = fmt.Sprintf("群 %s", fi.GetTitle())
 	this.Ctstmsg = fi.GetStmsg()
+	this.Ctnum = fi.GetGnum()
 }
 
 func (this *DataModel) Switchtoct(uniqid string) {
 	this.mu.Lock()
 	defer this.mu.Unlock()
 	this.Ctuniqid = uniqid
+
+	for _, v := range this.Groupsm {
+		if v.GroupId == uniqid {
+			this.setGroupInfo(v)
+			return
+		}
+	}
+	for _, v := range this.Friendsm {
+		if v.GetPubkey() == uniqid {
+			this.setFriendInfo(v)
+			return
+		}
+	}
 }
 
-func (this *DataModel) Setcontact(cttype int, ctnum uint32) {
-	this.mu.Lock()
-	defer this.mu.Unlock()
-	this.Cttype = cttype
-	this.Ctnum = ctnum
-}
+const maxinmemmsgcnt = 5000
 
 func (this *DataModel) Newmsg(uniqid string, msg string) {
 	this.mu.Lock()
 	defer this.mu.Unlock()
 
 	this.Ctmsgs[uniqid] = append(this.Ctmsgs[uniqid], msg)
+	if uniqid != this.Ctuniqid {
+	}
 	this.Hasnews[uniqid] += 1
 }
 
@@ -169,6 +204,11 @@ func (this *DataModel) Hasnewmsg(uniqid string) bool {
 	this.mu.RLock()
 	defer this.mu.RUnlock()
 	return this.Hasnews[uniqid] > 0
+}
+func (this *DataModel) Unsetnewmsg(uniqid string) {
+	this.mu.Lock()
+	defer this.mu.Unlock()
+	this.Hasnews[uniqid] = 0
 }
 func (this *DataModel) NewMsgcount(uniqid string) int {
 	this.mu.RLock()
@@ -183,4 +223,20 @@ func (this *DataModel) Msgcount(uniqid string) int {
 // like: limit m, offset n
 func (this *DataModel) Getmsgs(uniqid string, limit int, start ...int) {
 
+}
+
+func (this *DataModel) GetNewestMsgs(uniqid string, limit int) []string {
+	this.mu.RLock()
+	defer this.mu.RUnlock()
+
+	msgs := this.Ctmsgs[uniqid]
+	totcnt := len(msgs)
+
+	rets := []string{}
+	startpos := gopp.Max([]int{0, totcnt - 1 - limit}).(int)
+	for idx := startpos; idx < totcnt && idx < totcnt; idx++ {
+		rets = append(rets, msgs[idx])
+	}
+
+	return rets
 }

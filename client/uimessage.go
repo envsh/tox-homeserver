@@ -27,6 +27,8 @@ type Message struct {
 	LastMsgUi  string
 	Sent       bool
 	UserCode   int64
+
+	Index int64
 }
 
 func NewMessageForGroup(evto *thspbs.Event) *Message {

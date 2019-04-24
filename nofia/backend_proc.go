@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"flag"
-	"fmt"
 	"gopp"
 	"log"
 	"time"
@@ -95,8 +94,6 @@ func initAppBackend() {
 				dispatchEvent(evto)
 				// dispatchEventResp(evto)
 			}
-
-			// uictx.chatform.newmsg(which uint32, msg string)
 		}
 
 	}
@@ -104,24 +101,22 @@ func initAppBackend() {
 	condWait(50, func() bool { return vtcli.SelfGetAddress() != "" })
 	log.Println("My ToxID:", vtcli.SelfGetAddress())
 	// runOnUiThread(func() { this.switchUiStack(UIST_CONTACTUI) })
-	uictx.minfov.id = vtcli.SelfGetAddress()
-	uictx.minfov.name = vtcli.SelfGetName()
-	uictx.minfov.sttxt = fmt.Sprintf("%d", vtcli.SelfGetConnectionStatus())
-	uictx.minfov.stmsg, _ = vtcli.SelfGetStatusMessage()
+	stmsg, _ := vtcli.SelfGetStatusMessage()
+	uictx.mdl.SetMyInfo(vtcli.SelfGetName(), vtcli.SelfGetAddress(), stmsg)
+	uictx.mdl.SetMyConnStatus(vtcli.SelfGetConnectionStatus())
 
 	// uiw.Label_2.SetText(gopp.StrSuf4ui(vtcli.SelfGetName(), thscom.UiNameLen))
 	// uiw.Label_2.SetToolTip(vtcli.SelfGetName())
 	// runOnUiThread(func() { SetQLabelElideText(uiw.Label_2, vtcli.SelfGetName(), "") })
 	log.Println("My Name:", vtcli.SelfGetName())
-	stmsg, _ := vtcli.SelfGetStatusMessage()
-	_ = stmsg
 	// uiw.Label_3.SetText(gopp.StrSuf4ui(stmsg, thscom.UiStmsgLen))
 	// uiw.Label_3.SetToolTip(stmsg)
 	// runOnUiThread(func() { SetQLabelElideText(uiw.Label_3, stmsg, "") })
 	// uiw.ToolButton_17.SetToolTip(vtcli.SelfGetAddress())
 
-	uictx.ctview.setFriendInfos(vtcli.Binfo.Friends)
-	uictx.ctview.setGroupInfos(vtcli.Binfo.Groups)
+	uictx.mdl.SetFriendInfos(vtcli.Binfo.Friends)
+	uictx.mdl.SetGroupInfos(vtcli.Binfo.Groups)
+
 	/*
 		listw := uiw.ListWidget_2
 
