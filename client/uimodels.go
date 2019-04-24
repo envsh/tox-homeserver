@@ -29,7 +29,7 @@ type DataModel struct {
 	Grpinfo   thspbs.GroupInfo
 	Cttype    int
 	Ctnum     uint32
-	Ctuniqid  string
+	Ctuniqid  string // current active contact identifier ==> cur
 	Ctname    string // name or title
 	Ctstmsg   string
 	receiptid int64
@@ -47,7 +47,7 @@ type DataModel struct {
 
 	Ctmsgs  map[string][]string // uniqid =>
 	Hasnews map[string]int      // uniqid => , 某个联系人的未读取消息个数
-	// uniqid  string // current active contact identifier ==> cur
+
 }
 
 func NewDataModel() *DataModel {
@@ -215,9 +215,20 @@ func (this *DataModel) NewMsgcount(uniqid string) int {
 	defer this.mu.RUnlock()
 	return this.Hasnews[uniqid]
 }
-
 func (this *DataModel) Msgcount(uniqid string) int {
-	return 0
+	this.mu.RLock()
+	defer this.mu.RUnlock()
+	return len(this.Ctmsgs[uniqid])
+}
+
+func (this *DataModel) TotalCurrMsgcount() (cur, tot int) {
+	this.mu.RLock()
+	defer this.mu.RUnlock()
+
+	for _, v := range this.Ctmsgs {
+		tot += len(v)
+	}
+	return len(this.Ctmsgs[this.Ctuniqid]), tot
 }
 
 // like: limit m, offset n

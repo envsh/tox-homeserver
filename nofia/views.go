@@ -11,11 +11,18 @@ import (
 )
 
 type MyinfoView struct {
+	w *nk.Window2
 }
 
 func (this *MyinfoView) render() func(ctx *nk.Context) {
+	w := &nk.Window2{}
+	w.Name = "我的信息"
+	w.Rect = nk.NewRect(0, 0, 250, 120)
+	w.Flags = nk.WINDOW_BORDER
+	this.w = w
+
 	return func(ctx *nk.Context) {
-		err := ctx.Begin("我的信息", nk.NewRect(0, 0, 250, 120), nk.WINDOW_BORDER)
+		err := ctx.Begin(w.Name, w.Rect, w.Flags)
 		if err != nil {
 			name := uictx.mdl.Myname
 			name = gopp.IfElseStr(len(name) == 0, " ", name)
@@ -31,6 +38,7 @@ func (this *MyinfoView) render() func(ctx *nk.Context) {
 			stmsg := uictx.mdl.Mystmsg
 			stmsg = gopp.IfElseStr(len(stmsg) == 0, " ", stmsg)
 			sel1 := len(stmsg)
+			ctx.Tooltip(stmsg, 250)
 			ctx.LayoutRowDynamic(30, 1)
 			ctx.SelectableLabel(stmsg, 10, &sel1)
 			ctx.LayoutRowStatic(30, 100, 2)
@@ -46,11 +54,18 @@ func (this *MyinfoView) render() func(ctx *nk.Context) {
 }
 
 type MyactionView struct {
+	w *nk.Window2
 }
 
 func (this *MyactionView) render() func(ctx *nk.Context) {
+	w := &nk.Window2{}
+	w.Name = "我的控制按钮组"
+	w.Rect = nk.NewRect(0, 600-50, 250, 60)
+	w.Flags = nk.WINDOW_BORDER
+	this.w = w
+
 	return func(ctx *nk.Context) {
-		err := ctx.Begin("我的控制按钮组", nk.NewRect(0, 600-50, 250, 60), nk.WINDOW_BORDER)
+		err := ctx.Begin(w.Name, w.Rect, w.Flags)
 		if err != nil {
 
 			ctx.LayoutRowBegin(nk.STATIC, 30, 4)
@@ -76,11 +91,18 @@ func (this *MyactionView) render() func(ctx *nk.Context) {
 }
 
 type FriendInfoView struct {
+	w *nk.Window2
 }
 
 func (this *FriendInfoView) render() func(*nk.Context) {
+	w := &nk.Window2{}
+	w.Name = "好友状态视图123"
+	w.Rect = nk.NewRect(250, 0, 550, 85)
+	w.Flags = nk.WINDOW_NO_SCROLLBR
+	this.w = w
+
 	return func(ctx *nk.Context) {
-		err := ctx.Begin("好友状态视图123", nk.NewRect(250, 0, 550, 85), nk.WINDOW_NO_SCROLLBR)
+		err := ctx.Begin(w.Name, w.Rect, w.Flags)
 		if err != nil {
 			ctx.LayoutRowBegin(nk.STATIC, 30, 4)
 			ctx.LayoutRowPush(40)
@@ -103,8 +125,16 @@ func (this *FriendInfoView) render() func(*nk.Context) {
 			stmsg := uictx.mdl.Ctstmsg
 			stmsg = gopp.IfElseStr(len(stmsg) == 0, " ", stmsg)
 			sel1 := len(stmsg)
-			ctx.LayoutRowDynamic(30, 1)
+			ctx.LayoutRowBegin(nk.STATIC, 30, 2)
+			ctx.LayoutRowPush(500 - 90)
 			ctx.SelectableLabel(stmsg, 10, &sel1)
+
+			ctx.Tooltip("当前/总数", 120) // this is tooltip of next widget, here is below label
+			curcnt, totcnt := uictx.mdl.TotalCurrMsgcount()
+			labtxt := fmt.Sprintf("消息数：%d/%d", curcnt, totcnt)
+			ctx.LayoutRowPush(120)
+			ctx.Label(labtxt, 1)
+			ctx.LayoutRowEnd()
 		}
 		ctx.End()
 		if ctx.WindowIsHidden("Hello") {
@@ -115,6 +145,7 @@ func (this *FriendInfoView) render() func(*nk.Context) {
 }
 
 type ContectView struct {
+	w *nk.Window2
 }
 
 func NewcontactView() *ContectView {
@@ -123,12 +154,20 @@ func NewcontactView() *ContectView {
 }
 
 func (this *ContectView) render() func(ctx *nk.Context) {
+	w := &nk.Window2{}
+	w.Name = "Hel呵呵lo"
+	w.Rect = nk.NewRect(0, 120, 250, 600-160)
+	w.Flags = nk.WINDOW_BORDER | nk.WINDOW_SCROLL_AUTO_HIDE
+	this.w = w
+
 	return func(ctx *nk.Context) {
-		err := ctx.Begin("Hel呵呵lo", nk.NewRect(0, 120, 250, 600-160), nk.WINDOW_BORDER)
+		err := ctx.Begin(w.Name, w.Rect, w.Flags)
 		if err != nil {
 			for _, v := range uictx.mdl.GroupList() {
 				name := fmt.Sprintf("群 %s", v.GetTitle())
 				statxt := fmt.Sprintf("%d", uictx.mdl.NewMsgcount(v.GetGroupId()))
+				tiptxt := fmt.Sprintf("未读=%d, 所有=%d",
+					uictx.mdl.NewMsgcount(v.GetGroupId()), uictx.mdl.Msgcount(v.GetGroupId()))
 				ctx.LayoutRowBegin(nk.STATIC, 30, 3)
 				ctx.LayoutRowPush(30)
 				ctx.ButtonLabel("III")
@@ -137,13 +176,18 @@ func (this *ContectView) render() func(ctx *nk.Context) {
 					log.Println("group clicked", v.GetGnum(), name)
 					uictx.mdl.Switchtoct(v.GetGroupId())
 				}
+				ctx.Tooltip(tiptxt, 30)
 				ctx.LayoutRowPush(30)
 				ctx.Label(statxt, 10)
+				ctx.LayoutRowEnd()
 			}
 			for _, v := range uictx.mdl.FriendList() {
 				name := fmt.Sprintf("友 %s", v.GetName())
 				statxt := fmt.Sprintf("%s %d",
 					thscli.Conno2str1(int(v.Status)), uictx.mdl.NewMsgcount(v.GetPubkey()))
+				tiptxt := fmt.Sprintf("%s %s, 未读=%d, 所有=%d",
+					thscli.Conno2str(int(v.Status)), gopp.IfElseStr(v.Status == 0, "离线", "在线"),
+					uictx.mdl.NewMsgcount(v.GetPubkey()), uictx.mdl.Msgcount(v.GetPubkey()))
 				ctx.LayoutRowBegin(nk.STATIC, 30, 3)
 				ctx.LayoutRowPush(30)
 				ctx.ButtonLabel("III")
@@ -152,8 +196,10 @@ func (this *ContectView) render() func(ctx *nk.Context) {
 					log.Println("friend clicked", v.GetFnum(), name)
 					uictx.mdl.Switchtoct(v.GetPubkey())
 				}
+				ctx.Tooltip(tiptxt, 30)
 				ctx.LayoutRowPush(30)
 				ctx.Label(statxt, 10)
+				ctx.LayoutRowEnd()
 			}
 
 			for i := 0; i < 16; i++ {
@@ -177,6 +223,7 @@ func (this *ContectView) render() func(ctx *nk.Context) {
 
 /////
 type ChatForm struct {
+	w *nk.Window2
 }
 
 func NewChatForm() *ChatForm {
@@ -185,8 +232,14 @@ func NewChatForm() *ChatForm {
 }
 
 func (this *ChatForm) render() func(ctx *nk.Context) {
+	w := &nk.Window2{}
+	w.Name = "Hel呵呵lo2"
+	w.Rect = nk.NewRect(250, 80, 550, 600-160)
+	w.Flags = nk.WINDOW_BORDER | nk.WINDOW_MOVABLE
+	this.w = w
+
 	return func(ctx *nk.Context) {
-		err := ctx.Begin("Hel呵呵lo2", nk.NewRect(250, 80, 550, 600-160), nk.WINDOW_BORDER)
+		err := ctx.Begin(w.Name, w.Rect, w.Flags)
 		if err != nil {
 
 			ctx.LayoutRowDynamic(30, 1)
@@ -260,6 +313,8 @@ func (this *ChatForm) render() func(ctx *nk.Context) {
 }
 
 type SendForm struct {
+	w *nk.Window2
+
 	iptbuf  []byte
 	iptblen int
 	iptres  []byte
@@ -272,8 +327,14 @@ func NewSendForm() *SendForm {
 }
 
 func (this *SendForm) render() func(ctx *nk.Context) {
+	w := &nk.Window2{}
+	w.Name = "消息输入发送视图"
+	w.Rect = nk.NewRect(250, 520, 550, 600-510)
+	w.Flags = nk.WINDOW_BORDER
+	this.w = w
+
 	return func(ctx *nk.Context) {
-		err := ctx.Begin("消息输入发送视图", nk.NewRect(250, 520, 550, 600-490), nk.WINDOW_BORDER)
+		err := ctx.Begin(w.Name, w.Rect, w.Flags)
 		if err != nil {
 
 			ctx.LayoutRowBegin(nk.STATIC, 30, 7)
@@ -286,7 +347,7 @@ func (this *SendForm) render() func(ctx *nk.Context) {
 			ctx.LayoutRowEnd()
 
 			ctx.LayoutRowBegin(nk.STATIC, 30, 2)
-			ctx.LayoutRowPush(530 - 80)
+			ctx.LayoutRowPush(520 - 80)
 			newlen := this.iptblen
 			active := ctx.EditString(nk.EDIT_FIELD, this.iptbuf, &newlen, len(this.iptbuf))
 			if this.iptblen != newlen {
