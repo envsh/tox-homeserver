@@ -13,11 +13,13 @@ type Render interface {
 func main() {
 	flag.Parse()
 
-	appctx = thscli.NewAppContext()
-	go runbkdproc()
-
 	app := nk.NewApp()
 	uictx.app = app
+	mdl := thscli.NewDataModel(func() { app.Repaint() })
+	uictx.mdl = mdl
+
+	appctx = thscli.NewAppContext()
+	go runbkdproc()
 
 	app.Exec(
 		uictx.icop.render(),
@@ -58,8 +60,6 @@ type UiContext struct {
 
 func NewUiContext() *UiContext {
 	this := &UiContext{}
-
-	this.mdl = thscli.NewDataModel()
 
 	this.minfov = &MyinfoView{}
 	this.ctview = NewcontactView()

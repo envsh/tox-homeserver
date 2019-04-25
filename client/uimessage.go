@@ -67,8 +67,8 @@ func NewMessageForFriend(evto *thspbs.Event) *Message {
 	this := &Message{}
 	this.Msg = msg
 	this.PeerName = fname
-	this.Time = time.Now()
 	this.EventId = eventId
+	this.Time = time.Now()
 
 	this.refmtmsg()
 	return this
@@ -96,6 +96,7 @@ func NewMessageForMeFromJson(itext string, eventId int64) *Message {
 func (this *Message) refmtmsg() {
 	this.LastMsgUi = this.Msg
 	this.resetTimezone()
+	this.TimeUi = Time2Today(this.Time)
 
 	refmtmsgfns := []func(){this.refmtmsgRUser, this.refmtmsgLink}
 	for _, fn := range refmtmsgfns {

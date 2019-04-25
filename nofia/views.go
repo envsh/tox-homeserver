@@ -73,8 +73,8 @@ func (this *MyinfoView) render() func(ctx *nk.Context) {
 			ctx.LayoutRowDynamic(30, 1)
 			ctx.SelectableLabel(stmsg, 10, &sel1)
 			ctx.LayoutRowStatic(30, 100, 2)
-			ctx.Label("搜索框👉", 10)
-			ctx.Label("排列过滤 ", 10)
+			ctx.Label("搜索框👉", nk.TEXT_LEFT)
+			ctx.Label("排列过滤 ", nk.TEXT_RIGHT)
 
 		}
 		ctx.End()
@@ -152,7 +152,7 @@ func (this *FriendInfoView) render() func(*nk.Context) {
 			}
 			ctx.LayoutRowPush(80)
 			totheight := float32(3 * 40)
-			if ctx.MenuBeginLabel("  选项  ", nk.TEXT_LEFT, nk.NewVec2(120, totheight)) != nil {
+			if ctx.MenuBeginLabel("  选项  ", nk.TEXT_RIGHT, nk.NewVec2(120, totheight)) != nil {
 				ctx.LayoutRowDynamic(30, 1)
 				if ctx.MenuItemLabel("hehe1", nk.TEXT_LEFT) != nil {
 					log.Println("action1")
@@ -174,14 +174,14 @@ func (this *FriendInfoView) render() func(*nk.Context) {
 			stmsg = gopp.IfElseStr(len(stmsg) == 0, " ", stmsg)
 			sel1 := len(stmsg)
 			ctx.LayoutRowBegin(nk.STATIC, 30, 2)
-			ctx.LayoutRowPush(500 - 90)
+			ctx.LayoutRowPush(500 - 100)
 			ctx.SelectableLabel(stmsg, 10, &sel1)
 
-			ctx.Tooltip("当前/总数", 120) // this is tooltip of next widget, here is below label
+			ctx.Tooltip("当前/总数", 130) // this is tooltip of next widget, here is below label
 			curcnt, totcnt := uictx.mdl.TotalCurrMsgcount()
 			labtxt := fmt.Sprintf("消息数：%d/%d", curcnt, totcnt)
-			ctx.LayoutRowPush(120)
-			ctx.Label(labtxt, 1)
+			ctx.LayoutRowPush(130)
+			ctx.Label(labtxt, nk.TEXT_RIGHT)
 			ctx.LayoutRowEnd()
 		}
 		ctx.End()
@@ -291,13 +291,13 @@ func (this *ChatForm) render() func(ctx *nk.Context) {
 		if err != nil {
 
 			ctx.LayoutRowDynamic(30, 1)
-			ctx.Label("聊天消息窗口", 10)
+			ctx.Label("聊天消息窗口", nk.TEXT_CENTERED)
 			ctx.LayoutRowDynamic(30, 1)
-			ctx.Label("聊天消息1", 10)
+			ctx.Label("聊天消息1", nk.TEXT_CENTERED)
 			ctx.LayoutRowDynamic(30, 1)
-			ctx.Label("聊天消息2", 10)
+			ctx.Label("聊天消息2", nk.TEXT_CENTERED)
 			ctx.LayoutRowDynamic(30, 1)
-			ctx.Label("聊天消息3", 10)
+			ctx.Label("聊天消息3", nk.TEXT_CENTERED)
 
 			// draw newest n msgs
 			const maxlen = 500
@@ -310,25 +310,29 @@ func (this *ChatForm) render() func(ctx *nk.Context) {
 			}
 
 			for idx, msg := range msgs {
-				tmsg := fmt.Sprintf("%d %s", idx, msg)
+				ctx.LayoutRowBegin(nk.STATIC, 39, 4)
+				ctx.LayoutRowPush(30)
+				ctx.ButtonLabel(" ")
+				name := gopp.IfElseStr(msg.Me, uictx.mdl.Myname, msg.PeerNameUi)
+				ctx.LayoutRowPush(330)
+				ctx.Label(name, nk.TEXT_LEFT)
+				ctx.LayoutRowPush(80)
+				ctx.Label(msg.TimeUi, nk.TEXT_RIGHT)
+				ctx.LayoutRowPush(30)
+				ctx.Label(gopp.IfElseStr(msg.Sent, " ", "=>"), nk.TEXT_RIGHT)
+				ctx.LayoutRowEnd()
+
+				tmsg := fmt.Sprintf("%d %s", idx, msg.MsgUi)
 				wraped := gopp.Splitrnui(tmsg, 60)
 				for idx, line := range wraped {
 					ctx.LayoutRowBegin(nk.STATIC, 39, 3)
 					ctx.LayoutRowPush(30)
-					if idx == 0 {
-						ctx.ButtonLabel("|")
-					} else {
-						ctx.Label(" ", 1)
-					}
+					ctx.Label(" ", nk.TEXT_CENTERED)
 					ctx.LayoutRowPush(450)
 					seln := len(line)
 					ctx.SelectableLabel(line, gopp.IfElseInt(idx == 0, 1, 5), &seln)
 					ctx.LayoutRowPush(30)
-					if idx == 0 {
-						ctx.ButtonLabel("|")
-					} else {
-						ctx.Label(" ", 1)
-					}
+					ctx.Label(" ", nk.TEXT_CENTERED)
 					ctx.LayoutRowEnd()
 				}
 			}
@@ -409,16 +413,20 @@ func (this *SendForm) render() func(ctx *nk.Context) {
 					cttype := uictx.mdl.Cttype
 					ctnum := uictx.mdl.Ctnum
 					uniqid := uictx.mdl.Ctuniqid
-					rptid := uictx.mdl.Nxtreceiptid()
+					rptid := thscli.NextUserCode(devInfo.Uuid)
 					msg := string(this.iptbuf[:this.iptblen])
 					var err error
 					switch cttype {
 					case thscli.CTTYPE_FRIEND:
+						msgo := thscli.NewMessageForMe(msg)
+						msgo.UserCode = rptid
+						uictx.mdl.Newmsg(uniqid, msgo)
 						_, err = vtcli.FriendSendMessage(ctnum, msg, rptid)
-						uictx.mdl.Newmsg(uniqid, msg)
 					case thscli.CTTYPE_GROUP:
+						msgo := thscli.NewMessageForMe(msg)
+						msgo.UserCode = rptid
+						uictx.mdl.Newmsg(uniqid, msgo)
 						err = vtcli.ConferenceSendMessage(ctnum, 0, msg, rptid)
-						uictx.mdl.Newmsg(uniqid, msg)
 					default:
 						err = fmt.Errorf("Unseted cttype %d %d", cttype, ctnum)
 					}

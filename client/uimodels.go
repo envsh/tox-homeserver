@@ -44,15 +44,19 @@ type DataModel struct {
 	Groupsm  map[uint32]*thspbs.GroupInfo
 	Groupsv  []*thspbs.GroupInfo
 
-	Ctmsgs  map[string][]string // uniqid =>
-	Hasnews map[string]int      // uniqid => , 某个联系人的未读取消息个数
+	Ctmsgs map[string][]*Message // uniqid =>
+	// Ctmsgs  map[string][]string   // uniqid =>
+	Hasnews map[string]int // uniqid => , 某个联系人的未读取消息个数
 
+	repainter func()
 }
 
-func NewDataModel() *DataModel {
+func NewDataModel(repainter func()) *DataModel {
 	this := &DataModel{}
+	this.repainter = repainter
 	this.Mysttxt = Conno2str(0)
 	this.receiptid = 10000
+
 	this.Scrollbarys = map[string]int{}
 
 	this.Friendsm = map[uint32]*thspbs.FriendInfo{}
@@ -60,15 +64,21 @@ func NewDataModel() *DataModel {
 	this.Groupsm = map[uint32]*thspbs.GroupInfo{}
 	this.Groupsv = []*thspbs.GroupInfo{}
 
-	this.Ctmsgs = map[string][]string{}
+	this.Ctmsgs = map[string][]*Message{}
 	this.Hasnews = map[string]int{}
 
 	return this
 }
 
 func (this *DataModel) Nxtreceiptid() int64 { return atomic.AddInt64(&this.receiptid, 1) }
+func (this *DataModel) emitChanged() {
+	if this.repainter != nil {
+		this.repainter()
+	}
+}
 
 func (this *DataModel) SetMyInfo(name, id string, stmsg string) {
+	defer this.emitChanged()
 	this.mu.Lock()
 	defer this.mu.Unlock()
 
@@ -77,6 +87,7 @@ func (this *DataModel) SetMyInfo(name, id string, stmsg string) {
 	this.Mystmsg = stmsg
 }
 func (this *DataModel) SetMyConnStatus(stno int) {
+	defer this.emitChanged()
 	this.mu.Lock()
 	defer this.mu.Unlock()
 
@@ -91,6 +102,8 @@ func Conno2str(stno int) string {
 		return "TCP"
 	case 2:
 		return "UDP"
+	case 5:
+		return "BRK" // connect between client and homeserver
 	default:
 		return "UNK"
 	}
@@ -98,6 +111,7 @@ func Conno2str(stno int) string {
 func Conno2str1(stno int) string { return Conno2str(stno)[:1] }
 
 func (this *DataModel) SetFriendInfos(friends map[uint32]*thspbs.FriendInfo) {
+	defer this.emitChanged()
 	newedm := map[uint32]*thspbs.FriendInfo{}
 	newedv := []*thspbs.FriendInfo{}
 	for k, v := range friends {
@@ -112,6 +126,7 @@ func (this *DataModel) SetFriendInfos(friends map[uint32]*thspbs.FriendInfo) {
 	this.Friendsv = newedv
 }
 func (this *DataModel) SetGroupInfos(groups map[uint32]*thspbs.GroupInfo) {
+	defer this.emitChanged()
 	newedm := map[uint32]*thspbs.GroupInfo{}
 	newedv := []*thspbs.GroupInfo{}
 	for k, v := range groups {
@@ -180,6 +195,7 @@ func (this *DataModel) setGroupInfo(fi *thspbs.GroupInfo) {
 }
 
 func (this *DataModel) Switchtoct(uniqid string) {
+	defer this.emitChanged()
 	this.mu.Lock()
 	defer this.mu.Unlock()
 	this.Ctuniqid = uniqid
@@ -200,7 +216,8 @@ func (this *DataModel) Switchtoct(uniqid string) {
 
 const maxinmemmsgcnt = 5000
 
-func (this *DataModel) Newmsg(uniqid string, msg string) {
+func (this *DataModel) Newmsg(uniqid string, msg *Message) {
+	defer this.emitChanged()
 	this.mu.Lock()
 	defer this.mu.Unlock()
 
@@ -216,6 +233,7 @@ func (this *DataModel) Hasnewmsg(uniqid string) bool {
 	return this.Hasnews[uniqid] > 0
 }
 func (this *DataModel) Unsetnewmsg(uniqid string) {
+	defer this.emitChanged()
 	this.mu.Lock()
 	defer this.mu.Unlock()
 	this.Hasnews[uniqid] = 0
@@ -246,14 +264,14 @@ func (this *DataModel) Getmsgs(uniqid string, limit int, start ...int) {
 
 }
 
-func (this *DataModel) GetNewestMsgs(uniqid string, limit int) []string {
+func (this *DataModel) GetNewestMsgs(uniqid string, limit int) []*Message {
 	this.mu.RLock()
 	defer this.mu.RUnlock()
 
 	msgs := this.Ctmsgs[uniqid]
 	totcnt := len(msgs)
 
-	rets := []string{}
+	rets := []*Message{}
 	startpos := gopp.Max([]int{0, totcnt - 1 - limit}).(int)
 	for idx := startpos; idx < totcnt && idx < totcnt; idx++ {
 		rets = append(rets, msgs[idx])

@@ -28,8 +28,9 @@ func dispatchEvent(evto *thspbs.Event) {
 		fname := evto.Margs[0]
 		pubkey := evto.Margs[1]
 		_, _, _ = msg, fname, pubkey
-		uictx.mdl.Newmsg(pubkey, msg)
-
+		// uictx.mdl.Newmsg(pubkey, msg)
+		msgo := thscli.NewMessageForFriend(evto)
+		uictx.mdl.Newmsg(pubkey, msgo)
 		/*
 			itext := fmt.Sprintf("%s: %s", fname, msg)
 			uiw.ListWidget.AddItem(itext)
@@ -244,7 +245,8 @@ func dispatchEvent(evto *thspbs.Event) {
 		peerName := evto.Margs[0]
 		groupTitle := evto.Margs[2]
 		_, _, _ = message, peerName, groupTitle
-		uictx.mdl.Newmsg(groupId, peerName+": "+message)
+		msgo := thscli.NewMessageForGroup(evto)
+		uictx.mdl.Newmsg(groupId, msgo)
 
 		// raw message show area
 		// itext := fmt.Sprintf("%s@%s: %s", peerName, groupTitle, message)
