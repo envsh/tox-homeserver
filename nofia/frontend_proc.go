@@ -13,6 +13,13 @@ import (
 func dispatchEvent(evto *thspbs.Event) {
 
 	switch evto.Name {
+	case "brokenrpc":
+		status := 5
+		uictx.mdl.SetMyConnStatus(status)
+	case "goodrpc":
+		status := -5
+		uictx.mdl.SetMyConnStatus(status)
+
 	case "SelfConnectionStatus": // {"Name":"SelfConnectionStatus","Args":["2"],"Margs":["CONNECTION_UDP"]}
 		status := gopp.MustInt(evto.Args[0])
 		uictx.mdl.SetMyConnStatus(status)

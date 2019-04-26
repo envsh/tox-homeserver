@@ -5,6 +5,7 @@ import (
 	"gopp"
 	"io/ioutil"
 	"log"
+	"strings"
 	"sync"
 	"time"
 	"unsafe"
@@ -154,8 +155,8 @@ func (this *FriendInfoView) render() func(*nk.Context) {
 			totheight := float32(3 * 40)
 			if ctx.MenuBeginLabel("  选项  ", nk.TEXT_RIGHT, nk.NewVec2(120, totheight)) != nil {
 				ctx.LayoutRowDynamic(30, 1)
-				if ctx.MenuItemLabel("hehe1", nk.TEXT_LEFT) != nil {
-					log.Println("action1")
+				if ctx.MenuItemLabel("Mute", nk.TEXT_LEFT) != nil {
+					log.Println("Mute")
 				}
 				ctx.LayoutRowDynamic(30, 1)
 				if ctx.MenuItemLabel("hehe2", nk.TEXT_LEFT) != nil {
@@ -170,12 +171,21 @@ func (this *FriendInfoView) render() func(*nk.Context) {
 			}
 			ctx.LayoutRowEnd()
 
-			stmsg := uictx.mdl.Ctstmsg
+			// for group, it is always empty, so we borrow it to show lastmsg
+			stmsg := gopp.IfElseStr(uictx.mdl.Cttype != thscli.CTTYPE_FRIEND,
+				uictx.mdl.Lastmsg(), uictx.mdl.Ctstmsg)
 			stmsg = gopp.IfElseStr(len(stmsg) == 0, " ", stmsg)
 			sel1 := len(stmsg)
+			rstmsg := ""
+			if pos := strings.Index(stmsg, ": "); pos != -1 {
+				rstmsg = stmsg[pos+2:]
+			}
 			ctx.LayoutRowBegin(nk.STATIC, 30, 2)
+			if len(rstmsg) > 12 {
+				ctx.Tooltip(rstmsg, 500-100)
+			}
 			ctx.LayoutRowPush(500 - 100)
-			ctx.SelectableLabel(stmsg, 10, &sel1)
+			ctx.SelectableLabel(stmsg, nk.TEXT_LEFT, &sel1)
 
 			ctx.Tooltip("当前/总数", 130) // this is tooltip of next widget, here is below label
 			curcnt, totcnt := uictx.mdl.TotalCurrMsgcount()
@@ -226,7 +236,7 @@ func (this *ContectView) render() func(ctx *nk.Context) {
 				}
 				ctx.Tooltip(tiptxt, 30)
 				ctx.LayoutRowPush(30)
-				ctx.Label(statxt, 10)
+				ctx.Label(statxt, nk.TEXT_CENTERED)
 				ctx.LayoutRowEnd()
 			}
 			for _, v := range uictx.mdl.FriendList() {
@@ -246,7 +256,7 @@ func (this *ContectView) render() func(ctx *nk.Context) {
 				}
 				ctx.Tooltip(tiptxt, 30)
 				ctx.LayoutRowPush(30)
-				ctx.Label(statxt, 10)
+				ctx.Label(statxt, nk.TEXT_LEFT)
 				ctx.LayoutRowEnd()
 			}
 
@@ -254,12 +264,12 @@ func (this *ContectView) render() func(ctx *nk.Context) {
 				name := fmt.Sprintf("好友名%d", i+1)
 				statxt := fmt.Sprintf("联系人%d", i+1)
 				ctx.LayoutRowStatic(30, 100, 2)
-				ctx.Label(name, 10)
-				ctx.Label(statxt, 10)
+				ctx.Label(name, nk.TEXT_LEFT)
+				ctx.Label(statxt, nk.TEXT_LEFT)
 			}
 
 			ctx.LayoutRowDynamic(510-3*30, 1)
-			ctx.Label("空白区域", 10)
+			ctx.Label("空白区域", nk.TEXT_CENTERED)
 
 		}
 		ctx.End()
@@ -283,7 +293,7 @@ func (this *ChatForm) render() func(ctx *nk.Context) {
 	w := &nk.Window2{}
 	w.Name = "聊天消息列表窗口"
 	w.Rect = nk.NewRect(250, 80, 550, 600-160)
-	w.Flags = nk.WINDOW_BORDER | nk.WINDOW_MOVABLE
+	w.Flags = nk.WINDOW_BORDER
 	this.w = w
 
 	return func(ctx *nk.Context) {
@@ -309,28 +319,53 @@ func (this *ChatForm) render() func(ctx *nk.Context) {
 				// render no message
 			}
 
-			for idx, msg := range msgs {
-				ctx.LayoutRowBegin(nk.STATIC, 39, 4)
+			for oidx, msg := range msgs {
+				ctx.LayoutRowBegin(nk.STATIC, 39, 6)
 				ctx.LayoutRowPush(30)
-				ctx.ButtonLabel(" ")
+				if !msg.Me {
+					ctx.ButtonLabel(" ")
+				} else {
+					ctx.Label(" ", nk.TEXT_CENTERED)
+				}
 				name := gopp.IfElseStr(msg.Me, uictx.mdl.Myname, msg.PeerNameUi)
-				ctx.LayoutRowPush(330)
-				ctx.Label(name, nk.TEXT_LEFT)
+				ctx.LayoutRowPush(300)
+				if len(msg.Links) > 0 {
+					if ctx.MenuBeginLabel(name, nk.TEXT_LEFT, nk.NewVec2(450, 150)) != nil {
+						for _, link := range msg.Links {
+							ctx.LayoutRowDynamic(30, 1)
+							if ctx.MenuItemLabel(link, nk.TEXT_LEFT) != nil {
+								uictx.XdgOpen(link)
+							}
+						}
+						ctx.MenuEnd()
+					}
+				} else {
+					ctx.Label(name, nk.TEXT_LEFT)
+				}
 				ctx.LayoutRowPush(80)
 				ctx.Label(msg.TimeUi, nk.TEXT_RIGHT)
 				ctx.LayoutRowPush(30)
 				ctx.Label(gopp.IfElseStr(msg.Sent, " ", "=>"), nk.TEXT_RIGHT)
+				ctx.LayoutRowPush(30)
+				if ctx.ButtonLabel("Copy") != nil {
+					uictx.Copy2Clipboard(msg.MsgUi)
+				}
+				ctx.LayoutRowPush(30)
+				if msg.Me {
+					ctx.ButtonLabel("Me")
+				} else {
+					ctx.Label(" ", nk.TEXT_CENTERED)
+				}
 				ctx.LayoutRowEnd()
 
-				tmsg := fmt.Sprintf("%d %s", idx, msg.MsgUi)
-				wraped := gopp.Splitrnui(tmsg, 60)
+				wraped := gopp.Splitrnui(msg.MsgUi, 60)
 				for idx, line := range wraped {
 					ctx.LayoutRowBegin(nk.STATIC, 39, 3)
 					ctx.LayoutRowPush(30)
-					ctx.Label(" ", nk.TEXT_CENTERED)
+					ctx.Label(gopp.IfElseStr(idx > 0, " ", fmt.Sprintf("%d", oidx)), nk.TEXT_CENTERED)
 					ctx.LayoutRowPush(450)
 					seln := len(line)
-					ctx.SelectableLabel(line, gopp.IfElseInt(idx == 0, 1, 5), &seln)
+					ctx.SelectableLabel(line, nk.TEXT_LEFT, &seln)
 					ctx.LayoutRowPush(30)
 					ctx.Label(" ", nk.TEXT_CENTERED)
 					ctx.LayoutRowEnd()
@@ -342,13 +377,13 @@ func (this *ChatForm) render() func(ctx *nk.Context) {
 			for i := 1000; i < 300; i++ {
 				tmsg := fmt.Sprintf("聊天消息%d\x00", i)
 				ctx.LayoutRowDynamic(30, 1)
-				ctx.Label(tmsg, 10)
+				ctx.Label(tmsg, nk.TEXT_CENTERED)
 			}
 
 			emptylen := 410 - float32(len(msgs)+10)*30
 			if emptylen > 0 {
 				ctx.LayoutRowDynamic(emptylen, 1)
-				ctx.Label("空白区域", 10)
+				ctx.Label("空白区域", nk.TEXT_CENTERED)
 			}
 
 			if hasnew {
@@ -486,11 +521,11 @@ func (this *MemberListForm) render() func(ctx *nk.Context) {
 			for _, v := range mbs {
 				ctx.LayoutRowBegin(nk.STATIC, 30, 3)
 				ctx.LayoutRowPush(160)
-				ctx.Label(v.GetName(), 3)
+				ctx.Label(v.GetName(), nk.TEXT_CENTERED)
 				ctx.LayoutRowPush(160)
-				ctx.Label(v.GetPubkey(), 3)
+				ctx.Label(v.GetPubkey(), nk.TEXT_CENTERED)
 				ctx.LayoutRowPush(130)
-				ctx.Label(gopp.TimeToFmt1(time.Unix(v.GetJoints(), 0)), 3)
+				ctx.Label(gopp.TimeToFmt1(time.Unix(v.GetJoints(), 0)), nk.TEXT_CENTERED)
 				ctx.LayoutRowEnd()
 			}
 		}

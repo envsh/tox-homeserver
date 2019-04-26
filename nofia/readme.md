@@ -6,4 +6,5 @@ tox-homeserver 的轻量客户端，基于nuklear 界面库
 * 拷贝粘贴
 * 发送emoji
 * 可选字体
-
+* message notify, systray or window blink or sound?
+* systray

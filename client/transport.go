@@ -163,7 +163,8 @@ func (this *GrpcTransport) Start() error {
 func (this *GrpcTransport) serveBackendEventGrpc() {
 	nowt := time.Now()
 	for !this.closed {
-		this.serveBackendEventGrpcImpl()
+		err := this.serveBackendEventGrpcImpl()
+		gopp.ErrPrint(err)
 		if this.closed {
 			break
 		}
@@ -175,6 +176,7 @@ func (this *GrpcTransport) serveBackendEventGrpc() {
 		maxWait := 51 * time.Second
 		retryWait = gopp.IfElse(retryWait > maxWait, maxWait, retryWait).(time.Duration)
 		log.Println("Grpc maybe disconnected, retry after", retryWait)
+		this.notifyRpcStatus(err, retryWait)
 		// TODO for android, 需要在从休眠中醒来时通知并取消该sleep
 		// TODO for android, 也许需要监听wifi状态
 		time.Sleep(retryWait)
@@ -182,15 +184,34 @@ func (this *GrpcTransport) serveBackendEventGrpc() {
 	log.Println("Grpc serve proc done:", this.closed, time.Since(nowt))
 }
 
-func (this *GrpcTransport) serveBackendEventGrpcImpl() {
+func (this *GrpcTransport) notifyRpcStatus(err error, retryWait time.Duration) {
+	evto := &thspbs.Event{}
+	if err != nil {
+		evto.Name = "brokenrpc"
+		evto.Args = []string{err.Error(), retryWait.String()}
+	} else {
+		evto.Name = "goodrpc"
+	}
+
+	jcc, err := json.Marshal(evto)
+	gopp.ErrPrint(err)
+	if jcc == nil {
+		log.Println("Wtf:", evto)
+	}
+	this.runOnData(evto, jcc)
+}
+
+func (this *GrpcTransport) serveBackendEventGrpcImpl() error {
 	clio := thspbs.NewToxhsClient(this.rpcli)
 	stmc, err := clio.PollCallback(context.Background(),
 		&thspbs.Event{Name: "PollCallback", DeviceUuid: appctx.devo.Uuid})
 	gopp.ErrPrint(err)
 	if err != nil {
-		return
+		return err
 	}
+	this.notifyRpcStatus(nil, 0)
 
+	var toperr error
 	// success reset
 	this.retryer = nil
 	cnter := uint64(0)
@@ -198,6 +219,7 @@ func (this *GrpcTransport) serveBackendEventGrpcImpl() {
 		evto, err := stmc.Recv()
 		gopp.ErrPrint(err)
 		if err != nil {
+			toperr = err
 			break
 		}
 		cnter++
@@ -220,6 +242,7 @@ func (this *GrpcTransport) serveBackendEventGrpcImpl() {
 		this.runOnData(evto, jcc)
 	}
 	log.Println("Grpc poll got events:", cnter)
+	return toperr
 }
 
 func (this *GrpcTransport) rmtCall(args *thspbs.Event) (*thspbs.Event, error) {

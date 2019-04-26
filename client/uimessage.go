@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"golang.org/x/net/html"
 	"mvdan.cc/xurls"
 
 	"go-purple/msgflt-prpl/bridges"
@@ -28,6 +29,7 @@ type Message struct {
 	Sent       bool
 	UserCode   int64
 
+	Links []string
 	Index int64
 }
 
@@ -98,7 +100,8 @@ func (this *Message) refmtmsg() {
 	this.resetTimezone()
 	this.TimeUi = Time2Today(this.Time)
 
-	refmtmsgfns := []func(){this.refmtmsgRUser, this.refmtmsgLink}
+	// refmtmsgfns := []func(){this.refmtmsgRUser, this.refmtmsgLink}
+	refmtmsgfns := []func(){this.refmtmsgRUser, this.findmsgLinks}
 	for _, fn := range refmtmsgfns {
 		fn()
 	}
@@ -107,7 +110,8 @@ func (this *Message) refmtmsgRUser() {
 	if this.Me {
 		this.PeerNameUi, this.MsgUi = this.PeerName, this.Msg
 	} else {
-		newPeerName, newMsg, _ := bridges.ExtractRealUser(this.PeerName, this.Msg)
+		// newPeerName, newMsg, _ := bridges.ExtractRealUser(this.PeerName, this.Msg)
+		newPeerName, newMsg, _ := bridges.ExtractRealUserMD(this.PeerName, this.Msg)
 		this.PeerNameUi = newPeerName
 		this.MsgUi = newMsg
 		this.LastMsgUi = newMsg
@@ -120,6 +124,26 @@ func (this *Message) refmtmsgLink() {
 		s = strings.Replace(s, u, fmt.Sprintf(`<a href="%s">%s</a>`, u, u), -1)
 	}
 	this.MsgUi = s
+}
+func (this *Message) findmsgLinks() {
+	urls := xurls.Strict().FindAllString(this.MsgUi, -1)
+	this.Links = urls
+}
+
+// TODO
+func (this *Message) trimHTMLTags() {
+	var trimfn func(n *html.Node)
+	trimfn = func(n *html.Node) {
+		// if note is script tag
+		if n.Type == html.ElementNode && n.Data == "script" {
+			n.Parent.RemoveChild(n)
+			return // script tag is gone...
+		}
+		// traverse DOM
+		for c := n.FirstChild; c != nil; c = c.NextSibling {
+			trimfn(c)
+		}
+	}
 }
 func (this *Message) resetTimezone() {
 	if runtime.GOOS == "android" {

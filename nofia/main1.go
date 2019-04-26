@@ -2,8 +2,15 @@ package main
 
 import (
 	"flag"
+	"gopp"
+
+	"os/exec"
+
 	nk "mkuse/nuklear"
 	thscli "tox-homeserver/client"
+
+	"github.com/atotto/clipboard"
+	xdgopen "github.com/skratchdot/open-golang/open"
 )
 
 type Render interface {
@@ -82,4 +89,26 @@ func (this *UiContext) init() *UiContext {
 
 func (this *UiContext) runOnUiThread() {
 
+}
+
+type UiService struct {
+}
+
+func (this *UiContext) XdgOpen(u string) {
+	err := xdgopen.Run(u)
+	gopp.ErrPrint(err)
+
+	if false {
+		xdgopen, err := exec.LookPath("xdg-open")
+		gopp.ErrPrint(err)
+		if err == nil {
+			err = exec.Command(xdgopen, u).Run()
+			gopp.ErrPrint(err, u)
+		}
+	}
+}
+
+func (this *UiContext) Copy2Clipboard(txt string) {
+	err := clipboard.WriteAll(txt)
+	gopp.ErrPrint(err)
 }

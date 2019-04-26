@@ -1,6 +1,7 @@
 package client
 
 import (
+	"fmt"
 	"gopp"
 	"sort"
 	"sync/atomic"
@@ -21,6 +22,7 @@ type DataModel struct {
 	Mystmsg string
 	Mystno  int
 	Mysttxt string // status text
+	lastno  int    // last valid status no, in case rpc
 
 	// for ChatForm and SendForm
 	// currently active state
@@ -39,14 +41,16 @@ type DataModel struct {
 	// 当切换到一个窗口时，如果没有新消息，则使用上次记录下的位置
 	Scrollbarys map[string]int
 
-	Friendsm map[uint32]*thspbs.FriendInfo
+	Friendsm map[string]*thspbs.FriendInfo // uniqid =>
 	Friendsv []*thspbs.FriendInfo
-	Groupsm  map[uint32]*thspbs.GroupInfo
+	Groupsm  map[string]*thspbs.GroupInfo // uniqid =>
 	Groupsv  []*thspbs.GroupInfo
 
 	Ctmsgs map[string][]*Message // uniqid =>
 	// Ctmsgs  map[string][]string   // uniqid =>
-	Hasnews map[string]int // uniqid => , 某个联系人的未读取消息个数
+	Hasnews    map[string]int // uniqid => , 某个联系人的未读取消息个数
+	lastmsg    *Message       // Lastmsg must be not belongs to active contact chatform
+	lastctname string         // always according with lastmsg
 
 	repainter func()
 }
@@ -59,9 +63,9 @@ func NewDataModel(repainter func()) *DataModel {
 
 	this.Scrollbarys = map[string]int{}
 
-	this.Friendsm = map[uint32]*thspbs.FriendInfo{}
+	this.Friendsm = map[string]*thspbs.FriendInfo{}
 	this.Friendsv = []*thspbs.FriendInfo{}
-	this.Groupsm = map[uint32]*thspbs.GroupInfo{}
+	this.Groupsm = map[string]*thspbs.GroupInfo{}
 	this.Groupsv = []*thspbs.GroupInfo{}
 
 	this.Ctmsgs = map[string][]*Message{}
@@ -91,8 +95,18 @@ func (this *DataModel) SetMyConnStatus(stno int) {
 	this.mu.Lock()
 	defer this.mu.Unlock()
 
-	this.Mystno = stno
-	this.Mysttxt = Conno2str(stno)
+	if stno == 5 { // brokenrpc
+		this.lastno = this.Mystno
+		this.Mystno = stno
+	} else if stno == -5 { // goodrpc
+		if this.Mystno == 5 {
+			this.Mystno = this.lastno
+		}
+	} else {
+		this.Mystno = stno
+	}
+
+	this.Mysttxt = Conno2str(this.Mystno)
 }
 func Conno2str(stno int) string {
 	switch stno {
@@ -112,11 +126,11 @@ func Conno2str1(stno int) string { return Conno2str(stno)[:1] }
 
 func (this *DataModel) SetFriendInfos(friends map[uint32]*thspbs.FriendInfo) {
 	defer this.emitChanged()
-	newedm := map[uint32]*thspbs.FriendInfo{}
+	newedm := map[string]*thspbs.FriendInfo{}
 	newedv := []*thspbs.FriendInfo{}
-	for k, v := range friends {
+	for _, v := range friends {
 		f := *v
-		newedm[k] = &f
+		newedm[v.GetPubkey()] = &f
 		newedv = append(newedv, &f)
 	}
 	sort.Slice(newedv, func(i int, j int) bool { return newedv[i].GetFnum() < newedv[j].GetFnum() })
@@ -127,11 +141,11 @@ func (this *DataModel) SetFriendInfos(friends map[uint32]*thspbs.FriendInfo) {
 }
 func (this *DataModel) SetGroupInfos(groups map[uint32]*thspbs.GroupInfo) {
 	defer this.emitChanged()
-	newedm := map[uint32]*thspbs.GroupInfo{}
+	newedm := map[string]*thspbs.GroupInfo{}
 	newedv := []*thspbs.GroupInfo{}
-	for k, v := range groups {
+	for _, v := range groups {
 		g := *v
-		newedm[k] = &g
+		newedm[v.GetGroupId()] = &g
 		newedv = append(newedv, &g)
 	}
 	sort.Slice(newedv, func(i int, j int) bool { return newedv[i].GetGnum() < newedv[j].GetGnum() })
@@ -222,9 +236,27 @@ func (this *DataModel) Newmsg(uniqid string, msg *Message) {
 	defer this.mu.Unlock()
 
 	this.Ctmsgs[uniqid] = append(this.Ctmsgs[uniqid], msg)
-	if uniqid != this.Ctuniqid {
-	}
 	this.Hasnews[uniqid] += 1
+
+	if uniqid != this.Ctuniqid {
+		this.lastmsg = msg
+		if cto, ok := this.Groupsm[uniqid]; ok {
+			this.lastctname = cto.GetTitle()
+		} else if cto, ok := this.Friendsm[uniqid]; ok {
+			this.lastctname = cto.GetName()
+		}
+	}
+}
+
+func (this *DataModel) Lastmsg() string {
+	this.mu.RLock()
+	defer this.mu.RUnlock()
+	msgo := this.lastmsg
+	if msgo == nil {
+		return ""
+	}
+
+	return fmt.Sprintf("%s> %s: %s", this.lastctname, msgo.PeerNameUi, msgo.MsgUi)
 }
 
 func (this *DataModel) Hasnewmsg(uniqid string) bool {
