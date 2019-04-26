@@ -112,3 +112,9 @@ func (this *UiContext) Copy2Clipboard(txt string) {
 	err := clipboard.WriteAll(txt)
 	gopp.ErrPrint(err)
 }
+
+func (this *UiContext) ReadClipboard() string {
+	s, err := clipboard.ReadAll()
+	gopp.ErrPrint(err)
+	return s
+}

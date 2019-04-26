@@ -425,10 +425,19 @@ func (this *SendForm) render() func(ctx *nk.Context) {
 		if err != nil {
 
 			ctx.LayoutRowBegin(nk.STATIC, 30, 7)
-			for i := 0; i < 7; i++ {
+			for i := 0; i < 6; i++ {
 				txt := fmt.Sprintf("操作%d", i+1)
 				ctx.LayoutRowPush(50)
 				if ctx.ButtonLabel(txt) != nil {
+				}
+			}
+			txt := "粘贴"
+			ctx.LayoutRowPush(50)
+			if ctx.ButtonLabel(txt) != nil {
+				s := uictx.ReadClipboard()
+				if s != "" {
+					copy(this.iptbuf[this.iptblen:], []byte(s))
+					this.iptblen += len(s)
 				}
 			}
 			ctx.LayoutRowEnd()
