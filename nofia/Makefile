@@ -1,4 +1,16 @@
 
-all:
+all: nui
+	rm -f nofia
 	#  -ldflags "-w -s"
-	go build -v -i -pkgdir ~/oss/pkg/linux_amd64 # -linkshared
+	go build -v -i -x -pkgdir ~/oss/pkg/linux_amd64 -ldflags "-v -linkmode external" # -linkshared
+
+nui:
+	nim --threads:on --listcmd --header \
+		-p:/opt/nim/lib -p:$(HOME)/.nimble/mulib \
+		--nomain:on --nolinking:off --app:staticlib -o:libnikui.a \
+		c nikui.nim
+	cp $(HOME)/.cache/nim/nikui_d/nikui.h .
+
+c2n:
+	c2nim --typeprefixes render_x11_native.h
+

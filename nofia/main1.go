@@ -20,6 +20,9 @@ type Render interface {
 func main() {
 	flag.Parse()
 
+	startuimain()
+	select {}
+
 	app := nk.NewApp()
 	uictx.app = app
 	mdl := thscli.NewDataModel(func() { app.Repaint() })

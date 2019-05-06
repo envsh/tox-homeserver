@@ -1,0 +1,342 @@
+#ifdef RENDER_X11_NATIVE
+#include <string.h>
+
+#include "render_x11_native.h"
+
+
+/*
+ * This function chooses the "more desirable" of two input styles.  The
+ * style with the more complicated Preedit style is returned, and if the
+ * styles have the same Preedit styles, then the style with the more
+ * complicated Status style is returned.  There is no "official" way to
+ * order interaction styles.  This one makes the most sense to me.
+ * This is a long procedure for a simple heuristic.
+ */
+XIMStyle ChooseBetterStyle(style1,style2)
+XIMStyle style1, style2;
+{
+    XIMStyle s,t;
+    XIMStyle preedit = XIMPreeditArea | XIMPreeditCallbacks |
+        XIMPreeditPosition | XIMPreeditNothing | XIMPreeditNone;
+    XIMStyle status = XIMStatusArea | XIMStatusCallbacks |
+        XIMStatusNothing | XIMStatusNone;
+    if (style1 == 0) return style2;
+    if (style2 == 0) return style1;
+    if ((style1 & (preedit | status)) == (style2 & (preedit | status)))
+        return style1;
+    s = style1 & preedit;
+    t = style2 & preedit;
+    if (s != t) {
+        if (s | t | XIMPreeditCallbacks)
+            return (s == XIMPreeditCallbacks)?style1:style2;
+        else if (s | t | XIMPreeditPosition)
+            return (s == XIMPreeditPosition)?style1:style2;
+        else if (s | t | XIMPreeditArea)
+            return (s == XIMPreeditArea)?style1:style2;
+        else if (s | t | XIMPreeditNothing)
+            return (s == XIMPreeditNothing)?style1:style2;
+    }
+    else { /* if preedit flags are the same, compare status flags */
+        s = style1 & status;
+        t = style2 & status;
+        if (s | t | XIMStatusCallbacks)
+            return (s == XIMStatusCallbacks)?style1:style2;
+        else if (s | t | XIMStatusArea)
+            return (s == XIMStatusArea)?style1:style2;
+        else if (s | t | XIMStatusNothing)
+            return (s == XIMStatusNothing)?style1:style2;
+    }
+}
+void GetPreferredGeometry(ic, name, area)
+XIC ic;
+char *name;           /* XNPreEditAttributes or XNStatusAttributes */
+XRectangle *area;     /* the constraints on the area */
+{
+    XVaNestedList list;
+    list = XVaCreateNestedList(0, XNAreaNeeded, area, NULL);
+    /* set the constraints */
+    XSetICValues(ic, name, list, NULL);
+    /* Now query the preferred size */
+    /* The Xsi input method, Xwnmo, seems to ignore the constraints, */
+    /* but we're not going to try to enforce them here. */
+    XGetICValues(ic, name, list, NULL);
+    XFree(list);
+}
+void SetGeometry(ic, name, area)
+XIC ic;
+char *name;           /* XNPreEditAttributes or XNStatusAttributes */
+XRectangle *area;     /* the actual area to set */
+{
+    XVaNestedList list;
+    list = XVaCreateNestedList(0, XNArea, area, NULL);
+    XSetICValues(ic, name, list, NULL);
+    XFree(list);
+}
+
+const char* program_name = "nk-render-x11-native";
+RenderWindow* NewRenderWindow() {
+    RenderWindow* rdwin = (RenderWindow*)calloc(1, sizeof(RenderWindow));
+
+    /*
+     * The error messages in this program are all in English.
+     * In a truly internationalized program, they would not
+     * be hardcoded; they would be looked up in a database of
+     * some sort.
+     */
+    if (setlocale(LC_ALL, "") == NULL) {
+        (void) fprintf(stderr, "%s: cannot set locale.\n",program_name);
+        exit(1);
+    }
+    if ((rdwin->dpy = XOpenDisplay(NULL)) == NULL) {
+        (void) fprintf(stderr, "%s: cannot open Display.\n", program_name);
+        exit(1);
+    }
+    rdwin->root = DefaultRootWindow(rdwin->dpy);
+
+    if (!XSupportsLocale()) {
+        (void) fprintf(stderr, "%s: X does not support locale %s.\n",
+                       program_name, setlocale(LC_ALL, NULL));
+        exit(1);
+    }
+    if (XSetLocaleModifiers("") == NULL) {
+        (void) fprintf(stderr, "%s: Warning: cannot set locale modifiers.\n",
+                       program_name);
+    }
+
+
+    int curnfontpaths = 0;
+    char**curfontpaths = XGetFontPath(rdwin->dpy, &curnfontpaths); // xset -q
+    char** newfontpaths = (char**)calloc(1, (size_t)(16+curnfontpaths)*sizeof(void*));
+    newfontpaths[0] = "/usr/share/fonts/wenquanyi/wqy-microhei";
+    newfontpaths[1] = "/usr/share/fonts/wenquanyi/wqy-zenhei";
+    newfontpaths[2] = "/usr/share/fonts/noto-cjk";
+    for (int i = 0; i < curnfontpaths; i ++ ) {
+        newfontpaths[i+3] = curfontpaths[i];
+    }
+    int ret = XSetFontPath(rdwin->dpy, newfontpaths, curnfontpaths+3);
+    if (ret != True) {
+        fprintf(stderr, "%s: set font path failed\n", program_name);
+    }
+    free(newfontpaths);
+
+    /*
+     * Create the fontset.
+     */
+    rdwin->fontset = XCreateFontSet(rdwin->dpy,
+                             // "*-adobe-helvetica-*-r-*-*-*-120-*-*-*-*-*-*, \
+                              // -misc-fixed-*-r-*-*-*-130-*-*-*-*-*-*",
+                             "*",
+                             &rdwin->missing_charsets, &rdwin->num_missing_charsets,
+                             &rdwin->default_string);
+
+    /*
+     * if there are charsets for which no fonts can
+     * be found, print a warning message.
+     */
+    if (rdwin->num_missing_charsets > 0) {
+        (void)fprintf(stderr, "%s: The following charsets are missing:\n",
+                      program_name);
+        for(int i=0; i < rdwin->num_missing_charsets; i++)
+            (void)fprintf(stderr, "%s: %s\n", program_name,
+                          rdwin->missing_charsets[i]);
+        XFreeStringList(rdwin->missing_charsets);
+        (void)fprintf(stderr, "%s: The string %s will be used in place\n",
+                      program_name, rdwin->default_string);
+        (void)fprintf(stderr, "%s: of any characters from those sets.\n",
+                      program_name);
+    }
+    rdwin->screen = DefaultScreen(rdwin->dpy);
+    // rdwin->win = XCreateSimpleWindow(rdwin->dpy, RootWindow(rdwin->dpy, rdwin->screen), 0, 0, 800, 600,
+    //                         2, WhitePixel(rdwin->dpy,rdwin->screen),BlackPixel(rdwin->dpy,rdwin->screen));
+    rdwin->vis = XDefaultVisual(rdwin->dpy, rdwin->screen);
+    rdwin->cmap = XCreateColormap(rdwin->dpy,rdwin->root,rdwin->vis,AllocNone);
+
+    rdwin->swa.colormap = rdwin->cmap;
+    rdwin->swa.event_mask =
+        ExposureMask | KeyPressMask | KeyReleaseMask |
+        ButtonPress | ButtonReleaseMask| ButtonMotionMask |
+        Button1MotionMask | Button3MotionMask | Button4MotionMask | Button5MotionMask|
+        PointerMotionMask | KeymapStateMask;
+    rdwin->win = XCreateWindow(rdwin->dpy, rdwin->root, 0, 0, 800, 600, 0,
+                               XDefaultDepth(rdwin->dpy,rdwin->screen), InputOutput,
+                               rdwin->vis, CWEventMask | CWColormap, &rdwin->swa);
+    const char* wintitle = "X11-xlib 呵呵";
+    XStoreName(rdwin->dpy, rdwin->win, wintitle);// "X11-xlib 呵呵");
+    XChangeProperty(rdwin->dpy, rdwin->win,
+                    XInternAtom(rdwin->dpy, "_NET_WM_NAME", 0),
+                    XInternAtom(rdwin->dpy, "UTF8_STRING", 0), 8,
+                    PropModeReplace, (unsigned char*) wintitle, strlen(wintitle));
+
+    rdwin->gc = XCreateGC(rdwin->dpy,rdwin->win,0,&rdwin->gcv);
+    XSetForeground(rdwin->dpy,rdwin->gc,WhitePixel(rdwin->dpy,rdwin->screen));
+    XSetBackground(rdwin->dpy,rdwin->gc,BlackPixel(rdwin->dpy,rdwin->screen));
+    /* Connect to an input method.  */
+    /* In this example, we don't pass a resource database */
+    if ((rdwin->im = XOpenIM(rdwin->dpy, NULL, NULL, NULL)) == NULL) {
+        (void)fprintf(stderr, "Couldn't open input method\n");
+        exit(1);
+    }
+    /* set flags for the styles our application can support */
+    rdwin->app_supported_styles = XIMPreeditNone | XIMPreeditNothing | XIMPreeditArea;
+    rdwin->app_supported_styles |= XIMStatusNone | XIMStatusNothing | XIMStatusArea;
+    /* figure out which styles the IM can support */
+    XGetIMValues(rdwin->im, XNQueryInputStyle, &rdwin->im_supported_styles, NULL);
+    /*
+     * now look at each of the IM supported styles, and
+     * chose the "best" one that we can support.
+     */
+    rdwin->best_style = 0;
+    XIMStyle style = 0;
+    for(int i=0; i < rdwin->im_supported_styles->count_styles; i++) {
+        style = rdwin->im_supported_styles->supported_styles[i];
+        if ((style & rdwin->app_supported_styles) == style) /* if we can handle it */
+            rdwin->best_style = ChooseBetterStyle(style, rdwin->best_style);
+    }
+    /* if we couldn't support any of them, print an error and exit */
+    if (rdwin->best_style == 0) {
+        (void)fprintf(stderr, "%s: application and program do not share a\n",
+                      program_name);
+        (void)fprintf(stderr, "%s: commonly supported interaction style.\n",
+                      program_name);
+        exit(1);
+    }
+    XFree(rdwin->im_supported_styles);
+    /*
+     * Now go create an IC using the style we chose.
+     * Also set the window and fontset attributes now.
+     */
+
+    //*
+    rdwin->list = XVaCreateNestedList(0,XNFontSet,rdwin->fontset,NULL);
+    rdwin->ic = XCreateIC(rdwin->im,
+                   XNInputStyle, rdwin->best_style,
+                   XNClientWindow, rdwin->win,
+                   XNPreeditAttributes, rdwin->list,
+                   XNStatusAttributes, rdwin->list,
+                   NULL);
+    XFree(rdwin->list);
+    if (rdwin->ic == NULL) {
+        (void) fprintf(stderr, "Couldn't create input context\n");
+        exit(1);
+    }
+
+    XGetICValues(rdwin->ic, XNFilterEvents, &rdwin->im_event_mask, NULL);
+    // dont block nk event
+    // XSelectInput(rdwin->dpy,rdwin->win, ExposureMask | KeyPressMask 
+    //              | StructureNotifyMask | rdwin->im_event_mask);
+    XSetICFocus(rdwin->ic);
+    //*/
+    XMapWindow(rdwin->dpy,rdwin->win);
+
+    rdwin->wm_delete_window = XInternAtom(rdwin->dpy, "WM_DELETE_WINDOW", False);
+    XSetWMProtocols(rdwin->dpy, rdwin->win, &rdwin->wm_delete_window, 1);
+    XGetWindowAttributes(rdwin->dpy, rdwin->win, &rdwin->attr);
+
+    return rdwin;
+}
+
+void nk_x11_event_handle(RenderWindow* rdwin) {
+    XEvent event;
+    char string[200];
+    int str_len = 0;
+    int loopcnt = 0;
+    while(1) {
+        printf("looped %d\n", loopcnt++);
+
+        int buf_len = 10;
+        char *buffer = (char *)malloc(buf_len * sizeof(char));
+        int len;
+        KeySym keysym;
+        Status status;
+        Bool redraw = False;
+        XNextEvent(rdwin->dpy, &event);
+        if (XFilterEvent(&event, None))
+            continue;
+        switch (event.type) {
+        case Expose:
+            /* draw the string at a hard-coded location */
+            if (event.xexpose.count == 0) {
+                XmbDrawString(rdwin->dpy, rdwin->win, rdwin->fontset, rdwin->gc, 10, 50, string, str_len);
+                string[str_len] = 0;
+                printf("111 input string? %s\n", string);
+            }
+            break;
+        case KeyPress:
+            len = XmbLookupString(rdwin->ic, (XKeyPressedEvent*)&event, buffer, buf_len,
+                                  &keysym, &status);
+            printf("XmbLookupString len=%d, status=%d, none=%d, keysym=%d, both=%d, chars=%d, overflow=%d\n",
+                   len, status,
+                   XLookupNone, XLookupKeySym, XLookupBoth, XLookupChars, XBufferOverflow);
+            /*
+             * Workaround:  the Xsi implementation of XwcLookupString
+             * returns a length that is 4 times too big.  If this bug
+             * does not exist in your version of Xlib, remove the
+             * following line, and the similar line below.
+             */
+            len = len / 1 ; // 4;
+            if (status == XBufferOverflow) {
+                buf_len = len;
+                buffer = (char *)realloc((char *)buffer,
+                                            buf_len * sizeof(wchar_t));
+                len = XmbLookupString(rdwin->ic, (XKeyPressedEvent*)&event, buffer, buf_len,
+                                      &keysym, &status);
+                /* Workaround */
+                len = len / 1; // 4;
+            }
+            redraw = False;
+            switch (status) {
+            case XLookupNone:
+                break;
+            case XLookupKeySym:
+            case XLookupBoth:
+                /* Handle backspacing, and <Return> to exit */
+                if ((keysym == XK_Delete) || (keysym == XK_BackSpace)) {
+                    if (str_len > 0) str_len--;
+                    redraw = True;
+                    break;
+                }
+                if (keysym == XK_Return) exit(0);
+                if (status == XLookupKeySym) break;
+            case XLookupChars:
+                for(int i=0; i < len; i++)
+                    string[str_len++] = buffer[i];
+                printf("XLookupChars %d\n", len);
+                redraw = True;
+                break;
+            }
+            /* do a very simple-minded redraw, if needed */
+            if (redraw) {
+                XClearWindow(rdwin->dpy, rdwin->win);
+                XmbDrawString(rdwin->dpy, rdwin->win, rdwin->fontset, rdwin->gc, 10, 50, string, str_len);
+                printf("222 input string? slen=%d, len=%d, %s\n", str_len, len, string);
+                // char* fixedstr = "hehe呵呵";
+                // XmbDrawString(dpy, win, fontset, gc, 10, 50, fixedstr, 10);
+            }
+            break;
+        case ConfigureNotify:
+            /*
+             * When the window is resized, we should re-negotiate the
+             * geometry of the Preedit and Status area, if they are used
+             * in the interaction style.
+             */
+            if (rdwin->best_style & XIMPreeditArea) {
+                rdwin->preedit_area.width = event.xconfigure.width*4/5;
+                rdwin->preedit_area.height = 0;
+                GetPreferredGeometry(rdwin->ic, XNPreeditAttributes, &rdwin->preedit_area);
+                rdwin->preedit_area.x = event.xconfigure.width - rdwin->preedit_area.width;
+                rdwin->preedit_area.y = event.xconfigure.height - rdwin->preedit_area.height;
+                SetGeometry(rdwin->ic, XNPreeditAttributes, &rdwin->preedit_area);
+            }
+            if (rdwin->best_style & XIMStatusArea) {
+                rdwin->status_area.width = event.xconfigure.width/5;
+                rdwin->status_area.height = 0;
+                GetPreferredGeometry(rdwin->ic, XNStatusAttributes, &rdwin->status_area);
+                rdwin->status_area.x = 0;
+                rdwin->status_area.y = event.xconfigure.height - rdwin->status_area.height;
+                SetGeometry(rdwin->ic, XNStatusAttributes, &rdwin->status_area);
+            }
+            break;
+        }
+    }
+}
+#endif
