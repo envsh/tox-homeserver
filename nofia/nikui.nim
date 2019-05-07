@@ -91,7 +91,7 @@ proc eventloop(nkw:PNkwindow) =
     while true:
         # linfo("evtch recving...")
         var mxevt = nkw.evtch.recv()
-        ldebug("goty evty:", mxevt.typ, mxevt.evts.len(), nkw.evtch.peek())
+        # ldebug("goty evty:", mxevt.typ, mxevt.evts.len(), nkw.evtch.peek())
         if mxevt.typ == 0: discard
         elif mxevt.typ == 1: dorepaint(nkw, mxevt.evts)
         elif mxevt.typ == 2: discard
