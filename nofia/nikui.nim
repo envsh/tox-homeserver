@@ -1,21 +1,29 @@
-{.passc:"-fPIC -g -O0 -DRENDER_X11_NATIVE"}
+{.passc:"-fPIC -g -O0 -xc -DRENDER_X11_NATIVE"}
 {.passl:"-lX11 -lXft -lXrender"}
 
 # include 其他不使用全局变量的实现
-{.compile: "render_x11_native.c".}
+{.compile: "render_x11_native.c.ngo".}
 import x11/x, x11/xlib
 include render_x11_native
+
+{.passc:"-I/usr/include/freetype2"}
+{.compile:"nuklear_x11_all.c.ngo".}
+include nuklear_x11_all
 
 type MixEvent = ref object
     typ*: int
     evts*: seq[TXEvent]
 
+import tables
 type
     PNkwindow = ptr Nkwindow
     Nkwindow = ref object
         rdwin*: TRenderWindow
-        nkctx*: pointer
+        xfont*: XFont
+        nkctx*: nk_context
         evtch*: Channel[MixEvent]
+        wnds*: Table[string, proc (nkw:PNkwindow, name:string) {.gcsafe.}]
+        wndrunner*: proc (nkw:PNkwindow) {.gcsafe.}
 
 # like global vars, but put in struct
 type
@@ -29,8 +37,25 @@ type
         nkxwin*: Nkwindow
 
 include "nimenv.nim"
+include "views.nim"
 
 proc dorepaint(nkw:PNkwindow, evts : seq[TXEvent]) =
+    var rdwin = nkw.rdwin
+    nk_input_begin(nkw.nkctx)
+    for evt1 in evts:
+        var evt = evt1
+        nk_xlib_handle_event(rdwin.dpy, rdwin.screen, rdwin.win, evt.addr)
+    nk_input_end(nkw.nkctx)
+
+    # GUI
+
+    # APP widgets here
+    if nkw.wndrunner != nil: nkw.wndrunner(nkw)
+
+    # Draw
+    discard XClearWindow(rdwin.dpy, rdwin.win)
+    nk_xlib_render(rdwin.win, nk_color(r:30, g:30, b:30))
+    discard XFlush(rdwin.dpy)
     return
 
 proc x11proc(nkw:PNkwindow) =
@@ -54,7 +79,7 @@ proc x11proc(nkw:PNkwindow) =
             var mevt = MixEvent(typ:1, evts:evts)
             var ok = nkw.evtch.trysend(mevt)
             #var ok = nkw.evtch.trysend("hehhe" & repr(evts.len()))
-            ldebug("evts sent", ok, evts.len(), nkw.evtch.ready(), nkw.evtch.peek())
+            # ldebug("evts sent", ok, evts.len(), nkw.evtch.ready(), nkw.evtch.peek())
             # sync()
         else: sleep(300)
 
@@ -66,7 +91,7 @@ proc eventloop(nkw:PNkwindow) =
     while true:
         # linfo("evtch recving...")
         var mxevt = nkw.evtch.recv()
-        linfo("goty evty:", mxevt.typ, mxevt.evts.len(), nkw.evtch.peek())
+        ldebug("goty evty:", mxevt.typ, mxevt.evts.len(), nkw.evtch.peek())
         if mxevt.typ == 0: discard
         elif mxevt.typ == 1: dorepaint(nkw, mxevt.evts)
         elif mxevt.typ == 2: discard
@@ -75,6 +100,9 @@ proc eventloop(nkw:PNkwindow) =
 proc newNkwindow(nep:pointer): pointer {.exportc.} =
     var ne = cast[PNimenv](nep)
     var nkw = new(Nkwindow)
+    nkw.wnds = initTable[string, proc (nkw:PNkwindow, name:string)]()
+    createnkwndprocs(nkw.addr)
+
     linfo("chan is nil", repr(cast[pointer](addr(nkw.evtch))))
     ldebug("chan is ready", nkw.evtch.ready())
     nkw.evtch.open(8)
@@ -87,9 +115,21 @@ proc NkwindowOpen(nep:pointer) {.exportc.} =
     var nkw = ne.nkxwin
     var pnkw = addr(ne.nkxwin)
 
-    spawn eventloop(pnkw)
+    # 启动顺序，事件接收线程， 打开XDisplay, nk xlib初始化， 启动 x11事件接收线程
+    spawn eventloop(pnkw) # shoule before NewRenderWindow, or recv nothing
     nkw.rdwin = NewRenderWindow()
     linfo("rdwin is nil", nkw.rdwin == nil)
+
+    var xft = nk_xfont_create(nkw.rdwin.dpy, "*")
+    var rdwin = nkw.rdwin
+    var cmap = rdwin.cmap # 这种方式得到的值不对，可能是结构体在nim与c中不匹配。确认，XIM,XIC大小不对
+    # cmap = RenderWindowCmap(rdwin)
+    var vis = rdwin.vis
+    # vis = RenderWindowVis(rdwin)
+    var nkctx = nk_xlib_init(xft, rdwin.dpy, rdwin.screen, rdwin.win, vis, cmap, 800, 600)
+    nkw.xfont = xft
+    nkw.nkctx = nkctx
+
     spawn x11proc(pnkw)
     return
 

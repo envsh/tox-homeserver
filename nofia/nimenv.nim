@@ -4,6 +4,7 @@ import threadpool
 import macros
 import logging
 import strutils
+import tables
 
 ### logging initilize
 macro logecho(lvl : string, msgs: varargs[untyped]): untyped =
@@ -40,6 +41,10 @@ ldebug("hehehe有",true)
 ldebug("hehehe在",false)
 ]#
 
+proc c2nimbool(ok:cint):bool = return if ok == 1: true else: false
+proc nim2cbool(ok:bool):cint = return if ok: 1 else: 0
+let ctrue = cint(1)
+let cfalse = cint(0)
 
 ### begin emu code, 不能使用全局变量的部分
 proc freeNimenv(ne : pointer) {.exportc.} =

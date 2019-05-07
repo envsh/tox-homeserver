@@ -2,19 +2,13 @@ package main
 
 import (
 	"flag"
-	"gopp"
 
-	"os/exec"
-
-	nk "mkuse/nuklear"
+	// nk "mkuse/nuklear"
 	thscli "tox-homeserver/client"
-
-	"github.com/atotto/clipboard"
-	xdgopen "github.com/skratchdot/open-golang/open"
 )
 
 type Render interface {
-	render() func(*nk.Context)
+	// render() func(*nk.Context)
 }
 
 func main() {
@@ -23,47 +17,50 @@ func main() {
 	startuimain()
 	select {}
 
-	app := nk.NewApp()
-	uictx.app = app
-	mdl := thscli.NewDataModel(func() { app.Repaint() })
-	uictx.mdl = mdl
+	/*
+		app := nk.NewApp()
+		uictx.app = app
+		mdl := thscli.NewDataModel(func() { app.Repaint() })
+		uictx.mdl = mdl
 
-	appctx = thscli.NewAppContext()
-	go runbkdproc()
+		appctx = thscli.NewAppContext()
+		go runbkdproc()
 
-	app.Exec(
-		uictx.icop.render(),
+		app.Exec(
+			uictx.icop.render(),
 
-		uictx.minfov.render(),
-		uictx.ctview.render(),
-		uictx.myactv.render(),
-		uictx.fiview.render(),
-		uictx.chatform.render(),
-		uictx.sendv.render(),
-		uictx.mblstv.render(),
-		uictx.setfmv.render(),
-	)
+			uictx.minfov.render(),
+			uictx.ctview.render(),
+			uictx.myactv.render(),
+			uictx.fiview.render(),
+			uictx.chatform.render(),
+			uictx.sendv.render(),
+			uictx.mblstv.render(),
+			uictx.setfmv.render(),
+		)
+	*/
 }
 
 var appctx *thscli.AppContext
 var vtcli *thscli.LigTox
 
 // ui context
+
 var uictx = NewUiContext()
 
 type UiContext struct {
-	app      *nk.NkApp
-	mdl      *thscli.DataModel
-	minfov   *MyinfoView
-	ctview   *ContectView
-	myactv   *MyactionView
-	fiview   *FriendInfoView
-	chatform *ChatForm
-	sendv    *SendForm
-	mblstv   *MemberListForm
-	setfmv   *SettingForm
+	// app      *nk.NkApp
+	mdl *thscli.DataModel
+	// minfov   *MyinfoView
+	// ctview   *ContectView
+	// myactv   *MyactionView
+	// fiview   *FriendInfoView
+	// chatform *ChatForm
+	// sendv    *SendForm
+	// mblstv   *MemberListForm
+	// setfmv   *SettingForm
 
-	icop *IconPool //
+	// icop *IconPool //
 
 	themeNo int
 }
@@ -71,16 +68,16 @@ type UiContext struct {
 func NewUiContext() *UiContext {
 	this := &UiContext{}
 
-	this.minfov = &MyinfoView{}
-	this.ctview = NewcontactView()
-	this.myactv = &MyactionView{}
-	this.fiview = &FriendInfoView{}
-	this.chatform = NewChatForm()
-	this.sendv = NewSendForm()
-	this.mblstv = NewMemberListForm()
-	this.setfmv = NewSettingForm()
+	// this.minfov = &MyinfoView{}
+	// this.ctview = NewcontactView()
+	// this.myactv = &MyactionView{}
+	// this.fiview = &FriendInfoView{}
+	// this.chatform = NewChatForm()
+	// this.sendv = NewSendForm()
+	// this.mblstv = NewMemberListForm()
+	// this.setfmv = NewSettingForm()
 
-	this.icop = &IconPool{}
+	// this.icop = &IconPool{}
 
 	// this.themeNo = _STL_SYSTEM
 	return this
@@ -94,6 +91,7 @@ func (this *UiContext) runOnUiThread() {
 
 }
 
+/*
 type UiService struct {
 }
 
@@ -121,3 +119,57 @@ func (this *UiContext) ReadClipboard() string {
 	gopp.ErrPrint(err)
 	return s
 }
+
+
+*/
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 

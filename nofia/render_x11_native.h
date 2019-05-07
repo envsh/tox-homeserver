@@ -27,6 +27,12 @@ typedef struct {
     XFontSet fontset;
     XIM im;
     XIC ic;
+    Visual *vis;
+    Colormap cmap;
+    XWindowAttributes attr;
+    XSetWindowAttributes swa;
+    Atom wm_delete_window;
+
     XIMStyles *im_supported_styles;
     XIMStyle app_supported_styles;
     XIMStyle style;
@@ -39,14 +45,12 @@ typedef struct {
     int num_missing_charsets;
     char *default_string;
 
-    Visual *vis;
-    Colormap cmap;
-    XWindowAttributes attr;
-    XSetWindowAttributes swa;
-    Atom wm_delete_window;
 } RenderWindow;
+
 
 RenderWindow* NewRenderWindow();
 void nk_x11_event_handle(RenderWindow* rdwin);
+Colormap RenderWindowCmap(RenderWindow* rdwin);
+Visual* RenderWindowVis1(RenderWindow* rdwin);
 
 #endif

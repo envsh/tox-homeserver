@@ -1,8 +1,8 @@
 package main
 
 /*
-#cgo CFLAGS: -I/opt/nim/lib
-#cgo LDFLAGS: -L. -lnikui -ldl -lX11 -lXft -lXrender
+#cgo CFLAGS: -I/opt/nim/lib -I/usr/include/freetype2
+#cgo LDFLAGS: -L. -lnikui -ldl -lX11 -lXft -lXrender -lm
 
 #include "nikui.h"
 */

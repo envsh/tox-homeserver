@@ -339,4 +339,10 @@ void nk_x11_event_handle(RenderWindow* rdwin) {
         }
     }
 }
+
+Colormap RenderWindowCmap(RenderWindow* rdwin) { return rdwin->cmap; }
+Visual* RenderWindowVis1(RenderWindow* rdwin) {
+        // fprintf(stderr, "csizeof rdwin=%d, rdwin2=%d\n", sizeof(RenderWindow), sizeof(RenderWindow2));
+  return rdwin->vis; }
+
 #endif
