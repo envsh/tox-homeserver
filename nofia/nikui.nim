@@ -68,7 +68,7 @@ proc x11proc(nkw:PNkwindow) =
         while ret1 > 0:
             ret1 = ret1 - 1
             let ret = XNextEvent(nkw.rdwin.dpy, addr(evt))
-            # ldebug("nxtevt:", ret, "evty:", evt.theType, "pending left", ret1, repr(cast[pointer](nkw.rdwin.dpy)))
+            # ldebug("nxtevt:", ret, "evty:", evt.theType, "pending left", ret1, cast[pointer](nkw.rdwin.dpy))
             if evt.theType == ClientMessage:
                 lerror("some error occurs", evt.theType)
                 # stop = true # TODO
@@ -103,7 +103,7 @@ proc newNkwindow(nep:pointer): pointer {.exportc.} =
     nkw.wnds = initTable[string, proc (nkw:PNkwindow, name:string)]()
     createnkwndprocs(nkw.addr)
 
-    linfo("chan is nil", repr(cast[pointer](addr(nkw.evtch))))
+    linfo("chan is nil", cast[pointer](addr(nkw.evtch)))
     ldebug("chan is ready", nkw.evtch.ready())
     nkw.evtch.open(8)
     ldebug("chan is ready", nkw.evtch.ready())

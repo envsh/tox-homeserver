@@ -6,6 +6,8 @@ import logging
 import strutils
 import tables
 
+proc `$`*(x: pointer):string = return repr(x)
+
 ### logging initilize
 macro logecho(lvl : string, msgs: varargs[untyped]): untyped =
     result = nnkStmtList.newTree()
@@ -18,7 +20,8 @@ macro logecho(lvl : string, msgs: varargs[untyped]): untyped =
     result[0].add(newLit(lineobj.line))
     for msg in msgs:
         result[0].add(newLit(" "))
-        result[0].add(msg)
+        if msg.typeKind() == ntyPointer: result[0].add(newLit(repr(msg)))
+        else: result[0].add(msg)
     discard # 可能等于 python的pass
 
 macro ldebug(msgs: varargs[untyped]): untyped =
