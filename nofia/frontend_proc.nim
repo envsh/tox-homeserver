@@ -1,24 +1,15 @@
 
 import json
 
-type Event = ref object
-    EventId*: int64
-    Name*: string
-    Args*: seq[string]
-    Margs*: seq[string]
-    #Uargs*: pointer
-    ErrCode*: int32
-    ErrMsg*: string
-    UserCode*: int64
-    TrackId*: int64
-    SpanId*: int64
-    Json*: string
-    DeviceUuid*: string
-
-
-proc dispatchEvent(ne: PNimenv, evt: Event) =
+proc dispatchEvent(ne: PNimenv, evto: Event) =
     var mdl = ne.nkxwin.mdl
-    if evt.Name == "ConferenceMessage":
+    if evto.Name == "ConferenceMessage":
+        var groupId = evto.Margs[3]
+        var message = evto.Args[3]
+        var peerName = evto.Margs[0]
+        var groupTitle = evto.Margs[2]
+        var msgo = NewMessageForGroup(evto)
+        mdl.Newmsg(groupId, msgo)
         discard
     else: discard
     return
@@ -52,7 +43,7 @@ proc dispatchBaseInfo(ne:PNimenv, jsonNode:JsonNode) =
     var mdl = ne.nkxwin.mdl
     let jso = jsonNode
 
-    mdl.SetMyInfo(jso["ToxId"].getStr(), jso["Name"].getStr(), jso["Stmsg"].getStr())
+    mdl.SetMyInfo(jso["Name"].getStr(), jso["ToxId"].getStr(), jso["Stmsg"].getStr())
     mdl.SetMyConnStatus(jso["ConnStatus"].getInt())
 
     var frndsm = initTable[string, FriendInfo]()
@@ -78,6 +69,8 @@ proc dispatchBaseInfo(ne:PNimenv, jsonNode:JsonNode) =
         frndo.Fnum = cast[uint32](parseInt(k))
         #frndo.Status1 = cast[uint32](v["Status"].getInt())
         frndo.Pubkey = v["Pubkey"].getStr()
+        try: frndo.Name = v["Name"].getStr()
+        except: discard
         try: frndo.Stmsg = v["Stmsg"].getStr()
         except: discard
         try: frndo.ConnStatus = cast[int32](v["ConnStatus"].getInt())
