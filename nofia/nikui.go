@@ -8,6 +8,7 @@ package main
 */
 import "C"
 import (
+	"gopp"
 	"log"
 	"runtime"
 	"time"
@@ -35,7 +36,34 @@ func startuimain() {
 		newNimenv()
 		newNkwindow()
 		NkwindowOpen()
+
+		// must call nim func in this thread
+		for {
+			evtdat := <-nimthch
+			dispatchEventNim1(evtdat)
+		}
 	}()
+}
+
+var nimthch = make(chan []byte)
+
+func dispatchEventNim(evtdat []byte) {
+	evtdat1 := gopp.BytesDup(evtdat)
+	nimthch <- evtdat1
+}
+func dispatchEventNim1(evtdat []byte) {
+	evtdat = append(evtdat, 0)
+	p := (*C.char)(unsafe.Pointer(&evtdat[0]))
+	// p := (unsafe.Pointer(&evtdat[0]))
+	C.dispatchEventNim(p)
+}
+
+func dispatchEventRespNim1(evtdat []byte) {
+	return
+	evtdat = append(evtdat, 0)
+	p := (*C.char)(unsafe.Pointer(&evtdat[0]))
+	// p := (unsafe.Pointer(&evtdat[0]))
+	C.dispatchEventRespNim(p)
 }
 
 ////

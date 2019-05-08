@@ -15,17 +15,16 @@ func main() {
 	flag.Parse()
 
 	startuimain()
-	select {}
 
 	/*
 		app := nk.NewApp()
 		uictx.app = app
 		mdl := thscli.NewDataModel(func() { app.Repaint() })
 		uictx.mdl = mdl
-
-		appctx = thscli.NewAppContext()
-		go runbkdproc()
-
+	*/
+	appctx = thscli.NewAppContext()
+	go runbkdproc()
+	/*
 		app.Exec(
 			uictx.icop.render(),
 
@@ -39,6 +38,8 @@ func main() {
 			uictx.setfmv.render(),
 		)
 	*/
+
+	select {}
 }
 
 var appctx *thscli.AppContext
@@ -67,7 +68,7 @@ type UiContext struct {
 
 func NewUiContext() *UiContext {
 	this := &UiContext{}
-
+	this.mdl = thscli.NewDataModel(func() {})
 	// this.minfov = &MyinfoView{}
 	// this.ctview = NewcontactView()
 	// this.myactv = &MyactionView{}
@@ -122,70 +123,6 @@ func (this *UiContext) ReadClipboard() string {
 
 
 */
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
  
  
  

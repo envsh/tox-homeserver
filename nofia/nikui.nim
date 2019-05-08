@@ -1,7 +1,6 @@
 {.passc:"-fPIC -g -O0 -xc -DRENDER_X11_NATIVE"}
 {.passl:"-lX11 -lXft -lXrender"}
 
-# include 其他不使用全局变量的实现
 {.compile: "render_x11_native.c.ngo".}
 import x11/x, x11/xlib
 include render_x11_native
@@ -9,6 +8,12 @@ include render_x11_native
 {.passc:"-I/usr/include/freetype2"}
 {.compile:"nuklear_x11_all.c.ngo".}
 include nuklear_x11_all
+
+# Nimenv depend some types, put before it
+include "nimlog.nim"
+include "uimessage.nim"
+include "uimodels.nim"
+include "frontend_proc.nim"
 
 type MixEvent = ref object
     typ*: int
@@ -35,6 +40,7 @@ type
         argv*: string
         stoped*: bool
         nkxwin*: Nkwindow
+        mdl*: DataModel
 
 include "nimenv.nim"
 include "views.nim"
@@ -118,7 +124,7 @@ proc NkwindowOpen(nep:pointer) {.exportc.} =
     # 启动顺序，事件接收线程， 打开XDisplay, nk xlib初始化， 启动 x11事件接收线程
     spawn eventloop(pnkw) # shoule before NewRenderWindow, or recv nothing
     nkw.rdwin = NewRenderWindow()
-    linfo("rdwin is nil", nkw.rdwin == nil)
+    linfo("rdwin is nil", nkw.rdwin == nil, nkw.rdwin)
 
     var xft = nk_xfont_create(nkw.rdwin.dpy, "*")
     var rdwin = nkw.rdwin

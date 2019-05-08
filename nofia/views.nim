@@ -45,9 +45,9 @@ proc MyActionView(nkw:PNkwindow, name:string) {.gcsafe.} =
     if ctx.nk_begin(name, nk_rect(x:0, y:600-50, w:250, h:60), NK_WINDOW_BORDER) == ctrue:
         ctx.nk_layout_row_begin(NK_STATIC, 30, 4)
         ctx.nk_layout_row_push(50)
-        if ctx.nk_button_label("加好友") == ctrue: discard
+        if ctx.nk_button_label("加友") == ctrue: discard
         ctx.nk_layout_row_push(50)
-        if ctx.nk_button_label("加群组") == ctrue: discard
+        if ctx.nk_button_label("加群") == ctrue: discard
         ctx.nk_layout_row_push(50)
         if ctx.nk_button_label("文件") == ctrue: discard
         ctx.nk_layout_row_push(50)

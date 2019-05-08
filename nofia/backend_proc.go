@@ -93,6 +93,7 @@ func initAppBackend() {
 			if err == nil {
 				dispatchEvent(evto)
 				// dispatchEventResp(evto)
+				dispatchEventNim(bcc)
 			}
 		}
 
