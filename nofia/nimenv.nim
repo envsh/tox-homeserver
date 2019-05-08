@@ -41,7 +41,8 @@ proc newNimenvImpl() : PNimenv =
     if gptr_of_nimenv_dont_use_other_than_this_file != nil:
         return gptr_of_nimenv_dont_use_other_than_this_file
     #gnenv = cast[PNimEnv](allocShared0(sizeof(NimEnv)))
-    gref_of_nimenv_dont_use_other_than_this_file = new(Nimenv)
+    var ne = new(Nimenv)
+    gref_of_nimenv_dont_use_other_than_this_file = ne
     gptr_of_nimenv_dont_use_other_than_this_file = addr(gref_of_nimenv_dont_use_other_than_this_file)
 
     gptr_of_nimenv_dont_use_other_than_this_file.self = gref_of_nimenv_dont_use_other_than_this_file

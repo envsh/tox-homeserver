@@ -117,6 +117,13 @@ func initAppBackend() {
 
 	uictx.mdl.SetFriendInfos(vtcli.Binfo.Friends)
 	uictx.mdl.SetGroupInfos(vtcli.Binfo.Groups)
+	{
+		bcc, err := json.Marshal(vtcli.Binfo)
+		gopp.ErrPrint(err)
+		if err == nil {
+			dispatchEventNim(bcc)
+		}
+	}
 
 	/*
 		listw := uiw.ListWidget_2

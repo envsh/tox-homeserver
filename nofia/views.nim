@@ -19,20 +19,26 @@ proc nkwndhello2(nkw:PNkwindow, name : string) {.gcsafe.} =
 
 proc MyInfoView(nkw:PNkwindow, name:string) {.gcsafe.} =
     var ctx = nkw.nkctx
+    var mdl = nkw.mdl
+
     if ctx.nk_begin(name, nk_rect(x:0,y:0,w:250,h:120), NK_WINDOW_BORDER) == ctrue:
         ctx.nk_layout_row_begin(NK_STATIC, 30, 3)
         ctx.nk_layout_row_push(30)
         discard ctx.nk_button_label("ICO")
         ctx.nk_layout_row_push(160)
         let sel0 : int = 0
-        discard ctx.nk_selectable_label("hehhe", 10, sel0.unsafeAddr)
+        var MyName : cstring = mdl.MyName
+        if mdl.MyName == "": MyName = " "
+        discard ctx.nk_selectable_label(MyName, 10, sel0.unsafeAddr)
         ctx.nk_layout_row_push(20)
         ctx.nk_label("heheh", 10)
         ctx.nk_layout_row_end()
 
         ctx.nk_tooltip("ehehe", )
         ctx.nk_layout_row_dynamic(30, 1)
-        discard ctx.nk_selectable_label("hehhe", 10, sel0.unsafeAddr)
+        var Mystmsg : cstring = mdl.MyStmsg
+        if mdl.MyStmsg == "": Mystmsg = " "
+        discard ctx.nk_selectable_label(MyStmsg, 10, sel0.unsafeAddr)
         ctx.nk_layout_row_static(30, 100, 2)
         ctx.nk_label("搜索框👉", NK_TEXT_LEFT)
         ctx.nk_label("排列过滤 ", NK_TEXT_RIGHT)

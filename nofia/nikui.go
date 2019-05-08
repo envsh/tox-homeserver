@@ -55,7 +55,7 @@ func dispatchEventNim1(evtdat []byte) {
 	evtdat = append(evtdat, 0)
 	p := (*C.char)(unsafe.Pointer(&evtdat[0]))
 	// p := (unsafe.Pointer(&evtdat[0]))
-	C.dispatchEventNim(p)
+	C.dispatchEventNim(gnenv, p)
 }
 
 func dispatchEventRespNim1(evtdat []byte) {
@@ -63,7 +63,7 @@ func dispatchEventRespNim1(evtdat []byte) {
 	evtdat = append(evtdat, 0)
 	p := (*C.char)(unsafe.Pointer(&evtdat[0]))
 	// p := (unsafe.Pointer(&evtdat[0]))
-	C.dispatchEventRespNim(p)
+	C.dispatchEventRespNim(gnenv, p)
 }
 
 ////

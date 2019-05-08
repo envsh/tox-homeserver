@@ -13,7 +13,6 @@ include nuklear_x11_all
 include "nimlog.nim"
 include "uimessage.nim"
 include "uimodels.nim"
-include "frontend_proc.nim"
 
 type MixEvent = ref object
     typ*: int
@@ -29,6 +28,7 @@ type
         evtch*: Channel[MixEvent]
         wnds*: Table[string, proc (nkw:PNkwindow, name:string) {.gcsafe.}]
         wndrunner*: proc (nkw:PNkwindow) {.gcsafe.}
+        mdl*: DataModel
 
 # like global vars, but put in struct
 type
@@ -40,10 +40,11 @@ type
         argv*: string
         stoped*: bool
         nkxwin*: Nkwindow
-        mdl*: DataModel
 
+include "frontend_proc.nim"
 include "nimenv.nim"
 include "views.nim"
+
 
 proc dorepaint(nkw:PNkwindow, evts : seq[TXEvent]) =
     var rdwin = nkw.rdwin
@@ -107,6 +108,7 @@ proc newNkwindow(nep:pointer): pointer {.exportc.} =
     var ne = cast[PNimenv](nep)
     var nkw = new(Nkwindow)
     nkw.wnds = initTable[string, proc (nkw:PNkwindow, name:string)]()
+    nkw.mdl = new(DataModel)
     createnkwndprocs(nkw.addr)
 
     linfo("chan is nil", cast[pointer](addr(nkw.evtch)))
