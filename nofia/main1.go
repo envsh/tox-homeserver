@@ -4,7 +4,7 @@ import (
 	"flag"
 
 	// nk "mkuse/nuklear"
-	thscli "tox-homeserver/client"
+	thscli "tox-homeserver/client2"
 )
 
 type Render interface {
@@ -123,45 +123,6 @@ func (this *UiContext) ReadClipboard() string {
 
 
 */
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
  
  
  

@@ -18,3 +18,8 @@
 * [] server transport with cert
 * [] switchable dual ui engine: widgets/qml
 
+### rpc && transport
+* [ ] light enough https://github.com/nanomsg/nng
+* [ ] abstract client with different transport, by interface and register, light and weight
+
+

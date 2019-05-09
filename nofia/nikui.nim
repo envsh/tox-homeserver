@@ -11,6 +11,7 @@ include nuklear_x11_all
 
 # Nimenv depend some types, put before it
 include "nimlog.nim"
+include "nimplus.nim"
 include "datatypes.nim"
 include "uimessage.nim"
 include "uimodels.nim"

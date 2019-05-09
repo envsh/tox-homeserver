@@ -7,8 +7,7 @@ import (
 	"log"
 	"time"
 
-	thscli "tox-homeserver/client"
-	"tox-homeserver/store"
+	thscli "tox-homeserver/client2"
 	"tox-homeserver/thspbs"
 )
 
@@ -24,37 +23,41 @@ func condWait(timeoutms int, f func() bool) {
 }
 
 func runbkdproc() {
-	appctx.OpenStrorage()
+	// appctx.OpenStrorage()
 	loadDataForProfileUi()
 	initAppBackend()
 }
 
-var devInfo *store.Device
+var devInfo *thscli.Device
 
 func loadDataForProfileUi() {
-	st := appctx.GetStorage()
-	devInfo = st.GetDevice()
+	// st := appctx.GetStorage()
+	// devInfo = st.GetDevice()
+	devInfo = &thscli.Device{}
+	devInfo.Id = 0
+	devInfo.Uuid = "0c5b3037-3767-4c66-b9e4-46aff8d693b1"
 
-	setting, err := st.GetSetting(store.SK_HOMESERVER_URL)
-	gopp.ErrPrint(err)
-	if setting != nil {
-		// this.ComboBox_6.SetCurrentText(setting.Value)
-		log.Println("Profile db", setting.Value)
-		srvurl = gopp.IfElseStr(srvurl == "", setting.Value, srvurl)
-	}
+	// setting, err := st.GetSetting(store.SK_HOMESERVER_URL)
+	// gopp.ErrPrint(err)
+	// if setting != nil {
+	// this.ComboBox_6.SetCurrentText(setting.Value)
+	// log.Println("Profile db", setting.Value)
+	// 	srvurl = gopp.IfElseStr(srvurl == "", setting.Value, srvurl)
+	// }
+	srvurl = "s2.natfrp.org:22080"
 
-	setting, err = st.GetSetting(store.SK_LAST_LOGINED)
-	gopp.ErrPrint(err, store.SK_LAST_LOGINED)
-	if setting != nil {
-		if setting.Value == "true" {
-			// uictx.uiw.PushButton_7.SetDisabled(true)
-			time.AfterFunc(60*time.Millisecond, func() {
-				// runOnUiThread(func() { this.login(false) })
-			})
-		}
-	} else {
-		st.SetSetting(store.SK_LAST_LOGINED, "false")
-	}
+	// setting, err = st.GetSetting(store.SK_LAST_LOGINED)
+	// gopp.ErrPrint(err, store.SK_LAST_LOGINED)
+	// if setting != nil {
+	//	if setting.Value == "true" {
+	//		// uictx.uiw.PushButton_7.SetDisabled(true)
+	//		time.AfterFunc(60*time.Millisecond, func() {
+	// runOnUiThread(func() { this.login(false) })
+	//		})
+	//	}
+	// } else {
+	//	st.SetSetting(store.SK_LAST_LOGINED, "false")
+	// }
 }
 
 var srvurl = "" //  "127.0.0.1:2080"

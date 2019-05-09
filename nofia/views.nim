@@ -192,10 +192,28 @@ proc ChatForm(nkw:PNkwindow, name:string) {.gcsafe.} =
             else: ctx.nk_label(" ", NK_TEXT_CENTERED)
             ctx.nk_layout_row_end()
 
+            var mlines = msg.MsgUi.Splitn(60)
+            for idx, line in mlines:
+                ctx.nk_layout_row_begin(NK_STATIC, 39, 3)
+                ctx.nk_layout_row_push(30)
+                var idxtxt = if idx > 0: " " else: $oidx
+                ctx.nk_label(idxtxt, NK_TEXT_CENTERED)
+                ctx.nk_layout_row_push(450)
+                var seln = line.len()
+                discard ctx.nk_selectable_label(line, NK_TEXT_LEFT, seln.addr)
+                ctx.nk_layout_row_push(30)
+                ctx.nk_label(" ", NK_TEXT_CENTERED)
+                ctx.nk_layout_row_end()
+
+
             continue
 
-        ctx.nk_layout_row_dynamic(510-3*30, 1)
-        ctx.nk_label("空白区域", NK_TEXT_CENTERED)
+        var emptylen = 410 - float32(msgs.len()+10)*30
+        if emptylen > 0:
+            ctx.nk_layout_row_dynamic(emptylen, 1)
+            ctx.nk_label("空白区域", NK_TEXT_CENTERED)
+
+        if hasnew: discard # ctx.ForceScroll(100000, 100000) // seem ok
         discard
     discard ctx.nk_end()
 

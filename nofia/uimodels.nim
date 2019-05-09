@@ -1,4 +1,5 @@
 
+# TODO use mutex for write
 
 const CTTYPE_FRIEND = 1
 const CTTYPE_GROUP = 2

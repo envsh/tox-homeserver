@@ -6,7 +6,7 @@ import (
 	"log"
 	"strings"
 
-	thscli "tox-homeserver/client"
+	thscli "tox-homeserver/client2"
 	"tox-homeserver/thspbs"
 )
 

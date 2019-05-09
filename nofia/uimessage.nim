@@ -1,4 +1,16 @@
 
+# TODO and other refmter
+proc refmtmsgRUser(this:Message) =
+    return
+
+proc refmtmsg(msg:Message) =
+    msg.MsgUi = msg.Msg
+    msg.PeerNameUi = msg.PeerName
+    msg.TimeUi = "hehhe"
+    msg.LastMsgUi = msg.Msg
+
+    for fn in [refmtmsgRUser]: msg.fn()
+    return
 
 proc NewMessageForGroup(evto : Event) : Message =
     var groupId = evto.Args[3]
@@ -14,6 +26,6 @@ proc NewMessageForGroup(evto : Event) : Message =
     this.Time = "" # time.Now()
     this.EventId = eventId
     if peerName == "": this.PeerName = peerid.substr(0, 8)
-    # this.refmtmsg()
+    this.refmtmsg()
     return this
 

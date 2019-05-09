@@ -11,7 +11,7 @@ import (
 	"github.com/go-xorm/xorm"
 	// "github.com/hashicorp/go-uuid"
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/satori/go.uuid"
+	uuid "github.com/satori/go.uuid"
 )
 
 type Storage struct {
@@ -166,6 +166,9 @@ func (this *Storage) AddPeerOrUpdateName(peerPubkey string, rtnum uint32, name s
 }
 
 func (this *Storage) AddContact(c *Contact) (int64, error) {
+	if this == nil {
+		return 0, nil
+	}
 	c.Created = thscom.NowTimeStr()
 	c.Updated = c.Created
 
@@ -184,6 +187,10 @@ func (this *Storage) UpdateContactByPubkey(c *Contact) (int64, error) {
 // eventId 参数可选，为0表示服务器使用，自动生成
 // friendpk => room id, pubkey => peer(contact)
 func (this *Storage) AddFriendMessage(msg string, friendpk, pubkey string, eventId int64, userCode int64) (*Message, error) {
+	if this == nil {
+		return nil, nil
+	}
+
 	c := &Contact{}
 	c.Pubkey = pubkey
 	exist, err := this.dbh.Get(c)
@@ -216,6 +223,10 @@ func (this *Storage) AddFriendMessage(msg string, friendpk, pubkey string, event
 
 // eventId 参数可选，为0表示服务器使用，自动生成
 func (this *Storage) AddGroupMessage(msg string, mtype string, identify string, peerPubkey string, eventId int64, userCode int64) (*Message, error) {
+	if this == nil {
+		return nil, nil
+	}
+
 	c0 := &Contact{}
 	c0.Pubkey = identify
 	exist, err := this.dbh.Get(c0)
@@ -249,6 +260,10 @@ func (this *Storage) AddGroupMessage(msg string, mtype string, identify string, 
 
 //
 func (this *Storage) AddMessage(m *Message) (*Message, error) {
+	if this == nil {
+		return nil, nil
+	}
+
 	m.Updated = thscom.NowTimeStr()
 	// m.EventId <=0认为是server端，否则客户端
 	if m.EventId <= 0 {
