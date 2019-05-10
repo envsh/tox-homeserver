@@ -8,8 +8,9 @@ import (
 	"net/http"
 	_ "net/http/pprof"
 	"time"
-	thscom "tox-homeserver/common"
+
 	"tox-homeserver/store"
+	"tox-homeserver/thscom"
 
 	"github.com/envsh/go-toxcore/xtox"
 	"github.com/google/gops/agent"

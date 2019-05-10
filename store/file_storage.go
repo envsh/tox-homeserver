@@ -13,7 +13,7 @@ import (
 	"sync"
 	"time"
 
-	thscom "tox-homeserver/common"
+	"tox-homeserver/thscom"
 
 	"github.com/levigross/grequests"
 	"github.com/peterbourgon/diskv"

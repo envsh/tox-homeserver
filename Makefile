@@ -17,9 +17,9 @@ democ: com
 
 com:
 	protoc -I./server ./server/ths.proto --go_out=plugins=grpc:./thspbs/
-	go-bindata -nocompress -pkg client -o client/certs_bindata.go data/server.crt
+	go-bindata -nocompress -pkg transport -o client/transport/certs_bindata.go data/server.crt
 	# cd ${HOME}/golib/src/github.com/go-xorm/cmd/xorm && xorm reverse -s sqlite3 "${CPWD}/data/toxhs.sqlite" templates/goxorm "${CPWD}/gofia/"
-	go install -v ./thspbs/ ./common/ ./client/ ./store/ ./gomain2c/
+	go install -v ./thspbs/ ./thscom/ ./client/ ./client/grpctp ./client/websocketstp ./store/ ./gomain2c/
 	#go install -v ./avhlp/
 
 

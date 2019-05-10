@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"sync"
 	"time"
+	"tox-homeserver/client/transport"
 	"tox-homeserver/store"
 	"tox-homeserver/thspbs"
 
@@ -13,7 +14,7 @@ import (
 )
 
 type AppContext struct {
-	srvtp Transport
+	srvtp transport.Transport
 	vtcli *LigTox
 	logFn func(s string)
 

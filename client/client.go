@@ -1,7 +1,6 @@
 package client
 
 import (
-	"context"
 	"crypto/md5"
 	"encoding/json"
 	"fmt"
@@ -14,6 +13,7 @@ import (
 	"time"
 	"unsafe"
 
+	"tox-homeserver/client/transport"
 	"tox-homeserver/thspbs"
 )
 
@@ -54,7 +54,7 @@ type LigTox struct {
 	OnNewMsg func()
 
 	srvurl string
-	srvtp  Transport
+	srvtp  transport.Transport
 
 	// some callbacks, should be private. &fn => ud
 	cb_friend_requests           map[unsafe.Pointer]interface{}
@@ -90,8 +90,16 @@ func NewLigTox(srvurl string) *LigTox {
 	this := &LigTox{}
 	this.srvurl = srvurl
 	this.bemsgs = make([][]byte, 0)
-	this.srvtp = NewGrpcTransport()
+
+	this.srvtp = transport.DftTP()
+	if this.srvtp == nil {
+		log.Fatalln("Not found usable transport")
+	}
 	this.srvtp.OnData(this.onBackendEventDeduped)
+
+	// this.srvtp = NewGrpcTransport()
+	// this.srvtp.OnData(this.onBackendEventDeduped)
+
 	this.initCbmap()
 
 	return this
@@ -216,10 +224,26 @@ func (this *LigTox) onBackendEvent(evto *thspbs.Event, data []byte) {
 }
 
 func (this *LigTox) rmtCall(args *thspbs.Event) (*thspbs.Event, error) {
-	return this.srvtp.rmtCall(args)
+	return this.srvtp.RmtCall(args)
 }
 
 func (this *LigTox) GetBaseInfo() {
+	var binfo *thspbs.BaseInfo
+	binfo = this.srvtp.GetBaseInfo()
+
+	if binfo != nil {
+		if binfo.Groups == nil {
+			binfo.Groups = map[uint32]*thspbs.GroupInfo{}
+		}
+		if binfo.Friends == nil {
+			binfo.Friends = map[uint32]*thspbs.FriendInfo{}
+		}
+		this.ParseBaseInfo(binfo)
+	}
+}
+
+/*
+func (this *LigTox) GetBaseInfoDep() {
 	var binfo *thspbs.BaseInfo
 	switch tp := this.srvtp.(type) {
 	case *WebsocketTransport:
@@ -250,6 +274,7 @@ func (this *LigTox) GetBaseInfo() {
 		this.ParseBaseInfo(binfo)
 	}
 }
+*/
 
 func (this *LigTox) ParseBaseInfo(bi *thspbs.BaseInfo) {
 	this.Binfo = bi

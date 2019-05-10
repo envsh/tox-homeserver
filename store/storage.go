@@ -6,7 +6,8 @@ import (
 	"log"
 	"os"
 	"runtime"
-	thscom "tox-homeserver/common"
+
+	"tox-homeserver/thscom"
 
 	"github.com/go-xorm/xorm"
 	// "github.com/hashicorp/go-uuid"

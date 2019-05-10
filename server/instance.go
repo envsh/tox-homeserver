@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	thscom "tox-homeserver/common"
+	"tox-homeserver/thscom"
 	"tox-homeserver/thspbs"
 
 	tox "github.com/TokTok/go-toxcore-c"

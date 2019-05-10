@@ -7,7 +7,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	thscom "tox-homeserver/common"
+	"tox-homeserver/thscom"
 )
 
 var userCodeSeq uint64 = 0

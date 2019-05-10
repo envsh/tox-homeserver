@@ -20,7 +20,7 @@ import (
 	_ "google.golang.org/grpc/encoding/gzip"
 	"google.golang.org/grpc/keepalive"
 
-	thscom "tox-homeserver/common"
+	"tox-homeserver/thscom"
 	"tox-homeserver/thspbs"
 )
 
