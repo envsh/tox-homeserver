@@ -24,6 +24,7 @@ message Event {
     int64 Trackts = 11; // used for tracker. randomly set, and client can output info if it set
     bytes Json = 12;
     string DeviceUuid = 13;
+    BaseInfo Binfo = 14;
 }
 
 // like a union struct. collect all possible arguments name

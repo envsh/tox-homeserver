@@ -47,6 +47,11 @@ func newGrpcServer() *GrpcServer {
 	this.grpcConns = make(map[thspbs.Toxhs_PollCallbackServer]uint64)
 	this.grpcUuids = make(map[string]uint64)
 
+	this.Setup()
+	return this
+}
+
+func (this *GrpcServer) Setup() error {
 	// TODO 压缩支持
 	kaopt := keepalive.ServerParameters{} // TODO
 	_ = kaopt
@@ -69,27 +74,29 @@ func newGrpcServer() *GrpcServer {
 	this.svc = &GrpcService{}
 	thspbs.RegisterToxhsServer(this.srv, this.svc)
 
-	return this
+	return nil
 }
 
+func (this *GrpcServer) LoopCall() { go this.run() }
 func (this *GrpcServer) run() {
 	lsner, err := net.Listen("tcp", ":2080")
 	gopp.ErrPrint(err)
 	this.lsner = lsner
 	log.Println("listen on:", lsner.Addr())
 
-	this.register()
 	err = this.srv.Serve(this.lsner)
 	gopp.ErrPrint(err)
 }
 
-func (this *GrpcServer) register() {
-	// dyngrpc.RegisterService(demofn1, "thsdemo", "pasv")
+// TODO
+func (this *GrpcServer) Stop() error {
+	return nil
 }
 
-// TODO
-func (this *GrpcServer) Close() {
-
+func (this *GrpcServer) Pubmsg(ctx context.Context, evt *thspbs.Event) error {
+	err := pubmsg2grpc(ctx, evt)
+	gopp.ErrPrint(err, evt.Name)
+	return err
 }
 
 type GrpcService struct {

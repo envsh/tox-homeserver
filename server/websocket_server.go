@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"sync"
 	"time"
+
 	"tox-homeserver/thspbs"
 
 	"github.com/gorilla/websocket"
@@ -32,12 +33,25 @@ func NewWebsocketServer() *WebsocketServer {
 	return this
 }
 
+func (this *WebsocketServer) Setup() error {
+	this.initHandler()
+	return nil
+}
+
 func (this *WebsocketServer) initHandler() {
 	http.HandleFunc("/toxhsrpc", this.toxhsrpc)
 	http.HandleFunc("/toxhspush", this.toxhspush)
 	http.HandleFunc("/webdui/", this.webdui)
 	http.HandleFunc("/webdui", this.webdui)
 	http.HandleFunc("/echo", this.echo)
+}
+
+func (this *WebsocketServer) Stop() error {
+	return nil
+}
+
+func (this *WebsocketServer) LoopCall() {
+	// need nothing
 }
 
 func (this *WebsocketServer) toxhsrpc(w http.ResponseWriter, r *http.Request) {
@@ -106,6 +120,10 @@ func (this *WebsocketServer) toxhspush(w http.ResponseWriter, r *http.Request) {
 	log.Println("WSPusher disconnected from:", raddr, time.Since(ctime))
 }
 
+func (this *WebsocketServer) Pubmsg(ctx context.Context, evt *thspbs.Event) error {
+	return this.pushevt(evt)
+}
+
 func (this *WebsocketServer) pushevt(evt *thspbs.Event) error {
 	rspcc, err := json.Marshal(evt)
 	gopp.ErrPrint(err)
@@ -119,6 +137,7 @@ func (this *WebsocketServer) pushevt(evt *thspbs.Event) error {
 	return nil
 }
 
+//
 func (this *WebsocketServer) webdui(w http.ResponseWriter, r *http.Request) {
 	log.Println(r.URL.String())
 	bcc, err := ioutil.ReadFile("./webdui/index.html")

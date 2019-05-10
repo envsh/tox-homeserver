@@ -20,13 +20,16 @@ func init() {
 }
 
 type appContext struct {
-	tvm   *ToxVM
-	rpcs  *GrpcServer
-	wssrv *WebsocketServer
-	st    *store.Storage
+	tvm    *ToxVM
+	rpcs   *GrpcServer
+	wssrv  *WebsocketServer
+	nngsrv *NNGServer
+	st     *store.Storage
+
+	brker *msgbroker
 }
 
-var appctx = &appContext{}
+var appctx = &appContext{brker: &msgbroker{}}
 
 func Main() {
 	log.Println(BuildInfo)
@@ -55,6 +58,10 @@ func Main() {
 		err := http.ListenAndServe(fmt.Sprintf(":%d", thscom.WSPort), nil)
 		gopp.ErrPrint(err)
 	}()
+	nngsrv := newNNGServer()
+	appctx.nngsrv = nngsrv
+	nngsrv.Setup()
+	nngsrv.LoopCall()
 
 	rpcs := newGrpcServer()
 	appctx.rpcs = rpcs

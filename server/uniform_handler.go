@@ -110,6 +110,20 @@ func packBaseInfo(t *tox.Tox) (*thspbs.BaseInfo, error) {
 	return out, nil
 }
 
+// 让不同协议成为传输层，不再处理结构化消息层
+func RmtCallHandlerRaw(ctx context.Context, reqdat []byte) (repdat []byte, err error) {
+	req := &thspbs.Event{}
+	err = json.Unmarshal(reqdat, req)
+	gopp.ErrPrint(err, string(reqdat))
+
+	rsp, err := RmtCallHandlers(context.Background(), req)
+	gopp.ErrPrint(err)
+	rspcc, err := json.Marshal(rsp)
+	gopp.ErrPrint(err)
+
+	return rspcc, err
+}
+
 // 自己的消息做多终端同步转发
 // conn caller connection
 func RmtCallHandlers(ctx context.Context, req *thspbs.Event) (*thspbs.Event, error) {
@@ -167,6 +181,7 @@ func RmtCallExecuteHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Even
 		bdata, err := json.Marshal(binfo)
 		gopp.ErrPrint(err)
 		out.Args = []string{string(bdata)}
+		out.Binfo = binfo
 	case "FriendSendMessage": // args: "friendNumber" or "friendPubkey", "msg"
 		if len(req.Args) < 2 {
 			log.Println("paramter error")

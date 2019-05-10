@@ -19,7 +19,8 @@ com:
 	protoc -I./server ./server/ths.proto --go_out=plugins=grpc:./thspbs/
 	go-bindata -nocompress -pkg client -o client/certs_bindata.go data/server.crt
 	# cd ${HOME}/golib/src/github.com/go-xorm/cmd/xorm && xorm reverse -s sqlite3 "${CPWD}/data/toxhs.sqlite" templates/goxorm "${CPWD}/gofia/"
-	go install -v ./thspbs/ ./common/ ./client/ ./store/ ./gomain2c/ ./avhlp/
+	go install -v ./thspbs/ ./common/ ./client/ ./store/ ./gomain2c/
+	#go install -v ./avhlp/
 
 
 allfia: gofiab tofiab tofiai
