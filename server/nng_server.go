@@ -30,15 +30,17 @@ func testhhh() {
 
 func (this *NNGServer) Setup() error {
 	// althrough it listen, but not block
+	rurl := "tcp://0.0.0.0:2081"
 	r := nng.Nng_pub0_open(&this.pubsk)
-	log.Println(r)
-	r = nng.Nng_listen(this.pubsk, "tcp://0.0.0.0:2081", nil, 0)
-	log.Println(r)
+	log.Println(r, this.pubsk, nng.Nng_strerror(r))
+	r = nng.Nng_listen(this.pubsk, rurl, nil, 0)
+	log.Println(r, nng.Nng_strerror(r))
 
+	rurl = "tcp://0.0.0.0:2082"
 	r = nng.Nng_rep0_open(&this.repsk)
-	log.Println(r)
-	r = nng.Nng_listen(this.repsk, "tcp://0.0.0.0:2081", nil, 0)
-	log.Println(r)
+	log.Println(r, this.repsk, nng.Nng_strerror(r))
+	r = nng.Nng_listen(this.repsk, rurl, nil, 0)
+	log.Println(r, nng.Nng_strerror(r))
 	return nil
 }
 func (this *NNGServer) Stop() error {
@@ -49,11 +51,12 @@ func (this *NNGServer) LoopCall() {
 }
 
 func (this *NNGServer) repproc() {
-	var rbuf = make([]byte, 512)
-	var rblen int
+	var rbuf = make([]byte, 1512)
+	var pbuf = unsafe.Pointer(&rbuf[0]) // void*
+	var rblen int = len(rbuf)
 	for {
-		r := nng.Nng_recv(this.repsk, unsafe.Pointer(&rbuf[0]), (*nng.Size_t)(unsafe.Pointer(&rblen)), 0)
-		log.Println(r, rblen)
+		r := nng.Nng_recv(this.repsk, pbuf, (*uint64)(unsafe.Pointer(&rblen)), 0)
+		log.Println(r, rblen, string(rbuf[:rblen]))
 
 		req := &thspbs.Event{}
 		err := json.Unmarshal(rbuf[:rblen], req)

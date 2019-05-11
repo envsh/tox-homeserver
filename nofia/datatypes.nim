@@ -36,3 +36,16 @@ type
         Links*: seq[string]
         Index*: int64
 
+
+import ponng
+type
+    RpcClient = ref object
+        rurl*: string
+        subsk*: nng_socket
+        subrfd*: AsyncFD
+        subwrd*: AsyncFD
+        reqsk*: nng_socket
+        reqrfd*: AsyncFD
+        reqwfd*: AsyncFD
+
+

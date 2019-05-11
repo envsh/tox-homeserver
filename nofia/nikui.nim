@@ -10,6 +10,9 @@ include render_x11_native
 include nuklear_x11_all
 
 # Nimenv depend some types, put before it
+import asyncdispatch
+import asyncfutures
+
 include "nimlog.nim"
 include "nimplus.nim"
 include "datatypes.nim"
@@ -27,10 +30,12 @@ type
         rdwin*: TRenderWindow
         xfont*: XFont
         nkctx*: nk_context
+        dpyfd*: AsyncFD
         evtch*: Channel[MixEvent]
         wnds*: Table[string, proc (nkw:PNkwindow, name:string) {.gcsafe.}]
         wndrunner*: proc (nkw:PNkwindow) {.gcsafe.}
         mdl*: DataModel
+
 
 # like global vars, but put in struct
 type
@@ -42,11 +47,14 @@ type
         argv*: string
         stoped*: bool
         nkxwin*: Nkwindow
+        asyevts*: Table[string, proc (pne: PNimenv)]
+        rpcli*: RpcClient
+
 
 include "frontend_proc.nim"
 include "nimenv.nim"
 include "views.nim"
-
+include "client.nim"
 
 proc dorepaint(nkw:PNkwindow, evts : seq[TXEvent]) =
     var rdwin = nkw.rdwin
@@ -129,6 +137,9 @@ proc NkwindowOpen(nep:pointer) {.exportc.} =
     spawn eventloop(pnkw) # shoule before NewRenderWindow, or recv nothing
     nkw.rdwin = NewRenderWindow()
     linfo("rdwin is nil", nkw.rdwin == nil, nkw.rdwin)
+    var dpyfd = ConnectionNumber(nkw.rdwin.dpy)
+    linfo("dpyfd:", dpyfd)
+    nkw.dpyfd = cast[AsyncFD](dpyfd)
 
     var xft = nk_xfont_create(nkw.rdwin.dpy, "*")
     var rdwin = nkw.rdwin
@@ -152,6 +163,47 @@ linfo("singleton? ", ne1 == ne2)
 
 spawn stopafter3s(ne1)
 
-# runNimenv(ne1.self)
+discard newNkwindow(getNimenvp())
+NkwindowOpen(getNimenvp())
 
+# runNimenv(ne1.self)
+var cli = newclient()
+cli.connect()
+ne1.rpcli = cli
+
+### tryout eventloop
+proc onchkx11evt(pne:PNimenv) =
+    linfo("x11 check event timedout")
+    return
+proc onrtx11evt(fd: AsyncFD) : bool =
+    linfo("x11 has rt event")
+    return false
+proc chkx11toh(fd: AsyncFD): bool =
+    onchkx11evt(ne1)
+    return false
+
+proc initAsyevtTable() =
+    var ne = ne1
+    #ne.asyevts.add($ne.nkxwin.dpyfd, onrtx11evt)
+    # ne.asyevts.add("chkx11evt", onchkx11evt)
+    addTimer(50000, false, chkx11toh)
+    # too much, disable
+    #register(ne.nkxwin.dpyfd)
+    #addRead(ne.nkxwin.dpyfd, onrtx11evt)
+    register(cli.subrfd)
+    addRead(cli.subrfd, onsubskread)
+    register(cli.reqrfd)
+    addRead(cli.reqrfd, onreqskread)
+    return
+
+
+initAsyevtTable()
+# cli.reqsksend("hehehhee")
+cli.getBaseInfo()
+
+# type CallBack = proc (fd: AsyncFD) : bool
+
+while true:
+    poll(300000)
+    #linfo("poll timeout")
 
