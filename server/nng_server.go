@@ -53,9 +53,11 @@ func (this *NNGServer) LoopCall() {
 func (this *NNGServer) repproc() {
 	var rbuf = make([]byte, 1512)
 	var pbuf = unsafe.Pointer(&rbuf[0]) // void*
-	var rblen int = len(rbuf)
-	for {
-		r := nng.Nng_recv(this.repsk, pbuf, (*uint64)(unsafe.Pointer(&rblen)), 0)
+	var rblen uint64
+	stop := false
+	for !stop {
+		rblen = uint64(len(rbuf))
+		r := nng.Nng_recv(this.repsk, pbuf, &rblen, 0)
 		log.Println(r, rblen, string(rbuf[:rblen]))
 
 		req := &thspbs.Event{}

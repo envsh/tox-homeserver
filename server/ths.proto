@@ -9,6 +9,11 @@ service Toxhs {
     rpc Ping(EmptyReq) returns(EmptyReq);
 }
 
+message BaseEvent {
+    int64 EventId = 1;
+    string Name = 2; // event name
+}
+
 message Event {
     int64 EventId = 1;
     string Name = 2; // event name
@@ -45,7 +50,7 @@ message Argument {
     string Message = 14;
     int32 IsTyping = 15;
     uint32 MessageId = 16; // receipt
-    int32 Status = 17;
+    int32 Status1 = 17;
     string StatusText = 18;
     int32 ConnStatus = 19;
     uint32 Nospam = 20;
@@ -73,20 +78,21 @@ message Argument {
 }
 
 message BaseInfo {
-    string ToxId = 1;
-    string Name = 2;
-    string Stmsg = 3; // statusText
-    uint32 Status = 4;
-    map<uint32,FriendInfo> Friends = 5;
-    map<uint32,GroupInfo> Groups = 6;
-    int32 ConnStatus = 7;
-    int64 NextBatch = 8;
-    string ToxVersion = 9;
+    string Name = 1;
+    string ToxId = 2;
+    string MyName = 3;
+    string Stmsg = 4; // statusText
+    uint32 Status1 = 5;
+    map<uint32,FriendInfo> Friends = 6;
+    map<uint32,GroupInfo> Groups = 7;
+    int32 ConnStatus = 8;
+    int64 NextBatch = 9;
+    string ToxVersion = 10;
 }
 
 message FriendInfo {
     uint32 Fnum = 1;
-    uint32 Status = 2;
+    uint32 Status1 = 2;
     string Pubkey = 3;
     string Name = 4;
     string Stmsg = 5;
@@ -147,6 +153,6 @@ message HelloReq {
 }
 message HelloResp {
     int32 Code = 1;
-    int64 Status = 2;
+    int64 Status1 = 2;
 }
 

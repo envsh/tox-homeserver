@@ -1,6 +1,102 @@
 
 
 # 由于类型定义的可见顺序问题，把类型统一定义在此
+import tables
+
+type
+    MemberInfo = ref object
+        Pnum*: uint32
+        Pubkey* : string
+        Name* : string
+        Mtype* : int
+        # // extra
+        Joints* : int64
+
+type
+    FriendInfo = ref object
+        Fnum* : uint32
+        Status1* : uint32 # 为啥叫Status编译器报错
+        Pubkey* : string
+        Name* : string
+        Stmsg* : string
+        Avatar* : string
+        Seen* : uint64
+        ConnStatus* : int32
+
+type
+    GroupInfo = ref object
+        Gnum* : uint32
+        Mtype* : uint32
+        GroupId* : string
+        Title* : string
+        Stmsg* : string
+        Ours* : bool
+        Members* : Table[string,MemberInfo]
+
+
+# TODO 使用类型继承
+type
+    BaseEvent = ref object
+        EventId*: int64
+        Name*: string # event name
+
+type
+    BaseInfo = ref object
+        EventId*: int64
+        Name*: string # event name
+        ToxId*:string
+        MyName*: string
+        Stmsg*: string
+        Status1*: uint32
+        Friend*: Table[uint32,FriendInfo]
+        Groups*: Table[uint32,GroupInfo]
+        ConnStatus*: int32
+        NextBatch*: int64
+        ToxVersion*: string
+
+type
+    Argument = ref object
+        FriendNumber* : uint32
+        FriendName* : string
+        FriendAddress* : string
+        FriendPubkey* : string
+        GroupNumber* : uint32
+        GroupTitle* : string
+        GroupIdentity* : string
+        GroupCookie* : string
+        GroupType* : int32
+        PeerNumber* : uint32
+        PeerName* : string
+        PeerPubkey* : string
+        MsgType* : int32
+        Message* : string
+        IsTyping* : int32
+        MessageId* : uint32
+        Status1* : int32
+        StatusText* : string
+        ConnStatus* : int32
+        Nospam* : uint32
+        FileNumber* : uint32
+        FileControl* : int32
+        FileIdentity* : string
+        Sent* : int32
+        MimeMsgType* : string
+        MimeValue* : string
+        NextBatch* : int64
+        PrevBatch* : int64
+        AudioEnabled* : int32
+        VideoEnabled* : int32
+        CallState* : uint32
+        AudioBitRate* : uint32
+        VideoBiteRate* : uint32
+        Pcm* : seq[byte] # []byte
+        SampleCount* : int32
+        Channels* : int32
+        SamplingRate* : int32
+        Width* : int32
+        Height* : int32
+        VideoFrame* : seq[byte] # []byte
+        TimeStamp* : int64
 
 type
     Event = ref object
@@ -8,7 +104,7 @@ type
         Name*: string
         Args*: seq[string]
         Margs*: seq[string]
-        #Uargs*: pointer
+        Uargs*: Argument
         ErrCode*: int32
         ErrMsg*: string
         UserCode*: int64

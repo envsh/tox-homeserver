@@ -11,48 +11,6 @@ const MemberInfo_FRIEND = 1
 const MemberInfo_GROUP = 2
 const MemberInfo_PEER = 3
 
-type
-    MemberInfo = ref object
-        Pnum*: uint32
-        Pubkey* : string
-        Name* : string
-        Mtype* : int
-        # // extra
-        Joints* : int64
-
-type
-    FriendInfo = ref object
-        Fnum* : uint32
-        Status1* : uint32 # 为啥叫Status编译器报错
-        Pubkey* : string
-        Name* : string
-        Stmsg* : string
-        Avatar* : string
-        Seen* : uint64
-        ConnStatus* : int32
-
-type
-    GroupInfo = ref object
-        Gnum* : uint32
-        Mtype* : uint32
-        GroupId* : string
-        Title* : string
-        Stmsg* : string
-        Ours* : bool
-        Members* : Table[string,MemberInfo]
-
-
-type
-    BaseInfo = ref object
-        ToxId*:string
-        Name*: string
-        Stmsg*: string
-        Status*: uint32
-        Friend*: Table[uint32,FriendInfo]
-        Groups*: Table[uint32,GroupInfo]
-        ConnStatus*: int32
-        NextBatch*: int64
-        ToxVersion*: string
 
 type
     PDataModel = ptr DataModel

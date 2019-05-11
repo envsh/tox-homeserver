@@ -26,11 +26,12 @@ import (
 func packBaseInfo(t *tox.Tox) (*thspbs.BaseInfo, error) {
 
 	out := &thspbs.BaseInfo{}
+	out.Name = "BaseInfo"
 	out.ToxId = t.SelfGetAddress()
 	out.ToxVersion = xtox.VersionStr()
-	out.Name = t.SelfGetName()
+	out.MyName = t.SelfGetName()
 	out.Stmsg, _ = t.SelfGetStatusMessage()
-	out.Status = uint32(t.SelfGetStatus())
+	out.Status1 = uint32(t.SelfGetStatus())
 	out.ConnStatus = int32(t.SelfGetConnectionStatus())
 	out.Friends = make(map[uint32]*thspbs.FriendInfo)
 	out.Groups = make(map[uint32]*thspbs.GroupInfo)
@@ -58,7 +59,7 @@ func packBaseInfo(t *tox.Tox) (*thspbs.BaseInfo, error) {
 		fi.Fnum = fn
 		fi.Name = fname
 		fi.Stmsg = stmsg
-		fi.Status = uint32(fstatus)
+		fi.Status1 = uint32(fstatus)
 		fi.ConnStatus = int32(fstatus)
 
 		out.Friends[fn] = fi

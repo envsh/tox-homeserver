@@ -41,18 +41,6 @@ proc onsubskread(fd:AsyncFD):bool=
     ldebug("cli subsk readable", repr(fd))
     return
 
-proc onreqskread(fd:AsyncFD):bool {.gcsafe.}=
-    var ne = cast[PNimenv](getNimenvp())
-    var cli = ne.rpcli
-    var buf : array[8192,char]
-    var pbuf = buf.addr.toptr
-    var bsz  = buf.len()
-    var rv = nng_recv(cli.reqsk, pbuf, bsz.addr.tou64, NNG_FLAG_NONBLOCK)
-    ldebug("recved", rv, bsz)
-    var data = cast[string](buf[..(bsz-1)]) # the string result
-    return
-
-
 proc reqsksend(cli:RpcClient, s:string)=
     var cs : cstring = $s
     var data = cs.toptr
@@ -66,4 +54,47 @@ proc getBaseInfo(cli:RpcClient) =
     var jstr = $(%*evt)
     ldebug("send... req", jstr.len(), jstr)
     cli.reqsksend(jstr)
+    return
+
+proc dispatchBaseInfo(cli:RpcClient, evt : BaseInfo) =
+    return
+
+proc decodeBaseInfo(cli:RpcClient, jnode: JsonNode) : BaseInfo =
+    var binfo = BaseInfo()
+
+    return binfo
+
+proc dispatchEvent(cli:RpcClient, evt : Event) =
+    return
+
+proc decodeEvent(cli:RpcClient, jnode: JsonNode) : Event =
+    return
+
+proc dispatchEventRaw(cli:RpcClient, data:string)=
+
+    var jnode = parseJson(data)
+    var jname = jnode{"Name"}.getStr
+
+    if jname == "BaseInfo":
+        var binfo = cli.decodeBaseInfo(jnode)
+        cli.dispatchBaseInfo(binfo)
+    elif jname == "":
+        linfo("Empty event name")
+    else:
+        var evt : Event = cli.decodeEvent(jnode)
+        cli.dispatchEvent(evt)
+
+    return
+
+proc onreqskread(fd:AsyncFD):bool {.gcsafe.}=
+    var ne = cast[PNimenv](getNimenvp())
+    var cli = ne.rpcli
+    var buf : array[8192,char]
+    var pbuf = buf.addr.toptr
+    var bsz  = buf.len()
+    var rv = nng_recv(cli.reqsk, pbuf, bsz.addr.tou64, NNG_FLAG_NONBLOCK)
+    ldebug("recved", rv, bsz)
+    if bsz > buf.len(): lerror("Buf too small, need", bsz)
+    var data = cast[string](buf[..(bsz-1)]) # the string result
+    cli.dispatchEventRaw(data)
     return

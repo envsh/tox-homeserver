@@ -693,7 +693,7 @@ func (this *LigTox) SelfSetStatus(status uint8) {
 
 func (this *LigTox) SelfGetStatusMessageSize() int         { return len(this.Binfo.GetStmsg()) }
 func (this *LigTox) SelfGetStatusMessage() (string, error) { return this.Binfo.GetStmsg(), nil }
-func (this *LigTox) SelfGetStatus() int                    { return int(this.Binfo.GetStatus()) }
+func (this *LigTox) SelfGetStatus() int                    { return int(this.Binfo.GetStatus1()) }
 
 func (this *LigTox) FriendAdd(friendId string, message string) (uint32, error) {
 	fname := this.getMethodName()
@@ -845,7 +845,7 @@ func (this *LigTox) FriendGetStatusMessage(friendNumber uint32) (string, error) 
 func (this *LigTox) FriendGetStatus(friendNumber uint32) (int, error) {
 	frnds := this.Binfo.GetFriends()
 	if frndo, ok := frnds[friendNumber]; ok {
-		return int(frndo.Status), nil
+		return int(frndo.Status1), nil
 	}
 	return int(0), nil
 }
