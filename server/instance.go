@@ -78,7 +78,7 @@ func (this *ToxVM) setupEventsForMessage() {
 		}
 		log.Println(status, tox.ConnStatusString(status))
 		evt := thspbs.Event{}
-		evt.Name = "SelfConnectionStatus"
+		evt.EventName = "SelfConnectionStatus"
 		evt.Args = []string{fmt.Sprintf("%d", status)}
 		evt.Margs = []string{tox.ConnStatusString(status)}
 
@@ -87,7 +87,7 @@ func (this *ToxVM) setupEventsForMessage() {
 
 	t.CallbackFriendRequestAdd(func(_ *tox.Tox, pubkey string, message string, userData interface{}) {
 		evt := thspbs.Event{}
-		evt.Name = "FriendRequest"
+		evt.EventName = "FriendRequest"
 		evt.Args = []string{pubkey, message}
 
 		ctid, err := appctx.st.AddFriend(pubkey, 0, "", "")
@@ -102,7 +102,7 @@ func (this *ToxVM) setupEventsForMessage() {
 		//	return
 		// }
 		evt := thspbs.Event{}
-		evt.Name = "FriendMessage"
+		evt.EventName = "FriendMessage"
 		evt.Args = []string{fmt.Sprintf("%d", friendNumber), message}
 		friendpk, err := t.FriendGetPublicKey(friendNumber)
 		gopp.ErrPrint(err)
@@ -123,7 +123,7 @@ func (this *ToxVM) setupEventsForMessage() {
 
 	t.CallbackFriendConnectionStatusAdd(func(_ *tox.Tox, friendNumber uint32, status int, userData interface{}) {
 		evt := &thspbs.Event{}
-		evt.Name = "FriendConnectionStatus"
+		evt.EventName = "FriendConnectionStatus"
 		evt.Args = []string{fmt.Sprintf("%d", friendNumber), fmt.Sprintf("%d", status)}
 		pubkey, err := t.FriendGetPublicKey(friendNumber)
 		gopp.ErrPrint(err)
@@ -151,7 +151,7 @@ func (this *ToxVM) setupEventsForMessage() {
 						appctx.st.SetMessageSent(offmsg.Id)
 						// construct a FriendSendMessageResp
 						evt := &thspbs.Event{}
-						evt.Name = "FriendSendMessageResp"
+						evt.EventName = "FriendSendMessageResp"
 						evt.Args = gopp.ToStrs(friendNumber)
 						evt.Margs = gopp.ToStrs(0, 1, pubkey)
 						evt.EventId, evt.UserCode = offmsg.EventId, offmsg.UserCode
@@ -165,7 +165,7 @@ func (this *ToxVM) setupEventsForMessage() {
 
 	t.CallbackFriendNameAdd(func(_ *tox.Tox, friendNumber uint32, fname string, userData interface{}) {
 		evt := &thspbs.Event{}
-		evt.Name = "FriendName"
+		evt.EventName = "FriendName"
 		evt.Args = gopp.ToStrs(friendNumber, fname)
 		pubkey, err := t.FriendGetPublicKey(friendNumber)
 		gopp.ErrPrint(err)
@@ -175,7 +175,7 @@ func (this *ToxVM) setupEventsForMessage() {
 
 	t.CallbackFriendStatusMessageAdd(func(_ *tox.Tox, friendNumber uint32, statusText string, userData interface{}) {
 		evt := &thspbs.Event{}
-		evt.Name = "FriendStatusMessage"
+		evt.EventName = "FriendStatusMessage"
 		evt.Args = gopp.ToStrs(friendNumber, statusText)
 		pubkey, err := t.FriendGetPublicKey(friendNumber)
 		gopp.ErrPrint(err)
@@ -187,7 +187,7 @@ func (this *ToxVM) setupEventsForMessage() {
 
 	t.CallbackFriendStatusAdd(func(_ *tox.Tox, friendNumber uint32, status int, ud interface{}) {
 		evt := &thspbs.Event{}
-		evt.Name = "FriendStatus"
+		evt.EventName = "FriendStatus"
 		evt.Args = gopp.ToStrs(friendNumber, status)
 		pubkey, err := t.FriendGetPublicKey(friendNumber)
 		gopp.ErrPrint(err)
@@ -225,7 +225,7 @@ func (this *ToxVM) setupEventsForMessage() {
 
 	t.CallbackConferenceInviteAdd(func(_ *tox.Tox, friendNumber uint32, itype uint8, cookie string, userData interface{}) {
 		evt := thspbs.Event{}
-		evt.Name = "ConferenceInvite"
+		evt.EventName = "ConferenceInvite"
 		evt.Args = []string{fmt.Sprintf("%d", friendNumber), fmt.Sprintf("%d", itype), cookie}
 
 		pubkey, err := t.FriendGetPublicKey(friendNumber)
@@ -264,7 +264,7 @@ func (this *ToxVM) setupEventsForMessage() {
 
 	t.CallbackConferenceMessageAdd(func(_ *tox.Tox, groupNumber uint32, peerNumber uint32, message string, userData interface{}) {
 		evt := thspbs.Event{}
-		evt.Name = "ConferenceMessage"
+		evt.EventName = "ConferenceMessage"
 		evt.Args = []string{fmt.Sprintf("%d", groupNumber), fmt.Sprintf("%d", peerNumber), "0", message}
 
 		peerPubkey, err := t.ConferencePeerGetPublicKey(groupNumber, peerNumber)
@@ -312,7 +312,7 @@ func (this *ToxVM) setupEventsForMessage() {
 
 	t.CallbackConferenceActionAdd(func(_ *tox.Tox, groupNumber uint32, peerNumber uint32, message string, userData interface{}) {
 		evt := thspbs.Event{}
-		evt.Name = "ConferenceMessage"
+		evt.EventName = "ConferenceMessage"
 		evt.Args = []string{fmt.Sprintf("%d", groupNumber), fmt.Sprintf("%d", peerNumber), "1", message}
 
 		peerPubkey, err := t.ConferencePeerGetPublicKey(groupNumber, peerNumber)
@@ -346,7 +346,7 @@ func (this *ToxVM) setupEventsForMessage() {
 
 	t.CallbackConferencePeerNameAdd(func(_ *tox.Tox, groupNumber uint32, peerNumber uint32, name string, userData interface{}) {
 		evt := thspbs.Event{}
-		evt.Name = "ConferencePeerName"
+		evt.EventName = "ConferencePeerName"
 		evt.Args = []string{fmt.Sprintf("%d", groupNumber), fmt.Sprintf("%d", peerNumber), name}
 
 		peerPubkey, err := t.ConferencePeerGetPublicKey(groupNumber, peerNumber)
@@ -373,7 +373,7 @@ func (this *ToxVM) setupEventsForMessage() {
 	// detect which peer added/deleted here and directly tell client, make client lighter.
 	t.CallbackConferencePeerListChangedAdd(func(_ *tox.Tox, groupNumber uint32, userData interface{}) {
 		evt := thspbs.Event{}
-		evt.Name = "ConferencePeerListChange"
+		evt.EventName = "ConferencePeerListChange"
 		evt.Args = []string{fmt.Sprintf("%d", groupNumber)}
 
 		title, err := t.ConferenceGetTitle(groupNumber)
@@ -401,7 +401,7 @@ func (this *ToxVM) setupEventsForMessage() {
 	/*
 		t.CallbackConferenceNameListChangeAdd(func(_ *tox.Tox, groupNumber uint32, peerNumber uint32, change uint8, userData interface{}) {
 			evt := thspbs.Event{}
-			evt.Name = "ConferenceNameListChange"
+			evt.EventName = "ConferenceNameListChange"
 			evt.Args = []string{fmt.Sprintf("%d", groupNumber),
 				fmt.Sprintf("%d", peerNumber), fmt.Sprintf("%d", change)}
 
@@ -428,7 +428,7 @@ func (this *ToxVM) setupEventsForMessage() {
 
 	t.CallbackConferenceTitleAdd(func(_ *tox.Tox, groupNumber uint32, peerNumber uint32, title string, userData interface{}) {
 		evt := thspbs.Event{}
-		evt.Name = "ConferenceTitle"
+		evt.EventName = "ConferenceTitle"
 		stmsg := "" // fake group status message
 		if pos := strings.Index(title, thscom.GroupTitleSep); pos > 0 {
 			stmsg = title[pos+len(thscom.GroupTitleSep):]

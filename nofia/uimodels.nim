@@ -5,12 +5,7 @@ const CTTYPE_FRIEND = 1
 const CTTYPE_GROUP = 2
 
 import tables
-
-const MemberInfo_UNKNOWN  = 0
-const MemberInfo_FRIEND = 1
-const MemberInfo_GROUP = 2
-const MemberInfo_PEER = 3
-
+import algorithm
 
 type
     PDataModel = ptr DataModel
@@ -52,6 +47,17 @@ type
 
         repainter*: proc()
 
+
+proc newDataModel() : DataModel =
+    var mdl = DataModel()
+    mdl.Scrollbarys = initTable[string,int]()
+    mdl.Friendsm = initTable[string,FriendInfo]()
+    mdl.Friendsv = newseq[FriendInfo]()
+    mdl.Groupsm = initTable[string,GroupInfo]()
+    mdl.Groupsv = newseq[GroupInfo]()
+    mdl.Ctmsgs = initTable[string,seq[Message]]()
+    mdl.Hasnews = initTable[string, int]()
+    return mdl
 
 proc Nxtreceiptid(mdl:DataModel) : int64 =
     return 0
@@ -100,37 +106,45 @@ proc SetMyConnStatus(this:DataModel, stno: int) =
     this.Mysttxt = Conno2str(this.Mystno)
     return
 
-# func (this *DataModel) SetFriendInfos(friends map[uint32]*thspbs.FriendInfo) {
-# 	defer this.emitChanged()
-# 	newedm := map[string]*thspbs.FriendInfo{}
-# 	newedv := []*thspbs.FriendInfo{}
-# 	for _, v := range friends {
-# 		f := *v
-# 		newedm[v.GetPubkey()] = &f
-# 		newedv = append(newedv, &f)
-# 	}
-# 	sort.Slice(newedv, func(i int, j int) bool { return newedv[i].GetFnum() < newedv[j].GetFnum() })
-# 	this.mu.Lock()
-# 	defer this.mu.Unlock()
-# 	this.Friendsm = newedm
-# 	this.Friendsv = newedv
-# }
-# func (this *DataModel) SetGroupInfos(groups map[uint32]*thspbs.GroupInfo) {
-# 	defer this.emitChanged()
-# 	newedm := map[string]*thspbs.GroupInfo{}
-# 	newedv := []*thspbs.GroupInfo{}
-# 	for _, v := range groups {
-# 		g := *v
-# 		newedm[v.GetGroupId()] = &g
-# 		newedv = append(newedv, &g)
-# 	}
-# 	sort.Slice(newedv, func(i int, j int) bool { return newedv[i].GetGnum() < newedv[j].GetGnum() })
+proc friendcmper(x, y : FriendInfo) :int =
+    if x.Fnum < y.Fnum: return 1
+    elif x.Fnum > y.Fnum: return -1
+    else: return 0
 
-# 	this.mu.Lock()
-# 	defer this.mu.Unlock()
-# 	this.Groupsm = newedm
-# 	this.Groupsv = newedv
-# }
+proc SetFriendInfos(this:DataModel, friends: Table[uint32,FriendInfo]) =
+    var newedm = initTable[string,FriendInfo]()
+    var newedv = newseq[FriendInfo]()
+    for k, v in friends.pairs():
+        var f = v
+        newedm.add(v.Pubkey, f)
+        newedv.add(f)
+
+    # sort
+    sort(newedv, friendcmper)
+
+    this.Friendsm = newedm
+    this.Friendsv = newedv
+    return
+
+proc groupcmper (x, y : GroupInfo) :int =
+    if x.Gnum < y.Gnum: return 1
+    elif x.Gnum > y.Gnum: return -1
+    else: return 0
+
+proc SetGroupInfos(this:DataModel, groups: Table[uint32,GroupInfo]) =
+    var newedm = initTable[string,GroupInfo]()
+    var newedv = newseq[GroupInfo]()
+    for k, v in  groups.pairs:
+        var g = v # TODO deepcopy?
+        newedm.add(v.GroupId, g)
+        newedv.add(g)
+
+    # sort
+    sort(newedv, groupcmper)
+
+    this.Groupsm = newedm
+    this.Groupsv = newedv
+    return
 
 proc FriendList(mdl:DataModel) : seq[FriendInfo] = return mdl.Friendsv
 

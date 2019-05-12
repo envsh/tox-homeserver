@@ -50,17 +50,76 @@ proc reqsksend(cli:RpcClient, s:string)=
 
 proc getBaseInfo(cli:RpcClient) =
     var evt = Event()
-    evt.Name = "GetBaseInfo"
+    evt.EventName = "GetBaseInfo"
     var jstr = $(%*evt)
     ldebug("send... req", jstr.len(), jstr)
     cli.reqsksend(jstr)
     return
 
-proc dispatchBaseInfo(cli:RpcClient, evt : BaseInfo) =
+proc dispatchBaseInfo(cli:RpcClient, binfo : BaseInfo) =
+    ldebug("dispatch BaseInfo")
+    cli.binfo = binfo
+    var mdl = getnkmdl()
+
+    mdl.SetMyInfo(binfo.MyName, binfo.ToxId, binfo.Stmsg)
+    mdl.SetMyConnStatus(binfo.ConnStatus)
+    mdl.SetFriendInfos(binfo.Friends)
+    mdl.SetGroupInfos(binfo.Groups)
+
     return
 
 proc decodeBaseInfo(cli:RpcClient, jnode: JsonNode) : BaseInfo =
+    ldebug("decode BaseInfo")
     var binfo = BaseInfo()
+    binfo.EventId = jnode{"EventId"}.getInt.toi64
+    binfo.EventName = jnode{"EventName"}.getstr
+    binfo.ToxId = jnode{"ToxId"}.getstr
+    binfo.MyName = jnode{"MyName"}.getstr
+    binfo.Stmsg = jnode{"Stmsg"}.getstr
+    binfo.Status1 = jnode{"Status1"}.getInt.tou32
+    binfo.ConnStatus = jnode{"ConnStatus"}.getInt.toi32
+    binfo.NextBatch = jnode{"NextBatch"}.getInt.toi64
+    binfo.ToxVersion = jnode{"ToxVersion"}.getstr
+
+    binfo.Friends = initTable[uint32,FriendInfo]()
+    binfo.Groups = initTable[uint32,GroupInfo]()
+
+    linfo("hasKey", jnode.hasKey("Friends"))
+    linfo("hasKey", jnode.hasKey("Groups"))
+    for snum, fnode in jnode{"Friends"}.pairs:
+        var frnd = FriendInfo()
+        var num = parseInt(snum).tou32
+        frnd.Fnum = num
+        frnd.Status1 = fnode{"Status1"}.getint.tou32
+        frnd.Name = fnode{"Name"}.getstr
+        frnd.Stmsg = fnode{"Stmsg"}.getstr
+        frnd.Avatar = fnode{"Avatar"}.getstr
+        frnd.Seen = fnode{"Seen"}.getint.toi64
+        frnd.ConnStatus = fnode{"ConnStatus"}.getint.toi32
+        binfo.Friends.add(num, frnd)
+
+    for snum, gnode in jnode{"Groups"}.pairs:
+        var grpo = GroupInfo()
+        var num = parseInt(snum).tou32
+        grpo.Gnum = num
+        grpo.Mtype = gnode{"Mtype"}.getint.tou32
+        grpo.GroupId = gnode{"GroupId"}.getstr
+        grpo.Title = gnode{"Title"}.getstr
+        grpo.Stmsg = gnode{"Stmsg"}.getstr
+        grpo.Ours = gnode{"Ours"}.getbool
+        #grpo.Members
+        grpo.Members = initTable[string, MemberInfo]()
+        for snum, pnode in gnode{"Members"}.pairs:
+            var mbro = MemberInfo()
+            var pnum = parseInt(snum).tou32
+            mbro.Pnum = pnum
+            mbro.Pubkey = pnode{"Pubkey"}.getstr
+            mbro.Name = pnode{"Name"}.getstr
+            mbro.Mtype = pnode{"Mtype"}.getint
+            mbro.Joints = pnode{"Joints"}.getint.toi64
+            grpo.Members.add(mbro.Pubkey, mbro)
+
+        binfo.Groups.add(num, grpo)
 
     return binfo
 
@@ -73,11 +132,12 @@ proc decodeEvent(cli:RpcClient, jnode: JsonNode) : Event =
 proc dispatchEventRaw(cli:RpcClient, data:string)=
 
     var jnode = parseJson(data)
-    var jname = jnode{"Name"}.getStr
+    var jname = jnode{"EventName"}.getstr
 
-    if jname == "BaseInfo":
-        var binfo = cli.decodeBaseInfo(jnode)
-        cli.dispatchBaseInfo(binfo)
+    if jname == "GetBaseInfoResp":
+        ldebug("got BaseInfo", cli == nil, jnode == nil)
+        var binfo = cli.decodeBaseInfo(jnode["Binfo"])
+        #cli.dispatchBaseInfo(binfo)
     elif jname == "":
         linfo("Empty event name")
     else:

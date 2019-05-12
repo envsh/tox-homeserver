@@ -11,7 +11,7 @@ import (
 
 func (this *LigTox) PullEventsByContactId(pubkey string, prev_batch int64) ([]store.MessageJoined, error) {
 	args := &thspbs.Event{}
-	args.Name = "PullEventsByContactId"
+	args.EventName = "PullEventsByContactId"
 	args.Args = []string{pubkey, fmt.Sprintf("%d", prev_batch)}
 
 	rsp, err := this.rmtCall(args)

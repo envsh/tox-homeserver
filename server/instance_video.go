@@ -12,7 +12,7 @@ func _NewEvent4AV(name string, t *tox.Tox, friendNumber uint32) *thspbs.Event {
 	frndnm, _ := t.FriendGetName(friendNumber)
 	frndpk, _ := t.FriendGetPublicKey(friendNumber)
 
-	evto := &thspbs.Event{Uargs: &thspbs.Argument{}, Name: name}
+	evto := &thspbs.Event{Uargs: &thspbs.Argument{}, EventName: name}
 
 	evto.Uargs.FriendNumber = friendNumber
 	evto.Uargs.FriendName = frndnm
@@ -98,7 +98,7 @@ func (this *ToxVM) onGroupAudioFrame(t *tox.Tox, groupNumber uint32, peerNumber 
 	peerpk, _ := t.ConferencePeerGetPublicKey(groupNumber, peerNumber)
 	peerName, _ := t.ConferencePeerGetName(groupNumber, peerNumber)
 
-	evto := &thspbs.Event{Uargs: &thspbs.Argument{}, Name: "ConferenceAudioReceiveFrame"}
+	evto := &thspbs.Event{Uargs: &thspbs.Argument{}, EventName: "ConferenceAudioReceiveFrame"}
 
 	evto.Uargs.GroupNumber = groupNumber
 	evto.Uargs.GroupTitle = groupTitle

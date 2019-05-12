@@ -26,7 +26,7 @@ import (
 func packBaseInfo(t *tox.Tox) (*thspbs.BaseInfo, error) {
 
 	out := &thspbs.BaseInfo{}
-	out.Name = "BaseInfo"
+	out.EventName = "BaseInfo"
 	out.ToxId = t.SelfGetAddress()
 	out.ToxVersion = xtox.VersionStr()
 	out.MyName = t.SelfGetName()
@@ -129,16 +129,16 @@ func RmtCallHandlerRaw(ctx context.Context, reqdat []byte) (repdat []byte, err e
 // 自己的消息做多终端同步转发
 // conn caller connection
 func RmtCallHandlers(ctx context.Context, req *thspbs.Event) (*thspbs.Event, error) {
-	switch req.Name {
+	switch req.EventName {
 	case "AudioSendFrame":
 	case "VideoSendFrame":
 	case "GroupSendAudio":
 	default: // debug output too much
-		log.Println(req.EventId, req.Name, req.Args, req.Margs)
+		log.Println(req.EventId, req.EventName, req.Args, req.Margs)
 	}
 
 	// 先把消息同步到不同协议的不同终端上, not need execute result
-	switch req.Name {
+	switch req.EventName {
 	case "LoadEventsByContactId":
 	default:
 	case "SelfSetName", "SelfSetStatusMessage":
@@ -156,7 +156,7 @@ func RmtCallHandlers(ctx context.Context, req *thspbs.Event) (*thspbs.Event, err
 	rsp, err := RmtCallExecuteHandler(ctx, req)
 
 	// re sync to client, need execute result
-	switch req.Name {
+	switch req.EventName {
 	case "FriendAdd", "FriendAddNorequest", "FriendDelete",
 		"FriendSendMessage":
 		fallthrough
@@ -172,17 +172,15 @@ func RmtCallHandlers(ctx context.Context, req *thspbs.Event) (*thspbs.Event, err
 
 // 直接执行请求
 func RmtCallExecuteHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Event, error) {
-	out := &thspbs.Event{Name: req.Name + "Resp"}
+	out := &thspbs.Event{EventName: req.EventName + "Resp"}
 
 	var err error
 	t := appctx.tvm.t
-	switch req.Name {
+	switch req.EventName {
 	case "GetBaseInfo":
 		binfo, err := packBaseInfo(t)
 		gopp.ErrPrint(err)
-		bdata, err := json.Marshal(binfo)
-		gopp.ErrPrint(err)
-		out.Args = []string{string(bdata)}
+		binfo.EventName = out.EventName
 		out.Binfo = binfo
 	case "FriendSendMessage": // args: "friendNumber" or "friendPubkey", "msg"
 		if len(req.Args) < 2 {
@@ -256,7 +254,7 @@ func RmtCallExecuteHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Even
 		_, err = t.ConferenceDelete(gnum)
 		gopp.ErrPrint(err, req.Args)
 		out.Args = append(out.Args, groupId)
-		log.Println(req.Name, req.Args[0], title, groupId)
+		log.Println(req.EventName, req.Args[0], title, groupId)
 
 	case "ConferenceSendMessage": // "groupNumber" or groupIdentity,"mtype","msg", optional4web("groupTitle")
 		gnum := uint32(gopp.MustInt(req.Args[0]))
@@ -402,14 +400,14 @@ func RmtCallExecuteHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Even
 		}
 	case "GroupSendAudio":
 	default:
-		log.Println("unimpled:", req.Name, req.Args)
+		log.Println("unimpled:", req.EventName, req.Args)
 		out.ErrCode = -1
-		out.ErrMsg = fmt.Sprintf("Unimpled: %s", req.Name)
+		out.ErrMsg = fmt.Sprintf("Unimpled: %s", req.EventName)
 	}
 
 	thscom.BytesRecved(len(req.String()))
 	thscom.BytesSent(len(out.String()))
-	log.Println("response: ", req.Name, len(out.String()), out.String()[:32])
+	log.Println("response: ", req.EventName, len(out.String()), out.String()[:32])
 	return out, nil
 }
 
@@ -417,7 +415,7 @@ func RmtCallExecuteHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Even
 // 把其中一个端发送的消息再同步到其他端上
 // 需要记录一个终端的id
 func RmtCallResyncHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Event, error) {
-	log.Println(req.EventId, req.Name, req.Args, req.Margs)
+	log.Println(req.EventId, req.EventName, req.Args, req.Margs)
 	out := &thspbs.Event{}
 
 	var err error
@@ -426,7 +424,7 @@ func RmtCallResyncHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Event
 	err = gopp.DeepCopy(req, out)
 	gopp.ErrPrint(err)
 
-	switch req.Name {
+	switch req.EventName {
 	case "FriendSendMessage": // args: "friendNumber" or "friendPubkey", "msg"
 		fnum := uint32(gopp.MustInt(req.Args[0]))
 		if len(req.Args[0]) >= 64 { // think as friendPubkey
@@ -471,7 +469,7 @@ func RmtCallResyncHandler(ctx context.Context, req *thspbs.Event) (*thspbs.Event
 
 		go detectGroupMessageMime(out, req.Args[2])
 	default:
-		return nil, errors.New("not need/impl resync " + req.Name)
+		return nil, errors.New("not need/impl resync " + req.EventName)
 	}
 
 	return out, nil
@@ -510,10 +508,10 @@ func detectGroupMessageMime(evt *thspbs.Event, message string) {
 		}
 
 		fil := store.GetFS().NewFileInfoLine4Md5(md5str)
-		if evt.Name != "ConferenceMessage" {
-			log.Println("Rename event:", evt.Name)
+		if evt.EventName != "ConferenceMessage" {
+			log.Println("Rename event:", evt.EventName)
 		}
-		evt.Name = "ConferenceMessageReload" // TODO subcommand
+		evt.EventName = "ConferenceMessageReload" // TODO subcommand
 		evt.Args[3] = fil.String()
 		evt.Margs[6] = fil.ToType()
 		evt.Margs[7] = fil.Mime

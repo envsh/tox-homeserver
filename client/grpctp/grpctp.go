@@ -123,10 +123,10 @@ func (this *GrpcTransport) serveBackendEventGrpc() {
 func (this *GrpcTransport) notifyRpcStatus(err error, retryWait time.Duration) {
 	evto := &thspbs.Event{}
 	if err != nil {
-		evto.Name = "brokenrpc"
+		evto.EventName = "brokenrpc"
 		evto.Args = []string{err.Error(), retryWait.String()}
 	} else {
-		evto.Name = "goodrpc"
+		evto.EventName = "goodrpc"
 	}
 
 	jcc, err := json.Marshal(evto)
@@ -140,7 +140,7 @@ func (this *GrpcTransport) notifyRpcStatus(err error, retryWait time.Duration) {
 func (this *GrpcTransport) serveBackendEventGrpcImpl() error {
 	clio := thspbs.NewToxhsClient(this.rpcli)
 	stmc, err := clio.PollCallback(context.Background(),
-		&thspbs.Event{Name: "PollCallback", DeviceUuid: this.DevUuid})
+		&thspbs.Event{EventName: "PollCallback", DeviceUuid: this.DevUuid})
 	gopp.ErrPrint(err)
 	if err != nil {
 		return err
@@ -189,7 +189,7 @@ func (this *GrpcTransport) RmtCall(args *thspbs.Event) (*thspbs.Event, error) {
 
 func (this *GrpcTransport) GetBaseInfo() *thspbs.BaseInfo {
 	cli := thspbs.NewToxhsClient(this.rpcli)
-	in := &thspbs.Event{Name: "GetBaseInfo", DeviceUuid: this.DevUuid}
+	in := &thspbs.Event{EventName: "GetBaseInfo", DeviceUuid: this.DevUuid}
 	bi, err := cli.GetBaseInfo(context.Background(), in)
 	gopp.ErrPrint(err)
 

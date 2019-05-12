@@ -3,6 +3,11 @@
 # 由于类型定义的可见顺序问题，把类型统一定义在此
 import tables
 
+const MemberInfo_UNKNOWN  = 0
+const MemberInfo_FRIEND = 1
+const MemberInfo_GROUP = 2
+const MemberInfo_PEER = 3
+
 type
     MemberInfo = ref object
         Pnum*: uint32
@@ -20,7 +25,7 @@ type
         Name* : string
         Stmsg* : string
         Avatar* : string
-        Seen* : uint64
+        Seen* : int64
         ConnStatus* : int32
 
 type
@@ -43,12 +48,12 @@ type
 type
     BaseInfo = ref object
         EventId*: int64
-        Name*: string # event name
+        EventName*: string # event name
         ToxId*:string
         MyName*: string
         Stmsg*: string
         Status1*: uint32
-        Friend*: Table[uint32,FriendInfo]
+        Friends*: Table[uint32,FriendInfo]
         Groups*: Table[uint32,GroupInfo]
         ConnStatus*: int32
         NextBatch*: int64
@@ -101,7 +106,7 @@ type
 type
     Event = ref object
         EventId*: int64
-        Name*: string
+        EventName*: string
         Args*: seq[string]
         Margs*: seq[string]
         Uargs*: Argument
@@ -143,5 +148,5 @@ type
         reqsk*: nng_socket
         reqrfd*: AsyncFD
         reqwfd*: AsyncFD
-
+        binfo*: BaseInfo
 

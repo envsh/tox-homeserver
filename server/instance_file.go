@@ -160,7 +160,7 @@ func (this *ToxVM) onFriendFileUploaded(md5str string, frndpk string, userCodeSt
 	selfpk := this.t.SelfGetPublicKey()
 
 	evto := &thspbs.Event{}
-	evto.Name = "FriendSendMessage"
+	evto.EventName = "FriendSendMessage"
 	evto.Args = gopp.ToStrs(frndnum, msgContentFromFileData(data, md5str, oname))
 	evto.UserCode = userCode
 
@@ -179,7 +179,7 @@ func (this *ToxVM) onFriendFileUploaded(md5str string, frndpk string, userCodeSt
 		// set sent ok
 		appctx.st.SetMessageSent(msgo.Id)
 		// publish the last sent state
-		evto.Name = "FriendSendMessageResp"
+		evto.EventName = "FriendSendMessageResp"
 		evto.Margs[1] = gopp.ToStr(1)
 		this.pubmsg(evto)
 	})
@@ -208,7 +208,7 @@ func (this *ToxVM) onGroupFileUploaded(md5str string, frndpk string, userCodeStr
 		log.Println("Send file to external file store:", err)
 
 		evto := &thspbs.Event{}
-		evto.Name = "ConferenceSendMessage"
+		evto.EventName = "ConferenceSendMessage"
 		// 好像url不需要存储啊。只发送出去就好了
 		// evto.Args = gopp.ToStrs(frndnum, 0, msgContentFromFileDataUrl(data, md5str, oname, urlval))
 		evto.Args = gopp.ToStrs(frndnum, 0, msgContentFromFileData(data, md5str, oname))
@@ -243,12 +243,12 @@ func (this *ToxVM) onGroupFileUploaded(md5str string, frndpk string, userCodeStr
 		// set sent ok
 		appctx.st.SetMessageSent(msgo.Id)
 		// publish the last sent state
-		evto.Name = "ConferenceSendMessageResp"
+		evto.EventName = "ConferenceSendMessageResp"
 		evto.Margs = gopp.ToStrs(0, "1", groupId)
 		this.pubmsg(evto)
 
 		// update mime
-		evto.Name = "ConferenceMessageReload"
+		evto.EventName = "ConferenceMessageReload"
 		this.pubmsg(evto)
 	}()
 }
@@ -351,7 +351,7 @@ func NewEventFromFileInfo(fio *FileInfo, frndname, frndpk string, EventId int64)
 	msg := msgContentFromFileData(fio.fdata, md5str, fio.fname)
 
 	evto := &thspbs.Event{}
-	evto.Name = "FriendMessage"
+	evto.EventName = "FriendMessage"
 	evto.Args = []string{fmt.Sprintf("%d", fio.frndnum), msg}
 
 	msgty, mimety, _ := msgTypeFromFileData(fio.fdata, fio.fkind == 1)

@@ -191,7 +191,7 @@ func (this *LigTox) onBackendEvent(evto *thspbs.Event, data []byte) {
 		}
 	}()
 
-	switch evto.Name {
+	switch evto.EventName {
 	case "FriendConnectionStatus":
 		fnum := gopp.MustUint32(evto.Args[0])
 		st := gopp.MustInt(evto.Args[1])
@@ -641,7 +641,7 @@ func (this *LigTox) GetSavedata() []byte {
 func (this *LigTox) Bootstrap(addr string, port uint16, pubkey string) (bool, error) {
 	fname := this.getMethodName()
 	args := thspbs.Event{}
-	args.Name = fname
+	args.EventName = fname
 	args.Args = []string{addr, gopp.ToStr(port), pubkey}
 
 	rsp, err := this.rmtCall(&args)
@@ -656,7 +656,7 @@ func (this *LigTox) SelfGetConnectionStatus() int { return int(this.Binfo.GetCon
 func (this *LigTox) SelfSetName(name string) error {
 	fname := this.getMethodName()
 	args := thspbs.Event{}
-	args.Name = fname
+	args.EventName = fname
 	args.Args = []string{name}
 
 	rsp, err := this.rmtCall(&args)
@@ -665,13 +665,13 @@ func (this *LigTox) SelfSetName(name string) error {
 	return err
 }
 
-func (this *LigTox) SelfGetName() string  { return this.Binfo.GetName() }
-func (this *LigTox) SelfGetNameSize() int { return len(this.Binfo.GetName()) }
+func (this *LigTox) SelfGetName() string  { return this.Binfo.GetMyName() }
+func (this *LigTox) SelfGetNameSize() int { return len(this.Binfo.GetMyName()) }
 
 func (this *LigTox) SelfSetStatusMessage(statusText string) (bool, error) {
 	fname := this.getMethodName()
 	args := thspbs.Event{}
-	args.Name = fname
+	args.EventName = fname
 	args.Args = []string{statusText}
 
 	rsp, err := this.rmtCall(&args)
@@ -683,7 +683,7 @@ func (this *LigTox) SelfSetStatusMessage(statusText string) (bool, error) {
 func (this *LigTox) SelfSetStatus(status uint8) {
 	fname := this.getMethodName()
 	args := thspbs.Event{}
-	args.Name = fname
+	args.EventName = fname
 	args.Args = []string{gopp.ToStr(status)}
 
 	rsp, err := this.rmtCall(&args)
@@ -698,7 +698,7 @@ func (this *LigTox) SelfGetStatus() int                    { return int(this.Bin
 func (this *LigTox) FriendAdd(friendId string, message string) (uint32, error) {
 	fname := this.getMethodName()
 	args := thspbs.Event{}
-	args.Name = fname
+	args.EventName = fname
 	args.Args = []string{friendId, message}
 
 	rsp, err := this.rmtCall(&args)
@@ -715,7 +715,7 @@ func (this *LigTox) FriendAdd(friendId string, message string) (uint32, error) {
 func (this *LigTox) FriendAddNorequest(friendId string) (uint32, error) {
 	fname := this.getMethodName()
 	args := thspbs.Event{}
-	args.Name = fname
+	args.EventName = fname
 	args.Args = []string{friendId}
 
 	rsp, err := this.rmtCall(&args)
@@ -747,7 +747,7 @@ func (this *LigTox) FriendGetPublicKey(friendNumber uint32) (string, error) {
 func (this *LigTox) FriendDelete(friendNumber uint32) (bool, error) {
 	fname := this.getMethodName()
 	args := thspbs.Event{}
-	args.Name = fname
+	args.EventName = fname
 	args.Args = []string{gopp.ToStr(friendNumber)}
 
 	rsp, err := this.rmtCall(&args)
@@ -771,7 +771,7 @@ func (this *LigTox) FriendExists(friendNumber uint32) bool {
 func (this *LigTox) FriendSendMessage(friendNumber uint32, message string, userCode int64) (uint32, error) {
 	fname := this.getMethodName()
 	args := thspbs.Event{}
-	args.Name = fname
+	args.EventName = fname
 	args.Args = []string{fmt.Sprintf("%d", friendNumber), message}
 	args.UserCode = userCode
 
@@ -788,7 +788,7 @@ func (this *LigTox) FriendSendMessage(friendNumber uint32, message string, userC
 func (this *LigTox) FriendSendAction(friendNumber uint32, action string) (uint32, error) {
 	fname := this.getMethodName()
 	args := thspbs.Event{}
-	args.Name = fname
+	args.EventName = fname
 	args.Args = []string{fmt.Sprintf("%d", friendNumber), action}
 
 	// cli := thspbs.NewToxhsClient(this.rpcli)
@@ -857,7 +857,7 @@ func (this *LigTox) FriendGetLastOnline(friendNumber uint32) (uint64, error) {
 func (this *LigTox) SelfSetTyping(friendNumber uint32, typing bool) (bool, error) {
 	fname := this.getMethodName()
 	args := thspbs.Event{}
-	args.Name = fname
+	args.EventName = fname
 	args.Args = []string{gopp.ToStr(friendNumber), gopp.ToStr(typing)}
 
 	rsp, err := this.rmtCall(&args)
@@ -869,7 +869,7 @@ func (this *LigTox) SelfSetTyping(friendNumber uint32, typing bool) (bool, error
 func (this *LigTox) FriendGetTyping(friendNumber uint32) (bool, error) {
 	fname := this.getMethodName()
 	args := thspbs.Event{}
-	args.Name = fname
+	args.EventName = fname
 	args.Args = []string{gopp.ToStr(friendNumber)}
 
 	rsp, err := this.rmtCall(&args)
@@ -893,7 +893,7 @@ func (this *LigTox) SelfGetFriendList() []uint32 {
 func (this *LigTox) SelfGetNospam() uint32 {
 	fname := this.getMethodName()
 	args := thspbs.Event{}
-	args.Name = fname
+	args.EventName = fname
 	args.Args = []string{}
 
 	rsp, err := this.rmtCall(&args)
@@ -905,7 +905,7 @@ func (this *LigTox) SelfGetNospam() uint32 {
 func (this *LigTox) SelfSetNospam(nospam uint32) {
 	fname := this.getMethodName()
 	args := thspbs.Event{}
-	args.Name = fname
+	args.EventName = fname
 	args.Args = []string{gopp.ToStr(nospam)}
 
 	rsp, err := this.rmtCall(&args)
@@ -970,7 +970,7 @@ func (this *LigTox) IsConnected() int {
 func (this *LigTox) AudioSendFrame(friendNumber uint32, pcm []byte, sampleCount uint32, channels uint8, samplingRate uint32) error {
 	fname := this.getMethodName()
 	args := thspbs.Event{Uargs: &thspbs.Argument{}}
-	args.Name = fname
+	args.EventName = fname
 	args.Args = gopp.ToStrs(friendNumber, sampleCount, channels, samplingRate)
 	args.Uargs.Pcm = pcm
 
@@ -983,7 +983,7 @@ func (this *LigTox) AudioSendFrame(friendNumber uint32, pcm []byte, sampleCount 
 func (this *LigTox) VideoSendFrame(friendNumber uint32, vframe []byte, width, height uint16) error {
 	fname := this.getMethodName()
 	args := thspbs.Event{Uargs: &thspbs.Argument{}}
-	args.Name = fname
+	args.EventName = fname
 	args.Args = gopp.ToStrs(friendNumber, width, height)
 	args.Uargs.VideoFrame = vframe
 
@@ -996,7 +996,7 @@ func (this *LigTox) VideoSendFrame(friendNumber uint32, vframe []byte, width, he
 func (this *LigTox) GroupSendAudio(groupNumber uint32, pcm []byte, samples uint, channels uint8, samplingRate uint32) error {
 	fname := this.getMethodName()
 	args := thspbs.Event{Uargs: &thspbs.Argument{}}
-	args.Name = fname
+	args.EventName = fname
 	args.Args = gopp.ToStrs(groupNumber, samples, channels, samplingRate)
 	args.Uargs.Pcm = pcm
 
@@ -1017,7 +1017,7 @@ func (this *LigTox) getMethodName() string {
 func (this *LigTox) newRequest(fname string, args ...interface{}) *thspbs.Event {
 	// fname := this.getMethodName()
 	req := &thspbs.Event{}
-	req.Name = fname
+	req.EventName = fname
 	req.Args = []string{}
 	for _, arg := range args {
 		req.Args = append(req.Args, gopp.ToStr(arg))

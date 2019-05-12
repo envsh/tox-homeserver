@@ -16,7 +16,7 @@ message BaseEvent {
 
 message Event {
     int64 EventId = 1;
-    string Name = 2; // event name
+    string EventName = 2; // event name
     // int32 NameId = 2;  // TODO
     repeated string Args = 3;
     repeated string Margs = 4; // more info based on args
@@ -78,16 +78,17 @@ message Argument {
 }
 
 message BaseInfo {
-    string Name = 1;
-    string ToxId = 2;
-    string MyName = 3;
-    string Stmsg = 4; // statusText
-    uint32 Status1 = 5;
-    map<uint32,FriendInfo> Friends = 6;
-    map<uint32,GroupInfo> Groups = 7;
-    int32 ConnStatus = 8;
-    int64 NextBatch = 9;
-    string ToxVersion = 10;
+    int64  EventId = 1;
+    string EventName = 2;
+    string ToxId = 3;
+    string MyName = 4;
+    string Stmsg = 5; // statusText
+    uint32 Status1 = 6;
+    map<uint32,FriendInfo> Friends = 7;
+    map<uint32,GroupInfo> Groups = 8;
+    int32 ConnStatus = 9;
+    int64 NextBatch = 10;
+    string ToxVersion = 11;
 }
 
 message FriendInfo {
@@ -97,7 +98,7 @@ message FriendInfo {
     string Name = 4;
     string Stmsg = 5;
     string Avatar = 6;
-    uint64 Seen  = 7;
+    int64 Seen  = 7;
     int32 ConnStatus = 8;
 }
 

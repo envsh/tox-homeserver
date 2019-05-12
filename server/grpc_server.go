@@ -95,7 +95,7 @@ func (this *GrpcServer) Stop() error {
 
 func (this *GrpcServer) Pubmsg(ctx context.Context, evt *thspbs.Event) error {
 	err := pubmsg2grpc(ctx, evt)
-	gopp.ErrPrint(err, evt.Name)
+	gopp.ErrPrint(err, evt.EventName)
 	return err
 }
 
@@ -209,7 +209,7 @@ func pubmsg2grpc(ctx context.Context, evt *thspbs.Event) error {
 
 	// specific the connection to push this event, or push to all connections
 	for connid, stm := range stms {
-		log.Println(connid, toconnid, evt.DeviceUuid, evt.Name)
+		log.Println(connid, toconnid, evt.DeviceUuid, evt.EventName)
 		if evt.DeviceUuid == "" || (evt.DeviceUuid != "" && connid == toconnid) {
 			err := stm.Send(evt)
 			gopp.ErrPrint(err)
@@ -217,7 +217,7 @@ func pubmsg2grpc(ctx context.Context, evt *thspbs.Event) error {
 				errtop = err
 			}
 			jcc, _ := json.Marshal(evt)
-			log.Println(err == nil, connid, toconnid, evt.DeviceUuid, evt.Name, len(jcc))
+			log.Println(err == nil, connid, toconnid, evt.DeviceUuid, evt.EventName, len(jcc))
 		}
 	}
 	return errtop

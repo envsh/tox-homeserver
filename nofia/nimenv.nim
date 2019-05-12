@@ -57,4 +57,12 @@ proc newNimenvImpl() : PNimenv =
 proc newNimenv() : pointer {.exportc.} =
     return cast[pointer](newNimenvImpl())
 
+# 解偶
 proc getNimenvp() : pointer {.gcsafe.} = return grptr_of_nimenv_dont_use_other_than_this_file
+
+# 解偶
+proc getrpcli() : RpcClient = (cast[PNimenv](getNimenvp())).rpcli
+proc getnkwnd() : NKWindow = (cast[PNimenv](getNimenvp())).nkxwin
+proc getnkmdl() : DataModel = (cast[PNimenv](getNimenvp())).nkxwin.mdl
+
+

@@ -14,6 +14,7 @@ proc Splitn(s:string, n:int) : seq[string] =
 proc tostr(v:openArray[char]) : string = cast[string](v)
 proc tou64[T](v:ptr T) : ptr uint64 = cast[ptr uint64](v)
 proc tou64(v: Natural) : uint64 = cast[uint64](v)
+proc toi64(v: Natural) : int64 = cast[int64](v)
 proc toi32(v: Natural) : int32 = cast[int32](v)
 proc tou32(v: Natural) : uint32 = cast[uint32](v)
 proc toptr[T](v:ptr T) : pointer = cast[pointer](v)

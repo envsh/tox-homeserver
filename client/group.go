@@ -97,7 +97,7 @@ func (this *LigTox) CallbackConferenceNameListChangeAdd(cbfn cb_conference_namel
 func (this *LigTox) ConferenceSendMessage(groupNumber uint32, mtype int, msg string, userCode int64) error {
 	fname := this.getMethodName()
 	args := &thspbs.Event{}
-	args.Name = fname
+	args.EventName = fname
 	args.Args = []string{fmt.Sprintf("%d", groupNumber), fmt.Sprintf("%d", mtype), msg}
 	args.UserCode = userCode
 
@@ -113,7 +113,7 @@ func (this *LigTox) ConferenceSendMessage(groupNumber uint32, mtype int, msg str
 func (this *LigTox) ConferenceJoin(friendNumber uint32, cookie string) (uint32, error) {
 	fname := this.getMethodName()
 	args := &thspbs.Event{}
-	args.Name = fname
+	args.EventName = fname
 	args.Args = []string{fmt.Sprintf("%d", friendNumber), cookie}
 
 	rsp, err := this.rmtCall(args)
@@ -128,7 +128,7 @@ func (this *LigTox) ConferenceJoin(friendNumber uint32, cookie string) (uint32, 
 func (this *LigTox) ConferenceNew(name string) (uint32, string, error) {
 	fname := this.getMethodName()
 	args := &thspbs.Event{}
-	args.Name = fname
+	args.EventName = fname
 	args.Args = []string{fmt.Sprintf("%s", name)}
 
 	rsp, err := this.rmtCall(args)
@@ -143,7 +143,7 @@ func (this *LigTox) ConferenceNew(name string) (uint32, string, error) {
 func (this *LigTox) ConferenceDelete(groupNumber uint32) (uint32, error) {
 	fname := this.getMethodName()
 	args := &thspbs.Event{}
-	args.Name = fname
+	args.EventName = fname
 	args.Args = []string{fmt.Sprintf("%d", groupNumber)}
 
 	rsp, err := this.rmtCall(args)
@@ -158,7 +158,7 @@ func (this *LigTox) ConferenceDelete(groupNumber uint32) (uint32, error) {
 func (this *LigTox) ConferencePeerCount(groupNumber uint32) (uint32, error) {
 	fname := this.getMethodName()
 	args := &thspbs.Event{}
-	args.Name = fname
+	args.EventName = fname
 	args.Args = []string{fmt.Sprintf("%d", groupNumber)}
 
 	rsp, err := this.rmtCall(args)
@@ -173,7 +173,7 @@ func (this *LigTox) ConferencePeerCount(groupNumber uint32) (uint32, error) {
 func (this *LigTox) ConferencePeerGetName(groupNumber uint32, peerNumber uint32) (string, error) {
 	fname := this.getMethodName()
 	args := &thspbs.Event{}
-	args.Name = fname
+	args.EventName = fname
 	args.Args = []string{fmt.Sprintf("%d", groupNumber), fmt.Sprintf("%d", peerNumber)}
 
 	rsp, err := this.rmtCall(args)
@@ -188,7 +188,7 @@ func (this *LigTox) ConferencePeerGetName(groupNumber uint32, peerNumber uint32)
 func (this *LigTox) ConferenceInvite(groupNumber uint32, peerNumber uint32) error {
 	fname := this.getMethodName()
 	args := thspbs.Event{}
-	args.Name = fname
+	args.EventName = fname
 	args.Args = []string{fmt.Sprintf("%d", groupNumber), fmt.Sprintf("%d", peerNumber)}
 
 	// cli := thspbs.NewToxhsClient(this.rpcli)

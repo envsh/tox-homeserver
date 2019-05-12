@@ -118,7 +118,7 @@ proc newNkwindow(nep:pointer): pointer {.exportc.} =
     var ne = cast[PNimenv](nep)
     var nkw = new(Nkwindow)
     nkw.wnds = initTable[string, proc (nkw:PNkwindow, name:string)]()
-    nkw.mdl = new(DataModel)
+    nkw.mdl = newDataModel()
     createnkwndprocs(nkw.addr)
 
     linfo("chan is nil", cast[pointer](addr(nkw.evtch)))

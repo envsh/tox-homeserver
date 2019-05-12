@@ -98,7 +98,7 @@ func (this *AppContext) GetStorage() *store.Storage { return this.store }
 
 // 只用做消息存储
 func (this *AppContext) dispatchEvent(evto *thspbs.Event) {
-	switch evto.Name {
+	switch evto.EventName {
 	case "SelfConnectionStatus":
 	case "FriendRequest":
 		///

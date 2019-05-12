@@ -138,3 +138,8 @@ func (this *BaseInfo) PeerCount(grpnum uint32) int {
 	}
 	return 0
 }
+
+type EventIface interface {
+	GetEventId() int64
+	GetEventName() string
+}

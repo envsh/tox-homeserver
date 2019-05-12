@@ -125,7 +125,7 @@ func (this *WebsocketTransport) GetBaseInfo() *thspbs.BaseInfo {
 	var binfo *thspbs.BaseInfo
 
 	in := &thspbs.Event{}
-	in.Name = "GetBaseInfo"
+	in.EventName = "GetBaseInfo"
 	in.DeviceUuid = this.DevUuid
 	rsp, err := this.RmtCall(in)
 	gopp.ErrPrint(err)

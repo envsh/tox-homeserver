@@ -3,7 +3,7 @@ import json
 
 proc dispatchEvent(ne: PNimenv, evto: Event) =
     var mdl = ne.nkxwin.mdl
-    if evto.Name == "ConferenceMessage":
+    if evto.EventName == "ConferenceMessage":
         var groupId = evto.Margs[3]
         var message = evto.Args[3]
         var peerName = evto.Margs[0]
@@ -18,7 +18,7 @@ proc dispatchNormEvent(ne:PNimenv, jsonNode: JsonNode) =
     var evt = Event()
     try: evt.EventId = jsonNode["EventId"].getInt()
     except: discard
-    try: evt.Name = jsonNode["Name"].getStr()
+    try: evt.EventName = jsonNode["EventName"].getStr()
     except: discard
     try:
         for e in jsonNode["Args"].getElems(): evt.Args.add(e.getStr())
