@@ -2,6 +2,7 @@
 
 proc newclient() : RpcClient =
     var cli = new(RpcClient)
+    cli.devuuid = "0c5b3037-3767-4c66-b9e4-46aff8d693b1"
     cli.rurl = "tcp://10.0.0.32:2081"
 
     var rv = nng_sub0_open(cli.subsk.addr)
@@ -38,21 +39,53 @@ proc connect(cli:RpcClient) =
     return
 
 
-proc reqsksend(cli:RpcClient, s:string)=
+proc reqsksend(cli:RpcClient, s:string) : bool =
     var cs : cstring = $s
     var data = cs.toptr
     var rv = nng_send(cli.reqsk, data, s.len().tou64, NNG_FLAG_NONBLOCK)
-    ldebug("cli reqsk send", rv, s.len(), nng_strerror(rv))
-    return
+    if not rv.ctrue0: lerror("cli reqsk send error", rv, nng_strerror(rv))
+    return rv.ctrue0
 
 proc getBaseInfo(cli:RpcClient) =
     var evt = Event()
     evt.EventName = "GetBaseInfo"
-    evt.DeviceUuid = "0c5b3037-3767-4c66-b9e4-46aff8d693b1"
+    evt.DeviceUuid = cli.devuuid
     var jstr = $(%*evt)
     ldebug("send... req", jstr.len(), jstr)
-    cli.reqsksend(jstr)
+    discard cli.reqsksend(jstr)
     return
+
+include "crc64.nim"
+var userCodeSeq : int = 0
+# 无序不重复码
+# clinfo: device uuid for general
+proc NextUserCode(clinfo : string) : int64 =
+    var s = clinfo & "-" & $atomicInc(userCodeSeq, 1)
+    return crc64(0, s, s.len.tou64).toi64
+
+proc SelfGetName(cli:RpcClient) : string =
+    return cli.binfo.MyName
+
+proc FriendSendMessage(cli:RpcClient, ctnum: uint32, msg: string, rptid : int64) : bool =
+    var evt = Event()
+    evt.EventId = rptid
+    evt.EventName = "FriendSendMessage"
+    evt.Args.add($ctnum)
+    evt.Args.add(msg)
+
+    var jstr = $(%*evt)
+    return cli.reqsksend(jstr)
+
+proc ConferenceSendMessage(cli:RpcClient, ctnum: uint32, msg: string, rptid:int64) : bool =
+    var evt = Event()
+    evt.EventId = rptid
+    evt.EventName = "ConferenceSendMessage"
+    evt.Args.add($ctnum)
+    evt.Args.add($0)
+    evt.Args.add(msg)
+
+    var jstr = $(%*evt)
+    return cli.reqsksend(jstr)
 
 proc dispatchBaseInfo(cli:RpcClient, binfo : BaseInfo) =
     ldebug("dispatch BaseInfo")

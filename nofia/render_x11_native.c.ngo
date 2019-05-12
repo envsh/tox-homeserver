@@ -206,7 +206,6 @@ RenderWindow* NewRenderWindow() {
      * Also set the window and fontset attributes now.
      */
 
-    //*
     rdwin->list = XVaCreateNestedList(0,XNFontSet,rdwin->fontset,NULL);
     rdwin->ic = XCreateIC(rdwin->im,
                    XNInputStyle, rdwin->best_style,
@@ -225,7 +224,7 @@ RenderWindow* NewRenderWindow() {
     // XSelectInput(rdwin->dpy,rdwin->win, ExposureMask | KeyPressMask 
     //              | StructureNotifyMask | rdwin->im_event_mask);
     XSetICFocus(rdwin->ic);
-    //*/
+
     XMapWindow(rdwin->dpy,rdwin->win);
 
     rdwin->wm_delete_window = XInternAtom(rdwin->dpy, "WM_DELETE_WINDOW", False);
@@ -344,5 +343,10 @@ Colormap RenderWindowCmap(RenderWindow* rdwin) { return rdwin->cmap; }
 Visual* RenderWindowVis1(RenderWindow* rdwin) {
         // fprintf(stderr, "csizeof rdwin=%d, rdwin2=%d\n", sizeof(RenderWindow), sizeof(RenderWindow2));
   return rdwin->vis; }
+
+int XmbLookupStringFixed(unsigned long para1, void* para2, char* para3,
+                         int para4, void* para5, void* para6) {
+    return XmbLookupString(para1, para2, para3, para4, para5, para6);
+}
 
 #endif

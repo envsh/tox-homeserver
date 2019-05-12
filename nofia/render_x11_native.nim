@@ -45,3 +45,7 @@ proc RenderWindowCmap*(rdwin:TRenderWindow): TColormap
 
 proc RenderWindowVis*(rdwin:TRenderWindow): ptr TVisual
     {.importc:"RenderWindowVis1", header:"render_x11_native.h".}
+
+# becase nim-x11 has wrong type: XIC
+proc XmbLookupStringFixed*(para1: culong, para2: pointer, para3: cstring,
+                           para4: cint, para5: pointer, para6: pointer): cint {.importc:"XmbLookupStringFixed".}

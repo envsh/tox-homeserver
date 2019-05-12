@@ -6,7 +6,7 @@ proc refmtmsgRUser(this:Message) =
 proc refmtmsg(msg:Message) =
     msg.MsgUi = msg.Msg
     msg.PeerNameUi = msg.PeerName
-    msg.TimeUi = "hehhe"
+    msg.TimeUi = msg.Time.totoday()
     msg.LastMsgUi = msg.Msg
 
     for fn in [refmtmsgRUser]: msg.fn()
@@ -23,9 +23,21 @@ proc NewMessageForGroup(evto : Event) : Message =
     var this = new(Message)
     this.Msg = message
     this.PeerName = peerName
-    this.Time = "" # time.Now()
+    this.Time = now()
     this.EventId = eventId
     if peerName == "": this.PeerName = peerid.substr(0, 8)
     this.refmtmsg()
     return this
+
+proc NewMessageForMe(iname, itext : string) : Message =
+    #var mdl = getnkmdl()
+
+    var msgo = new(Message)
+    msgo.Msg = itext
+    msgo.PeerName = iname # mdl.Myname
+    msgo.Time = now()
+    msgo.Me = true
+
+    msgo.refmtmsg()
+    return msgo
 

@@ -238,6 +238,8 @@ proc ChatForm(nkw:PNkwindow, name:string) {.gcsafe.} =
 
 proc SendForm(nkw:PNkwindow, name:string) {.gcsafe.} =
     var ctx = nkw.nkctx
+    var mdl = nkw.mdl
+
     if ctx.nk_begin(name, nk_rect(x:250, y:520, w:550, h:600-510), NK_WINDOW_BORDER) == ctrue:
         ctx.nk_layout_row_begin(NK_STATIC, 30, 7)
         for i in 0..5:
@@ -251,10 +253,30 @@ proc SendForm(nkw:PNkwindow, name:string) {.gcsafe.} =
 
         ctx.nk_layout_row_begin(NK_STATIC, 30, 2)
         ctx.nk_layout_row_push(520-80)
-        var newlen : int = 5
-        var active = ctx.nk_edit_string(NK_EDIT_FIELD, "jifeiwajfwf", newlen.unsafeAddr, 6, nil)
+
+        var sdipt = nkw.sdipt
+        var maxlen = sdipt.edbuf.len
+        var oldlen = sdipt.edlen
+        var iptptr = sdipt.edbuf.addr
+        var active = ctx.nk_edit_string(NK_EDIT_FIELD, iptptr, sdipt.edlen.addr, maxlen, nil)
+        if oldlen != sdipt.edlen: ldebug("changed", oldlen, sdipt.getstr)
+
         ctx.nk_layout_row_push(80)
-        if ctx.nk_button_label("发送按钮") == ctrue: discard
+        if ctx.nk_button_label("发送按钮") == ctrue and sdipt.edlen > 0:
+            var cli = getrpcli()
+            var cttype = mdl.Cttype
+            var msg = sdipt.getstr
+            var msgo = NewMessageForMe(mdl.Myname, msg)
+            msgo.UserCode = NextUserCode(cli.devuuid)
+            mdl.Newmsg(mdl.Ctuniqid, msgo)
+            var sendok = false
+            if mdl.Cttype == CTTYPE_FRIEND:
+                sendok = cli.FriendSendMessage(mdl.Ctnum, msg, msgo.UserCode)
+            elif cttype == CTTYPE_GROUP:
+                sendok = cli.ConferenceSendMessage(mdl.Ctnum, msg, msgo.UserCode)
+            else:
+                lerror("Unseted cttype", cttype, mdl.Ctnum)
+            if sendok: sdipt.edlen = 0
         ctx.nk_layout_row_end()
         discard
     discard ctx.nk_end()

@@ -16,7 +16,6 @@ import asyncfutures
 include "nimlog.nim"
 include "nimplus.nim"
 include "datatypes.nim"
-include "uimessage.nim"
 include "uimodels.nim"
 
 type MixEvent = ref object
@@ -35,7 +34,8 @@ type
         wnds*: Table[string, proc (nkw:PNkwindow, name:string) {.gcsafe.}]
         wndrunner*: proc (nkw:PNkwindow) {.gcsafe.}
         mdl*: DataModel
-
+        sdipt*: nk_editor_state
+        ximst*: xim_state
 
 # like global vars, but put in struct
 type
@@ -51,16 +51,37 @@ type
         rpcli*: RpcClient
 
 
-include "frontend_proc.nim"
+#include "frontend_proc.nim"
 include "nimenv.nim"
-include "views.nim"
+include "uimessage.nim"
 include "client.nim"
+include "views.nim"
+
+proc docjkinput(nkw:PNkwindow, evt : PXEvent) =
+    var ximst = nkw.ximst
+    var ksym : TKeySym
+    var status: int
+
+    ximst.gotlen = XmbLookupStringFixed(nkw.rdwin.ic, cast[PXKeyPressedEvent](evt),
+                                        ximst.ximbuf.addr, ximst.ximbuf.len.cint, ksym.addr,
+                                        cast[PStatus](status.addr))
+    if ximst.gotlen > 0:
+        var cjkiptxt = ximst.ximstr()
+        linfo("xim inputed", ximst.gotlen, cjkiptxt.len, cjkiptxt)
+        for r in cjkiptxt.runes: nkw.nkctx.nk_input_unicode(r)
+    return
 
 proc dorepaint(nkw:PNkwindow, evts : seq[TXEvent]) =
     var rdwin = nkw.rdwin
     nk_input_begin(nkw.nkctx)
     for evt1 in evts:
         var evt = evt1
+        var evtp = evt.addr
+        var kevtp = cast[PXKeyEvent](evtp)
+        if evtp.theType == KeyPress and kevtp.keycode == 0:
+            linfo("not your(nk) food", evtp.theType, kevtp.keycode)
+            docjkinput(nkw, evtp)
+            continue
         nk_xlib_handle_event(rdwin.dpy, rdwin.screen, rdwin.win, evt.addr)
     nk_input_end(nkw.nkctx)
 
@@ -85,6 +106,7 @@ proc x11proc(nkw:PNkwindow) =
         while ret1 > 0:
             ret1 = ret1 - 1
             let ret = XNextEvent(nkw.rdwin.dpy, addr(evt))
+            if XFilterEvent(evt.addr, None) == ctrue: continue # 为啥没这行会调不出输入法
             # ldebug("nxtevt:", ret, "evty:", evt.theType, "pending left", ret1, cast[pointer](nkw.rdwin.dpy))
             if evt.theType == ClientMessage:
                 lerror("some error occurs", evt.theType)
@@ -119,6 +141,8 @@ proc newNkwindow(nep:pointer): pointer {.exportc.} =
     var nkw = new(Nkwindow)
     nkw.wnds = initTable[string, proc (nkw:PNkwindow, name:string)]()
     nkw.mdl = newDataModel()
+    nkw.sdipt = neweditstate()
+    nkw.ximst = newximstate()
     createnkwndprocs(nkw.addr)
 
     linfo("chan is nil", cast[pointer](addr(nkw.evtch)))
@@ -165,6 +189,7 @@ spawn stopafter3s(ne1)
 
 discard newNkwindow(getNimenvp())
 NkwindowOpen(getNimenvp())
+# nk_x11_event_handle(ne1.nkxwin.rdwin)
 
 # runNimenv(ne1.self)
 var cli = newclient()

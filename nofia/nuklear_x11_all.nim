@@ -1,6 +1,7 @@
 {.hint[XDeclaredButNotUsed]:off.}
 
 import macros
+import unicode
 
 macro NK_FLAGS(v:untyped) : untyped = result = quote do: 1 shl `v`
 
@@ -79,6 +80,7 @@ proc nk_xlib_render(scrn:TWindow, clear: nk_color) {.importc.}
 
 proc nk_input_begin(ctx:nk_context) {.importc.}
 proc nk_input_end(ctx:nk_context) {.importc.}
+proc nk_input_unicode(ctx:nk_context, r:Rune) {.importc.}
 proc nk_input_is_mouse_hovering_rect(ipt:nk_input, bounds:nk_rect) : int {.importc.}
 proc nk_widget_bounds(ctx:nk_context) : nk_rect {.importc.}
 proc nk_get_input(ctx:nk_context) : nk_input {.importc.}
@@ -120,4 +122,31 @@ proc nk_tooltip(ctx: nk_context, title:cstring) {.importc.}
 proc nk_tooltip_begin(ctx: nk_context,  width:float32): int{.importc.}
 proc nk_tooltip_end(ctx: nk_context){.importc.}
 
+###
+
+type
+    nk_editor_state = ref object
+        edbuf*: array[256,char]
+        edlen*: int
+
+proc neweditstate() : nk_editor_state =
+    var e = new(nk_editor_state)
+    return e
+
+proc getstr(e: nk_editor_state) : string =
+    var str = cast[string](@(e.edbuf))
+    return str.substr(0, e.edlen-1)
+
+type
+    xim_state = ref object
+        ximbuf*: array[64,char]
+        gotlen*: int
+
+proc newximstate() : xim_state =
+    var i = new(xim_state)
+    return i
+
+proc ximstr(e:xim_state) : string =
+    var str = cast[string](@(e.ximbuf))
+    return str.substr(0, e.gotlen-1)
 

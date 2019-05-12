@@ -123,7 +123,7 @@ type
     Message = ref object
         Msg*: string
         PeerName*: string
-        Time*: string # time.Time?
+        Time*: DateTime # time.Time?
         EventId*: int64
 
         Me*: bool
@@ -149,4 +149,5 @@ type
         reqrfd*: AsyncFD
         reqwfd*: AsyncFD
         binfo*: BaseInfo
+        devuuid*: string
 
