@@ -37,9 +37,6 @@ proc connect(cli:RpcClient) =
     ldebug("req0 dial", rv, nng_strerror(rv))
     return
 
-proc onsubskread(fd:AsyncFD):bool=
-    ldebug("cli subsk readable", repr(fd))
-    return
 
 proc reqsksend(cli:RpcClient, s:string)=
     var cs : cstring = $s
@@ -51,6 +48,7 @@ proc reqsksend(cli:RpcClient, s:string)=
 proc getBaseInfo(cli:RpcClient) =
     var evt = Event()
     evt.EventName = "GetBaseInfo"
+    evt.DeviceUuid = "0c5b3037-3767-4c66-b9e4-46aff8d693b1"
     var jstr = $(%*evt)
     ldebug("send... req", jstr.len(), jstr)
     cli.reqsksend(jstr)
@@ -66,6 +64,7 @@ proc dispatchBaseInfo(cli:RpcClient, binfo : BaseInfo) =
     mdl.SetFriendInfos(binfo.Friends)
     mdl.SetGroupInfos(binfo.Groups)
 
+    ldebug("mdl info", "grplen", binfo.Groups.len)
     return
 
 import typeinfo
@@ -93,21 +92,21 @@ proc decodeBaseInfo(cli:RpcClient, jnode: JsonNode) : BaseInfo =
     if not jnode.haskey("Friends"): jnode{"Friends"} = newJObject()
     for snum, fnode in jnode{"Friends"}.pairs:
         var frnd = FriendInfo()
-        var num = parseInt(snum).tou32
-        frnd.Fnum = num
+        var fnum = parseInt(snum).tou32
+        frnd.Fnum = fnum
         frnd.Status1 = fnode{"Status1"}.getint.tou32
         frnd.Name = fnode{"Name"}.getstr
         frnd.Stmsg = fnode{"Stmsg"}.getstr
         frnd.Avatar = fnode{"Avatar"}.getstr
         frnd.Seen = fnode{"Seen"}.getint.toi64
         frnd.ConnStatus = fnode{"ConnStatus"}.getint.toi32
-        binfo.Friends.add(num, frnd)
+        binfo.Friends.add(fnum, frnd)
 
     if not jnode.haskey("Groups"): jnode{"Groups"} = newJObject()
     for snum, gnode in jnode{"Groups"}.pairs:
         var grpo = GroupInfo()
-        var num = parseInt(snum).tou32
-        grpo.Gnum = num
+        var gnum = parseInt(snum).tou32
+        grpo.Gnum = gnum
         grpo.Mtype = gnode{"Mtype"}.getint.tou32
         grpo.GroupId = gnode{"GroupId"}.getstr
         grpo.Title = gnode{"Title"}.getstr
@@ -116,25 +115,52 @@ proc decodeBaseInfo(cli:RpcClient, jnode: JsonNode) : BaseInfo =
         #grpo.Members
         grpo.Members = initTable[string, MemberInfo]()
         if not gnode.haskey("Members"): jnode{"Members"} = newJObject()
-        for snum, pnode in gnode{"Members"}.pairs:
+        for pkey, pnode in gnode{"Members"}.pairs:
             var mbro = MemberInfo()
-            var pnum = parseInt(snum).tou32
-            mbro.Pnum = pnum
+            mbro.Pnum = pnode{"Pnum"}.getint.tou32
             mbro.Pubkey = pnode{"Pubkey"}.getstr
             mbro.Name = pnode{"Name"}.getstr
             mbro.Mtype = pnode{"Mtype"}.getint
             mbro.Joints = pnode{"Joints"}.getint.toi64
             grpo.Members.add(mbro.Pubkey, mbro)
 
-        binfo.Groups.add(num, grpo)
+        binfo.Groups.add(gnum, grpo)
 
     return binfo
 
 proc dispatchEvent(cli:RpcClient, evt : Event) =
+    ldebug("dispatch common event", evt.EventName)
+    var mdl = getnkmdl()
+
+    if evt.EventName == "ConferenceMessage":
+        var groupId = evt.Margs[3]
+        var message = evt.Args[3]
+        var peerName = evt.Margs[0]
+        var groupTitle = evt.Margs[2]
+        var msgo = NewMessageForGroup(evt)
+        mdl.Newmsg(groupId, msgo)
+    else: discard
+
     return
 
 proc decodeEvent(cli:RpcClient, jnode: JsonNode) : Event =
-    return
+    var evt = Event()
+    fixjsonnode(evt, jnode)
+    ldebug("decode common event", jnode{"EventName"}.getstr)
+
+    # evt = jnode.to(Event) # still Error: unhandled exception: key not found:  [KeyError]
+    evt.EventId = jnode{"EventId"}.getint
+    evt.EventName = jnode{"EventName"}.getstr
+
+    for e in jnode{"Args"}.getElems(): evt.Args.add(e.getstr)
+    for e in jnode["Margs"].getElems(): evt.Margs.add(e.getstr)
+
+    evt.ErrCode = jnode{"ErrCode"}.getint.toi32
+    evt.ErrMsg = jnode{"ErrMsg"}.getstr
+    evt.UserCode = jnode{"UserCode"}.getint
+    evt.DeviceUuid = jnode{"DeviceUuid"}.getstr()
+
+    return evt
 
 proc dispatchEventRaw(cli:RpcClient, data:string)=
 
@@ -153,6 +179,21 @@ proc dispatchEventRaw(cli:RpcClient, data:string)=
 
     return
 
+    # TODO optional error
+    # maybe subsk or reqsk
+    # always NONBLOCK
+proc readclisk(sk:nng_socket) : (string, int32) =
+    var ne = cast[PNimenv](getNimenvp())
+    var cli = ne.rpcli
+    var buf : array[8192,char]
+    var pbuf = buf.addr.toptr
+    var bsz  = buf.len()
+    var rv = nng_recv(sk, pbuf, bsz.addr.tou64, NNG_FLAG_NONBLOCK)
+    ldebug("recved", rv, bsz)
+    if bsz > buf.len(): lerror("Buf too small, need", bsz)
+    var data = cast[string](buf[..(bsz-1)]) # the string result
+    return (data, rv)
+
 proc onreqskread(fd:AsyncFD):bool {.gcsafe.}=
     var ne = cast[PNimenv](getNimenvp())
     var cli = ne.rpcli
@@ -160,6 +201,21 @@ proc onreqskread(fd:AsyncFD):bool {.gcsafe.}=
     var pbuf = buf.addr.toptr
     var bsz  = buf.len()
     var rv = nng_recv(cli.reqsk, pbuf, bsz.addr.tou64, NNG_FLAG_NONBLOCK)
+    ldebug("recved", rv, bsz)
+    if bsz > buf.len(): lerror("Buf too small, need", bsz)
+    var data = cast[string](buf[..(bsz-1)]) # the string result
+    cli.dispatchEventRaw(data)
+    return
+
+
+proc onsubskread(fd:AsyncFD):bool=
+    ldebug("cli subsk readable", repr(fd))
+    var ne = cast[PNimenv](getNimenvp())
+    var cli = ne.rpcli
+    var buf : array[2192,char]
+    var pbuf = buf.addr.toptr
+    var bsz  = buf.len()
+    var rv = nng_recv(cli.subsk, pbuf, bsz.addr.tou64, NNG_FLAG_NONBLOCK)
     ldebug("recved", rv, bsz)
     if bsz > buf.len(): lerror("Buf too small, need", bsz)
     var data = cast[string](buf[..(bsz-1)]) # the string result

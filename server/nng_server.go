@@ -77,7 +77,7 @@ func (this *NNGServer) Pubmsg(ctx context.Context, evt *thspbs.Event) error {
 	bcc, err := json.Marshal(evt)
 	gopp.ErrPrint(err)
 
-	r := nng.Nng_send(this.repsk, unsafe.Pointer(&bcc[0]), uint64(len(bcc)), 0)
+	r := nng.Nng_send(this.pubsk, unsafe.Pointer(&bcc[0]), uint64(len(bcc)), 0)
 	log.Println(r, len(bcc))
 	return err
 }

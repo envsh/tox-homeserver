@@ -8,11 +8,12 @@ import (
 
 type msgbroker struct{}
 
-func (this *msgbroker) Pubmsg(ctx context.Context, evt *thspbs.Event) {
+func (this *msgbroker) Pubmsg(ctx context.Context, evt *thspbs.Event) (err error) {
 	for name, srv := range srvp {
-		err := srv.Pubmsg(ctx, evt)
+		err = srv.Pubmsg(ctx, evt)
 		gopp.ErrPrint(err, name)
 	}
+	return
 }
 
 var srvp = map[string]Serveror{} // name => Serveror

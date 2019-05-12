@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"gopp"
@@ -469,4 +470,8 @@ func (this *ToxVM) setupEventsForMessage() {
 	*/
 }
 
-func (this *ToxVM) pubmsg(evt *thspbs.Event) error { return pubmsgall(nil, evt) }
+func (this *ToxVM) pubmsg(evt *thspbs.Event) error {
+	log.Println("pubing msg...", evt.EventName)
+	appctx.brker.Pubmsg(context.Background(), evt)
+	return pubmsgall(nil, evt)
+}

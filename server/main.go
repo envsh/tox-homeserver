@@ -55,6 +55,7 @@ func Main() {
 		wso := NewWebsocketServer()
 		appctx.wssrv = wso
 		store.GetFS().SetupHttpServer(nil)
+		registerServeror("websockets", wso)
 		log.Printf("Listen on WS: *:%d ..., %#v\n", thscom.WSPort, wso)
 		err := http.ListenAndServe(fmt.Sprintf(":%d", thscom.WSPort), nil)
 		gopp.ErrPrint(err)
@@ -66,6 +67,9 @@ func Main() {
 
 	rpcs := newGrpcServer()
 	appctx.rpcs = rpcs
+
+	registerServeror("nng", nngsrv)
+	registerServeror("grpc", rpcs)
 
 	appctx.tvm = newToxVM()
 

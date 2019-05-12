@@ -72,5 +72,6 @@ proc fixjsonnode[T](obj:var T, jnode:JsonNode)=
         elif y.kind == akUInt16: jnode{x} = newJInt(0)
         elif y.kind == akString: jnode{x} = newJString("")
         elif y.kind == akTuple: jnode{x} = newJObject()
+        elif y.kind == akRef: jnode{x} = newJObject()
         else: linfo("Unknown", obj.type.name, y.kind)
     return
