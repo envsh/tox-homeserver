@@ -98,7 +98,7 @@ proc x11proc(nkw:PNkwindow) =
             #var ok = nkw.evtch.trysend("hehhe" & repr(evts.len()))
             # ldebug("evts sent", ok, evts.len(), nkw.evtch.ready(), nkw.evtch.peek())
             # sync()
-        else: sleep(300)
+        else: sleep(150)
 
     linfo("x11proc done")
     return

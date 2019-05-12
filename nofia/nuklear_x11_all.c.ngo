@@ -1,1 +1,15 @@
 #include "nuklear_x11_all.h"
+
+struct nk_input* nk_get_input(struct nk_context* ctx) { return &ctx->input; }
+struct nk_style* nk_get_style(struct nk_context* ctx) { return &ctx->style; }
+struct nk_window* nk_get_curwnd(struct nk_context* ctx) { return ctx->current; }
+
+void nk_window_scrollto(struct nk_window* wnd, int sbx, int sby) {
+     wnd->scrollbar.x = sbx;
+     wnd->scrollbar.y = sby;
+}
+void nk_curwnd_scrollto(struct nk_context* ctx, int sbx, int sby) {
+     nk_window_scrollto(ctx->current, sbx, sby);
+}
+
+

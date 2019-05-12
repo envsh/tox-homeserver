@@ -1,3 +1,5 @@
+{.hint[XDeclaredButNotUsed]:off.}
+
 import macros
 import logging
 import strutils

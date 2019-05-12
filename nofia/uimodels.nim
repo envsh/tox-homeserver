@@ -89,7 +89,7 @@ proc Conno2str(stno: int) : string =
 
 proc Conno2str1(stno: int) : string =
     let s = Conno2str(stno)
-    return s.substr(0, 1)
+    return s.substr(0, 0)
 
 proc SetMyConnStatus(this:DataModel, stno: int) =
     #defer this.emitChanged()
@@ -209,7 +209,7 @@ proc Newmsg(this:DataModel, uniqid: string, msg : Message) =
 proc Lastmsg(this:DataModel): string =
     var msgo = this.lastmsg
     if msgo == nil: return ""
-    return this.lastctname & " $" & msgo.PeerNameUi & msgo.MsgUi
+    return this.lastctname & "$ " & msgo.PeerNameUi & msgo.MsgUi
 
 proc Hasnewmsg(this:DataModel, uniqid:string):bool =
     if not this.Hasnews.hasKey(uniqid): return false

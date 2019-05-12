@@ -1,3 +1,4 @@
+{.hint[XDeclaredButNotUsed]:off.}
 
 import macros
 
@@ -51,6 +52,8 @@ const NK_EDIT_EDITOR  = NK_EDIT_SELECTABLE or NK_EDIT_MULTILINE or NK_EDIT_ALLOW
 
 type XFont = pointer
 type nk_context = pointer
+type nk_window = pointer
+type nk_input = pointer
 
 type nk_color = object
     r*: uint8
@@ -76,6 +79,11 @@ proc nk_xlib_render(scrn:TWindow, clear: nk_color) {.importc.}
 
 proc nk_input_begin(ctx:nk_context) {.importc.}
 proc nk_input_end(ctx:nk_context) {.importc.}
+proc nk_input_is_mouse_hovering_rect(ipt:nk_input, bounds:nk_rect) : int {.importc.}
+proc nk_widget_bounds(ctx:nk_context) : nk_rect {.importc.}
+proc nk_get_input(ctx:nk_context) : nk_input {.importc.}
+proc nk_get_window(ctx:nk_context) : nk_window {.importc.}
+proc nk_curwnd_scrollto(ctx:nk_context, sbx, sby : int) {.importc.}
 
 proc nk_begin(ctx:nk_context, name:cstring, r: nk_rect, flags: cint) : cint {.importc.}
 proc nk_end(ctx:nk_context) : cint {.importc.}
@@ -111,4 +119,5 @@ proc nk_menu_item_label(ctx: nk_context, title:cstring, alignment: cint) : int {
 proc nk_tooltip(ctx: nk_context, title:cstring) {.importc.}
 proc nk_tooltip_begin(ctx: nk_context,  width:float32): int{.importc.}
 proc nk_tooltip_end(ctx: nk_context){.importc.}
+
 

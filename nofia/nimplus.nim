@@ -1,15 +1,48 @@
+{.hint[XDeclaredButNotUsed]:off.}
+
+import unicode
 
 proc Splitn(s:string, n:int) : seq[string] =
     var rets: seq[string]
-    var sub : string
+    var sub = newString(0)
     for c in s:
         sub.add(c)
         if sub.len() >= n:
             rets.add(sub)
-            sub = ""
+            sub = newString(0)
+    if strutils.strip(sub).len > 0:
+        if sub.len < 5:
+            ldebug("left sub", sub.len, sub[0], sub)
+        rets.add(sub)
     return rets
 
+proc Splitrn(s:string, n:int) : seq[string] =
+    var rets: seq[string]
+    var sub = newString(0)
+    for c in s.runes:
+        sub.add(c)
+        if sub.len() >= n:
+            rets.add(sub)
+            sub = newString(0)
+    if unicode.strip(sub).len > 0: rets.add(sub)
+    return rets
 
+# // rune support, utf8 3byte, but ui width is 2
+proc Splitrnui(s:string, n:int) : seq[string] =
+    var rets: seq[string]
+    var sub = newString(0)
+    var subuilen = 0
+    for c in s.runes:
+        let uilen = if c.size == 1: 1 else: 2
+        if (subuilen + uilen) > n:
+            rets.add(sub)
+            sub = newString(0)
+            subuilen = 0
+
+        sub.add(c)
+        subuilen += uilen
+    if unicode.strip(sub).len > 0: rets.add(sub)
+    return rets
 
 proc tostr(v:openArray[char]) : string = cast[string](v)
 proc tou64[T](v:ptr T) : ptr uint64 = cast[ptr uint64](v)
@@ -19,6 +52,8 @@ proc toi32(v: Natural) : int32 = cast[int32](v)
 proc tou32(v: Natural) : uint32 = cast[uint32](v)
 proc toptr[T](v:ptr T) : pointer = cast[pointer](v)
 proc toptr(v:cstring) : pointer = cast[pointer](v)
+proc tof32(v: Natural) : float32 = return v.float # for float, cannot use cast, for cast is bitwise cast
+proc tof64(v: Natural) : float64 = return v.float
 
 # some case c use 0 as success, 1 as failed
 proc ctrue0(v : Natural) : bool = v == 0

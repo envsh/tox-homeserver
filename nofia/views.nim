@@ -1,4 +1,14 @@
 
+# some nk util or fix
+# // ww next widget width, must replace from auto get value
+proc nk_tooltipw(ctx:nk_context, txt:string, ww: int) =
+    var bounds = ctx.nk_widget_bounds()
+    bounds.w = float32(ww) # dont cast[float32](v)
+    var ipt = ctx.nk_get_input()
+    if nk_input_is_mouse_hovering_rect(ipt, bounds) != 0:
+        var ctxt : cstring = txt
+        ctx.nk_tooltip(ctxt)
+    return
 
 proc nkwndhello0(nkw:PNkwindow, name : string) {.gcsafe.} =
     var cname : cstring = "hehehhehehee"
@@ -31,13 +41,13 @@ proc MyInfoView(nkw:PNkwindow, name:string) {.gcsafe.} =
         if mdl.MyName == "": MyName = " "
         discard ctx.nk_selectable_label(MyName, 10, sel0.unsafeAddr)
         ctx.nk_layout_row_push(20)
-        ctx.nk_label("heheh", 10)
+        ctx.nk_label(Conno2str(mdl.Mystno), 10)
         ctx.nk_layout_row_end()
 
-        ctx.nk_tooltip("ehehe", )
-        ctx.nk_layout_row_dynamic(30, 1)
-        var Mystmsg : cstring = mdl.MyStmsg
+        var Mystmsg : string = mdl.MyStmsg
         if mdl.MyStmsg == "": Mystmsg = " "
+        ctx.nk_tooltipw(Mystmsg, 250)
+        ctx.nk_layout_row_dynamic(30, 1)
         discard ctx.nk_selectable_label(MyStmsg, 10, sel0.unsafeAddr)
         ctx.nk_layout_row_static(30, 100, 2)
         ctx.nk_label("搜索框👉", NK_TEXT_LEFT)
@@ -101,9 +111,11 @@ proc FriendInfoView(nkw:PNkwindow, name:string) {.gcsafe.} =
         if stmsg == "": stmsg = " "
         discard ctx.nk_selectable_label(stmsg, NK_TEXT_LEFT, sel0.unsafeAddr)
 
-        ctx.nk_tooltip("当前/总数",)
+        ctx.nk_tooltipw("当前/总数", 250)
         ctx.nk_layout_row_push(130)
-        ctx.nk_label("hoiifddf", NK_TEXT_RIGHT)
+        var (curcnt, totcnt) = mdl.TotalCurrMsgcount()
+        var labtxt = format("消息数：$#/$#", curcnt, totcnt)
+        ctx.nk_label(labtxt, NK_TEXT_RIGHT)
         ctx.nk_layout_row_end()
         discard
     discard ctx.nk_end()
@@ -113,10 +125,12 @@ proc ContactView(nkw:PNkwindow, name:string) {.gcsafe.} =
     var mdl = nkw.mdl
 
     if ctx.nk_begin(name, nk_rect(x:0, y:120, w:250, h:600-160),
-                    NK_WINDOW_BORDER or NK_WINDOW_NO_SCROLLBAR) == ctrue:
+                    NK_WINDOW_BORDER or NK_WINDOW_SCROLL_AUTO_HIDE) == ctrue:
         for v in mdl.GroupList():
-            var name = v.Title
-            var tiptxt = "hehe"
+            var name = format("$#・$#", v.Title, len(v.Members))
+            var statxt = format("$#", mdl.NewMsgcount(v.GroupId))
+            var tiptxt = format("未读=$#, 所有=$#", mdl.NewMsgcount(v.GroupId), mdl.Msgcount(v.GroupId))
+
             ctx.nk_layout_row_begin(NK_STATIC, 30, 3)
             ctx.nk_layout_row_push(30)
             discard ctx.nk_button_label("群")
@@ -124,14 +138,17 @@ proc ContactView(nkw:PNkwindow, name:string) {.gcsafe.} =
             if ctx.nk_button_label(name) == ctrue:
                 linfo("group clicked", name)
                 mdl.Switchtoct(v.GroupId)
+            ctx.nk_tooltipw(tiptxt, 100)
             ctx.nk_layout_row_push(30)
-            ctx.nk_label("hehhe", NK_TEXT_CENTERED)
+            ctx.nk_label(statxt, NK_TEXT_CENTERED)
             ctx.nk_layout_row_end()
 
         for v in mdl.FriendList():
             var name = v.Name
-            var statxt = "hehhe"
-            var tiptxt = "hehehe"
+            var statxt = format("$# $#", Conno2str1(v.Status1.int), mdl.NewMsgcount(v.Pubkey))
+            var tiptxt = format("$# $#, 未读=$#, 所有=$#",
+                                Conno2str(v.Status1.int), if v.Status1 == 0: "离线" else: "在线",
+                                mdl.NewMsgcount(v.Pubkey), mdl.Msgcount(v.Pubkey))
             ctx.nk_layout_row_begin(NK_STATIC, 30, 3)
             ctx.nk_layout_row_push(30)
             discard ctx.nk_button_label("友")
@@ -139,6 +156,7 @@ proc ContactView(nkw:PNkwindow, name:string) {.gcsafe.} =
             if ctx.nk_button_label(name) == ctrue:
                 linfo("friend clicked", name)
                 mdl.Switchtoct(v.Pubkey)
+            ctx.nk_tooltipw(tiptxt, 100)
             ctx.nk_layout_row_push(30)
             ctx.nk_label(statxt, NK_TEXT_LEFT)
             ctx.nk_layout_row_end()
@@ -192,7 +210,7 @@ proc ChatForm(nkw:PNkwindow, name:string) {.gcsafe.} =
             else: ctx.nk_label(" ", NK_TEXT_CENTERED)
             ctx.nk_layout_row_end()
 
-            var mlines = msg.MsgUi.Splitn(60)
+            var mlines = msg.MsgUi.Splitrnui(50)
             for idx, line in mlines:
                 ctx.nk_layout_row_begin(NK_STATIC, 39, 3)
                 ctx.nk_layout_row_push(30)
@@ -213,7 +231,8 @@ proc ChatForm(nkw:PNkwindow, name:string) {.gcsafe.} =
             ctx.nk_layout_row_dynamic(emptylen, 1)
             ctx.nk_label("空白区域", NK_TEXT_CENTERED)
 
-        if hasnew: discard # ctx.ForceScroll(100000, 100000) // seem ok
+        if hasnew: # discard # ctx.ForceScroll(100000, 100000) // seem ok
+            ctx.nk_curwnd_scrollto(100000, 100000)  # // seem ok
         discard
     discard ctx.nk_end()
 
