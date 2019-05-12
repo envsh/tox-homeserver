@@ -5,6 +5,19 @@ import strutils
 proc `$`*(x: pointer):string = return repr(x)
 
 ### logging initilize
+const LOGLVL_TRACE = 0
+const LOGLVL_DEBUG = 1
+const LOGLVL_INFO = 2
+const LOGLVL_WARNING = 3
+const LOGLVL_ERROR = 4
+const LOGLVL_FATAL = 5
+
+# nim plus log level
+var nploglevel = LOGLVL_DEBUG
+proc llevel(lvl: int) =
+    if lvl >= LOGLVL_TRACE and lvl <= LOGLVL_FATAL:
+        nploglevel = lvl
+
 macro logecho(lvl : string, msgs: varargs[untyped]): untyped =
     result = nnkStmtList.newTree()
     result.add newCall("echo", newLit("[" & $lvl & "] "))
@@ -31,6 +44,7 @@ macro linfo(msgs: varargs[untyped]): untyped =
 macro lerror(msgs: varargs[untyped]): untyped =
     result = quote do: logecho("ERROR", `msgs`)
     # discard
+
 
 #[
 echo ("123", 456)

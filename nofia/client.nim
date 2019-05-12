@@ -68,9 +68,15 @@ proc dispatchBaseInfo(cli:RpcClient, binfo : BaseInfo) =
 
     return
 
+import typeinfo
+import typetraits
+
 proc decodeBaseInfo(cli:RpcClient, jnode: JsonNode) : BaseInfo =
     ldebug("decode BaseInfo")
     var binfo = BaseInfo()
+    # try fill valid zero value for not exist fields
+    fixjsonnode(binfo, jnode)
+
     binfo.EventId = jnode{"EventId"}.getInt.toi64
     binfo.EventName = jnode{"EventName"}.getstr
     binfo.ToxId = jnode{"ToxId"}.getstr
@@ -84,8 +90,7 @@ proc decodeBaseInfo(cli:RpcClient, jnode: JsonNode) : BaseInfo =
     binfo.Friends = initTable[uint32,FriendInfo]()
     binfo.Groups = initTable[uint32,GroupInfo]()
 
-    linfo("hasKey", jnode.hasKey("Friends"))
-    linfo("hasKey", jnode.hasKey("Groups"))
+    if not jnode.haskey("Friends"): jnode{"Friends"} = newJObject()
     for snum, fnode in jnode{"Friends"}.pairs:
         var frnd = FriendInfo()
         var num = parseInt(snum).tou32
@@ -98,6 +103,7 @@ proc decodeBaseInfo(cli:RpcClient, jnode: JsonNode) : BaseInfo =
         frnd.ConnStatus = fnode{"ConnStatus"}.getint.toi32
         binfo.Friends.add(num, frnd)
 
+    if not jnode.haskey("Groups"): jnode{"Groups"} = newJObject()
     for snum, gnode in jnode{"Groups"}.pairs:
         var grpo = GroupInfo()
         var num = parseInt(snum).tou32
@@ -109,6 +115,7 @@ proc decodeBaseInfo(cli:RpcClient, jnode: JsonNode) : BaseInfo =
         grpo.Ours = gnode{"Ours"}.getbool
         #grpo.Members
         grpo.Members = initTable[string, MemberInfo]()
+        if not gnode.haskey("Members"): jnode{"Members"} = newJObject()
         for snum, pnode in gnode{"Members"}.pairs:
             var mbro = MemberInfo()
             var pnum = parseInt(snum).tou32
@@ -137,7 +144,7 @@ proc dispatchEventRaw(cli:RpcClient, data:string)=
     if jname == "GetBaseInfoResp":
         ldebug("got BaseInfo", cli == nil, jnode == nil)
         var binfo = cli.decodeBaseInfo(jnode["Binfo"])
-        #cli.dispatchBaseInfo(binfo)
+        cli.dispatchBaseInfo(binfo)
     elif jname == "":
         linfo("Empty event name")
     else:

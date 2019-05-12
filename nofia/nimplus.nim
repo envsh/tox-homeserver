@@ -49,3 +49,28 @@ macro newtable*(TK:typedesc, TV:typedesc) :untyped =
 #var tab = newtable(int,  string)
 #ldebug(tab.len())
 
+import json
+import typeinfo
+import typetraits
+
+# 默认填充在obj有的字段，但jnode中没有的字段
+# var obj = SomeTime()
+# fixjsonnode(obj, jnode)
+# jnode.to(obj)
+proc fixjsonnode[T](obj:var T, jnode:JsonNode)=
+    # fields 需要作用于Tuple 或者 Object，ref不行，所以要.base
+    var anyobj = obj.toany
+    if anyobj.kind == akRef: anyobj = obj.toany.base
+    elif anyobj.kind == akPtr: anyobj = obj.toany.base
+    for x, y in anyobj.fields():
+        if jnode.haskey(x): continue
+        if y.kind == akInt64: jnode{x} = newJInt(0)
+        elif y.kind == akUInt64: jnode{x} = newJInt(0)
+        elif y.kind == akInt32: jnode{x} = newJInt(0)
+        elif y.kind == akUInt32: jnode{x} = newJInt(0)
+        elif y.kind == akInt16: jnode{x} = newJInt(0)
+        elif y.kind == akUInt16: jnode{x} = newJInt(0)
+        elif y.kind == akString: jnode{x} = newJString("")
+        elif y.kind == akTuple: jnode{x} = newJObject()
+        else: linfo("Unknown", obj.type.name, y.kind)
+    return
