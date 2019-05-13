@@ -1,5 +1,7 @@
 {.passl:"-lnng"}
 
+# woc, nng会启动16 个线程：https://github.com/nanomsg/nng/issues/769
+
 proc newclient() : RpcClient =
     var cli = new(RpcClient)
     cli.devuuid = "0c5b3037-3767-4c66-b9e4-46aff8d693b1"

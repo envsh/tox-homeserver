@@ -1,6 +1,14 @@
 {.passc:"-fPIC -g -O0 -xc -DRENDER_X11_NATIVE"}
 {.passl:"-lX11 -lXft -lXrender"}
 
+import threadpool
+setMinPoolSize(2)
+setMaxPoolSize(3)
+
+include pthread_hook
+pthread_setowner(1)
+init_pthread_hook()
+
 {.compile: "render_x11_native.c.ngo".}
 import x11/x, x11/xlib
 include render_x11_native
@@ -187,11 +195,13 @@ linfo("singleton? ", ne1 == ne2)
 
 spawn stopafter3s(ne1)
 
+pthread_setowner(2)
 discard newNkwindow(getNimenvp())
 NkwindowOpen(getNimenvp())
 # nk_x11_event_handle(ne1.nkxwin.rdwin)
 
 # runNimenv(ne1.self)
+pthread_setowner(3)
 var cli = newclient()
 cli.connect()
 ne1.rpcli = cli
@@ -221,13 +231,12 @@ proc initAsyevtTable() =
     addRead(cli.reqrfd, onreqskread)
     return
 
-
 initAsyevtTable()
 # cli.reqsksend("hehehhee")
 cli.getBaseInfo()
 
 # type CallBack = proc (fd: AsyncFD) : bool
-
+pthread_setowner(4)
 while true:
     poll(300000)
     #linfo("poll timeout")
