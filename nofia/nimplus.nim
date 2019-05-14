@@ -56,6 +56,9 @@ proc toptr*(v:cstring) : pointer = cast[pointer](v)
 proc tof32*(v: Natural) : float32 = return v.float # for float, cannot use cast, for cast is bitwise cast
 proc tof64*(v: Natural) : float64 = return v.float
 proc tojson*[T](v: T) : string = $(%*v)
+proc toaddr(v: proc) : pointer = cast[pointer](v)
+proc ntocstr(v: string) : cstring {.exportc.}= return v
+proc ctonstr(v: cstring) : string {.exportc.} = $v
 
 # some case c use 0 as success, 1 as failed
 proc ctrue0*(v : Natural) : bool = v == 0

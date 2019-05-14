@@ -65,4 +65,5 @@ proc getrpcli() : RpcClient = (cast[PNimenv](getNimenvp())).rpcli
 proc getnkwnd() : NKWindow = (cast[PNimenv](getNimenvp())).nkxwin
 proc getnkmdl() : DataModel = (cast[PNimenv](getNimenvp())).nkxwin.mdl
 
-
+proc strcat1() : string {.exportc.} =
+    return "aaa"
