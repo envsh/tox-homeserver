@@ -14,3 +14,10 @@ c2n:
 clean:
 	rm -f nofia libnikui.a
 
+gogo:
+	# g++ -g -O0 -c gogo.cpp -o gogo.o -I/home/me/oss/src/cxrt/libgo/libgo
+	nim --threads:on --listcmd --header -d:nimCallDepthLimit=128 \
+		-d:debug --define:useRealtimeGC -p:/opt/nim/lib -p:$(HOME)/.nimble/mulib \
+		-o:gogo- c gogo.nim
+
+
