@@ -1,7 +1,9 @@
 #include <stdlib.h>
+#include <assert.h>
 #include <dlfcn.h>
 #include <pthread.h>
 #include <unistd.h>
+#include <gc/gc.h>
 
 typedef struct {
     pthread_t *thread;
@@ -12,12 +14,16 @@ typedef struct {
 typedef int (*pthread_create_t)(pthread_t *thread, const pthread_attr_t *attr,
                                 void *(*start_routine) (void *), void *arg);
 pthread_create_t pthread_create_f = 0;
+void (*mcthinitfn)() = 0;
 
 // 在nim中实现，在c中调用
 extern int nim_pthread_create(packedpthargs* tra);
 
 // 在c中实现，在nim中调用
 void nim_pthread_getinfo(packedpthargs* tra) {
+    assert(mcthinitfn != 0);
+    mcthinitfn();
+
     printf("nim_pthread_getinfo %p\n", tra);
     *(tra->thread) = pthread_self();
     void*(*r)(void*) = tra->start_routine;
@@ -80,7 +86,25 @@ int pthread_create(pthread_t *thread, const pthread_attr_t *attr,
 extern int __pthread_create(pthread_t *thread, const pthread_attr_t *attr,
                             void *(*start_routine) (void *), void *arg);
 
-void init_pthread_hook() {
+void init_pthread_hook(void(*thinitfn)()) {
     pthread_create_f = (pthread_create_t)dlsym(RTLD_NEXT, "pthread_create");
+    mcthinitfn = thinitfn;
     printf("pthread_create_f=%p\n", pthread_create_f);
 }
+
+/*
+void *malloc(size_t size) {
+    // printf("malloc=%d\n", size);
+    return GC_malloc(size);
+}
+void free(void *ptr) {GC_free(ptr);}
+void *calloc(size_t nmemb, size_t size) {
+    return GC_malloc(nmemb*size);
+}
+void *realloc(void *ptr, size_t size) {
+    return GC_realloc(ptr, size);
+}
+void *reallocarray(void *ptr, size_t nmemb, size_t size) {
+    return GC_realloc(ptr, nmemb * size);
+}
+*/

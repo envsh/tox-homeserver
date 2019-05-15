@@ -7,7 +7,7 @@
 proc nim_pthread_getinfo(tra:pointer) {.importc.}
 
 proc nim_pthread_proc(tra : pointer) =
-    setupForeignThreadGc()
+    when defined(setupForeignThreadGc): setupForeignThreadGc()
     echo ("nim_pthread_proc ...", tra == nil)
     nim_pthread_getinfo(tra)
     return
@@ -18,7 +18,7 @@ proc nim_pthread_create(tra:pointer) : int {.exportc.} =
     createThread(nth, nim_pthread_proc, tra)
     return 0
 
-proc init_pthread_hook() {.importc.}
+proc init_pthread_hook(thinitfn: pointer) {.importc.}
 proc pthread_setowner(which: int) {.importc.}
 
 # usage:

@@ -1,7 +1,9 @@
-import threadpool
+# GC_disableMarkAndSweep()
+
+#import threadpool
+#setMinPoolSize(2)
+#setMaxPoolSize(3)
 import asyncdispatch
-setMinPoolSize(2)
-setMaxPoolSize(3)
 
 #[
 extern void cxrt_init_env();
@@ -10,15 +12,18 @@ extern void cxrt_routine_post(void (*f)(void*), void*arg);
 proc cxrt_init_routine_env() {.importc.}
 proc cxrt_routine_post(f:pointer, arg:pointer) {.importc.}
 include "pthread_hook.nim"
+proc setupForeignThreadGc2() =
+    when not defined(setupForeignThreadGc): discard
+    else: setupForeignThreadGc()
+init_pthread_hook(cast[pointer](setupForeignThreadGc2))
 pthread_setowner(1)
-init_pthread_hook()
 # create goroutines thread pool
 cxrt_init_routine_env()
 pthread_setowner(0)
 
 # {.compile:"gogo.cpp".}
 {.link:"gogo1.o"}
-{.passl:"-lstdc++ -L/home/me/oss/src/cxrt/libgo -llibgo -lgc -lgccpp"}
+{.passl:"-lstdc++ -L/home/me/oss/src/cxrt/libgo -L/home/me/oss/src/tox-homeserver/nofia/gc-8.0.4/.libs -llibgo -lgc -lgccpp -lpthread"}
 {.passc:"-g -O0"}
 
 include "nimlog.nim"
@@ -116,12 +121,6 @@ type
 
 include "ffi.nim"
 
-proc ffi_call2(cif:pffi_cif, fn:proc, rvalue: Any , avalue: pointer) =
-    var fnptr = cast[pointer](fn)
-    var rval2 = cast[SysAny](rvalue)
-    ffi_call(cif, fnptr, rval2.value, avalue)
-    return
-
 # nim typeinfo.AnyKind to ffi_type*
 proc nak2ffipty(ak: AnyKind) : pffi_type =
     if ak == akInt:
@@ -143,45 +142,46 @@ proc nak2ffipty(ak: AnyKind) : pffi_type =
 
 proc gogorunner_cleanup(arg :pointer) =
     linfo "gogorunner_cleanup", repr(arg)
-    var argv = cast[seq[pointer]](arg)
-    var argc = cast[int](argv[1])
+    var argc = cast[int](pointer_array_get(arg, 1))
     for idx in 0..argc-1:
         let tyidx = 2 + idx*2
         let validx = tyidx + 1
-        let akty = cast[AnyKind](argv[tyidx])
+        let akty = cast[AnyKind](pointer_array_get(arg, tyidx.cint))
+        let akval = pointer_array_get(arg, validx.cint)
         if akty == akString:
-            deallocShared(argv[validx])
+            deallocShared(akval)
         elif akty == akCString:
-            deallocShared(argv[validx])
+            deallocShared(akval)
         elif akty == akInt:
-            deallocShared(argv[validx])
+            deallocShared(akval)
         else: linfo "unknown", akty
+    deallocShared(arg)
     return
 
 # pack struct, seq[pointer], which, [0]=fnptr, 1=argc, 2=a0ty, 3=a0val, 4=a1ty, 5=a1val ...
 proc gogorunner(arg : pointer) =
     linfo "gogorunner", repr(arg)
-    var argv = cast[seq[pointer]](arg)
-    var fnptr  = argv[0]
-    var argc = cast[int](argv[1])
+    var fnptr = pointer_array_get(arg, 0)
+    var argc = cast[int](pointer_array_get(arg, 1))
+    assert(argc == 3, $argc)
 
     var atypes : seq[pffi_type]
     var avalues : seq[pointer]
     for idx in 0..argc-1:
         let tyidx = 2 + idx*2
         let validx = tyidx + 1
-        let akty = cast[AnyKind](argv[tyidx])
+        let akty = cast[AnyKind](pointer_array_get(arg, tyidx.cint))
+        let akval = pointer_array_get(arg, validx.cint)
         atypes.add(nak2ffipty(akty))
-        linfo "recv val", idx, akty, argv[validx]
         if akty == akString:
-            var cs = cast[cstring](argv[validx])
+            var cs = cast[cstring](akval)
             var ns : string = $cs
             GC_ref(ns)
             avalues.add(ns.addr)
         elif akty == akCString:
-            avalues.add(argv[validx])
-        elif akty == akInt: avalues.add(argv[validx])
-        else: linfo "unknown", akty, argv[validx]
+            avalues.add(akval)
+        elif akty == akInt: avalues.add(akval)
+        else: linfo "unknown", akty, akval
         discard
 
     var cif : ffi_cif
@@ -196,36 +196,36 @@ proc gogorunner(arg : pointer) =
 
 # packed to passby format
 proc packany(fn:proc, args:varargs[Any, toany]) =
-    var pargs : seq[pointer]
-    pargs.add(cast[pointer](fn))
-    pargs.add(cast[pointer](args.len()))
+    var ecnt = (2+args.len()*2+2)
+    var pargs = pointer_array_new(ecnt.cint)
+    pointer_array_set(pargs, 0, cast[pointer](fn))
+    pointer_array_set(pargs, 1, cast[pointer](args.len()))
 
-    for idx, arg in args:
+    for idx in 0..args.len-1:
+        var arg = args[idx]
+        var tyidx = 2+idx*2
+        var validx = tyidx+1
+        pointer_array_set(pargs, tyidx.cint, cast[pointer](arg.kind))
         var sarg = cast[SysAny](arg)
         if arg.kind == akInt:
             var v = allocShared0(sizeof(int))
             copyMem(v, sarg.value, sizeof(int))
-            pargs.add(cast[pointer](akInt))
-            pargs.add(v)
+            pointer_array_set(pargs, validx.cint, v)
         elif arg.kind == akString:
             var ns = arg.getString()
             var cs : cstring = $ns
             var v = allocShared0(ns.len()+1)
             copyMem(v, cs, ns.len())
-            pargs.add(cast[pointer](akString))
-            pargs.add(v)
+            pointer_array_set(pargs, validx.cint, v)
         elif arg.kind == akCString:
             var cs = arg.getCString()
             var v = allocShared0(cs.len()+1)
             copyMem(v, cs, cs.len())
-            pargs.add(cast[pointer](akCString))
-            pargs.add(v)
+            pointer_array_set(pargs, validx.cint, v)
         else: linfo "unknown", arg.kind
-        linfo "add val", idx, arg.kind, pargs[pargs.len-1]
 
-    GC_ref(pargs)
-    linfo "copy margs", pargs.len, cast[pointer](pargs)
-    cxrt_routine_post(gogorunner.toaddr(), cast[pointer](pargs))
+    linfo "copy margs", 2+args.len*2, pargs # why refc=1
+    cxrt_routine_post(gogorunner.toaddr(), pargs)
     return
 
 macro gogo2(stmt:typed) : untyped =
@@ -248,7 +248,7 @@ macro gogo2(stmt:typed) : untyped =
 
 ###
 proc hello(i:int, s:string, cs:cstring) =
-    linfo 123,"inhello, called by goroutines",getThreadId()
+    linfo 123,"inhello, called by goroutines"#,getThreadId()
 
 const usegogon = 2 # , 2
 proc timeoutfn0(fd:AsyncFD):bool{.gcsafe.} = return false
@@ -282,7 +282,7 @@ proc timeoutfn3(fd:AsyncFD):bool{.gcsafe.} =
 if isMainModule:
     var seqinterp : seq[int]
     seqinterp.add(123)
-    echo "main threadid",getThreadId()
+    linfo "main threadid"#, getThreadId()
     #gogo hello(789, "nim lit string", "c lit string")
     gogo2 hello(789, "nim lit string", "c lit string")
     addTimer(30000000, false, timeoutfn0)

@@ -59,6 +59,9 @@ proc ffi_call(cif:pffi_cif, fn:proc, rvalue: pointer, avalue: pointer) {.importc
 proc ffi_call(cif:pffi_cif, fn:proc, rvalue: pffi_type, avalue: pointer) {.importc.}
 
 proc dump_pointer_array(n:cint, p:pointer) {.importc.}
+proc pointer_array_new(n:cint) : pointer {.importc.}
+proc pointer_array_set(p:pointer, idx:cint, v:pointer) {.importc.}
+proc pointer_array_get(p:pointer, idx:cint) :pointer {.importc.}
 
 #[
 

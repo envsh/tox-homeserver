@@ -15,10 +15,12 @@ clean:
 	rm -f nofia libnikui.a
 
 gogo:
+	# handle SIGXCPU SIG33 SIG35 SIGPWR nostop noprint
+	# ./configure --enable-redirect-malloc --enable-static=yes --enable-shared=no --enable-cplusplus --disable-thread-local-alloc
 	# g++ -g -O0 -c gogo1.cpp -o gogo1.o -I/home/me/oss/src/cxrt/libgo/libgo
 	# --gc:none
-	nim --threads:on --listcmd --header -d:nimCallDepthLimit=128 \
-		-d:debug --define:useRealtimeGC -p:/opt/nim/lib -p:$(HOME)/.nimble/mulib \
+	LDFLAGS="-lgc123" nim -f --threads:on --listcmd --header -d:nimCallDepthLimit=128 \
+		-d:debug --gc:refc -p:/opt/nim/lib -p:$(HOME)/.nimble/mulib \
 		-o:gogo- c gogo.nim
 
 
