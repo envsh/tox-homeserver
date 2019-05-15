@@ -4,7 +4,7 @@ import macros
 import logging
 import strutils
 
-proc `$`*(x: pointer):string = return repr(x)
+proc `$`*(x: pointer):string = return repr(x).strip()
 
 ### logging initilize
 const LOGLVL_TRACE = 0

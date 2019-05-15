@@ -18,7 +18,7 @@ void foo()
 
 void done()
 {
-    printf("done.\n");
+    printf("%s:%d done.\n", __FILE__, __LINE__);
 }
 
 extern "C"

@@ -2,6 +2,7 @@
 
 import unicode
 import json
+import strutils
 
 proc Splitn*(s:string, n:int) : seq[string] =
     var rets: seq[string]
