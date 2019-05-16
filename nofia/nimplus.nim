@@ -1,8 +1,9 @@
-{.hint[XDeclaredButNotUsed]:off.}
 
-import unicode
 import json
 import strutils
+import unicode
+import encodings
+#import unidecode
 
 proc Splitn*(s:string, n:int) : seq[string] =
     var rets: seq[string]
@@ -22,7 +23,7 @@ proc Splitrn*(s:string, n:int) : seq[string] =
     var rets: seq[string]
     var sub = newString(0)
     for c in s.runes:
-        sub.add(c)
+        sub.add($c)
         if sub.len() >= n:
             rets.add(sub)
             sub = newString(0)
@@ -41,7 +42,7 @@ proc Splitrnui*(s:string, n:int) : seq[string] =
             sub = newString(0)
             subuilen = 0
 
-        sub.add(c)
+        sub.add($c)
         subuilen += uilen
     if unicode.strip(sub).len > 0: rets.add(sub)
     return rets
@@ -125,4 +126,6 @@ import times
 # // 中文常用格式
 proc totoday*(t: DateTime) : string = t.format("HH:mm:ss")
 proc totodayminite*(t: DateTime): string = t.format("HH:mm")
+
+{.hint[XDeclaredButNotUsed]:off.}
 

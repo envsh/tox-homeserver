@@ -3,8 +3,10 @@
 import macros
 import logging
 import strutils
+import asyncdispatch
 
 proc `$`*(x: pointer):string = return repr(x).strip()
+proc `$`*(x: AsyncFD):string = return repr(x).strip()
 
 ### logging initilize
 const LOGLVL_TRACE = 0
