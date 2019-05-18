@@ -4,6 +4,11 @@
 #setMinPoolSize(2)
 #setMaxPoolSize(3)
 import asyncdispatch
+import coro
+
+proc GC_addStack(bottom: pointer) {.cdecl, importc.}
+proc GC_removeStack(bottom: pointer) {.cdecl, importc.}
+proc GC_setActiveStack(bottom: pointer) {.cdecl, importc.}
 
 #[
 extern void cxrt_init_env();
@@ -23,7 +28,7 @@ pthread_setowner(0)
 
 # {.compile:"gogo.cpp".}
 {.link:"gogo1.o"}
-{.passl:"-lstdc++ -L/home/me/oss/src/cxrt/libgo -L/home/me/oss/src/tox-homeserver/nofia/gc-8.0.4/.libs -llibgo -lgc -lgccpp -lpthread"}
+{.passl:"-lstdc++ -L/home/me/oss/src/cxrt/libgo -L/home/me/oss/src/tox-homeserver/nofia/gc-8.0.4/.libs -llibgo -lpthread"}
 {.passc:"-g -O0"}
 
 include "nimlog.nim"
@@ -160,6 +165,7 @@ proc gogorunner_cleanup(arg :pointer) =
 
 # pack struct, seq[pointer], which, [0]=fnptr, 1=argc, 2=a0ty, 3=a0val, 4=a1ty, 5=a1val ...
 proc gogorunner(arg : pointer) =
+    setupForeignThreadGc()
     linfo "gogorunner", repr(arg)
     var fnptr = pointer_array_get(arg, 0)
     var argc = cast[int](pointer_array_get(arg, 1))
