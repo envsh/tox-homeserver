@@ -17,7 +17,8 @@ clean:
 gogo:
 	# handle SIGXCPU SIG33 SIG35 SIGPWR nostop noprint
 	# ./configure --enable-redirect-malloc --enable-static=yes --enable-shared=no --enable-cplusplus --disable-thread-local-alloc
-	g++ -g -O0 -c gogo1.cpp -o gogo1.o -I/home/me/oss/src/cxrt/libgo/libgo
+	# g++ -g -O0 -c gogo1.cpp -o gogo1.o -I/home/me/oss/src/cxrt/libgo/libgo
+	go build -v -buildmode=c-archive -o libgocrt.a gocrt.go
 	# --gc:none
 	LDFLAGS="-lgc123" nim --threads:on --listcmd --header -d:nimCallDepthLimit=128 \
 		-d:debug -d:nimCoroutines --gc:refc -p:/opt/nim/lib -p:$(HOME)/.nimble/mulib \

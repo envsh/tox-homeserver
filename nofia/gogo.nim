@@ -15,7 +15,6 @@ extern void cxrt_init_env();
 extern void cxrt_routine_post(void (*f)(void*), void*arg);
 ]#
 proc cxrt_init_routine_env() {.importc.}
-proc cxrt_routine_post(f:pointer, arg:pointer) {.importc.}
 include "pthread_hook.nim"
 proc setupForeignThreadGc2() =
     when not defined(setupForeignThreadGc): discard
@@ -23,12 +22,12 @@ proc setupForeignThreadGc2() =
 init_pthread_hook(cast[pointer](setupForeignThreadGc2))
 pthread_setowner(1)
 # create goroutines thread pool
-cxrt_init_routine_env()
+#cxrt_init_routine_env()
 pthread_setowner(0)
 
 # {.compile:"gogo.cpp".}
-{.link:"gogo1.o"}
-{.passl:"-lstdc++ -L/home/me/oss/src/cxrt/libgo -L/home/me/oss/src/tox-homeserver/nofia/gc-8.0.4/.libs -llibgo -lpthread"}
+# {.link:"gogo1.o"}
+# {.passl:"-lstdc++ -L/home/me/oss/src/cxrt/libgo -L/home/me/oss/src/tox-homeserver/nofia/gc-8.0.4/.libs -llibgo -lpthread"}
 {.passc:"-g -O0"}
 
 include "nimlog.nim"
@@ -49,6 +48,12 @@ proc todptr(v: string) : pointer = ((cast[PNSeq](v)).data).addr
 
 import macros
 import typeinfo
+
+include "gocrt.nim"
+proc cxrt_routine_post(f:pointer, arg:pointer) = # {.importc.}
+    linfo "f=",f, "arg=", arg
+    gogoimp(f, arg)
+    return
 
 proc cxrt_routine_post_emu(fnptr:pointer, arg:pointer) =
     echo "routine post...", repr(arg)
@@ -124,7 +129,6 @@ type
         value*: pointer
         rawTypePtr*: pointer
 
-include "ffi.nim"
 
 # nim typeinfo.AnyKind to ffi_type*
 proc nak2ffipty(ak: AnyKind) : pffi_type =
@@ -160,7 +164,8 @@ proc gogorunner_cleanup(arg :pointer) =
         elif akty == akInt:
             deallocShared(akval)
         else: linfo "unknown", akty
-    deallocShared(arg)
+    #deallocShared(arg)
+    pointer_array_free(arg)
     return
 
 # pack struct, seq[pointer], which, [0]=fnptr, 1=argc, 2=a0ty, 3=a0val, 4=a1ty, 5=a1val ...
@@ -230,7 +235,7 @@ proc packany(fn:proc, args:varargs[Any, toany]) =
             pointer_array_set(pargs, validx.cint, v)
         else: linfo "unknown", arg.kind
 
-    linfo "copy margs", 2+args.len*2, pargs # why refc=1
+    linfo "copy margs", gogorunner.toaddr, 2+args.len*2, pargs # why refc=1
     cxrt_routine_post(gogorunner.toaddr(), pargs)
     return
 
@@ -295,6 +300,7 @@ if isMainModule:
     addTimer(2000, false, timeoutfn1)
     addTimer(1000, false, timeoutfn2)
     while true: poll(5000)
+    gomain()
 
 # expand expr:
 #[

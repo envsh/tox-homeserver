@@ -1,5 +1,5 @@
 
-{.compile:"pthread_hook.c".}
+{.compile:"pthread_hook.c.ngo".}
 {.passc:"-D_GNU_SOURCE".}
 
 # not need import threads
