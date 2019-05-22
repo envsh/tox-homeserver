@@ -6,7 +6,11 @@
 
 proc nim_pthread_getinfo(tra:pointer) {.importc.}
 
+var thrstkbs {.threadvar.} : pointer
+
 proc nim_pthread_proc(tra : pointer) =
+    var stkbs : pointer
+    thrstkbs = stkbs.addr
     when defined(setupForeignThreadGc): setupForeignThreadGc()
     echo ("nim_pthread_proc ...", tra == nil)
     nim_pthread_getinfo(tra)
@@ -27,3 +31,25 @@ proc pthread_setowner(which: int) {.importc.}
 # init_pthread_hook()
 # pthread_create
 # uninit_pthread_hook()
+
+### some about gc
+type
+    GCStackBase = ref object
+        sb0*: GCStackBaseImpl
+        sb1*: GCStackBaseImpl
+
+    GCStackBaseImpl = object
+        membase*: pointer
+        regbase*: pointer
+        bottom*: pointer
+        gchandle*: pointer
+
+proc GC_get_stack_base(sb:pointer) {.importc.}
+proc GC_register_my_thread(sb:pointer) {.importc.}
+proc GC_get_my_stackbottom(sb:pointer) : pointer {.importc.}
+proc GC_set_stackbottom(gchandle:pointer, sb:pointer) {.importc.}
+proc GC_call_with_alloc_lock(fn:pointer, arg: pointer) {.importc.}
+proc GC_malloc(size:csize):pointer {.importc.}
+proc GC_realloc(obj:pointer,size:csize):pointer {.importc.}
+proc pthread_self() : uint {.importc.}
+
