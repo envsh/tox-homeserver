@@ -21,16 +21,22 @@ extern int nim_pthread_create(packedpthargs* tra);
 
 // 在c中实现，在nim中调用
 void nim_pthread_getinfo(packedpthargs* tra) {
+    // gc related
+    struct GC_stack_base sb = {0};
+    GC_get_stack_base(&sb);
+    GC_register_my_thread(&sb);
+    printf("GC_register_my_thread: %d\n", GC_thread_is_registered());
+    //
     assert(mcthinitfn != 0);
     mcthinitfn();
 
     printf("nim_pthread_getinfo %p\n", tra);
     *(tra->thread) = pthread_self();
-    void*(*r)(void*) = tra->start_routine;
+    void*(*routine)(void*) = tra->start_routine;
     void*arg = tra->arg;
     free(tra);
 
-    void* rv = r(arg);
+    void* rv = routine(arg);
 }
 
 

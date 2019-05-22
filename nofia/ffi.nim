@@ -1,5 +1,5 @@
 {.passl:"-lffi"}
-{.passc:"-I/usr/lib/libffi-3.2.1/include/ -xc"}
+{.passc:"-xc -I/usr/lib/libffi-3.2.1/include/"}
 {.compile:"ffi1.c.ngo"}
 
 proc ffi_get_default_abi() : cint {.importc.}
@@ -63,6 +63,7 @@ proc pointer_array_new(n:cint) : pointer {.importc.}
 proc pointer_array_set(p:pointer, idx:cint, v:pointer) {.importc.}
 proc pointer_array_get(p:pointer, idx:cint) :pointer {.importc.}
 proc pointer_array_free(p:pointer) {.importc.}
+
 
 #[
 
