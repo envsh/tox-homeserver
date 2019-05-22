@@ -58,12 +58,12 @@ proc ffi_call(cif:pffi_cif, fn:pointer, rvalue: pointer, avalue: pointer) {.impo
 proc ffi_call(cif:pffi_cif, fn:proc, rvalue: pointer, avalue: pointer) {.importc.}
 proc ffi_call(cif:pffi_cif, fn:proc, rvalue: pffi_type, avalue: pointer) {.importc.}
 
-proc dump_pointer_array(n:cint, p:pointer) {.importc.}
-proc pointer_array_new(n:cint) : pointer {.importc.}
-proc pointer_array_set(p:pointer, idx:cint, v:pointer) {.importc.}
-proc pointer_array_get(p:pointer, idx:cint) :pointer {.importc.}
+proc dump_pointer_array(n:int, p:pointer) {.importc.}
+proc pointer_array_new(n:int) : pointer {.importc.}
+proc pointer_array_set(p:pointer, idx:int, v:pointer) {.importc.}
+proc pointer_array_get(p:pointer, idx:int) :pointer {.importc.}
 proc pointer_array_free(p:pointer) {.importc.}
-
+proc pointer_array_addr(p:pointer) :pointer {.importc.}
 
 #[
 

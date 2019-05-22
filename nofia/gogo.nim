@@ -176,10 +176,13 @@ proc gogorunner_cleanup(arg :pointer) =
         let akval = pointer_array_get(arg, validx.cint)
         if akty == akString:
             deallocShared(akval)
+            discard
         elif akty == akCString:
             deallocShared(akval)
+            discard
         elif akty == akInt:
             deallocShared(akval)
+            discard
         else: linfo "unknown", akty
     #deallocShared(arg)
     pointer_array_free(arg)
@@ -223,33 +226,37 @@ proc gogorunner(arg : pointer) =
     var argc = cast[int](pointer_array_get(arg, 1))
     assert(argc == 3, $argc)
 
-    var atypes : seq[pffi_type]
-    var avalues : seq[pointer]
+    var atypes = newseq[pffi_type](argc+1)
+    var avalues = newseq[pointer](argc+1)
+    var ptrtmps = newseq[pointer](argc+1)
     for idx in 0..argc-1:
         let tyidx = 2 + idx*2
         let validx = tyidx + 1
         let akty = cast[AnyKind](pointer_array_get(arg, tyidx.cint))
-        let akval = pointer_array_get(arg, validx.cint)
-        atypes.add(nak2ffipty(akty))
+        var akval = pointer_array_get(arg, validx.cint)
+        atypes[idx] = nak2ffipty(akty)
         if akty == akString:
             var cs = cast[cstring](akval)
-            var ns : string = $cs
-            GC_ref(ns)
-            avalues.add(ns.addr)
+            var ns = $cs
+            ptrtmps[idx] = cast[pointer](ns)
+            avalues[idx] = ptrtmps[idx].addr
         elif akty == akCString:
             var cs = cast[cstring](akval)
-            avalues.add(cs.addr)
-        elif akty == akInt: avalues.add(akval)
+            ptrtmps[idx] = akval
+            avalues[idx] = ptrtmps[idx].addr
+        elif akty == akInt:
+            ptrtmps[idx] = akval
+            avalues[idx] = ptrtmps[idx]
         else: linfo "unknown", akty, akval
         discard
 
     var cif : ffi_cif
     var rvalue : uint64
     # dump_pointer_array(argc.cint, atypes.todptr())
-    var ret = ffi_prep_cif(cif.addr, FFI_DEFAULT_ABI, argc.cuint, ffi_type_pointer.addr, atypes.todptr())
+    var ret = ffi_prep_cif(cif.addr, FFI_DEFAULT_ABI, argc.cuint, ffi_type_pointer.addr, atypes.todptr)
 
     # dump_pointer_array(argc.cint, avalues.todptr())
-    ffi_call(cif.addr, fnptr, rvalue.addr, avalues.todptr())
+    ffi_call(cif.addr, fnptr, rvalue.addr, avalues.todptr)
     gogorunner_cleanup(arg)
     nimGC_setStackBottom(thrstkbs)
     GC_call_with_alloc_lock(gcsetbottom0.toaddr, sbp.sb0.addr)
@@ -310,6 +317,7 @@ macro gogo2(stmt:typed) : untyped =
 ###
 proc hello(i:int, s:string, cs:cstring) =
     linfo 123,"inhello, called by goroutines"#,getThreadId()
+    linfo i, s, cs
     var p : pointer
     p = GC_malloc(5678)
     p = GC_malloc(6789)
