@@ -51,5 +51,5 @@ proc GC_set_stackbottom(gchandle:pointer, sb:pointer) {.importc.}
 proc GC_call_with_alloc_lock(fn:pointer, arg: pointer) {.importc.}
 proc GC_malloc(size:csize):pointer {.importc.}
 proc GC_realloc(obj:pointer,size:csize):pointer {.importc.}
-proc pthread_self() : uint {.importc.}
-
+# proc pthread_self() : uint {.importc.}
+proc pthread_self() : uint = 0

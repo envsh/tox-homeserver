@@ -1,5 +1,8 @@
 package main
 
+/*
+ */
+import "C"
 import (
 	"log"
 	"math/rand"
@@ -9,14 +12,20 @@ import (
 	// "github.com/alangpierce/go-forceexport"
 )
 
-//export gomain
-func gomain() {
+var cnimcallfn unsafe.Pointer
+
+//export goinit
+func goinit(cnimcallfnptr unsafe.Pointer) { cnimcallfn = cnimcallfnptr }
+
+//export gomainloop
+func gomainloop() {
 	go func() {
 		for {
 			time.Sleep(5 * time.Hour)
 		}
 	}()
 	main()
+	// runtime.SetFinalizer()
 }
 func main() { select {} }
 

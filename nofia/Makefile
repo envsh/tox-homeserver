@@ -19,8 +19,8 @@ gogo:
 	# ./configure --enable-redirect-malloc --enable-static=yes --enable-shared=no --enable-cplusplus --disable-thread-local-alloc
 	# g++ -g -O0 -DGC_THREADS -c gogo1.cpp -o gogo1.o -I/home/me/oss/src/cxrt/libgo/libgo
 	# --gc:none
-	LDFLAGS="-lgc123" nim -f --threads:on --listcmd --header -d:nimCallDepthLimit=128 \
-		-d:debug -d:nimCoroutinesddd --gc:boehm -p:/opt/nim/lib -p:$(HOME)/.nimble/mulib \
+	LDFLAGS="-lgc123" nim --threads:on --listcmd --header -d:nimCallDepthLimit=128 \
+		-d:debug -d:nimCoroutinesddd -d:nimDebugDlOpenddd -p:/opt/nim/lib -p:$(HOME)/.nimble/mulib \
 		-o:gogo- c gogo.nim
 
 gort:
