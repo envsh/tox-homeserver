@@ -58,6 +58,7 @@ proc toptr*(v:cstring) : pointer = cast[pointer](v)
 proc tof32*(v: Natural) : float32 = return v.float # for float, cannot use cast, for cast is bitwise cast
 proc tof64*(v: Natural) : float64 = return v.float
 proc tojson*[T](v: T) : string = $(%*v)
+proc `%`*(v:uint32) : JsonNode = newJInt(v.BiggestInt)
 proc toaddr(v: proc) : pointer = cast[pointer](v)
 proc toaddr[T](v: ref T) : pointer = cast[pointer](v)
 proc ntocstr(v: string) : cstring {.exportc.}= return v
@@ -95,7 +96,7 @@ macro newtable*(TK:typedesc, TV:typedesc) :untyped =
 #var tab = newtable(int,  string)
 #ldebug(tab.len())
 
-import json
+#import json
 import typeinfo
 import typetraits
 
@@ -127,6 +128,7 @@ import times
 # // 中文常用格式
 proc totoday*(t: DateTime) : string = t.format("HH:mm:ss")
 proc totodayminite*(t: DateTime): string = t.format("HH:mm")
+proc tostr*(d:Duration) : string = return $d
 
 {.hint[XDeclaredButNotUsed]:off.}
 

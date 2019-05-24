@@ -1,5 +1,5 @@
 {.passc:"-fPIC -g -O0 -xc -DRENDER_X11_NATIVE"}
-{.passl:"-lX11 -lXft -lXrender"}
+{.passl:"-lX11 -lXft -lXrender -lpthread"}
 
 import threadpool
 setMinPoolSize(2)
@@ -9,7 +9,7 @@ setMaxPoolSize(3)
 import x11/x, x11/xlib
 include render_x11_native
 
-{.passc:"-I/usr/include/freetype2"}
+{.passc:"-I. -I/usr/include/freetype2"}
 {.compile:"nuklear_x11_all.c.ngo".}
 include nuklear_x11_all
 

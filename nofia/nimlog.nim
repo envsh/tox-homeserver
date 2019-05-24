@@ -5,8 +5,11 @@ import logging
 import strutils
 import asyncdispatch
 
-proc `$`*(x: pointer):string = return repr(x).strip()
-proc `$`*(x: AsyncFD):string = return repr(x).strip()
+proc `$`*(x: pointer):string = return strutils.strip(repr(x))
+proc `$`*(x: AsyncFD):string = return strutils.strip(repr(x))
+proc tostr*(x: pointer):string = return strutils.strip(repr(x))
+proc tostr*(x: AsyncFD):string = return strutils.strip(repr(x))
+
 
 ### logging initilize
 const LOGLVL_TRACE = 0

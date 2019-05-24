@@ -1,47 +1,16 @@
 package main
 
-/*
-#cgo LDFLAGS: -ldl
-#cgo CFLAGS: -D_GNU_SOURCE
-
-#include <stdio.h>
-#include <dlfcn.h>
-
-static void* cnimcallfnptr = 0;
-
-// why cannot
-static void dlsyms() {
-    void* sym = dlsym(RTLD_DEFAULT, "cnimcall");
-    printf("111cnimcallfnptr=%p\n", sym);
-}
-static void cnimcallset(void*ptr) {cnimcallfnptr = ptr;}
-static void cnimcall(void*fn, void*args) {
-    ((void(*)(void*, void*))(cnimcallfnptr))(fn, args);
-}
-*/
-import "C"
 import (
 	"log"
 	"math/rand"
 	"sync"
 	"time"
 	"unsafe"
-
-	"github.com/alangpierce/go-forceexport"
+	// "github.com/alangpierce/go-forceexport"
 )
-
-func init() {
-	//C.dlsyms()
-}
-
-//export goinit
-func goinit(cnimcallfnptr unsafe.Pointer) {
-	C.cnimcallset(cnimcallfnptr)
-}
 
 //export gomain
 func gomain() {
-	// C.dlsyms()
 	go func() {
 		for {
 			time.Sleep(5 * time.Hour)
@@ -59,19 +28,20 @@ func init() {
 	log.SetFlags(log.Flags() ^ log.Ldate)
 	// log.SetFlags(log.Flags() ^ log.Ltime)
 
-	err := forceexport.GetFunc(&cgocall, "runtime.cgocall")
-	if err != nil {
-		log.Println(err)
-	}
+	/*
+		err := forceexport.GetFunc(&cgocall, "runtime.cgocall")
+		if err != nil {
+			log.Println(err)
+		}
+	*/
 
 	if rand.Uint64() == 1 && rand.Uint64() == 2 {
 		gogo(nil, nil)
 	}
 }
 
-func cnimcall(fn unsafe.Pointer, args unsafe.Pointer) {
-	C.cnimcall(fn, args)
-}
+//extern cnimcall
+func cnimcall(fn unsafe.Pointer, args unsafe.Pointer)
 
 //export gogo
 func gogo(fnptr unsafe.Pointer, args unsafe.Pointer) {
