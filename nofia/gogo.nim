@@ -34,8 +34,8 @@ proc libgo_thread_createcbfn() =
     GC_get_stack_base(sbp.sb0.addr)
     GC_register_my_thread(sbp.sb0.addr)
     sbp.sb0.gchandle = GC_get_my_stackbottom(sbp.sb0.addr)
-    linfo "libgo thread created", getThreadId(), thrh
-    linfo "libgo thread created", sbp.sb0.gchandle, sbp.sb0.membase, sbp.sb0.bottom
+    linfo "libgo thread created", thrmap.len(), getThreadId(), thrh
+    linfo "libgo thread created", thrmap.len(), sbp.sb0.gchandle, sbp.sb0.membase, sbp.sb0.bottom
     return
 libgo_set_thread_createcb(libgo_thread_createcbfn)
 init_pthread_hook(cast[pointer](setupForeignThreadGc2)) # 由于链接顺序问题，pthread hook failed
@@ -43,6 +43,8 @@ pthread_setowner(1)
 # create goroutines thread pool
 cxrt_init_routine_env()
 pthread_setowner(0)
+import os
+sleep(1)
 
 # {.compile:"gogo.cpp".} # too slow
 {.link:"gogo1.o"}
@@ -189,8 +191,6 @@ proc gogorunner_cleanup(arg :pointer) =
     return
 
 import tables
-var gostacks = newTable[pointer, pointer]()
-var gostacksptr = gostacks.addr
 
 proc gcsetbottom0(arg:pointer):pointer =
     var sbi = cast[ptr GCStackBaseImpl](arg)
@@ -211,11 +211,6 @@ proc gogorunner(arg : pointer) =
     var stkbase = libgo_currtask_stack(stksize.addr)
     var stkbottom = cast[pointer](cast[uint64](stkbase) + stksize.uint64)
     if stkbase != nil: # still nolucky let nim GC work
-        if not gostacksptr[].haskey(stkbase):
-            gostacksptr[].add(stkbase, nil)
-            #GC_addStack(stkbase)
-        #GC_setActiveStack(stkbase)
-        nimGC_setStackBottom(stkbase)
         sbp.sb1.membase = stkbottom
         sbp.sb1.gchandle = sbp.sb0.gchandle
         GC_call_with_alloc_lock(gcsetbottom1.toaddr, sbp.sb1.addr)
@@ -258,7 +253,6 @@ proc gogorunner(arg : pointer) =
     # dump_pointer_array(argc.cint, avalues.todptr())
     ffi_call(cif.addr, fnptr, rvalue.addr, avalues.todptr)
     gogorunner_cleanup(arg)
-    nimGC_setStackBottom(thrstkbs)
     GC_call_with_alloc_lock(gcsetbottom0.toaddr, sbp.sb0.addr)
     return
 
@@ -359,10 +353,11 @@ if isMainModule:
     seqinterp.add(123)
     linfo "main threadid"#, getThreadId()
     #gogo hello(789, "nim lit string", "c lit string")
-    gogo2 hello(789, "nim lit string", "c lit string")
     addTimer(30000000, false, timeoutfn0)
     addTimer(2000, false, timeoutfn1)
     addTimer(1000, false, timeoutfn2)
+    poll(5000)
+    # gogo2 hello(789, "nim lit string", "c lit string")
     while true: poll(5000)
 
 # expand expr:

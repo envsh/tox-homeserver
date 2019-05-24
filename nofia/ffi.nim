@@ -64,6 +64,8 @@ proc pointer_array_set(p:pointer, idx:int, v:pointer) {.importc.}
 proc pointer_array_get(p:pointer, idx:int) :pointer {.importc.}
 proc pointer_array_free(p:pointer) {.importc.}
 proc pointer_array_addr(p:pointer) :pointer {.importc.}
+proc calloc(count:csize, size:csize) :pointer {.importc.}
+proc free(p:pointer) {.importc.}
 
 #[
 
