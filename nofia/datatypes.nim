@@ -2,6 +2,7 @@
 
 # 由于类型定义的可见顺序问题，把类型统一定义在此
 import tables
+import times
 
 const MemberInfo_UNKNOWN  = 0
 const MemberInfo_FRIEND = 1

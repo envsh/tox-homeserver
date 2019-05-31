@@ -17,8 +17,8 @@ include nuklear_x11_all
 import asyncdispatch
 import asyncfutures
 
-include "nimlog.nim"
-include "nimplus.nim"
+import nimlog
+import nimplus
 include "datatypes.nim"
 include "uimodels.nim"
 
@@ -233,4 +233,6 @@ cli.getBaseInfo()
 while true:
     poll(300000)
     #linfo("poll timeout")
+
+{.push hint[XDeclaredButNotUsed]:off.}
 

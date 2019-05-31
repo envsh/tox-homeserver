@@ -1,5 +1,7 @@
 {.passl:"-lnng"}
 
+import json
+
 # woc, nng会启动16 个线程：https://github.com/nanomsg/nng/issues/769
 
 proc newclient() : RpcClient =
@@ -229,7 +231,7 @@ proc readclisk(sk:nng_socket) : (string, int32) =
     var data = cast[string](buf[..(bsz-1)]) # the string result
     return (data, rv)
 
-proc onreqskread(fd:AsyncFD):bool {.gcsafe.}=
+proc onreqskread(fd:AsyncFD):bool =
     var ne = cast[PNimenv](getNimenvp())
     var cli = ne.rpcli
     var buf : array[8192,char]
