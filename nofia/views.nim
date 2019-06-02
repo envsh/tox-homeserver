@@ -210,8 +210,9 @@ proc ChatForm(nkw:PNkwindow, name:string) {.gcsafe.} =
             else: ctx.nk_label(" ", NK_TEXT_CENTERED)
             ctx.nk_layout_row_end()
 
-            var mlines = msg.MsgUi.Splitrnui(50)
+            var mlines = msg.MsgUi.Splitrnui2(45)
             for idx, line in mlines:
+                if line == "": linfo("wtf empty", idx, mlines.len(), msg.MsgUi, mlines)
                 ctx.nk_layout_row_begin(NK_STATIC, 39, 3)
                 ctx.nk_layout_row_push(30)
                 var idxtxt = if idx > 0: " " else: $oidx

@@ -1,11 +1,12 @@
 
 all: nui
 
-#		--nomain:on --nolinking:off --app:staticlib -o:libnikui.a
+# --nomain:on --nolinking:off --app:staticlib -o:libnikui.a
+# --opt:none fastest compile speed
 nui:
 	nim --threads:on --listcmd --header -d:nimCallDepthLimit=128 \
 		-p:/opt/nim/lib -p:$(HOME)/.nimble/mulib \
-		-o:nofia c nikui.nim
+		--opt:none -o:nofia c nikui.nim
 	cp $(HOME)/.cache/nim/nikui_d/nikui.h .
 
 c2n:

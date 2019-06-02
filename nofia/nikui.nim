@@ -19,6 +19,7 @@ import asyncfutures
 
 import nimlog
 import nimplus
+include "fiautil.nim"
 include "datatypes.nim"
 include "uimodels.nim"
 

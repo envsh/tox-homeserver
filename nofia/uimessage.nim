@@ -1,6 +1,10 @@
 
 # TODO and other refmter
-proc refmtmsgRUser(this:Message) =
+proc refmtmsgRUser(msg:Message) =
+    var (sender, message, color) = ExtractRealUserMD(msg.PeerName, msg.Msg)
+    msg.MsgUi = message
+    msg.PeerNameUi = sender
+    msg.LastMsgUi = message
     return
 
 proc refmtmsg(msg:Message) =
