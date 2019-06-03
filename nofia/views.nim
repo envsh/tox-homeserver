@@ -181,7 +181,7 @@ proc ChatForm(nkw:PNkwindow, name:string) {.gcsafe.} =
         ctx.nk_label("聊天消息3", NK_TEXT_CENTERED)
 
         # // draw newest n msgs
-        const maxlen = 500
+        const maxlen = 1500
         var uniqid = mdl.Ctuniqid
         var hasnew = mdl.Hasnewmsg(uniqid)
         mdl.Unsetnewmsg(uniqid)

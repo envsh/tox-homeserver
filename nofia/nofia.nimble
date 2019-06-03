@@ -8,5 +8,6 @@ srcDir        = "."
 
 # Dependencies
 
-requires "nim >= 0.19.6"
+# 0.19.6 has very slow memory GC, so update to 0.19.9
+requires "nim >= 0.19.9"
 

@@ -3,6 +3,7 @@ all: nui
 
 # --nomain:on --nolinking:off --app:staticlib -o:libnikui.a
 # --opt:none fastest compile speed
+# -d:useRealtimeGC
 nui:
 	nim --threads:on --listcmd --header -d:nimCallDepthLimit=128 \
 		-p:/opt/nim/lib -p:$(HOME)/.nimble/mulib \

@@ -76,7 +76,7 @@ proc testExtractRealUser0() =
     return
 
 proc ExtractUrls(txt: string) : seq[string] =
-    return re.findAll(txt, re(re.reURL))
+    return re.findAll(txt, re(regURL))
 
 if isMainModule and false:
     testExtractRealUser0()

@@ -1,10 +1,14 @@
 
+import random
+
 # TODO and other refmter
 proc refmtmsgRUser(msg:Message) =
     var (sender, message, color) = ExtractRealUserMD(msg.PeerName, msg.Msg)
-    msg.MsgUi = message
-    msg.PeerNameUi = sender
-    msg.LastMsgUi = message
+    #if itsfalse():
+    if true:
+        msg.MsgUi = message
+        msg.PeerNameUi = sender
+        msg.LastMsgUi = message
     return
 
 proc refmtmsg(msg:Message) =
