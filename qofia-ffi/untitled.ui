@@ -257,13 +257,6 @@
         <property name="bottomMargin">
          <number>0</number>
         </property>
-        <item>
-         <widget class="QQuickWidget" name="quickWidget_2">
-          <property name="resizeMode">
-           <enum>QQuickWidget::SizeRootObjectToView</enum>
-          </property>
-         </widget>
-        </item>
        </layout>
       </widget>
       <widget class="QWidget" name="page_3">
@@ -283,18 +276,6 @@
         <property name="bottomMargin">
          <number>0</number>
         </property>
-        <item>
-         <widget class="QQuickWidget" name="quickWidget">
-          <property name="resizeMode">
-           <enum>QQuickWidget::SizeRootObjectToView</enum>
-          </property>
-          <property name="source">
-           <url>
-            <string>qrc:/qml/area.qml</string>
-           </url>
-          </property>
-         </widget>
-        </item>
        </layout>
       </widget>
       <widget class="QWidget" name="page_7">
@@ -1041,7 +1022,7 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>84</width>
+             <width>98</width>
              <height>16</height>
             </rect>
            </property>
@@ -1576,8 +1557,8 @@
            <property name="geometry">
             <rect>
              <x>0</x>
-             <y>0</y>
-             <width>66</width>
+             <y>12</y>
+             <width>98</width>
              <height>16</height>
             </rect>
            </property>
@@ -2172,7 +2153,7 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>66</width>
+             <width>98</width>
              <height>18</height>
             </rect>
            </property>
@@ -2763,13 +2744,6 @@
    </property>
   </action>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>QQuickWidget</class>
-   <extends>QWidget</extends>
-   <header>QtQuickWidgets/QQuickWidget</header>
-  </customwidget>
- </customwidgets>
  <resources>
   <include location="rcc.qrc"/>
  </resources>

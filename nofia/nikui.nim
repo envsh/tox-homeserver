@@ -13,6 +13,8 @@ include render_x11_native
 {.compile:"nuklear_x11_all.c.ngo".}
 include nuklear_x11_all
 
+include "qomain.nim"
+
 # Nimenv depend some types, put before it
 import asyncdispatch
 import asyncfutures
@@ -229,6 +231,12 @@ proc initAsyevtTable() =
 initAsyevtTable()
 # cli.reqsksend("hehehhee")
 cli.getBaseInfo()
+
+proc qomain2(arg:pointer) {.thread.}=
+    qomain()
+
+var qtuith : Thread[pointer]
+createThread(qtuith, qomain2, nil)
 
 # type CallBack = proc (fd: AsyncFD) : bool
 while true:
