@@ -4,6 +4,7 @@
 #include "ui_message_item_view.h"
 
 class MessageItem : public QWidget {
+    Q_OBJECT;
  public:
     MessageItem(QWidget* parent = nullptr);
 
