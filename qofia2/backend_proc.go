@@ -127,7 +127,7 @@ func (dm *daemon) pollmsg() {
 		gopp.ErrPrint(err)
 		if err == nil {
 			dispatchEvent(evto)
-			dispatchEventResp(evto)
+			// dispatchEventResp(evto)
 		}
 		dispatchEvent2c(string(bcc))
 	}

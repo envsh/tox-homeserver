@@ -16,6 +16,8 @@ const CTTYPE_GROUP = 2
 // 绘制UI界面的快照数据
 // 共享给所有的views
 type DataModel struct {
+	maxcnt int
+
 	mu      deadlock.RWMutex
 	Myid    string
 	Myname  string
@@ -55,8 +57,9 @@ type DataModel struct {
 	repainter func()
 }
 
-func NewDataModel(repainter func()) *DataModel {
+func NewDataModel(maxcnt int, repainter func()) *DataModel {
 	this := &DataModel{}
+	this.maxcnt = gopp.IfElseInt(maxcnt == 0, 512, maxcnt)
 	this.repainter = repainter
 	this.Mysttxt = Conno2str(0)
 	this.receiptid = 10000

@@ -8,6 +8,7 @@ extern "C" {
 #endif // __cplusplus
     typedef struct qofiaui_context {
         void (*uion_command)(char* cmd);
+        char* (*uion_loadmsg)(char* uid, int maxcnt);
     } qofiaui_context ;
 
     extern qofiaui_context* uictx;

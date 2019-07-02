@@ -23,9 +23,10 @@ qt5_wrap_ui(uisrcs
 # scroll_widget.ui
   untitled.ui
   )
+#qt5_add_resources(uircs rcc.qrc)
 
 add_library(qofiaui SHARED qofiaui.cpp mainwin.cpp contact_item.cpp message_item.cpp
-  frontend.cpp ${uisrcs})
+  frontend.cpp ${uisrcs} ${uircs})
 target_link_libraries(qofiaui Qt5::Widgets)
 
 add_executable(demo demo.cpp)

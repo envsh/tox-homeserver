@@ -50,6 +50,7 @@ void qofiaui_main(qofiaui_context* ctx) {
     int argc = 1;
     char*argv[] = {(char*)"qofiaui",NULL};
     uictx->uion_command = ctx->uion_command;
+    uictx->uion_loadmsg = ctx->uion_loadmsg;
 
     qSetMessagePattern("%{file}(%{line}): %{message}");
     QApplication app(argc, argv);
