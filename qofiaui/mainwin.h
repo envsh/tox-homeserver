@@ -3,6 +3,13 @@
 
 #include "ui_untitled.h"
 
+class contentAreaState {
+ public:
+    bool isBottom;
+    int curpos;
+    int maxpos;
+};
+
 class MainWin : public QMainWindow {
     Q_OBJECT;
  public:
@@ -12,9 +19,12 @@ class MainWin : public QMainWindow {
     QStack<int> uistks;
     QString curuid;
     QVector<QWidget*> msgviews; // msg view cache
+    contentAreaState ccstate;
 
     void AddContactItem(QString uid, QString name, QString stmsg);
     void AddConferenceMessage(QString uid, QString msg);
+    void AddConferenceMessage1(QString uid, QString msg);
+    void AddConferenceMessage2(QString uid, QString msg);
 
 public slots:
     void qofiaui_cmdproc(QString cmdmsg);

@@ -4,6 +4,8 @@ ContactItem::ContactItem(QWidget* parent)
     : QWidget(parent) {
     uiw.setupUi(this);
 
+    uiw.label_4->clear();
+
     uiw.toolButton_2->installEventFilter(this);
     uiw.label_2->installEventFilter(this);
     uiw.LabelLastMsgTime->installEventFilter(this);

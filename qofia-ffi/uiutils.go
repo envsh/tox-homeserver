@@ -19,7 +19,7 @@ import (
 	"github.com/kitech/qt.go/qtrt"
 	"github.com/kitech/qt.go/qtwidgets"
 
-	"github.com/holys/initials-avatar"
+	avatar "github.com/holys/initials-avatar"
 	"github.com/issue9/identicon"
 )
 

@@ -26,10 +26,11 @@ void MainWin::qofiaui_cmdproc(QString cmdmsg) {
     qInfo()<<cmdmsg;
     QJsonParseError perr;
     QJsonDocument jdoc = QJsonDocument::fromJson(cmdmsg.toUtf8(), &perr);
-    qInfo()<<perr.errorString();
+    if (perr.error != QJsonParseError::NoError) {
+        qInfo()<<perr.errorString();
+    }
     QJsonObject jobj = jdoc.object();
     QString evtname = jobj.value("EventName").toString();
-    qInfo()<<evtname;
 
     auto jarr = jobj.value("Args").toArray();
     auto marr = jobj.value("Margs").toArray();
@@ -42,6 +43,8 @@ void MainWin::qofiaui_cmdproc(QString cmdmsg) {
         AddContactItem(jarr.at(1).toString(), jarr.at(2).toString(), jarr.at(3).toString());
     }else if (evtname == "ConferenceMessage") {
         AddConferenceMessage(marr.at(3).toString(), jarr.at(3).toString());
+    }else {
+        qInfo()<<"todo"<<evtname;
     }
 }
 

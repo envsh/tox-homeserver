@@ -131,6 +131,9 @@ func (this *GrpcService) PollCallback(req *thspbs.Event, stm thspbs.Toxhs_PollCa
 	nowt := time.Now()
 	conno := atomic.AddUint64(&grpcStreamConnNo, 1)
 	log.Println("New grpc stream poll connect.", len(appctx.rpcs.grpcConns), conno, req.DeviceUuid)
+	if req.DeviceUuid == "" {
+		log.Println("Invalid device", req.DeviceUuid)
+	}
 	appctx.rpcs.connsmu.Lock()
 	if oldconno, ok := appctx.rpcs.grpcUuids[req.DeviceUuid]; ok {
 		log.Println("already connected device:", req.DeviceUuid, oldconno)
@@ -151,6 +154,8 @@ func (this *GrpcService) PollCallback(req *thspbs.Event, stm thspbs.Toxhs_PollCa
 		delete(appctx.rpcs.grpcConns, stm)
 		if oldconno, ok := appctx.rpcs.grpcUuids[req.DeviceUuid]; ok && oldconno == conno {
 			delete(appctx.rpcs.grpcUuids, req.DeviceUuid)
+		} else {
+			log.Println("Not found device stream", req.DeviceUuid, oldconno, conno)
 		}
 		appctx.rpcs.connsmu.Unlock()
 	}()
@@ -184,8 +189,8 @@ func pubmsgall(ctx context.Context, evt *thspbs.Event) error {
 	var err error
 	err = pubmsg2ws(ctx, evt)
 	{
-		err := pubmsg2grpc(ctx, evt)
-		gopp.ErrPrint(err, ctx)
+		// err := pubmsg2grpc(ctx, evt)
+		// gopp.ErrPrint(err, ctx)
 	}
 	return err
 }

@@ -20,7 +20,7 @@ func dispatchEvent(evto *thspbs.Event) {
 	// listwp1 := Ui_MainWindow_Get_listWidget(uiw)
 	// listw1 := widgets.NewQListWidgetFromPointer(listwp1)
 
-	switch evto.Name {
+	switch evto.EventName {
 	case "SelfConnectionStatus": // {"Name":"SelfConnectionStatus","Args":["2"],"Margs":["CONNECTION_UDP"]}
 		status := gopp.MustUint32(evto.Args[0])
 		uictx.mw.setConnStatus(status > 0)
@@ -314,7 +314,7 @@ func dispatchEvent(evto *thspbs.Event) {
 		avm.NewSession(uargs.FriendPubkey, uargs.AudioEnabled == 1, uargs.VideoEnabled == 1,
 			onNewAudioFrame, onNewVideoFrame)
 	case "CallState":
-		log.Println(evto.Name, evto.Uargs.CallState, CallStateString(evto.Uargs.CallState))
+		log.Println(evto.EventName, evto.Uargs.CallState, CallStateString(evto.Uargs.CallState))
 		uargs := evto.Uargs
 		if uargs.CallState == 2 /**/ || uargs.CallState == 1 /*error*/ {
 			AVMan().RemoveSession(evto.Uargs.FriendPubkey, evto.Uargs.FriendName)
@@ -347,8 +347,8 @@ func dispatchEvent(evto *thspbs.Event) {
 		}
 		AVMan().PutAudioFrame(uargs.GroupIdentity, pcm)
 	default:
-		if !strings.HasSuffix(evto.Name, "Resp") &&
-			!strings.HasSuffix(evto.Name, "Reload") {
+		if !strings.HasSuffix(evto.EventName, "Resp") &&
+			!strings.HasSuffix(evto.EventName, "Reload") {
 			log.Printf("Unimpled: %+v\n", evto)
 		}
 	}
@@ -359,7 +359,7 @@ func dispatchEventResp(evto *thspbs.Event) {
 	// listwp1 := Ui_MainWindow_Get_listWidget(uiw)
 	// listw1 := widgets.NewQListWidgetFromPointer(listwp1)
 
-	switch evto.Name {
+	switch evto.EventName {
 	case "FriendAddResp":
 		fnum := gopp.MustUint32(evto.Args[0])
 		toxid := evto.Margs[0]
@@ -461,8 +461,8 @@ func dispatchEventResp(evto *thspbs.Event) {
 	case "AudioReceiveFrame": // do nothing
 	case "VideoReceiveFrame": // do nothing
 	default:
-		if strings.HasSuffix(evto.Name, "Resp") ||
-			strings.HasSuffix(evto.Name, "Reload") {
+		if strings.HasSuffix(evto.EventName, "Resp") ||
+			strings.HasSuffix(evto.EventName, "Reload") {
 			log.Printf("Unimpled: %+v\n", evto)
 		}
 	}
@@ -472,7 +472,7 @@ func dispatchEventResp(evto *thspbs.Event) {
 func dispatchOtherEvent(evto *thspbs.Event) {
 	log.Println(evto)
 
-	switch evto.Name {
+	switch evto.EventName {
 	case "IntentMessage":
 		mtype := evto.Args[0]
 		mcontent := evto.Args[1]

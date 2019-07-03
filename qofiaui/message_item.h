@@ -9,6 +9,8 @@ class MessageItem : public QWidget {
     MessageItem(QWidget* parent = nullptr);
 
     Ui::MessageItemView uiw;
+
+    void clear();
 };
 
 #endif /* MESSAGE_ITEM_H */

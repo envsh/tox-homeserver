@@ -1,5 +1,7 @@
+#include <QtWidgets>
 
 #include "qofiaui.h"
+#include "uiutils.h"
 
 #include "mainwin.h"
 #include "contact_item.h"
@@ -46,7 +48,7 @@ MainWin::MainWin(QWidget* parent)
     // 2000 67M?
     // 1000 66M?
     // 0 65M
-    for (int i = 0; i < 500; i ++) {
+    for (int i = 0; i < maxmsgcnt; i ++) {
         msgviews.append(new MessageItem());
         // msgviews.append(new QLabel());
         // msgviews.append(new QWidget());
@@ -59,6 +61,24 @@ MainWin::MainWin(QWidget* parent)
             this->switchStackUi(UIST_CONTACTUI);
         });
     connect(uiw.toolButton_33, &QToolButton::clicked, this, &MainWin::backStackUi);
+
+    ccstate.isBottom = true;
+    auto sa2vb = uiw.scrollArea_2->verticalScrollBar();
+    connect(sa2vb, &QScrollBar::rangeChanged,
+            [this,sa2vb](int min, int max) {
+                int curpos = sa2vb->value();
+                if (ccstate.isBottom && curpos < max) {
+                    sa2vb->setValue(max);
+                }
+                ccstate.maxpos = max;
+            });
+    connect(sa2vb, &QScrollBar::valueChanged,
+            [this](int value){
+                ccstate.curpos = value;
+                int maxval = ccstate.maxpos;
+                ccstate.isBottom = value >= maxval ? true : false;
+                ccstate.maxpos = value > maxval ? value : maxval;
+            });
 }
 
 void MainWin::AddContactItem(QString uid, QString name, QString stmsg) {
@@ -66,7 +86,9 @@ void MainWin::AddContactItem(QString uid, QString name, QString stmsg) {
     auto ctv = new ContactItem();
     ctv->uid = uid;
     ctv->uiw.label_2->setText(name);
-    ctv->uiw.label_3->setText(stmsg);
+    // SetQLabelElideText(ctv->uiw.label_2,name,"..",true);
+    // ctv->uiw.label_3->setText(stmsg);
+    SetQLabelElideText(ctv->uiw.label_3,stmsg,"..",true);
 
     connect(ctv, &ContactItem::clicked, this, &MainWin::ctitem_clicked, Qt::QueuedConnection);
     auto lo9 = uiw.verticalLayout_9;
@@ -74,6 +96,10 @@ void MainWin::AddContactItem(QString uid, QString name, QString stmsg) {
 }
 
 void MainWin::AddConferenceMessage(QString uid, QString msg) {
+    AddConferenceMessage1(uid,msg);
+    AddConferenceMessage2(uid,msg);
+}
+void MainWin::AddConferenceMessage1(QString uid, QString msg) {
     auto lo9 = uiw.verticalLayout_9;
     int cnt = lo9->count();
 
@@ -87,9 +113,40 @@ void MainWin::AddConferenceMessage(QString uid, QString msg) {
             lo9->removeWidget(w);
             lo9->insertWidget(0, w);
         }
-        w->uiw.label_4->setText(msg); // lastmsg
+        // w->uiw.label_4->setText(msg); // lastmsg
+        SetQLabelElideText(w->uiw.label_4,msg,"..",false);
         break;
     }
+    if (uid != curuid && uiw.stackedWidget->currentIndex() == UIST_MESSAGEUI) {
+        SetQLabelElideText(uiw.label_7,msg,"..",false);
+    }
+}
+// append to message list
+void MainWin::AddConferenceMessage2(QString uid, QString msg) {
+    if (uid != curuid) {
+        return;
+    }
+    auto vlo8 = uiw.verticalLayout_3;
+    int curcnt = vlo8->count();
+    MessageItem* msgv = nullptr;
+    if (curcnt >= msgviews.count()) {
+        qWarning()<<"too many msgs"<<curcnt;
+        // swap index 0 to newest
+        msgv = (MessageItem*)msgviews.takeAt(0);
+        msgv->clear();
+        vlo8->removeWidget(msgv);
+        msgviews.append(msgv);
+    }else {
+        msgv = (MessageItem*)msgviews.at(curcnt);
+    }
+
+    vlo8->addWidget(msgv);
+
+    msgv->uiw.label_5->setText(msg);
+    // msgv->uiw.LabelUserName4MessageItem->setText(msgo.at(1).toString());
+    // msgv->uiw.LabelMsgTime->setText(msgo.at(2).toString());
+
+    uiw.LabelMsgCount2->setText(QString::number(curcnt+1));
 }
 
 void MainWin:: switchStackUi(int idx) {
@@ -117,6 +174,7 @@ void MainWin::ctitem_clicked(QString uid, QWidget* that) {
     auto cti = (ContactItem*)that;
 
     switchStackUi(UIST_MESSAGEUI);
+    curuid = uid;
 
     // switched, loading new info
     uiw.label_5->setText(cti->uiw.label_2->text());
@@ -129,8 +187,11 @@ void MainWin::ctitem_clicked(QString uid, QWidget* that) {
     qInfo() << scc.length() << scc.left(32);
 
     auto vlo8 = uiw.verticalLayout_3;
-    for (int i = 0; i < vlo8->count(); i++) {
-        vlo8->removeWidget(msgviews.at(i));
+    int curcnt = vlo8->count();
+    for (int i = 0; i < curcnt; i++) {
+        auto msgv = (MessageItem*)msgviews.at(i);
+        msgv->clear();
+        vlo8->removeWidget(msgv);
     }
 
     QJsonDocument jdoc = QJsonDocument::fromJson(scc.toUtf8());
@@ -138,11 +199,13 @@ void MainWin::ctitem_clicked(QString uid, QWidget* that) {
     for (int i = 0; i < msgos.count() && i < maxmsgcnt; i++) {
         auto msgo = msgos.at(i).toArray();
         auto msgv = (MessageItem*)msgviews.at(i);
+        vlo8->addWidget(msgv);
+
         msgv->uiw.label_5->setText(msgo.at(0).toString());
         msgv->uiw.LabelUserName4MessageItem->setText(msgo.at(1).toString());
         msgv->uiw.LabelMsgTime->setText(msgo.at(2).toString());
-        vlo8->addWidget(msgv);
     }
+    uiw.LabelMsgCount2->setText(QString::number(msgos.count()));
 }
 
 

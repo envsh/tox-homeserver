@@ -63,7 +63,7 @@
          <string>...</string>
         </property>
         <property name="icon">
-         <iconset resource="rcc.qrc">
+         <iconset>
           <normaloff>:/icons/barbuttonicon_back_gray64.png</normaloff>:/icons/barbuttonicon_back_gray64.png</iconset>
         </property>
         <property name="autoRaise">
@@ -222,7 +222,7 @@
          <string>...</string>
         </property>
         <property name="icon">
-         <iconset resource="rcc.qrc">
+         <iconset>
           <normaloff>:/icons/barbuttonicon_forward_gray64.png</normaloff>:/icons/barbuttonicon_forward_gray64.png</iconset>
         </property>
         <property name="autoRaise">
@@ -806,7 +806,7 @@
               <string>...</string>
              </property>
              <property name="icon">
-              <iconset resource="rcc.qrc">
+              <iconset>
                <normaloff>:/icons/icon_avatar_40.png</normaloff>:/icons/icon_avatar_40.png</iconset>
              </property>
              <property name="iconSize">
@@ -895,7 +895,7 @@
               <string>...</string>
              </property>
              <property name="icon">
-              <iconset resource="rcc.qrc">
+              <iconset>
                <normaloff>:/icons/online_30.png</normaloff>:/icons/online_30.png</iconset>
              </property>
              <property name="toolButtonStyle">
@@ -918,7 +918,7 @@
               <string>...</string>
              </property>
              <property name="icon">
-              <iconset resource="rcc.qrc">
+              <iconset>
                <normaloff>:/icons/power-button-off.png</normaloff>:/icons/power-button-off.png</iconset>
              </property>
              <property name="iconSize">
@@ -987,7 +987,7 @@
              <string>...</string>
             </property>
             <property name="icon">
-             <iconset resource="rcc.qrc">
+             <iconset>
               <normaloff>:/icons/remove-symbol_gray64.png</normaloff>:/icons/remove-symbol_gray64.png</iconset>
             </property>
             <property name="autoRaise">
@@ -1022,7 +1022,7 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>98</width>
+             <width>364</width>
              <height>16</height>
             </rect>
            </property>
@@ -1063,7 +1063,7 @@
              <string>...</string>
             </property>
             <property name="icon">
-             <iconset resource="rcc.qrc">
+             <iconset>
               <normaloff>:/icons/add-square-button-gray.png</normaloff>:/icons/add-square-button-gray.png</iconset>
             </property>
             <property name="iconSize">
@@ -1083,7 +1083,7 @@
              <string>...</string>
             </property>
             <property name="icon">
-             <iconset resource="rcc.qrc">
+             <iconset>
               <normaloff>:/icons/groupgray.png</normaloff>:/icons/groupgray.png</iconset>
             </property>
             <property name="iconSize">
@@ -1103,7 +1103,7 @@
              <string>...</string>
             </property>
             <property name="icon">
-             <iconset resource="rcc.qrc">
+             <iconset>
               <normaloff>:/icons/transfer_gray64.png</normaloff>:/icons/transfer_gray64.png</iconset>
             </property>
             <property name="iconSize">
@@ -1123,7 +1123,7 @@
              <string>...</string>
             </property>
             <property name="icon">
-             <iconset resource="rcc.qrc">
+             <iconset>
               <normaloff>:/icons/settings_gray64.png</normaloff>:/icons/settings_gray64.png</iconset>
             </property>
             <property name="iconSize">
@@ -1161,7 +1161,7 @@
               <string/>
              </property>
              <property name="pixmap">
-              <pixmap resource="rcc.qrc">:/icons/icon_avatar_40.png</pixmap>
+              <pixmap>:/icons/icon_avatar_40.png</pixmap>
              </property>
             </widget>
            </item>
@@ -1203,18 +1203,21 @@
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_4">
                <property name="spacing">
-                <number>0</number>
+                <number>3</number>
                </property>
                <item>
                 <widget class="QLabel" name="label_6">
                  <property name="sizePolicy">
-                  <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                    <horstretch>0</horstretch>
                    <verstretch>0</verstretch>
                   </sizepolicy>
                  </property>
                  <property name="text">
-                  <string>0 people</string>
+                  <string>0 user</string>
+                 </property>
+                 <property name="margin">
+                  <number>0</number>
                  </property>
                  <property name="textInteractionFlags">
                   <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
@@ -1261,7 +1264,7 @@
                 <string>...</string>
                </property>
                <property name="icon">
-                <iconset resource="rcc.qrc">
+                <iconset>
                  <normaloff>:/icons/phone_mic_gray64.png</normaloff>:/icons/phone_mic_gray64.png</iconset>
                </property>
                <property name="iconSize">
@@ -1290,7 +1293,7 @@
                 <string>...</string>
                </property>
                <property name="icon">
-                <iconset resource="rcc.qrc">
+                <iconset>
                  <normaloff>:/icons/speaker_volume_gray64.png</normaloff>:/icons/speaker_volume_gray64.png</iconset>
                </property>
                <property name="iconSize">
@@ -1321,7 +1324,7 @@
               <string>...</string>
              </property>
              <property name="icon">
-              <iconset resource="rcc.qrc">
+              <iconset>
                <normaloff>:/icons/phone_call_gray64.png</normaloff>:/icons/phone_call_gray64.png</iconset>
              </property>
              <property name="iconSize">
@@ -1350,7 +1353,7 @@
               <string>...</string>
              </property>
              <property name="icon">
-              <iconset resource="rcc.qrc">
+              <iconset>
                <normaloff>:/icons/video_recorder_gray64.png</normaloff>:/icons/video_recorder_gray64.png</iconset>
              </property>
              <property name="iconSize">
@@ -1370,7 +1373,7 @@
               <string>...</string>
              </property>
              <property name="icon">
-              <iconset resource="rcc.qrc">
+              <iconset>
                <normaloff>:/icons/vertical-ellipsis_gray32.png</normaloff>:/icons/vertical-ellipsis_gray32.png</iconset>
              </property>
              <property name="iconSize">
@@ -1557,8 +1560,8 @@
            <property name="geometry">
             <rect>
              <x>0</x>
-             <y>12</y>
-             <width>98</width>
+             <y>408</y>
+             <width>346</width>
              <height>16</height>
             </rect>
            </property>
@@ -1602,7 +1605,7 @@
              <string>...</string>
             </property>
             <property name="icon">
-             <iconset resource="rcc.qrc">
+             <iconset>
               <normaloff>:/icons/smile_gray64.png</normaloff>:/icons/smile_gray64.png</iconset>
             </property>
             <property name="iconSize">
@@ -1625,7 +1628,7 @@
              <string>&amp;Send</string>
             </property>
             <property name="icon">
-             <iconset resource="rcc.qrc">
+             <iconset>
               <normaloff>:/icons/cursor_gray64.png</normaloff>:/icons/cursor_gray64.png</iconset>
             </property>
             <property name="iconSize">
@@ -1682,7 +1685,7 @@
              <string>...</string>
             </property>
             <property name="icon">
-             <iconset resource="rcc.qrc">
+             <iconset>
               <normaloff>:/icons/snapshot@2x.png</normaloff>:/icons/snapshot@2x.png</iconset>
             </property>
             <property name="iconSize">
@@ -1708,7 +1711,7 @@
              <string>...</string>
             </property>
             <property name="icon">
-             <iconset resource="rcc.qrc">
+             <iconset>
               <normaloff>:/icons/paper-clip-outline_gray64.png</normaloff>:/icons/paper-clip-outline_gray64.png</iconset>
             </property>
             <property name="iconSize">
