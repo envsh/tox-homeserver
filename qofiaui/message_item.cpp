@@ -8,7 +8,7 @@ MessageItem::MessageItem(QWidget* parent)
 }
 
 MessageItem::~MessageItem() {
-    qInfo()<<this<<"dtor";
+    // qInfo()<<this<<"dtor";
 }
 
 void MessageItem::clear() {

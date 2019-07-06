@@ -30,6 +30,7 @@ void ContactForm::AddContactItem(QString uid, QString name, QString stmsg) {
     SetQLabelElideText(ctv->uiw.label_3,stmsg,"..",true);
 
     connect(ctv, &ContactItem::clicked, this, &ContactForm::clicked, Qt::QueuedConnection);
+    connect(ctv, &ContactItem::reqmenu, this, &ContactForm::showmenu);
     auto lo9 = uiw.verticalLayout_9;
     lo9->insertWidget(0, ctv);
 }
@@ -55,4 +56,8 @@ void ContactForm::AddConferenceMessage1(QString uid, QString msg) {
         SetQLabelElideText(w->uiw.label_4,msg,"..",false);
         break;
     }
+}
+
+void ContactForm::showmenu(QString uid, QWidget* that, const QPoint &pos) {
+    qInfo()<<uid<<that<<pos;
 }

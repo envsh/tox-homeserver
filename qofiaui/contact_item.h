@@ -17,6 +17,7 @@ class ContactItem : public QWidget {
 
  signals:
     void clicked(QString uid, QWidget* that);
+    void reqmenu(QString uid, QWidget* that, const QPoint &pos);
 
  protected:
     bool event(QEvent *event);

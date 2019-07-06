@@ -1,3 +1,5 @@
+#include <QtGui>
+
 #include "contact_item.h"
 
 ContactItem::ContactItem(QWidget* parent)
@@ -20,11 +22,27 @@ bool ContactItem::event(QEvent *event) {
 
 bool ContactItem::eventFilter(QObject *object, QEvent *event) {
     if (event->type() == QEvent::MouseButtonPress) {
-        prtime = QDateTime::currentDateTime();
+        auto mevt = (QMouseEvent*)event;
+        if (mevt->buttons() & Qt::LeftButton) {
+            prtime = QDateTime::currentDateTime();
+        }else if (mevt->buttons() & Qt::RightButton) {
+            prtime = QDateTime::currentDateTime();
+        }else {
+            qInfo()<<"what"<<mevt->buttons();
+        }
     }else if (event->type() == QEvent::MouseButtonRelease) {
+        auto mevt = (QMouseEvent*)event;
         auto nowt = QDateTime::currentDateTime();
-        if (prtime.msecsTo(nowt) < 300) {
-            emit clicked(uid, this);
+        if (mevt->button() == Qt::LeftButton) {
+            if (prtime.msecsTo(nowt) < 300) {
+                emit clicked(uid, this);
+            }
+        }else if (mevt->button() == Qt::RightButton) {
+            if (prtime.msecsTo(nowt) < 300) {
+                emit reqmenu(uid, this, mevt->pos());
+            }
+        }else{
+            qInfo()<<"what"<<mevt->buttons()<<mevt->button();
         }
     }
     return false;

@@ -30,7 +30,10 @@ chatform.ui
 memberform.ui
 settingform.ui
 )
-#qt5_add_resources(uircs rcc.qrc)
+qt5_add_resources(uircs
+  rcc.qrc
+  # thefont.qrc
+  )
 set(cppsrcs
   qofiaui.cpp mainwin.cpp contact_item.cpp message_item.cpp
   frontend.cpp uiutils.cpp event.cpp

@@ -1,0 +1,6 @@
+<RCC>
+  <qresource>
+    <file>resource/emojione-android.ttf</file>
+    <file>resource/fzlt.ttf</file>
+  </qresource>
+</RCC>

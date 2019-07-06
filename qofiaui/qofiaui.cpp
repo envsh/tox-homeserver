@@ -91,7 +91,7 @@ void MainWin::qofiaui_cmdproc(QString cmdmsg) {
     }
 }
 
-void qofiaui_dmcommand(char* cmdmsgc) {
+void qofiaui_daemoncmd(char* cmdmsgc) {
     QString cmdmsg = QString::fromUtf8(cmdmsgc);
     // qInfo()<<__FILE__<<":"<<__LINE__<<": "<<cmdmsg;
     // emit gmw->cmdhandle(cmdmsg);

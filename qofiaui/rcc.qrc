@@ -1,6 +1,5 @@
 <RCC>
   <qresource>
-    <file>resource/emojione-android.ttf</file>
     <file>icons/emoji-categories/activity.png</file>
     <file>icons/emoji-categories/activity@2x.png</file>
     <file>icons/emoji-categories/flags.png</file>
@@ -84,6 +83,5 @@
     <file>icons/volum_40.png</file>
     <file>icons/MessageListSending@2x.png</file>
     <file>icons/filehelper.png</file>
-    <file>resource/fzlt.ttf</file>
   </qresource>
 </RCC>

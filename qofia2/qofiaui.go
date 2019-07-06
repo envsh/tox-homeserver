@@ -7,9 +7,11 @@ package main
 #include <stdlib.h>
 
 // #include "../qofiaui/qofiaui.h"
+// called by go
 extern void qofiaui_main(void* ctx);
-extern void qofiaui_dmcommand(char*cmdmsg);
+extern void qofiaui_daemoncmd(char*cmdmsg);
 
+// called by cpp
 extern void onui_command(char* cmd);
 extern char* onui_loadmsg(char* uid, int maxcnt);
 */
@@ -17,7 +19,9 @@ import "C"
 import (
 	"encoding/json"
 	"gopp"
+	"gopp/cgopp"
 	"log"
+	"math/rand"
 	"strings"
 	"unsafe"
 )
@@ -67,9 +71,9 @@ func onui_loadmsg_go(uid string, maxcnt int) string {
 		imsgo = append(imsgo, msgo.TimeUi)
 		imsgos = append(imsgos, imsgo)
 	}
-	for len(imsgos) < maxcnt {
-		imsgos = append(imsgos, testmsg())
-	}
+	// for len(imsgos) < maxcnt {
+	// 	imsgos = append(imsgos, testmsg())
+	// }
 	bcc, err := json.Marshal(imsgos)
 	gopp.ErrPrint(err, uid, maxcnt)
 	return string(bcc)
@@ -84,7 +88,12 @@ func testmsg() []string {
 
 func dispatchEvent2c(evtmsg string) {
 	evtmsgc := C.CString(evtmsg)
-	defer C.free(unsafe.Pointer(evtmsgc))
+	defer func() {
+		C.free(unsafe.Pointer(evtmsgc))
+		if rand.Uint32()%5 == 0 {
+			cgopp.MallocTrim()
+		}
+	}()
 
-	C.qofiaui_dmcommand(evtmsgc)
+	C.qofiaui_daemoncmd(evtmsgc)
 }

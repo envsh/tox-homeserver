@@ -15,7 +15,6 @@ void ChatForm::dtor() {
     for (int i = 0; i < curcnt; i++) {
         auto item = vlo8->takeAt(0);
         auto w = item->widget();
-        qInfo()<<"delete"<<i<<item << w << vlo8->count();
         wdelete(w);
         delete item;
     }
@@ -39,6 +38,7 @@ void ChatForm::AddConferenceMessage2(QString uid, QString msg) {
     if (curcnt >= maxmsgcnt) {
         qWarning()<<"too many msgs"<<curcnt;
         auto item = vlo8->takeAt(0);
+        wdelete(item->widget());
         delete item;
     }
     MessageItem* msgv = new MessageItem();
@@ -67,8 +67,7 @@ void ChatForm::setandload(QString uid, QString ctname, QString ctstmsg) {
 
     auto vlo8 = uiw.verticalLayout_3;
     int curcnt = vlo8->count();
-    for (int i = 0; i < curcnt; i++) {
-    }
+    for (int i = 0; i < curcnt; i++) { }
 
     QJsonDocument jdoc = QJsonDocument::fromJson(scc.toUtf8());
     auto msgos = jdoc.array();

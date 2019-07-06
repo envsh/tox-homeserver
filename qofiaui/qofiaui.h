@@ -15,7 +15,7 @@ extern "C" {
     extern qofiaui_context* uictx;
 
     void qofiaui_main(qofiaui_context* ctx);
-    void qofiaui_dmcommand(char* cmdmsg);
+    void qofiaui_daemoncmd(char* cmdmsg);
 
     // void uion_login();
 #ifdef __cplusplus

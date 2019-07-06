@@ -96,6 +96,7 @@ void MainForm::switchchat(QString uid, QWidget* that) {
 
     auto msgform = (ChatForm*)getcurform();
     msgform->setandload(uid, ctname, ctstmsg);
+    malloc_trim(0);
 }
 
 void MainForm::onback() {
@@ -134,4 +135,5 @@ void MainForm::qofiaui_cmdproc(QString cmdmsg) {
     }else {
         qInfo()<<"todo"<<evtname;
     }
+    malloc_trim(0);
 }

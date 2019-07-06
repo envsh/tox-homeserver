@@ -19,7 +19,10 @@ class ContactForm : public QWidget {
     void AddConferenceMessage(QString uid, QString msg);
     void AddConferenceMessage1(QString uid, QString msg);
 
- signals:
+public slots:
+    void showmenu(QString uid, QWidget* that, const QPoint &pos);
+
+signals:
     void clicked(QString uid, QWidget* that);
 };
 
