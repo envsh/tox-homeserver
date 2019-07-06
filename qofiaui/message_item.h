@@ -7,7 +7,7 @@ class MessageItem : public QWidget {
     Q_OBJECT;
  public:
     MessageItem(QWidget* parent = nullptr);
-
+    virtual ~MessageItem();
     Ui::MessageItemView uiw;
 
     void clear();

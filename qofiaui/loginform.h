@@ -11,6 +11,8 @@ class LoginForm: public QWidget
  public:
     LoginForm(QWidget* parent = nullptr);
     Ui::LoginForm uiw;
+
+    void prepui();
 };
 
 

@@ -1,6 +1,7 @@
 #ifndef QOFIAUI_H
 #define QOFIAUI_H
 
+#include <malloc.h> // for malloc_trim
 #include <QtCore>
 
 #ifdef __cplusplus
@@ -23,6 +24,7 @@ extern "C" {
 
 void uion_command(QString cmd);
 
+const int maxmsgcnt = 500; // 最多显示消息个数，每个联系人
 enum {
       UIST_QMLMCTRL = 0                   ,
       UIST_QMLORIGIN                      ,

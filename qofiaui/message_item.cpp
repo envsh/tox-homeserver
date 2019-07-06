@@ -1,8 +1,14 @@
+#include <QtCore>
+
 #include "message_item.h"
 
 MessageItem::MessageItem(QWidget* parent)
     : QWidget(parent) {
     uiw.setupUi(this);
+}
+
+MessageItem::~MessageItem() {
+    qInfo()<<this<<"dtor";
 }
 
 void MessageItem::clear() {

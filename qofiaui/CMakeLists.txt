@@ -26,6 +26,7 @@ untitled.ui
 mainform.ui
 loginform.ui
 contactform.ui
+chatform.ui
 memberform.ui
 settingform.ui
 )

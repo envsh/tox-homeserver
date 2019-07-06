@@ -67,9 +67,19 @@ func onui_loadmsg_go(uid string, maxcnt int) string {
 		imsgo = append(imsgo, msgo.TimeUi)
 		imsgos = append(imsgos, imsgo)
 	}
+	for len(imsgos) < maxcnt {
+		imsgos = append(imsgos, testmsg())
+	}
 	bcc, err := json.Marshal(imsgos)
 	gopp.ErrPrint(err, uid, maxcnt)
 	return string(bcc)
+}
+func testmsg() []string {
+	var imsgo []string
+	imsgo = append(imsgo, "hehe 消息oiefjaweiofwefwefifae")
+	imsgo = append(imsgo, "hehe sender xyz")
+	imsgo = append(imsgo, "ab:ef:egg.iwafwef")
+	return imsgo
 }
 
 func dispatchEvent2c(evtmsg string) {

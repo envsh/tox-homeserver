@@ -8,8 +8,6 @@
 #include "message_item.h"
 
 
-const int maxmsgcnt = 500; // 最多显示消息个数，每个联系人
-
 MainWin::MainWin(QWidget* parent)
     : QMainWindow(parent) {
     uiw.setupUi(this);

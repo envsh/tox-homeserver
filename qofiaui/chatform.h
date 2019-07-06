@@ -10,6 +10,16 @@ class ChatForm  : public QWidget {
  public:
     ChatForm(QWidget*parent = nullptr);
     Ui::ChatForm uiw;
+    QString curuid;
+
+    virtual ~ChatForm();
+    void dtor();
+
+    void AddConferenceMessage(QString uid, QString msg);
+    void AddConferenceMessage1(QString uid, QString msg);
+    void AddConferenceMessage2(QString uid, QString msg);
+
+    void setandload(QString uid, QString ctname, QString ctstmsg);
 };
 
 

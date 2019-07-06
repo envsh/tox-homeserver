@@ -23,7 +23,9 @@
 qofiaui_context uictxm = {0};
 qofiaui_context* uictx = &uictxm;
 MainWin* gmw = 0;
+MainForm* gmw2 = 0;
 
+#include <malloc.h>
 
 void qofiaui_main(qofiaui_context* ctx) {
     int argc = 1;
@@ -31,19 +33,24 @@ void qofiaui_main(qofiaui_context* ctx) {
     uictx->uion_command = ctx->uion_command;
     uictx->uion_loadmsg = ctx->uion_loadmsg;
 
+    int rv = mallopt(M_TRIM_THRESHOLD, 16000);
+    rv = mallopt(M_MMAP_THRESHOLD, 16000);
     qSetMessagePattern("%{file}(%{line}): %{message}");
     QApplication app(argc, argv);
 
     int uiflag = 1;
     if (uiflag == 0) {
-        auto* btn = new QPushButton();
+        auto btn = new QPushButton();
         btn->show();
     }else if (uiflag == 1) {
-        auto* mw = new MainForm();
+        auto mw = new MainForm();
+        gmw2 = mw;
+        QObject::connect(mw, &MainForm::cmdhandle, mw,
+                         &MainForm::qofiaui_cmdproc, Qt::QueuedConnection);
         mw->show();
         mw->setform(UIST_LOGINUI);
     }else if (uiflag == 2){
-        auto* mw = new MainWin();
+        auto mw = new MainWin();
         gmw = mw;
         QObject::connect(mw, &MainWin::cmdhandle, mw,
                          &MainWin::qofiaui_cmdproc, Qt::QueuedConnection);
@@ -87,5 +94,6 @@ void MainWin::qofiaui_cmdproc(QString cmdmsg) {
 void qofiaui_dmcommand(char* cmdmsgc) {
     QString cmdmsg = QString::fromUtf8(cmdmsgc);
     // qInfo()<<__FILE__<<":"<<__LINE__<<": "<<cmdmsg;
-    emit gmw->cmdhandle(cmdmsg);
+    // emit gmw->cmdhandle(cmdmsg);
+    emit gmw2->cmdhandle(cmdmsg);
 }
