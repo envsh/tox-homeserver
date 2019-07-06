@@ -2,6 +2,7 @@ package main
 
 /*
 #cgo LDFLAGS: -L ../qofiaui -lqofiaui
+// -lQt5Widgets -lQt5Gui -lQt5Core -lstdc++
 
 #include <stdlib.h>
 

@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainForm</class>
+ <widget class="QWidget" name="MainForm">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>364</width>
+    <height>595</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_7">
+     <property name="spacing">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="QToolButton" name="toolButton_33">
+       <property name="statusTip">
+        <string>Back by logic order.(Android Back)</string>
+       </property>
+       <property name="text">
+        <string>◁ Back</string>
+       </property>
+       <property name="autoRaise">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="toolButton_11">
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
+       </property>
+       <property name="statusTip">
+        <string>Back by fixed order.</string>
+       </property>
+       <property name="text">
+        <string>...</string>
+       </property>
+       <property name="icon">
+        <iconset resource="rcc.qrc">
+         <normaloff>:/icons/barbuttonicon_back_gray64.png</normaloff>:/icons/barbuttonicon_back_gray64.png</iconset>
+       </property>
+       <property name="autoRaise">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>3</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>curwin: </string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+       <property name="textInteractionFlags">
+        <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="comboBox">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
+       </property>
+       <property name="maxVisibleItems">
+        <number>12</number>
+       </property>
+       <property name="sizeAdjustPolicy">
+        <enum>QComboBox::AdjustToContents</enum>
+       </property>
+       <property name="frame">
+        <bool>false</bool>
+       </property>
+       <item>
+        <property name="text">
+         <string>1 qmlmctrl</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>2 qmlorgin</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>3 settings</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>4 loginui</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>5 contactui</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>6 messageui</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>7 videoui</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>8 add group</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>9 add friend</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>10 invite friend</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>11 memberui</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>12 contactinfoui</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>13 testui</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>14 logui</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>15 aboutui</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="toolButton_19">
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
+       </property>
+       <property name="toolTip">
+        <string>Tools menu</string>
+       </property>
+       <property name="text">
+        <string> &amp;Tool </string>
+       </property>
+       <property name="autoRaise">
+        <bool>true</bool>
+       </property>
+       <property name="arrowType">
+        <enum>Qt::NoArrow</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="toolButton_12">
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
+       </property>
+       <property name="text">
+        <string>...</string>
+       </property>
+       <property name="icon">
+        <iconset resource="rcc.qrc">
+         <normaloff>:/icons/barbuttonicon_forward_gray64.png</normaloff>:/icons/barbuttonicon_forward_gray64.png</iconset>
+       </property>
+       <property name="autoRaise">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources>
+  <include location="rcc.qrc"/>
+ </resources>
+ <connections/>
+</ui>

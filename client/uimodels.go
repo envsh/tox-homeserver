@@ -57,6 +57,7 @@ type DataModel struct {
 	repainter func()
 }
 
+// 1M RAM
 func NewDataModel(maxcnt int, repainter func()) *DataModel {
 	this := &DataModel{}
 	this.maxcnt = gopp.IfElseInt(maxcnt == 0, 512, maxcnt)

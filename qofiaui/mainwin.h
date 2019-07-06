@@ -14,6 +14,7 @@ class MainWin : public QMainWindow {
     Q_OBJECT;
  public:
     MainWin (QWidget* parent=nullptr);
+    void prepui();
 
     Ui::MainWindow uiw;
     QStack<int> uistks;
@@ -21,6 +22,7 @@ class MainWin : public QMainWindow {
     QVector<QWidget*> msgviews; // msg view cache
     contentAreaState ccstate;
 
+    void SetSelfInfo(QString name, QString stmsg);
     void AddContactItem(QString uid, QString name, QString stmsg);
     void AddConferenceMessage(QString uid, QString msg);
     void AddConferenceMessage1(QString uid, QString msg);

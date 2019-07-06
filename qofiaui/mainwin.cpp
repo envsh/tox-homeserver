@@ -7,24 +7,6 @@
 #include "contact_item.h"
 #include "message_item.h"
 
-enum {
-      UIST_QMLMCTRL = 0                   ,
-      UIST_QMLORIGIN                      ,
-      UIST_SETTINGS                       ,
-      UIST_LOGINUI                        ,
-      UIST_CONTACTUI                      ,
-      UIST_MESSAGEUI                      ,
-      UIST_VIDEOUI                        ,
-      // UIST_PICKCALLUI // TODO video 
-      UIST_ADD_GROUP                      ,
-      UIST_ADD_FRIEND                     ,
-      UIST_INVITE_FRIEND                  ,
-      UIST_MEMBERS                        ,
-      UIST_CONTACT_INFO                   ,
-      UIST_TESTUI                         ,
-      UIST_LOGUI                          ,
-      UIST_ABOUTUI                        ,
-};
 
 const int maxmsgcnt = 500; // 最多显示消息个数，每个联系人
 
@@ -49,7 +31,7 @@ MainWin::MainWin(QWidget* parent)
     // 1000 66M?
     // 0 65M
     for (int i = 0; i < maxmsgcnt; i ++) {
-        msgviews.append(new MessageItem());
+        // msgviews.append(new MessageItem()); // 12M
         // msgviews.append(new QLabel());
         // msgviews.append(new QWidget());
     }
@@ -79,6 +61,17 @@ MainWin::MainWin(QWidget* parent)
                 ccstate.isBottom = value >= maxval ? true : false;
                 ccstate.maxpos = value > maxval ? value : maxval;
             });
+    prepui();
+}
+void MainWin::prepui() {
+    uiw.lineEdit_5->setVisible(false);
+    uiw.lineEdit_6->setVisible(false);
+}
+
+void MainWin:: SetSelfInfo(QString name, QString stmsg) {
+    uiw.label_2->setText(name);
+    // uiw.label_3->setText(stmsg);
+    SetQLabelElideText(uiw.label_3,stmsg,"",false);
 }
 
 void MainWin::AddContactItem(QString uid, QString name, QString stmsg) {

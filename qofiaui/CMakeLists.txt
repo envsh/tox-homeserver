@@ -21,12 +21,22 @@ qt5_wrap_ui(uisrcs
   emoji_panel.ui
   message_item_view.ui
 # scroll_widget.ui
-  untitled.ui
-  )
+untitled.ui
+# seperated uis
+mainform.ui
+loginform.ui
+contactform.ui
+memberform.ui
+settingform.ui
+)
 #qt5_add_resources(uircs rcc.qrc)
-
-add_library(qofiaui SHARED qofiaui.cpp mainwin.cpp contact_item.cpp message_item.cpp
-  frontend.cpp uiutils.cpp ${uisrcs} ${uircs})
+set(cppsrcs
+  qofiaui.cpp mainwin.cpp contact_item.cpp message_item.cpp
+  frontend.cpp uiutils.cpp event.cpp
+  mainform.cpp settingform.cpp loginform.cpp
+  contactform.cpp chatform.cpp memberform.cpp
+  )
+add_library(qofiaui SHARED ${cppsrcs} ${uisrcs} ${uircs})
 target_link_libraries(qofiaui Qt5::Widgets)
 
 add_executable(demo demo.cpp)

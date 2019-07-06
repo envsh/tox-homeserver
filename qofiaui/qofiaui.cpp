@@ -12,41 +12,17 @@
 #include <QtWidgets>
 #include <QDebug>
 
+#include "mainform.h"
 #include "mainwin.h"
 #include "message_item.h"
 #include "contact_item.h"
 #include "qofiaui.h"
+#include "event.h"
 
 // extern "C"
 qofiaui_context uictxm = {0};
 qofiaui_context* uictx = &uictxm;
 MainWin* gmw = 0;
-
-void MainWin::qofiaui_cmdproc(QString cmdmsg) {
-    qInfo()<<cmdmsg;
-    QJsonParseError perr;
-    QJsonDocument jdoc = QJsonDocument::fromJson(cmdmsg.toUtf8(), &perr);
-    if (perr.error != QJsonParseError::NoError) {
-        qInfo()<<perr.errorString();
-    }
-    QJsonObject jobj = jdoc.object();
-    QString evtname = jobj.value("EventName").toString();
-
-    auto jarr = jobj.value("Args").toArray();
-    auto marr = jobj.value("Margs").toArray();
-    if (evtname == "SelfInfo") {
-        uiw.label_2->setText(jarr.at(1).toString());
-        uiw.label_3->setText(jarr.at(2).toString().left(30));
-    }else if (evtname == "AddFriendItem") {
-        AddContactItem(jarr.at(1).toString(), jarr.at(2).toString(), jarr.at(3).toString());
-    }else if (evtname == "AddGroupItem") {
-        AddContactItem(jarr.at(1).toString(), jarr.at(2).toString(), jarr.at(3).toString());
-    }else if (evtname == "ConferenceMessage") {
-        AddConferenceMessage(marr.at(3).toString(), jarr.at(3).toString());
-    }else {
-        qInfo()<<"todo"<<evtname;
-    }
-}
 
 
 void qofiaui_main(qofiaui_context* ctx) {
@@ -58,11 +34,21 @@ void qofiaui_main(qofiaui_context* ctx) {
     qSetMessagePattern("%{file}(%{line}): %{message}");
     QApplication app(argc, argv);
 
-    auto* mw = new MainWin();
-    gmw = mw;
-    QObject::connect(mw, &MainWin::cmdhandle, mw,
-                     &MainWin::qofiaui_cmdproc, Qt::QueuedConnection);
-    mw->show();
+    int uiflag = 1;
+    if (uiflag == 0) {
+        auto* btn = new QPushButton();
+        btn->show();
+    }else if (uiflag == 1) {
+        auto* mw = new MainForm();
+        mw->show();
+        mw->setform(UIST_LOGINUI);
+    }else if (uiflag == 2){
+        auto* mw = new MainWin();
+        gmw = mw;
+        QObject::connect(mw, &MainWin::cmdhandle, mw,
+                         &MainWin::qofiaui_cmdproc, Qt::QueuedConnection);
+        mw->show();
+    }
 
     app.exec();
 }
@@ -71,6 +57,32 @@ void uion_command(QString cmd) {
     uictx->uion_command(cmd.toUtf8().data());
 }
 
+
+void MainWin::qofiaui_cmdproc(QString cmdmsg) {
+    qInfo()<<cmdmsg;
+    QJsonParseError perr;
+    QJsonDocument jdoc = QJsonDocument::fromJson(cmdmsg.toUtf8(), &perr);
+    if (perr.error != QJsonParseError::NoError) {
+        qInfo()<<perr.errorString();
+    }
+    QJsonObject jobj = jdoc.object();
+    QString evtname = jobj.value("EventName").toString();
+    Event evto = Event::fromJson(jdoc);
+
+    auto jarr = jobj.value("Args").toArray();
+    auto marr = jobj.value("Margs").toArray();
+    if (evtname == "SelfInfo") {
+        SetSelfInfo(jarr.at(1).toString(), jarr.at(2).toString());
+    }else if (evtname == "AddFriendItem") {
+        AddContactItem(jarr.at(1).toString(), jarr.at(2).toString(), jarr.at(3).toString());
+    }else if (evtname == "AddGroupItem") {
+        AddContactItem(jarr.at(1).toString(), jarr.at(2).toString(), jarr.at(3).toString());
+    }else if (evtname == "ConferenceMessage") {
+        AddConferenceMessage(marr.at(3).toString(), jarr.at(3).toString());
+    }else {
+        qInfo()<<"todo"<<evtname;
+    }
+}
 
 void qofiaui_dmcommand(char* cmdmsgc) {
     QString cmdmsg = QString::fromUtf8(cmdmsgc);

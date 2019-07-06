@@ -63,7 +63,7 @@
          <string>...</string>
         </property>
         <property name="icon">
-         <iconset>
+         <iconset resource="rcc.qrc">
           <normaloff>:/icons/barbuttonicon_back_gray64.png</normaloff>:/icons/barbuttonicon_back_gray64.png</iconset>
         </property>
         <property name="autoRaise">
@@ -222,7 +222,7 @@
          <string>...</string>
         </property>
         <property name="icon">
-         <iconset>
+         <iconset resource="rcc.qrc">
           <normaloff>:/icons/barbuttonicon_forward_gray64.png</normaloff>:/icons/barbuttonicon_forward_gray64.png</iconset>
         </property>
         <property name="autoRaise">
@@ -304,6 +304,32 @@
            <property name="spacing">
             <number>12</number>
            </property>
+           <item row="2" column="0">
+            <widget class="QLabel" name="label_10">
+             <property name="text">
+              <string>Use HS</string>
+             </property>
+             <property name="textInteractionFlags">
+              <set>Qt::TextBrowserInteraction</set>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_8">
+             <property name="text">
+              <string>Theme</string>
+             </property>
+             <property name="textInteractionFlags">
+              <set>Qt::TextBrowserInteraction</set>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="1">
+            <widget class="QFontComboBox" name="fontComboBox"/>
+           </item>
+           <item row="5" column="1">
+            <widget class="QSpinBox" name="spinBox"/>
+           </item>
            <item row="2" column="1">
             <widget class="QCheckBox" name="checkBox_2">
              <property name="text">
@@ -311,56 +337,6 @@
              </property>
              <property name="checked">
               <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="6" column="1">
-            <widget class="QCheckBox" name="checkBox">
-             <property name="text">
-              <string/>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="1">
-            <widget class="QCheckBox" name="checkBox_3">
-             <property name="text">
-              <string/>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="0">
-            <widget class="QLabel" name="label_49">
-             <property name="text">
-              <string>Font Name</string>
-             </property>
-             <property name="textInteractionFlags">
-              <set>Qt::TextBrowserInteraction</set>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="label_9">
-             <property name="text">
-              <string>ToxHS IP:</string>
-             </property>
-             <property name="textInteractionFlags">
-              <set>Qt::TextBrowserInteraction</set>
-             </property>
-            </widget>
-           </item>
-           <item row="6" column="0">
-            <widget class="QLabel" name="label_13">
-             <property name="text">
-              <string>PlaceHolder...</string>
-             </property>
-             <property name="textInteractionFlags">
-              <set>Qt::TextBrowserInteraction</set>
              </property>
             </widget>
            </item>
@@ -386,26 +362,6 @@
              </item>
             </widget>
            </item>
-           <item row="2" column="0">
-            <widget class="QLabel" name="label_10">
-             <property name="text">
-              <string>Use HS</string>
-             </property>
-             <property name="textInteractionFlags">
-              <set>Qt::TextBrowserInteraction</set>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <widget class="QLabel" name="label_8">
-             <property name="text">
-              <string>Theme</string>
-             </property>
-             <property name="textInteractionFlags">
-              <set>Qt::TextBrowserInteraction</set>
-             </property>
-            </widget>
-           </item>
            <item row="0" column="1">
             <widget class="QComboBox" name="comboBox_2">
              <property name="frame">
@@ -428,6 +384,16 @@
              </item>
             </widget>
            </item>
+           <item row="4" column="0">
+            <widget class="QLabel" name="label_49">
+             <property name="text">
+              <string>Font Name</string>
+             </property>
+             <property name="textInteractionFlags">
+              <set>Qt::TextBrowserInteraction</set>
+             </property>
+            </widget>
+           </item>
            <item row="3" column="0">
             <widget class="QLabel" name="label_11">
              <property name="text">
@@ -438,8 +404,35 @@
              </property>
             </widget>
            </item>
-           <item row="4" column="1">
-            <widget class="QFontComboBox" name="fontComboBox"/>
+           <item row="6" column="1">
+            <widget class="QCheckBox" name="checkBox">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="0">
+            <widget class="QLabel" name="label_13">
+             <property name="text">
+              <string>PlaceHolder...</string>
+             </property>
+             <property name="textInteractionFlags">
+              <set>Qt::TextBrowserInteraction</set>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="1">
+            <widget class="QCheckBox" name="checkBox_3">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
            </item>
            <item row="5" column="0">
             <widget class="QLabel" name="label_51">
@@ -451,8 +444,15 @@
              </property>
             </widget>
            </item>
-           <item row="5" column="1">
-            <widget class="QSpinBox" name="spinBox"/>
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_9">
+             <property name="text">
+              <string>ToxHS IP:</string>
+             </property>
+             <property name="textInteractionFlags">
+              <set>Qt::TextBrowserInteraction</set>
+             </property>
+            </widget>
            </item>
           </layout>
          </widget>
@@ -806,7 +806,7 @@
               <string>...</string>
              </property>
              <property name="icon">
-              <iconset>
+              <iconset resource="rcc.qrc">
                <normaloff>:/icons/icon_avatar_40.png</normaloff>:/icons/icon_avatar_40.png</iconset>
              </property>
              <property name="iconSize">
@@ -895,7 +895,7 @@
               <string>...</string>
              </property>
              <property name="icon">
-              <iconset>
+              <iconset resource="rcc.qrc">
                <normaloff>:/icons/online_30.png</normaloff>:/icons/online_30.png</iconset>
              </property>
              <property name="toolButtonStyle">
@@ -918,7 +918,7 @@
               <string>...</string>
              </property>
              <property name="icon">
-              <iconset>
+              <iconset resource="rcc.qrc">
                <normaloff>:/icons/power-button-off.png</normaloff>:/icons/power-button-off.png</iconset>
              </property>
              <property name="iconSize">
@@ -987,7 +987,7 @@
              <string>...</string>
             </property>
             <property name="icon">
-             <iconset>
+             <iconset resource="rcc.qrc">
               <normaloff>:/icons/remove-symbol_gray64.png</normaloff>:/icons/remove-symbol_gray64.png</iconset>
             </property>
             <property name="autoRaise">
@@ -1063,7 +1063,7 @@
              <string>...</string>
             </property>
             <property name="icon">
-             <iconset>
+             <iconset resource="rcc.qrc">
               <normaloff>:/icons/add-square-button-gray.png</normaloff>:/icons/add-square-button-gray.png</iconset>
             </property>
             <property name="iconSize">
@@ -1083,7 +1083,7 @@
              <string>...</string>
             </property>
             <property name="icon">
-             <iconset>
+             <iconset resource="rcc.qrc">
               <normaloff>:/icons/groupgray.png</normaloff>:/icons/groupgray.png</iconset>
             </property>
             <property name="iconSize">
@@ -1103,7 +1103,7 @@
              <string>...</string>
             </property>
             <property name="icon">
-             <iconset>
+             <iconset resource="rcc.qrc">
               <normaloff>:/icons/transfer_gray64.png</normaloff>:/icons/transfer_gray64.png</iconset>
             </property>
             <property name="iconSize">
@@ -1123,7 +1123,7 @@
              <string>...</string>
             </property>
             <property name="icon">
-             <iconset>
+             <iconset resource="rcc.qrc">
               <normaloff>:/icons/settings_gray64.png</normaloff>:/icons/settings_gray64.png</iconset>
             </property>
             <property name="iconSize">
@@ -1161,7 +1161,7 @@
               <string/>
              </property>
              <property name="pixmap">
-              <pixmap>:/icons/icon_avatar_40.png</pixmap>
+              <pixmap resource="rcc.qrc">:/icons/icon_avatar_40.png</pixmap>
              </property>
             </widget>
            </item>
@@ -1264,7 +1264,7 @@
                 <string>...</string>
                </property>
                <property name="icon">
-                <iconset>
+                <iconset resource="rcc.qrc">
                  <normaloff>:/icons/phone_mic_gray64.png</normaloff>:/icons/phone_mic_gray64.png</iconset>
                </property>
                <property name="iconSize">
@@ -1293,7 +1293,7 @@
                 <string>...</string>
                </property>
                <property name="icon">
-                <iconset>
+                <iconset resource="rcc.qrc">
                  <normaloff>:/icons/speaker_volume_gray64.png</normaloff>:/icons/speaker_volume_gray64.png</iconset>
                </property>
                <property name="iconSize">
@@ -1324,7 +1324,7 @@
               <string>...</string>
              </property>
              <property name="icon">
-              <iconset>
+              <iconset resource="rcc.qrc">
                <normaloff>:/icons/phone_call_gray64.png</normaloff>:/icons/phone_call_gray64.png</iconset>
              </property>
              <property name="iconSize">
@@ -1353,7 +1353,7 @@
               <string>...</string>
              </property>
              <property name="icon">
-              <iconset>
+              <iconset resource="rcc.qrc">
                <normaloff>:/icons/video_recorder_gray64.png</normaloff>:/icons/video_recorder_gray64.png</iconset>
              </property>
              <property name="iconSize">
@@ -1373,7 +1373,7 @@
               <string>...</string>
              </property>
              <property name="icon">
-              <iconset>
+              <iconset resource="rcc.qrc">
                <normaloff>:/icons/vertical-ellipsis_gray32.png</normaloff>:/icons/vertical-ellipsis_gray32.png</iconset>
              </property>
              <property name="iconSize">
@@ -1605,7 +1605,7 @@
              <string>...</string>
             </property>
             <property name="icon">
-             <iconset>
+             <iconset resource="rcc.qrc">
               <normaloff>:/icons/smile_gray64.png</normaloff>:/icons/smile_gray64.png</iconset>
             </property>
             <property name="iconSize">
@@ -1628,7 +1628,7 @@
              <string>&amp;Send</string>
             </property>
             <property name="icon">
-             <iconset>
+             <iconset resource="rcc.qrc">
               <normaloff>:/icons/cursor_gray64.png</normaloff>:/icons/cursor_gray64.png</iconset>
             </property>
             <property name="iconSize">
@@ -1685,7 +1685,7 @@
              <string>...</string>
             </property>
             <property name="icon">
-             <iconset>
+             <iconset resource="rcc.qrc">
               <normaloff>:/icons/snapshot@2x.png</normaloff>:/icons/snapshot@2x.png</iconset>
             </property>
             <property name="iconSize">
@@ -1711,7 +1711,7 @@
              <string>...</string>
             </property>
             <property name="icon">
-             <iconset>
+             <iconset resource="rcc.qrc">
               <normaloff>:/icons/paper-clip-outline_gray64.png</normaloff>:/icons/paper-clip-outline_gray64.png</iconset>
             </property>
             <property name="iconSize">
@@ -2156,7 +2156,7 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>98</width>
+             <width>346</width>
              <height>18</height>
             </rect>
            </property>
