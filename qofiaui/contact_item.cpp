@@ -6,7 +6,10 @@ ContactItem::ContactItem(QWidget* parent)
     : QWidget(parent) {
     uiw.setupUi(this);
 
+    uiw.label_3->clear();
     uiw.label_4->clear();
+    unread = 0;
+    uiw.label_4->setVisible(false);
 
     uiw.toolButton_2->installEventFilter(this);
     uiw.label_2->installEventFilter(this);
@@ -46,6 +49,18 @@ bool ContactItem::eventFilter(QObject *object, QEvent *event) {
         }
     }
     return false;
+}
+
+void ContactItem::upUnread() {
+    uiw.toolButton->setText(QString::number(unread));
+}
+void ContactItem::addUnread() {
+    unread ++;
+    upUnread();
+}
+void ContactItem::zeroUnread() {
+    unread = 0;
+    upUnread();
 }
 
 // void ContactItem::mousePressEvent(QMouseEvent *event) {

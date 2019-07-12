@@ -12,6 +12,17 @@ ContactForm::ContactForm(QWidget* parent)
 void ContactForm::prepui() {
     uiw.lineEdit_5->setVisible(false);
     uiw.lineEdit_6->setVisible(false);
+
+    updateTime();
+    auto tmer = new QTimer();
+    connect(tmer, &QTimer::timeout, this, &ContactForm::updateTime);
+    tmer->start(1000);
+}
+
+void ContactForm::updateTime() {
+    auto nowt = QDateTime::currentDateTime();
+    auto secstr = nowt.toString("HH:mm:ss  ");
+    uiw.label->setText(secstr);
 }
 
 void ContactForm:: SetSelfInfo(QString name, QString stmsg) {
@@ -27,7 +38,9 @@ void ContactForm::AddContactItem(QString uid, QString name, QString stmsg) {
     ctv->uiw.label_2->setText(name);
     // SetQLabelElideText(ctv->uiw.label_2,name,"..",true);
     // ctv->uiw.label_3->setText(stmsg);
-    SetQLabelElideText(ctv->uiw.label_3,stmsg,"..",true);
+    // SetQLabelElideText(ctv->uiw.label_3,stmsg,"..",true);
+    ctv->uiw.LabelLastMsgTime->clear();
+    ctv->uiw.toolButton->setText("0");
 
     connect(ctv, &ContactItem::clicked, this, &ContactForm::clicked, Qt::QueuedConnection);
     connect(ctv, &ContactItem::reqmenu, this, &ContactForm::showmenu);
@@ -35,10 +48,10 @@ void ContactForm::AddContactItem(QString uid, QString name, QString stmsg) {
     lo9->insertWidget(0, ctv);
 }
 
-void ContactForm::AddConferenceMessage(QString uid, QString msg) {
-    AddConferenceMessage1(uid,msg);
+void ContactForm::AddConferenceMessage(QString uid, QString msg, QString peername, QString timestr) {
+    AddConferenceMessage1(uid,msg, peername, timestr);
 }
-void ContactForm::AddConferenceMessage1(QString uid, QString msg) {
+void ContactForm::AddConferenceMessage1(QString uid, QString msg, QString peername, QString timestr) {
     auto lo9 = uiw.verticalLayout_9;
     int cnt = lo9->count();
 
@@ -52,8 +65,12 @@ void ContactForm::AddConferenceMessage1(QString uid, QString msg) {
             lo9->removeWidget(w);
             lo9->insertWidget(0, w);
         }
-        // w->uiw.label_4->setText(msg); // lastmsg
-        SetQLabelElideText(w->uiw.label_4,msg,"..",false);
+        // w->uiw.label_3->setText(msg); // lastmsg
+        SetQLabelElideText(w->uiw.label_3,msg,"..",false);
+        w->uiw.LabelLastMsgTime->setText(timestr);
+        if (uid != curuid) {
+            w->addUnread();
+        }
         break;
     }
 }

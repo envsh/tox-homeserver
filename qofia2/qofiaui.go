@@ -24,6 +24,8 @@ import (
 	"math/rand"
 	"strings"
 	"unsafe"
+
+	thscli "tox-homeserver/client"
 )
 
 func qofiaui_main() {
@@ -77,6 +79,14 @@ func onui_loadmsg_go(uid string, maxcnt int) string {
 	bcc, err := json.Marshal(imsgos)
 	gopp.ErrPrint(err, uid, maxcnt)
 	return string(bcc)
+}
+func msgo2cfmt(msgo *thscli.Message, uid string) []string {
+	var imsgo []string
+	imsgo = append(imsgo, msgo.MsgUi)
+	imsgo = append(imsgo, msgo.PeerNameUi)
+	imsgo = append(imsgo, msgo.TimeUi)
+	// imsgo = append(imsgo, uid)
+	return imsgo
 }
 func testmsg() []string {
 	var imsgo []string

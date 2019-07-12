@@ -255,6 +255,8 @@ func dispatchEvent(evto *thspbs.Event) {
 		_, _, _ = message, peerName, groupTitle
 		msgo := thscli.NewMessageForGroup(evto)
 		uictx.mdl.Newmsg(groupId, msgo)
+		msgo2 := msgo2cfmt(msgo, groupId)
+		evto.Margs = append(evto.Margs, msgo2...)
 
 		// raw message show area
 		// itext := fmt.Sprintf("%s@%s: %s", peerName, groupTitle, message)

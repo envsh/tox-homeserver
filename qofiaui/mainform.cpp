@@ -90,12 +90,14 @@ void MainForm::onlogin() {
 
 void MainForm::switchchat(QString uid, QWidget* that) {
     auto cti = (ContactItem*)that;
+    cti->zeroUnread();
     setform(UIST_MESSAGEUI);
     QString ctname = cti->uiw.label_2->text();
     QString ctstmsg = cti->uiw.label_3->text();
 
     auto msgform = (ChatForm*)getcurform();
     msgform->setandload(uid, ctname, ctstmsg);
+    ctform->curuid = cti->uid;
     malloc_trim(0);
 }
 
@@ -103,8 +105,10 @@ void MainForm::onback() {
     if (curuist == UIST_CONTACTUI) {
         return;
     }
+
     auto oldform = setform(UIST_CONTACTUI);
     wdelete (oldform);
+    ctform->curuid.clear();
 }
 
 void MainForm::qofiaui_cmdproc(QString cmdmsg) {
@@ -127,10 +131,13 @@ void MainForm::qofiaui_cmdproc(QString cmdmsg) {
     }else if (evtname == "AddGroupItem") {
         ctform->AddContactItem(jarr.at(1).toString(), jarr.at(2).toString(), jarr.at(3).toString());
     }else if (evtname == "ConferenceMessage") {
-        ctform->AddConferenceMessage(marr.at(3).toString(), jarr.at(3).toString());
+        ctform->AddConferenceMessage(marr.at(3).toString(), marr.at(8).toString(),
+                                     marr.at(9).toString(), marr.at(10).toString());
         if (curuist == UIST_MESSAGEUI) {
             auto msgform = (ChatForm*)getcurform();
-            msgform->AddConferenceMessage(marr.at(3).toString(), jarr.at(3).toString());
+            // msgform->AddConferenceMessage(marr.at(3).toString(), jarr.at(3).toString());
+            msgform->AddConferenceMessage(marr.at(3).toString(), marr.at(8).toString(),
+                                          marr.at(9).toString(), marr.at(10).toString());
         }
     }else {
         qInfo()<<"todo"<<evtname;

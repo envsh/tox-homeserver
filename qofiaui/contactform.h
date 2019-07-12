@@ -16,11 +16,12 @@ class ContactForm : public QWidget {
 
     void SetSelfInfo(QString name, QString stmsg);
     void AddContactItem(QString uid, QString name, QString stmsg);
-    void AddConferenceMessage(QString uid, QString msg);
-    void AddConferenceMessage1(QString uid, QString msg);
+    void AddConferenceMessage(QString uid, QString msg, QString peername, QString timestr);
+    void AddConferenceMessage1(QString uid, QString msg, QString peername, QString timestr);
 
 public slots:
     void showmenu(QString uid, QWidget* that, const QPoint &pos);
+    void updateTime();
 
 signals:
     void clicked(QString uid, QWidget* that);

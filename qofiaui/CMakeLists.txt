@@ -1,7 +1,8 @@
 project(qofiaui)
 cmake_minimum_required(VERSION 3.0)
 set(CMAKE_VERBOSE_MAKEFILE on)
-set(CMAKE_CXX_FLAGS "-g -O0 -std=c++11")
+# use -std=gnu++11 to fix pch error: trigraphs was enabled in PCH file but is currently disabled
+set(CMAKE_CXX_FLAGS "-g -O0 -std=gnu++11")
 #set(CMAKE_CXX_FLAGS "-O0 -std=c++11")
 set(CMAKE_CXX_COMPILER "clang++")
 set(CMAKE_BUILD_TYPE "Debug")
@@ -45,3 +46,9 @@ target_link_libraries(qofiaui Qt5::Widgets)
 
 add_executable(demo demo.cpp)
 target_link_libraries(demo qofiaui)
+
+# need set -std=gnu++11
+set (CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/../CMake")
+include(PrecompiledHeader)
+add_precompiled_header(qofiaui qthdrsrc.h FORCEINCLUDE)
+

@@ -128,7 +128,11 @@ func (dm *daemon) pollmsg() {
 		if err == nil {
 			dispatchEvent(evto)
 			// dispatchEventResp(evto)
+
+			// dispatchEvent will change evto for next step use
+			bcc2, err2 := json.Marshal(evto)
+			gopp.ErrPrint(err2)
+			dispatchEvent2c(string(bcc2))
 		}
-		dispatchEvent2c(string(bcc))
 	}
 }

@@ -20,19 +20,19 @@ void ChatForm::dtor() {
     }
 }
 
-void ChatForm::AddConferenceMessage(QString uid, QString msg) {
-    AddConferenceMessage1(uid,msg);
+void ChatForm::AddConferenceMessage(QString uid, QString msg, QString peername, QString timestr) {
+    AddConferenceMessage1(uid,msg,peername,timestr);
     if (uid == curuid) {
-        AddConferenceMessage2(uid,msg);
+        AddConferenceMessage2(uid,msg,peername, timestr);
     }
 }
-void ChatForm::AddConferenceMessage1(QString uid, QString msg) {
+void ChatForm::AddConferenceMessage1(QString uid, QString msg, QString peername, QString timestr) {
     if (uid != curuid) {
         SetQLabelElideText(uiw.label_7,msg,"..",false);
     }
 }
 // append to message list
-void ChatForm::AddConferenceMessage2(QString uid, QString msg) {
+void ChatForm::AddConferenceMessage2(QString uid, QString msg, QString peername, QString timestr) {
     auto vlo8 = uiw.verticalLayout_3;
     int curcnt = vlo8->count();
     if (curcnt >= maxmsgcnt) {
@@ -45,8 +45,8 @@ void ChatForm::AddConferenceMessage2(QString uid, QString msg) {
     vlo8->addWidget(msgv);
 
     msgv->uiw.label_5->setText(msg);
-    // msgv->uiw.LabelUserName4MessageItem->setText(msgo.at(1).toString());
-    // msgv->uiw.LabelMsgTime->setText(msgo.at(2).toString());
+    msgv->uiw.LabelUserName4MessageItem->setText(peername);
+    msgv->uiw.LabelMsgTime->setText(timestr);
 
     uiw.LabelMsgCount2->setText(QString::number(curcnt+1));
 }

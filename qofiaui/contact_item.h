@@ -14,7 +14,11 @@ class ContactItem : public QWidget {
     QString uid;
     QDateTime prtime;
     bool selected;
+    int unread;
 
+    void upUnread();
+    void addUnread();
+    void zeroUnread();
  signals:
     void clicked(QString uid, QWidget* that);
     void reqmenu(QString uid, QWidget* that, const QPoint &pos);

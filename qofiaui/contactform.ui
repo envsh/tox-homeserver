@@ -203,6 +203,13 @@
       <number>6</number>
      </property>
      <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QLineEdit" name="lineEdit">
        <property name="placeholderText">
         <string>Filter...</string>
@@ -315,6 +322,9 @@
      </property>
      <item>
       <widget class="QToolButton" name="toolButton_4">
+       <property name="toolTip">
+        <string>Add Friend</string>
+       </property>
        <property name="text">
         <string>...</string>
        </property>
@@ -335,6 +345,9 @@
      </item>
      <item>
       <widget class="QToolButton" name="toolButton_5">
+       <property name="toolTip">
+        <string>Add Group</string>
+       </property>
        <property name="text">
         <string>...</string>
        </property>
@@ -355,6 +368,9 @@
      </item>
      <item>
       <widget class="QToolButton" name="toolButton_6">
+       <property name="toolTip">
+        <string>File Transfer</string>
+       </property>
        <property name="text">
         <string>...</string>
        </property>
@@ -375,6 +391,9 @@
      </item>
      <item>
       <widget class="QToolButton" name="toolButton_7">
+       <property name="toolTip">
+        <string>Preferences</string>
+       </property>
        <property name="text">
         <string>...</string>
        </property>
