@@ -108,6 +108,14 @@ func (this *BaseInfo) GetGroup(grpnum uint32) *GroupInfo {
 	}
 	return nil
 }
+func (this *BaseInfo) GetGroupById(groupId string) *GroupInfo {
+	for _, grpo := range this.Groups {
+		if grpo.GroupId == groupId {
+			return grpo
+		}
+	}
+	return nil
+}
 
 func (this *BaseInfo) AddGroup(grpnum uint32, grpid string) bool {
 	if this.HasGroup(grpnum) {

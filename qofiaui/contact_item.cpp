@@ -10,6 +10,7 @@ ContactItem::ContactItem(QWidget* parent)
     uiw.label_4->clear();
     unread = 0;
     uiw.label_4->setVisible(false);
+    uiw.toolButton->setIconSize(QSize(12,12));
 
     uiw.toolButton_2->installEventFilter(this);
     uiw.label_2->installEventFilter(this);
@@ -18,6 +19,7 @@ ContactItem::ContactItem(QWidget* parent)
     uiw.label_4->installEventFilter(this);
     uiw.toolButton->installEventFilter(this);
 }
+
 
 bool ContactItem::event(QEvent *event) {
     return QWidget::event(event);
@@ -61,6 +63,10 @@ void ContactItem::addUnread() {
 void ContactItem::zeroUnread() {
     unread = 0;
     upUnread();
+}
+void ContactItem::setOnline(bool on) {
+    QString icofile = on ? ":/icons/online_30.png" : ":/icons/offline_2x.png";
+    uiw.toolButton->setIcon(QIcon(icofile));
 }
 
 // void ContactItem::mousePressEvent(QMouseEvent *event) {

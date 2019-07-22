@@ -18,6 +18,8 @@ class ContactForm : public QWidget {
     void AddContactItem(QString uid, QString name, QString stmsg);
     void AddConferenceMessage(QString uid, QString msg, QString peername, QString timestr);
     void AddConferenceMessage1(QString uid, QString msg, QString peername, QString timestr);
+    void setOnline(QString uid, bool on);
+    QWidget* findContactItem(QString uid);
 
 public slots:
     void showmenu(QString uid, QWidget* that, const QPoint &pos);

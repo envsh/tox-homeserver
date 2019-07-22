@@ -40,7 +40,7 @@ func qofiaui_main() {
 	C.qofiaui_main(unsafe.Pointer(&uictx))
 }
 
-const uicmdsep = "/"
+const uicmdsep = "|"
 
 //export onui_command
 func onui_command(cmdc *C.char) {
@@ -53,6 +53,16 @@ func onui_command_go(cmdmsg string) {
 	switch args[0] {
 	case "login":
 		go dm.initAppBackend()
+	case "sendmsg":
+		uid := args[1]
+		msg := args[2]
+		frndnum, err := dm.vtcli.FriendByPublicKey(uid)
+		grpo := dm.vtcli.Binfo.GetGroupById(uid)
+		if grpo != nil {
+			dm.vtcli.ConferenceSendMessage(grpo.Gnum, 0, msg, 0)
+		} else if err == nil {
+			dm.vtcli.FriendSendMessage(frndnum, msg, 0)
+		}
 	}
 }
 

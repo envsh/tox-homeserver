@@ -24,6 +24,7 @@ extern "C" {
 
 void uion_command(QString cmd);
 
+#define uicmdsep "|"
 const int maxmsgcnt = 500; // 最多显示消息个数，每个联系人
 enum {
       UIST_QMLMCTRL = 0                   ,

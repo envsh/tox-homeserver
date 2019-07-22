@@ -15,6 +15,8 @@ class ChatForm  : public QWidget {
     virtual ~ChatForm();
     void dtor();
 
+    void sendmsg();
+
     void AddConferenceMessage(QString uid, QString msg, QString peername, QString timestr);
     void AddConferenceMessage1(QString uid, QString msg, QString peername, QString timestr);
     void AddConferenceMessage2(QString uid, QString msg, QString peername, QString timestr);

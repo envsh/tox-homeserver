@@ -81,9 +81,9 @@ void MainForm::onlogin() {
     qInfo()<<"logining...";
     auto w = (LoginForm*)setform(UIST_CONTACTUI);
 
-    QString cmd = "login/";
-    cmd += w->uiw.comboBox_6->currentText();
-    uion_command(cmd);
+    QStringList cmd = {"login"};
+    cmd << w->uiw.comboBox_6->currentText();
+    uion_command(cmd.join(uicmdsep));
 
     wdelete(w);
 }
@@ -139,6 +139,11 @@ void MainForm::qofiaui_cmdproc(QString cmdmsg) {
             msgform->AddConferenceMessage(marr.at(3).toString(), marr.at(8).toString(),
                                           marr.at(9).toString(), marr.at(10).toString());
         }
+    }else if (evtname == "FriendMessage") {
+        // ctform->AddFriendMessage();
+    }else if (evtname == "FriendConnectionStatus") {
+        bool on = jarr.at(1).toString() != "0";
+        ctform->setOnline(marr.at(1).toString(), on);
     }else {
         qInfo()<<"todo"<<evtname;
     }

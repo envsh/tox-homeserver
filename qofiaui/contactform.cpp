@@ -75,6 +75,27 @@ void ContactForm::AddConferenceMessage1(QString uid, QString msg, QString peerna
     }
 }
 
+QWidget* ContactForm::findContactItem(QString uid) {
+    auto lo9 = uiw.verticalLayout_9;
+    int cnt = lo9->count();
+
+    for (int i = 0; i < cnt; i++) {
+        auto witem = lo9->itemAt(i);
+        auto w = (ContactItem*)witem->widget();
+        if (w->uid != uid) {
+            continue;
+        }
+
+        return w;
+    }
+    return nullptr;
+}
+
 void ContactForm::showmenu(QString uid, QWidget* that, const QPoint &pos) {
     qInfo()<<uid<<that<<pos;
+}
+
+void ContactForm::setOnline(QString uid, bool on) {
+    auto w = (ContactItem*)findContactItem(uid);
+    w->setOnline(on);
 }

@@ -6,6 +6,8 @@
 ChatForm::ChatForm(QWidget* parent)  :  QWidget(parent)
 {
     uiw.setupUi(this);
+
+    connect(uiw.toolButton_18, &QToolButton::clicked, this, &ChatForm::sendmsg);
 }
 
 ChatForm::~ChatForm() { dtor(); }
@@ -18,6 +20,15 @@ void ChatForm::dtor() {
         wdelete(w);
         delete item;
     }
+}
+
+void ChatForm::sendmsg() {
+    auto msg = uiw.textEdit_3->toPlainText();
+    uiw.textEdit_3->clear();
+    if (msg.isEmpty()) return;
+    QStringList cmd = {"sendmsg", curuid};
+    cmd << msg;
+    uion_command(cmd.join(uicmdsep));
 }
 
 void ChatForm::AddConferenceMessage(QString uid, QString msg, QString peername, QString timestr) {

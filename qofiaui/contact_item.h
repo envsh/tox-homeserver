@@ -19,6 +19,7 @@ class ContactItem : public QWidget {
     void upUnread();
     void addUnread();
     void zeroUnread();
+    void setOnline(bool on);
  signals:
     void clicked(QString uid, QWidget* that);
     void reqmenu(QString uid, QWidget* that, const QPoint &pos);

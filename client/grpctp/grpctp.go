@@ -16,9 +16,11 @@ import (
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
+	_ "google.golang.org/grpc/encoding/gzip"
 	"google.golang.org/grpc/keepalive"
 )
 
+// must import 	_ "google.golang.org/grpc/encoding/gzip"
 func init() {
 	tp := NewGrpcTransport()
 	transport.RegisterTransport("grpc", tp)
