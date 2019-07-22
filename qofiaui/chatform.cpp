@@ -8,6 +8,24 @@ ChatForm::ChatForm(QWidget* parent)  :  QWidget(parent)
     uiw.setupUi(this);
 
     connect(uiw.toolButton_18, &QToolButton::clicked, this, &ChatForm::sendmsg);
+
+    ccstate.isBottom = true;
+    auto sa2vb = uiw.scrollArea_2->verticalScrollBar();
+    connect(sa2vb, &QScrollBar::rangeChanged,
+            [this,sa2vb](int min, int max) {
+                int curpos = sa2vb->value();
+                if (ccstate.isBottom && curpos < max) {
+                    sa2vb->setValue(max);
+                }
+                ccstate.maxpos = max;
+            });
+    connect(sa2vb, &QScrollBar::valueChanged,
+            [this](int value){
+                ccstate.curpos = value;
+                int maxval = ccstate.maxpos;
+                ccstate.isBottom = value >= maxval ? true : false;
+                ccstate.maxpos = value > maxval ? value : maxval;
+            });
 }
 
 ChatForm::~ChatForm() { dtor(); }
@@ -31,10 +49,17 @@ void ChatForm::sendmsg() {
     uion_command(cmd.join(uicmdsep));
 }
 
+void ChatForm::scrollEnd() {
+    if (!ccstate.isBottom) {return;}
+    auto sb = uiw.scrollArea_2->verticalScrollBar();
+    sb->setValue(ccstate.maxpos);
+}
+
 void ChatForm::AddConferenceMessage(QString uid, QString msg, QString peername, QString timestr) {
     AddConferenceMessage1(uid,msg,peername,timestr);
     if (uid == curuid) {
         AddConferenceMessage2(uid,msg,peername, timestr);
+        scrollEnd();
     }
 }
 void ChatForm::AddConferenceMessage1(QString uid, QString msg, QString peername, QString timestr) {

@@ -3,16 +3,17 @@
 
 #include "ui_untitled.h"
 
-class contentAreaState {
- public:
-    bool isBottom;
-    int curpos;
-    int maxpos;
-};
 
 class MainWin : public QMainWindow {
     Q_OBJECT;
  public:
+    class contentAreaState {
+    public:
+        bool isBottom;
+        int curpos;
+        int maxpos;
+    };
+
     MainWin (QWidget* parent=nullptr);
     void prepui();
 

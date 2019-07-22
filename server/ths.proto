@@ -30,6 +30,7 @@ message Event {
     bytes Json = 12;
     string DeviceUuid = 13;
     BaseInfo Binfo = 14;
+    string protocol = 15;
 }
 
 // like a union struct. collect all possible arguments name
