@@ -13,12 +13,12 @@ import (
 )
 
 // should block
-func (dm *daemon) initAppBackend() {
+func (dm *daemon) initAppBackend(srvurl string) {
 	// mech, uiw := uictx.mech, uictx.uiw
 
 	// TODO maybe do not read/write ui in goroutine
 	// srvurl := uiw.ComboBox_6.CurrentText()
-	srvurl := "127.0.0.1:2080"
+	srvurl = gopp.IfElseStr(srvurl == "", "127.0.0.1:2080", srvurl)
 	err := thscli.AppConnect(srvurl)
 	gopp.ErrPrint(err, srvurl)
 	if err != nil {

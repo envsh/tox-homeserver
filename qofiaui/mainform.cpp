@@ -144,6 +144,10 @@ void MainForm::qofiaui_cmdproc(QString cmdmsg) {
     }else if (evtname == "FriendConnectionStatus") {
         bool on = jarr.at(1).toString() != "0";
         ctform->setOnline(marr.at(1).toString(), on);
+    }else if (evtname == "brokenrpc") {
+        ctform->setOnline("", false);
+    }else if (evtname == "goodrpc") {
+        ctform->setOnline("", true);
     }else {
         qInfo()<<"todo"<<evtname;
     }

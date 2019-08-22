@@ -96,6 +96,14 @@ void ContactForm::showmenu(QString uid, QWidget* that, const QPoint &pos) {
 }
 
 void ContactForm::setOnline(QString uid, bool on) {
-    auto w = (ContactItem*)findContactItem(uid);
-    w->setOnline(on);
+    if (!uid.isEmpty()) {
+        auto w = (ContactItem*)findContactItem(uid);
+        w->setOnline(on);
+    }else{
+        if (on) {
+            uiw.toolButton->setIcon(QIcon(":/icons/online_30.png"));
+        }else{
+            uiw.toolButton->setIcon(QIcon(":/icons/offline_2x.png"));
+        }
+    }
 }

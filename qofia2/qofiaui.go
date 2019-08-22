@@ -48,11 +48,11 @@ func onui_command(cmdc *C.char) {
 	onui_command_go(cmd)
 }
 func onui_command_go(cmdmsg string) {
-	log.Println(cmdmsg)
 	args := strings.Split(cmdmsg, uicmdsep)
+	log.Println(cmdmsg, args)
 	switch args[0] {
 	case "login":
-		go dm.initAppBackend()
+		go dm.initAppBackend(args[1])
 	case "sendmsg":
 		uid := args[1]
 		msg := args[2]
