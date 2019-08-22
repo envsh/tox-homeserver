@@ -5,7 +5,7 @@ set(CMAKE_VERBOSE_MAKEFILE on)
 set(CMAKE_CXX_FLAGS "-g -O0 -std=gnu++11")
 #set(CMAKE_CXX_FLAGS "-O0 -std=c++11")
 set(CMAKE_CXX_COMPILER "clang++")
-set(CMAKE_BUILD_TYPE "Debug")
+#set(CMAKE_BUILD_TYPE "Debug")
 
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
