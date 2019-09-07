@@ -136,7 +136,7 @@ void MainForm::qofiaui_cmdproc(QString cmdmsg) {
         if (curuist == UIST_MESSAGEUI) {
             auto msgform = (ChatForm*)getcurform();
             // msgform->AddConferenceMessage(marr.at(3).toString(), jarr.at(3).toString());
-            msgform->AddConferenceMessage(marr.at(3).toString(), marr.at(8).toString(),
+            msgform->AddConferenceMessage(marr.at(3).toString(), marr.at(11).toString(),
                                           marr.at(9).toString(), marr.at(10).toString());
         }
     }else if (evtname == "FriendMessage") {

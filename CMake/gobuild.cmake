@@ -1,4 +1,7 @@
 
+### Note
+# Now this is *nix/*bsd only
+
 ### example
 # gobuild(qofia2 ../qofia2/ # b.go
 #  ARGS -v -i -p 1
@@ -32,14 +35,21 @@ function(GOBUILD TARGET PKGORFILES)
     set(depfiles "${depfile} ${depfiles}")
   endforeach()
   string(REGEX REPLACE " $" "" depfiles "${depfiles}")
+  if("${depfiles}" STREQUAL  "")
+    # case for nodeps
+    set(depfiles "${TARGET}-nodeps")
+  endif()
   set(depsumsfile "${TARGET}_depsums.go")
 
   set(godir ${PKGORFILES})
   if(NOT IS_DIRECTORY ${PKGORFILES})
-    foreach(file ${PKGORFILES})
-      get_filename_component(godir ${file} DIRECTORY)
+    string(REPLACE " " ";" FLST ${PKGORFILES})
+    foreach(file ${FLST})
+      get_filename_component(fdir ${file} DIRECTORY)
+      set(godir "${CMAKE_CURRENT_SOURCE_DIR}/${fdir}") # fix empty godir
       break()
     endforeach()
+    set(PKGORFILES "${PKGORFILES} ${depsumsfile}")
   endif()
 
   set(gogrepv "")
@@ -66,7 +76,7 @@ function(GOBUILD TARGET PKGORFILES)
     COMMAND ${CMAKE_COMMAND} -E remove -f ${${TARGET}_TEST_FLAG_FILE}
     COMMAND echo "package main" > ${depsumsfile} # TODO package name not always main
     COMMAND echo "\\/\\*" >> ${depsumsfile}
-    COMMAND md5sum ${depfiles} >> ${depsumsfile}
+    COMMAND md5sum "${depfiles}" >> ${depsumsfile} 2>&1 || true
     COMMAND echo "\\*\\/" >> ${depsumsfile}
 
     COMMAND ${CMAKE_COMMAND} -E rename ${depsumsfile} ${godir}/${depsumsfile}
@@ -80,6 +90,8 @@ function(GOBUILD TARGET PKGORFILES)
     ${CMAKE_BINARY_DIR}/${GOBUILD_BINNAME}
     ${CMAKE_BINARY_DIR}/${gomkfile}
     ${CMAKE_BINARY_DIR}/${${TARGET}_TEST_FLAG_FILE}
+    ${TARGET}_GOBUILD.PASS1.log
+    ${TARGET}_GOBUILD.PASS2.log
     )
 endfunction(GOBUILD)
 

@@ -197,12 +197,16 @@ func (this *Message) refmtmsgRUser() {
 		this.LastMsgUi = newMsg
 	}
 }
-func (this *Message) refmtmsgLink() {
+func (this *Message) RefmtToHtml() string {
 	urls := xurls.Strict().FindAllString(this.MsgUi, -1)
 	s := this.MsgUi
 	for _, u := range urls {
 		s = strings.Replace(s, u, fmt.Sprintf(`<a href="%s">%s</a>`, u, u), -1)
 	}
+	return s
+}
+func (this *Message) refmtmsgLink() {
+	s := this.RefmtToHtml()
 	this.MsgUi = s
 }
 func (this *Message) findmsgLinks() {

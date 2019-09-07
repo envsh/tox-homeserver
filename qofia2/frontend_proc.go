@@ -10,6 +10,7 @@ import (
 	"tox-homeserver/thspbs"
 )
 
+// 在这个版本中，该处理器的作用是变换event，供qtui直接使用，让C++代码处理少一些
 func dispatchEvent(evto *thspbs.Event) {
 	uictx := dm
 

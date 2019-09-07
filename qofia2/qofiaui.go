@@ -81,6 +81,8 @@ func onui_loadmsg_go(uid string, maxcnt int) string {
 		imsgo = append(imsgo, msgo.MsgUi)
 		imsgo = append(imsgo, msgo.PeerNameUi)
 		imsgo = append(imsgo, msgo.TimeUi)
+		imsgo = append(imsgo, msgo.RefmtToHtml())
+		imsgo = msgargsfill(imsgo)
 		imsgos = append(imsgos, imsgo)
 	}
 	// for len(imsgos) < maxcnt {
@@ -95,8 +97,19 @@ func msgo2cfmt(msgo *thscli.Message, uid string) []string {
 	imsgo = append(imsgo, msgo.MsgUi)
 	imsgo = append(imsgo, msgo.PeerNameUi)
 	imsgo = append(imsgo, msgo.TimeUi)
+	imsgo = append(imsgo, msgo.RefmtToHtml())
 	// imsgo = append(imsgo, uid)
+	imsgo = msgargsfill(imsgo)
 	return imsgo
+}
+
+// 填满固定个数
+func msgargsfill(msgo []string) []string {
+	const num = 10
+	for i := 0; i < num-len(msgo); i++ {
+		msgo = append(msgo, "")
+	}
+	return msgo
 }
 func testmsg() []string {
 	var imsgo []string

@@ -112,7 +112,8 @@ void ChatForm::setandload(QString uid, QString ctname, QString ctstmsg) {
         auto msgv = new MessageItem();
         vlo8->addWidget(msgv);
 
-        msgv->uiw.label_5->setText(msgo.at(0).toString());
+        // msgv->uiw.label_5->setText(msgo.at(0).toString());
+        msgv->uiw.label_5->setText(msgo.at(3).toString()); // html format
         msgv->uiw.LabelUserName4MessageItem->setText(msgo.at(1).toString());
         msgv->uiw.LabelMsgTime->setText(msgo.at(2).toString());
     }
